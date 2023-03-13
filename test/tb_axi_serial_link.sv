@@ -123,8 +123,8 @@ module tb_axi_serial_link();
   ) i_serial_link_1 (
       .clk_i          ( clk_1           ),
       .rst_ni         ( rst_1_n         ),
-      .clk_reg_i      ( clk_1         ),
-      .rst_reg_ni     ( rst_1_n       ),
+      .clk_reg_i      ( clk_reg         ),
+      .rst_reg_ni     ( rst_reg_n       ),
       .testmode_i     ( 1'b0            ),
       .axi_in_req_i   ( axi_in_req_1    ),
       .axi_in_rsp_o   ( axi_in_rsp_1    ),
@@ -155,8 +155,8 @@ module tb_axi_serial_link();
   ) i_serial_link_2 (
       .clk_i          ( clk_2           ),
       .rst_ni         ( rst_2_n         ),
-      .clk_reg_i      ( clk_2         ),
-      .rst_reg_ni     ( rst_2_n       ),
+      .clk_reg_i      ( clk_reg         ),
+      .rst_reg_ni     ( rst_reg_n       ),
       .testmode_i     ( 1'b0            ),
       .axi_in_req_i   ( axi_in_req_2    ),
       .axi_in_rsp_o   ( axi_in_rsp_2    ),
