@@ -117,8 +117,8 @@ module tb_axi_serial_link();
     .r_chan_t         ( axi_r_chan_t    ),
     .cfg_req_t        ( cfg_req_t       ),
     .cfg_rsp_t        ( cfg_rsp_t       ),
-    .NumChannels      ( NumChannels  ),
-    .NumLanes         ( NumLanes     ),
+    .NumChannels      ( NumChannels     ),
+    .NumLanes         ( NumLanes        ),
     .MaxClkDiv        ( MaxClkDiv       )
   ) i_serial_link_1 (
       .clk_i          ( clk_1           ),
@@ -149,8 +149,8 @@ module tb_axi_serial_link();
     .r_chan_t         ( axi_r_chan_t    ),
     .cfg_req_t        ( cfg_req_t       ),
     .cfg_rsp_t        ( cfg_rsp_t       ),
-    .NumChannels      ( NumChannels  ),
-    .NumLanes         ( NumLanes     ),
+    .NumChannels      ( NumChannels     ),
+    .NumLanes         ( NumLanes        ),
     .MaxClkDiv        ( MaxClkDiv       )
   ) i_serial_link_2 (
       .clk_i          ( clk_2           ),
