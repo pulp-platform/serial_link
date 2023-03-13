@@ -28,13 +28,15 @@ import serial_link_pkg::*;
   parameter int NumChannels = serial_link_pkg::NumChannels,
   parameter int NumLanes = serial_link_pkg::NumLanes,
   parameter int MaxClkDiv = serial_link_pkg::MaxClkDiv,
+  parameter bit NoRegCdc = 1'b0,
   localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1
 ) (
   // There are 3 different clock/resets:
   // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
-  // 2) clk_sl_i & rst_sl_ni: Same as 1) but clock is gated and reset is SW synchronized.
-  // 3) clk_reg_i & rst_reg_ni: peripheral clock and reset. Only connected to RegBus CDC
-  // W/o clock gating, reset synchronization -> tie clk_sl_i to clk_i resp. rst_sl_ni to rst_ni
+  // 2) clk_sl_i & rst_sl_ni: Same as 1) but clock is gated and reset is SW synchronized. This is the clock that drives the serial link
+  //    i.e. network, data-link and physical layer all run on this clock and can be clock gated if needed. If no clock gating, reset synchronization
+  //    is desired, you can tie clk_sl_i -> clk_i resp. rst_sl_ni -> rst_ni
+  // 3) clk_reg_i & rst_reg_ni: peripheral clock and reset. Only connected to RegBus CDC. If NoRegCdc is set, this clock must be the same as 1)
   input  logic                      clk_i,
   input  logic                      rst_ni,
   input  logic                      clk_sl_i,
@@ -311,20 +313,25 @@ import serial_link_pkg::*;
   //   CONFIGURATION REGISTERS   //
   /////////////////////////////////
 
-  reg_cdc #(
-    .req_t  ( cfg_req_t ),
-    .rsp_t  ( cfg_rsp_t )
-  ) i_cdc_cfg (
-    .src_clk_i  ( clk_reg_i   ),
-    .src_rst_ni ( rst_reg_ni  ),
-    .src_req_i  ( cfg_req_i   ),
-    .src_rsp_o  ( cfg_rsp_o   ),
+  if (!NoRegCdc) begin : gen_reg_cdc
+    reg_cdc #(
+      .req_t  ( cfg_req_t ),
+      .rsp_t  ( cfg_rsp_t )
+    ) i_cdc_cfg (
+      .src_clk_i  ( clk_reg_i   ),
+      .src_rst_ni ( rst_reg_ni  ),
+      .src_req_i  ( cfg_req_i   ),
+      .src_rsp_o  ( cfg_rsp_o   ),
 
-    .dst_clk_i  ( clk_i       ),
-    .dst_rst_ni ( rst_ni      ),
-    .dst_req_o  ( cfg_req     ),
-    .dst_rsp_i  ( cfg_rsp     )
-  );
+      .dst_clk_i  ( clk_i       ),
+      .dst_rst_ni ( rst_ni      ),
+      .dst_req_o  ( cfg_req     ),
+      .dst_rsp_i  ( cfg_rsp     )
+    );
+  end else begin : gen_no_reg_cdc
+    assign cfg_req = cfg_req_i;
+    assign cfg_rsp_o = cfg_rsp;
+  end
 
   if (NumChannels == 1) begin : gen_single_channel_cfg_regs
     serial_link_single_channel_reg_top #(
