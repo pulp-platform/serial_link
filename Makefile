@@ -4,11 +4,10 @@
 
 # Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-GIT 		?= git
 BENDER 		?= bender
-VSIM 		?= vsim
+VSIM 		  ?= vsim
 REGGEN 		?= $(shell ${BENDER} path register_interface)/vendor/lowrisc_opentitan/util/regtool.py
-WORK 		?= work
+WORK 		  ?= work
 
 all: compile_questa
 
@@ -64,7 +63,7 @@ VSIM_FLAGS += $(RUN_ARGS)
 
 ifeq ($(GUI), true)
 	VSIM_FLAGS += -voptargs=+acc
-	VSIM_FLAGS += -do "log -r /*; do util/serial_link_wave.do; run -all"
+	VSIM_FLAGS += -do "log -r /*; do util/serial_link_wave.tcl; run -all"
 else
 	VSIM_FLAGS += -c
 	VSIM_FLAGS += -do "run -all; exit"

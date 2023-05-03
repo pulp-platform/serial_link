@@ -19,7 +19,7 @@ The link uses [bender](https://github.com/pulp-platform/bender) to manage its de
 
 ### Simulation
 The Serial Link can be simulated in QuestaSim with the following steps:
-```
+```sh
 # To compile the link, run the following command:
 make all
 # Run the simulation. This will start the simulation in batch mode.
