@@ -63,7 +63,7 @@ VSIM_FLAGS += $(RUN_ARGS)
 
 ifeq ($(GUI), true)
 	VSIM_FLAGS += -voptargs=+acc
-	VSIM_FLAGS += -do "log -r /*; do util/serial_link_wave.do; run -all"
+	VSIM_FLAGS += -do "log -r /*; do util/serial_link_wave.tcl; run -all"
 else
 	VSIM_FLAGS += -c
 	VSIM_FLAGS += -do "run -all; exit"
