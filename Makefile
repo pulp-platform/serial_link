@@ -4,10 +4,17 @@
 
 # Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
+GIT 		?= git
 BENDER 		?= bender
-VSIM 		  ?= vsim
+VSIM 		?= questa-2022.3 vsim
 REGGEN 		?= $(shell ${BENDER} path register_interface)/vendor/lowrisc_opentitan/util/regtool.py
-WORK 		  ?= work
+WORK 		?= work
+
+.PHONY: sim sim_c
+sim: compile_questa	run_questa_gui
+
+sim_c: compile_questa run_questa
+
 
 all: compile_questa
 
@@ -48,6 +55,7 @@ update-regs: src/regs/*.hjson
 # --------------
 
 TB_DUT ?= tb_axi_serial_link
+WaveDo ?= serial_link
 
 BENDER_FLAGS := -t test -t simulation
 
@@ -63,13 +71,13 @@ VSIM_FLAGS += $(RUN_ARGS)
 
 ifeq ($(GUI), true)
 	VSIM_FLAGS += -voptargs=+acc
-	VSIM_FLAGS += -do "log -r /*; do util/serial_link_wave.tcl; run -all"
+	VSIM_FLAGS += -do "log -r /*; do util/$(WaveDo)_wave.do; run -all"
 else
 	VSIM_FLAGS += -c
 	VSIM_FLAGS += -do "run -all; exit"
 endif
 
-.PHONY: compile_questa clean_questa run_questa
+.PHONY: compile_questa clean_questa run_questa run_questa_gui
 
 scripts/compile_vsim.tcl: Bender.lock
 	@mkdir -p scripts
@@ -86,6 +94,8 @@ else
 	$(VSIM) -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log
 endif
 	@! grep -P "Errors: [1-9]*," $(dir $<)vsim.log
+	@echo GrepAnalysis
+	@cat $(dir $<)vsim.log | grep --color -e Error -e Warning
 
 clean_questa:
 	@rm -rf scripts/compile_vsim.tcl
@@ -95,9 +105,15 @@ clean_questa:
 	@rm -rf modelsim.ini
 	@rm -rf *.vstf
 	@rm -rf scripts/vsim.log
+	@rm -rf scripts/vsim_consoleSimulation.log
 
 run_questa:
-	$(VSIM) $(VSIM_FLAGS)
+	$(VSIM) $(VSIM_FLAGS) | tee $(dir $<)vsim_consoleSimulation.log
+	@echo GrepAnalysis
+	@cat $(dir $<)vsim_consoleSimulation.log | grep --color -e Error -e Warning	
+
+run_questa_gui:
+	$(VSIM) $(TB_DUT) -work $(WORK) $(RUN_ARGS) -voptargs=+acc -do "log -r /*; do util/$(WaveDo)_wave.do; echo \"Expected stop time is 26,389,950 ns\"; run -all"
 
 
 # --------------
