@@ -62,7 +62,6 @@ sources:
 
     - target: simulation
       files:
-      - test/axi_channel_compare.sv
       - test/tb_axi_serial_link.sv
       - test/tb_floo_serial_link.sv
       - test/tb_floo_noc_bridge.sv

@@ -150,9 +150,10 @@ module tb_floo_noc_bridge;
     .req_t      ( axi_in_req_t     ),
     .resp_t     ( axi_in_resp_t    )
   ) i_axi_channel_compare_0 (
-    .clk_i      ( clk               ),
-    .axi_a_req  ( node_man_req[0]   ),
-    .axi_a_res  ( node_man_rsp[0]   ),
+    .clk_a_i    ( clk                  ),
+    .clk_b_i    ( clk                  ),
+    .axi_a_req  ( node_man_req[0]      ),
+    .axi_a_res  ( node_man_rsp[0]      ),
     .axi_b_req  ( sub_req_id_mapped[1] ),
     .axi_b_res  ( sub_rsp_id_mapped[1] )
   );
@@ -293,9 +294,10 @@ module tb_floo_noc_bridge;
     .req_t      ( axi_in_req_t     ),
     .resp_t     ( axi_in_resp_t    )
   ) i_axi_channel_compare_1 (
-    .clk_i(clk),
-    .axi_a_req  ( node_man_req[1] ),
-    .axi_a_res  ( node_man_rsp[1] ),
+    .clk_a_i    ( clk                  ),
+    .clk_b_i    ( clk                  ),
+    .axi_a_req  ( node_man_req[1]      ),
+    .axi_a_res  ( node_man_rsp[1]      ),
     .axi_b_req  ( sub_req_id_mapped[0] ),
     .axi_b_res  ( sub_rsp_id_mapped[0] )
   );
