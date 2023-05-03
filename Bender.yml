@@ -44,6 +44,10 @@ sources:
     - src/serial_link_data_link.sv
     - src/serial_link_physical.sv
 
+    # NoC-bridge versions
+    - src/floo_axis_noc_bridge.sv
+    - src/floo_axis_noc_bridge_withArbitration.sv
+
     # Serial Link Wrapper
     - src/axi_serial_link.sv
     - src/floo_serial_link.sv
@@ -61,6 +65,7 @@ sources:
       - test/axi_channel_compare.sv
       - test/tb_axi_serial_link.sv
       - test/tb_floo_serial_link.sv
+      - test/tb_floo_noc_bridge.sv
       - test/tb_ch_calib_serial_link.sv
       - test/tb_stream_chopper.sv
       - test/tb_stream_chopper_dechopper.sv
