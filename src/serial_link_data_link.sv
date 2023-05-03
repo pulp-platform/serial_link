@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: SHL-0.51
 
 // Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
+// Modified: Yannick Baumann <baumanny@student.ethz.ch>
 
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
@@ -22,7 +23,14 @@ import serial_link_pkg::*;
   parameter int RawModeFifoDepth = 8,
   parameter int PayloadSplits = -1,
   localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1,
-  localparam int unsigned Log2RawModeFifoDepth = $clog2(RawModeFifoDepth)
+  localparam int unsigned Log2RawModeFifoDepth = $clog2(RawModeFifoDepth),
+
+  // For credit-based control flow
+  parameter type credit_t = logic,
+  parameter int NumCredits  = -1,
+  // Force send out credits belonging to the other side
+  // after ForceSendThresh is reached
+  localparam int ForceSendThresh  = NumCredits - 4  
 ) (
   input  logic                            clk_i,
   input  logic                            rst_ni,
@@ -54,6 +62,11 @@ import serial_link_pkg::*;
   output logic                            cfg_raw_mode_out_data_fifo_is_full_o
 );
 
+  // credit-based-flow-control related signals
+  payload_t axis_in_data_to_physical;
+  logic axis_in_req_tvalid_afterFlowControl;
+  logic axis_in_rsp_tready_afterFlowControl;
+  credit_t credits_to_send, credits_incoming;
 
   logic [PayloadSplits-1:0] recv_reg_in_valid, recv_reg_in_ready;
   logic [PayloadSplits-1:0] recv_reg_out_valid, recv_reg_out_ready;
@@ -67,6 +80,39 @@ import serial_link_pkg::*;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
   phy_data_t raw_mode_fifo_data_in, raw_mode_fifo_data_out;
 
+  ////////////////////////////////
+  //   FLOW-CONTROL-INSERTION   //
+  ////////////////////////////////
+
+  serial_link_credit_synchronization #(
+    .credit_t   ( credit_t   ),
+    .data_t     ( payload_t  ),
+    .NumCredits ( NumCredits )
+  ) i_synchronization_flow_control (
+    .clk_i              ( clk_i                   ),
+    .rst_ni             ( rst_ni                  ),
+
+    // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
+    // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
+    // be made smaller, without loosing any information...
+    .data_to_send_in    ( axis_in_req_i.t.data ),
+    .data_to_send_out   ( axis_in_data_to_physical ),
+
+    // towards button (internal)
+    .credits_to_send_o  ( credits_to_send ),
+    // top
+    .send_ready_o       ( axis_in_rsp_o.tready    ),
+    // top
+    .send_valid_i       ( axis_in_req_i.tvalid    ),
+    // button
+    .send_valid_o       ( axis_in_req_tvalid_afterFlowControl  ),
+    // button
+    .send_ready_i       ( axis_in_rsp_tready_afterFlowControl  ),
+    
+    .credits_received_i ( credits_incoming  ),
+    .receive_valid_i    ( axis_out_req_o.tvalid   ),
+    .receive_ready_i    ( axis_out_rsp_i.tready   )
+  );
 
   /////////////////
   //   DATA IN   //
@@ -118,7 +164,7 @@ import serial_link_pkg::*;
     data_in_ready_o = '0;
     recv_reg_index_d = recv_reg_index_q;
     axis_out_req_o.tvalid = 1'b0;
-    axis_out_req_o.t.data = recv_reg_data;
+    {axis_out_req_o.t.data, credits_incoming} = recv_reg_data;
     recv_reg_out_ready = '0;
     cfg_raw_mode_in_data_o = '0;
     cfg_raw_mode_in_data_valid_o = '0;
@@ -166,7 +212,7 @@ import serial_link_pkg::*;
   //////////////////
 
   always_comb begin
-    axis_in_rsp_o.tready = 1'b0;
+    axis_in_rsp_tready_afterFlowControl = 1'b0;
     data_out_o = '0;
     data_out_valid_o = '0;
     link_out_index_d = link_out_index_q;
@@ -186,15 +232,15 @@ import serial_link_pkg::*;
       // Normal operating mode
       unique case (link_state_q)
         LinkSendIdle: begin
-          if (axis_in_req_i.tvalid) begin
+          if (axis_in_req_tvalid_afterFlowControl) begin
             link_out_index_d = NumChannels * NumLanes * 2;
             data_out_valid_o = '1;
-            data_out_o = axis_in_req_i.t.data;
+            data_out_o = {axis_in_data_to_physical, credits_to_send};
             if (data_out_ready_i) begin
               link_state_d = LinkSendBusy;
-              if (link_out_index_d >= $bits(axis_in_req_i.t.data)) begin
+              if (link_out_index_d >= $bits({axis_in_data_to_physical, credits_to_send})) begin
                 link_state_d = LinkSendIdle;
-                axis_in_rsp_o.tready = 1'b1;
+                axis_in_rsp_tready_afterFlowControl = 1'b1;
               end
             end
           end
@@ -202,12 +248,12 @@ import serial_link_pkg::*;
 
         LinkSendBusy: begin
           data_out_valid_o = '1;
-          data_out_o = axis_in_req_i.t.data >> link_out_index_q;
+          data_out_o = {axis_in_data_to_physical, credits_to_send} >> link_out_index_q;
           if (data_out_ready_i) begin
             link_out_index_d = link_out_index_q + NumChannels * NumLanes * 2;
-            if (link_out_index_d >= $bits(axis_in_req_i.t.data)) begin
+            if (link_out_index_d >= $bits({axis_in_data_to_physical, credits_to_send})) begin
               link_state_d = LinkSendIdle;
-              axis_in_rsp_o.tready = 1'b1;
+              axis_in_rsp_tready_afterFlowControl = 1'b1;
             end
           end
         end

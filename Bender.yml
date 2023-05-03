@@ -9,12 +9,13 @@ package:
     - "Manuel Eggimann <meggimann@iis.ee.ethz.ch>"
     - "Thomas Benz <tbenz@iis.ee.ethz.ch>"
     - "Paul Scheffler <paulsc@iis.ee.ethz.ch>"
+    - "Yannick Baumann <baumanny@student.ethz.ch>"
 
 dependencies:
-  common_cells:        { git: "https://github.com/pulp-platform/common_cells.git",       version: 1.28.0   }
-  axi:                 { git: "https://github.com/pulp-platform/axi.git",                version: 0.38.0   }
-  register_interface:  { git: "https://github.com/pulp-platform/register_interface.git", version: 0.3.8    }
-  floo_noc:            { git: "git@iis-git.ee.ethz.ch:axi-noc/floo_noc.git",         rev:     master }
+  common_cells:        { git: "https://github.com/pulp-platform/common_cells.git",       version: 1.28.0     }
+  axi:                 { git: "https://github.com/pulp-platform/axi.git",                version: 0.38.0     }
+  register_interface:  { git: "https://github.com/pulp-platform/register_interface.git", version: 0.3.8      }
+  floo_noc:            { git: "git@iis-git.ee.ethz.ch:axi-noc/floo_noc.git",             rev:     noc-bridge }
 
 export_include_dirs:
   - src/axis/include
@@ -37,15 +38,19 @@ sources:
     - src/channel_allocator/channel_despread_sfr.sv
     - src/channel_allocator/channel_spread_sfr.sv
     - src/channel_allocator/serial_link_channel_allocator.sv
-    - src/serial_link_network.sv
+    - src/serial_link_credit_synchronization.sv
+    - src/serial_link_axi_network.sv
+    - src/serial_link_floo_network.sv
     - src/serial_link_data_link.sv
     - src/serial_link_physical.sv
 
     # Serial Link Wrapper
-    - src/serial_link.sv
+    - src/axi_serial_link.sv
+    - src/floo_serial_link.sv
 
     # Wrapper for Occamy
-    - src/serial_link_occamy_wrapper.sv
+    - src/axi_serial_link_occamy_wrapper.sv
+    - src/floo_serial_link_occamy_wrapper.sv
 
     - target: synthesis
       files:
@@ -55,6 +60,7 @@ sources:
       files:
       - test/axi_channel_compare.sv
       - test/tb_axi_serial_link.sv
+      - test/tb_floo_serial_link.sv
       - test/tb_ch_calib_serial_link.sv
       - test/tb_stream_chopper.sv
       - test/tb_stream_chopper_dechopper.sv
