@@ -4,11 +4,10 @@
 
 # Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-GIT 		?= git
 BENDER 		?= bender
-VSIM 		?= vsim
+VSIM 		  ?= vsim
 REGGEN 		?= $(shell ${BENDER} path register_interface)/vendor/lowrisc_opentitan/util/regtool.py
-WORK 		?= work
+WORK 		  ?= work
 
 all: compile_questa
 
