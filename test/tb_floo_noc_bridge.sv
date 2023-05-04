@@ -25,21 +25,20 @@ module tb_floo_noc_bridge;
   localparam int unsigned MaxTxnsPerId = 32;
 
   // set to zero if the noc_bridge should be inserted. Assign to one if the bridge should be ignored/bypassede
-  localparam BridgeBypass = 0;
+  localparam bit BridgeBypass = 1'b1;
 
-  // disable this line if no arbitration should be used and both, the request and the response channels of the NoC-flits
-  // should be send over the AXIS channel. This results in a wider AXIS bus...
+  // disable this line if the noc_bridge with virtual channels should be used.
 
-  // `define useArbitration 1
+  // `define useVirtualChannels 1
 
-  `ifdef useArbitration
+  `ifdef useVirtualChannels
     localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
     localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
     typedef struct packed {
       logic hdr;
       logic [FlitDataSize-1:0] flit_data;
     } axis_payload_t;
-    localparam BridgeArbitr = 1;
+    localparam bit BridgeVirtualChannels = 1'b1;
   `else 
     typedef struct packed { 
       logic [$bits(req_flit_t)-3:0] req_data;
@@ -49,7 +48,7 @@ module tb_floo_noc_bridge;
       logic rsp_valid;
       logic rsp_ready;
     } axis_payload_t;  
-    localparam BridgeArbitr = 0;
+    localparam bit BridgeVirtualChannels = 1'b0;
   `endif
 
   // Axi stream dimension must be a multiple of 8 bits
@@ -141,7 +140,8 @@ module tb_floo_noc_bridge;
     .end_of_sim     ( end_of_sim[0]   )
   );
 
-  axi_channel_compare #(
+  axi_chan_compare #(
+  	.IgnoreId   ( 1'b1             ),
     .aw_chan_t  ( axi_in_aw_chan_t ),
     .w_chan_t   ( axi_in_w_chan_t  ),
     .b_chan_t   ( axi_in_b_chan_t  ),
@@ -180,8 +180,9 @@ module tb_floo_noc_bridge;
     .rsp_i          ( chimney_0_rsp[1]  )
   );
 
-  if (BridgeArbitr == 1) begin : bridge
-    floo_axis_noc_bridge_withArbitration #(
+  if (BridgeVirtualChannels) begin : bridge
+    floo_axis_noc_bridge_virtual_channels #(
+    	.ignore_assert   ( BridgeBypass              ),
       .req_flit_t      ( req_flit_t                ),
       .rsp_flit_t      ( rsp_flit_t                ),
       .axis_req_t      ( axis_req_t                ),
@@ -200,7 +201,8 @@ module tb_floo_noc_bridge;
       .axis_out_rsp_i  ( bridge_rsp[1]             )
     );
 
-    floo_axis_noc_bridge_withArbitration #(
+    floo_axis_noc_bridge_virtual_channels #(
+    	.ignore_assert   ( BridgeBypass              ),
       .req_flit_t      ( req_flit_t                ),
       .rsp_flit_t      ( rsp_flit_t                ),
       .axis_req_t      ( axis_req_t                ),
@@ -220,6 +222,7 @@ module tb_floo_noc_bridge;
     );    
   end else begin : bridge
     floo_axis_noc_bridge #(
+    	.ignore_assert   ( BridgeBypass              ),
       .req_flit_t      ( req_flit_t                ),
       .rsp_flit_t      ( rsp_flit_t                ),
       .axis_req_t      ( axis_req_t                ),
@@ -239,6 +242,7 @@ module tb_floo_noc_bridge;
     );
 
     floo_axis_noc_bridge #(
+    	.ignore_assert   ( BridgeBypass              ),
       .req_flit_t      ( req_flit_t                ),
       .rsp_flit_t      ( rsp_flit_t                ),
       .axis_req_t      ( axis_req_t                ),
@@ -258,10 +262,10 @@ module tb_floo_noc_bridge;
     );
   end
 
-  assign chimney_1_req[0] = (BridgeBypass==1) ? chimney_0_req[0] : req_bridge_1_o;
-  assign chimney_1_rsp[0] = (BridgeBypass==1) ? chimney_0_rsp[0] : rsp_bridge_1_o;
-  assign chimney_0_req[1] = (BridgeBypass==1) ? chimney_1_req[1] : req_bridge_0_o;
-  assign chimney_0_rsp[1] = (BridgeBypass==1) ? chimney_1_rsp[1] : rsp_bridge_0_o;
+  assign chimney_1_req[0] = BridgeBypass ? chimney_0_req[0] : req_bridge_1_o;
+  assign chimney_1_rsp[0] = BridgeBypass ? chimney_0_rsp[0] : rsp_bridge_1_o;
+  assign chimney_0_req[1] = BridgeBypass ? chimney_1_req[1] : req_bridge_0_o;
+  assign chimney_0_rsp[1] = BridgeBypass ? chimney_1_rsp[1] : rsp_bridge_0_o;
 
   floo_axi_chimney #(
     .RouteAlgo          ( floo_pkg::IdTable   ),
@@ -285,7 +289,8 @@ module tb_floo_noc_bridge;
     .rsp_i          ( chimney_1_rsp[0]      )
   );
 
-  axi_channel_compare #(
+  axi_chan_compare #(
+  	.IgnoreId   ( 1'b1             ),
     .aw_chan_t  ( axi_in_aw_chan_t ),
     .w_chan_t   ( axi_in_w_chan_t  ),
     .b_chan_t   ( axi_in_b_chan_t  ),
@@ -331,14 +336,14 @@ module tb_floo_noc_bridge;
   );
 
   initial begin
-    if (BridgeBypass == 1) begin
+    if (BridgeBypass) begin
       $display("INFO: The NoC-bridge is not inserted in the test chain and will be ignored!");
     end else begin
       $display("INFO: The NoC-bridge is actively connected!");
-      if (BridgeArbitr == 1) begin
-        $display("INFO: The NoC-bridge sends either the request or the response flit-channel to the AXIS side.");
+      if (BridgeVirtualChannels) begin
+        $display("INFO: The NoC-bridge uses virtual channels.");
       end else begin
-        $display("INFO: The NoC-bridge does not contain arbitration logic and sends request and response channels simultaneously over AXIS.");
+        $display("INFO: The NoC-bridge uses only physical channels.");
       end    
     end
     wait(&end_of_sim);

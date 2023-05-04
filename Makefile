@@ -18,8 +18,6 @@ sim_c: compile_questa run_questa
 
 sim_clean: clean_questa
 
-bender_refresh: Bender.yml
-
 all: compile_questa
 
 clean: clean_bender clean_questa clean_vcs
@@ -95,9 +93,9 @@ else
 	$(VSIM) -64 -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log
 endif
 	@! grep -P "Errors: [1-9]*," $(dir $<)vsim.log
-	@echo -e "\033[1;31m______________________________CompilationSummary______________________________\033[0m"
+	@echo -e "\033[1;32m______________________________CompilationSummary______________________________\033[0m"
 	@cat $(dir $<)vsim.log | grep --color -e Error -e Warning || true
-	@echo -e "\033[1;31m________________________________CompilationEnd________________________________\033[0m"
+	@echo -e "\033[1;32m________________________________CompilationEnd________________________________\033[0m"
 
 clean_questa:
 	@rm -rf scripts/compile_vsim.tcl
@@ -113,10 +111,13 @@ run_questa:
 	@echo -e "\033[0;34mRunning the testbench: \033[1m$(TB_DUT)\033[0m"
 	@echo -e "\033[0;34mExpected stop time is \033[1m$(StopTime) ns\033[0m"
 	$(VSIM) $(TB_DUT) -work $(WORK) $(RUN_ARGS) -c -do "run -all; exit" | tee $(dir $<)vsim_consoleSimulation.log
-	@echo -e "\033[1;31m______________________________Simulation-Summary______________________________\033[0m"
+	@echo -e "\033[0;34mTestbench: \033[1m$(TB_DUT)\033[0m"
+	@echo -e "\033[0;34mExpected stop time: \033[1m$(StopTime) ns\033[0m"	
+	@echo -e "\033[1;32m______________________________Simulation-Summary______________________________\033[0m"
 	@cat $(dir $<)vsim_consoleSimulation.log | grep --color -e Error -e Warning -e "AW queue is empty!" -e "AW mismatch!" -e "W queue is empty!" -e "W mismatch!" -e "AR queue is empty!" -e "AR mismatch!" -e "B queue is empty!" -e "B mismatch!" -e "R queue is empty!" -e "R mismatch!" || true
-	@cat $(dir $<)vsim_consoleSimulation.log | grep --color "INFO: " || true
-	@echo -e "\033[1;31m________________________________Simulation-End________________________________\033[0m"
+	@cat $(dir $<)vsim_consoleSimulation.log | grep --color "INFO: " | sed "s/INFO/`printf '\033[1;35mINFO\033[0m'`/g" || true
+	@cat $(dir $<)vsim_consoleSimulation.log | grep -c "Error: " | sed -e "s/\(.*\)/'\1'/" | sed "s/'0'/good/g" | sed -e "s/'\([0-9]\+\)'/error/g"| sed "s/good/`printf '\033[1;37;42mStatus: It all looks good!\033[0m'`/g" | sed "s/error/`printf '\033[1;37;41mStatus: There are errors!\033[0m'`/g" || true
+	@echo -e "\033[1;32m________________________________Simulation-End________________________________\033[0m"
 
 run_questa_gui:
 	$(VSIM) $(TB_DUT) -work $(WORK) $(RUN_ARGS) -voptargs=+acc -do "log -r /*; do util/$(WaveDo); echo \"Running the testbench: $(TB_DUT)\"; echo \"Expected stop time is $(StopTime) ns\"; run -all"

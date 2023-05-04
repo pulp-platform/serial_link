@@ -359,7 +359,8 @@ module tb_axi_serial_link();
   //    Checks
   // ==============
 
-  axi_channel_compare #(
+  axi_chan_compare #(
+    .IgnoreId  ( 1'b1          ),
     .aw_chan_t ( axi_aw_chan_t ),
     .w_chan_t  ( axi_w_chan_t  ),
     .b_chan_t  ( axi_b_chan_t  ),
@@ -376,7 +377,8 @@ module tb_axi_serial_link();
     .axi_b_res ( axi_out_rsp_2  )
   );
 
-  axi_channel_compare #(
+  axi_chan_compare #(
+    .IgnoreId  ( 1'b1          ),
     .aw_chan_t ( axi_aw_chan_t ),
     .w_chan_t  ( axi_w_chan_t  ),
     .b_chan_t  ( axi_b_chan_t  ),
