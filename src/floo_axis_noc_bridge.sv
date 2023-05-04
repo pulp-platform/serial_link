@@ -3,6 +3,8 @@
 
 module floo_axis_noc_bridge
 #(
+  // If the parameter is set to 1, all the module intern assertion checks will be ignored.
+  parameter bit   ignore_assert = 1'b0,
   parameter type  rsp_flit_t    = logic,
   parameter type  req_flit_t    = logic,
   parameter type  axis_req_t    = logic,
@@ -175,6 +177,8 @@ module floo_axis_noc_bridge
   //  ASSERTIONS  //
   //////////////////
 
-  `ASSERT(AxisStable, axis_out_req_o.tvalid & !axis_out_rsp_i.tready |=> $stable(axis_out_req_o.t))
+  if (~ignore_assert) begin
+    `ASSERT(AxisStable, axis_out_req_o.tvalid & !axis_out_rsp_i.tready |=> $stable(axis_out_req_o.t))
+  end
 
 endmodule
