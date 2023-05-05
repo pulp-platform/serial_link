@@ -25,7 +25,7 @@ module tb_floo_noc_bridge;
   localparam int unsigned MaxTxnsPerId = 32;
 
   // set to zero if the noc_bridge should be inserted. Assign to one if the bridge should be ignored/bypassede
-  localparam bit BridgeBypass = 1'b1;
+  localparam bit BridgeBypass = 1'b0;
 
   // disable this line if the noc_bridge with virtual channels should be used.
 
@@ -40,14 +40,20 @@ module tb_floo_noc_bridge;
     } axis_payload_t;
     localparam bit BridgeVirtualChannels = 1'b1;
   `else 
-    typedef struct packed { 
-      logic [$bits(req_flit_t)-3:0] req_data;
-      logic req_valid;
-      logic req_ready;
-      logic [$bits(rsp_flit_t)-3:0] rsp_data;
-      logic rsp_valid;
-      logic rsp_ready;
-    } axis_payload_t;  
+    // typedef struct packed { 
+    //   logic [$bits(req_flit_t)-3:0] req_data;
+    //   logic req_valid;
+    //   logic req_ready;
+    //   logic [$bits(rsp_flit_t)-3:0] rsp_data;
+    //   logic rsp_valid;
+    //   logic rsp_ready;
+    // } axis_payload_t;
+		localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
+    localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
+    typedef struct packed {
+      logic hdr;
+      logic [FlitDataSize-1:0] flit_data;
+    } axis_payload_t;    
     localparam bit BridgeVirtualChannels = 1'b0;
   `endif
 
@@ -341,9 +347,9 @@ module tb_floo_noc_bridge;
     end else begin
       $display("INFO: The NoC-bridge is actively connected!");
       if (BridgeVirtualChannels) begin
-        $display("INFO: The NoC-bridge uses virtual channels.");
+        $display("INFO: The NoC-bridge uses virtual channels (credit-based non-blocking channels).");
       end else begin
-        $display("INFO: The NoC-bridge uses only physical channels.");
+        $display("INFO: The NoC-bridge uses a shared physical channel (no credit-based virtual channel abstraction).");
       end    
     end
     wait(&end_of_sim);
