@@ -11,16 +11,18 @@ VSIM 		?= questa-2022.3 vsim
 REGGEN 		?= $(shell ${BENDER} path register_interface)/vendor/lowrisc_opentitan/util/regtool.py
 WORK 		?= work
 
-.PHONY: sim sim_c sim_clean bender_refresh
+.PHONY: sim sim_c sim_clean sim_compile rebuild
 sim: compile_questa	run_questa_gui
 
 sim_c: compile_questa run_questa
 
 sim_clean: clean_questa
 
-all: compile_questa
+sim_compile: compile_questa
 
 clean: clean_bender clean_questa clean_vcs
+
+rebuild: clean Bender.lock
 
 run: run_questa
 
@@ -56,8 +58,8 @@ update-regs: src/regs/*.hjson
 # QuestaSim
 # --------------
 
-# TB_DUT ?= tb_axi_serial_link
-TB_DUT ?= tb_floo_noc_bridge
+TB_DUT ?= tb_axi_serial_link
+# TB_DUT ?= tb_floo_noc_bridge
 WaveDo ?= $(TB_DUT)_wave.do
 
 BENDER_FLAGS := -t test -t simulation
@@ -69,7 +71,8 @@ VLOG_FLAGS += -timescale 1ns/1ps
 VLOG_FLAGS += -work $(WORK)
 
 ifeq ($(TB_DUT),tb_floo_noc_bridge)
-	StopTime := "380,400"
+	StopTime := "399,190"
+# 	StopTime := "380,400"
 else ifeq ($(TB_DUT),tb_axi_serial_link)
 	StopTime := "26,389,950"
 else 

@@ -18,15 +18,19 @@ The Serial Link is released under Solderpad v0.51 (SHL-0.51) see [`LICENSE`](LIC
 The link uses [bender](https://github.com/pulp-platform/bender) to manage its dependencies and to automatically generate compilation scripts. Further `Python >= 3.8` is required with the packages listed in `requirements.txt`. Currently, we do not provide any open-source simulation setup. Internally, the Serial Link was tested using QuestaSim.
 
 ### Simulation
-The Serial Link can be simulated in QuestaSim with the following steps:
-```sh
+The Serial Link (AXI to off-chip, or NoC-flit to off-chip) can be simulated in QuestaSim with the following steps:
+```
+# Select the correct testbench in the makefile (section QuestaSim) or assign the testbench name to the variable "TB_DUT" when running a command:
+make <command> TB_DUT = <testbench name>
 # To compile the link, run the following command:
-make all
-# Run the simulation. This will start the simulation in batch mode.
-make run
+make sim_compile
+# Run the simulation (and compile). This will start the simulation in batch mode.
+make sim_c
 # To open it in the GUI mode, run the following command:
 # This command will also add all interesting waves to the wave window.
-make run GUI=true
+make sim
+# To rebuild the dependencies (in case of changes in the Bender.yml file) type:
+make rebuild
 ```
 
 ## Configuration
