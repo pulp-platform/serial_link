@@ -25,7 +25,7 @@ module tb_floo_noc_bridge;
   localparam int unsigned MaxTxnsPerId = 32;
 
   // set to zero if the noc_bridge should be inserted. Assign to one if the bridge should be ignored/bypassede
-  localparam bit BridgeBypass = 1'b0;
+  localparam bit BridgeBypass = 1'b1;
 
   // disable this line if the noc_bridge with virtual channels should be used.
 
