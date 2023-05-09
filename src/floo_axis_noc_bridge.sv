@@ -32,10 +32,14 @@ module floo_axis_noc_bridge
   // typedef struct packed {
   //   logic hdr;
   //   logic [FlitDataSize-1:0] flit_data;
-  // } axis_payload_t;
+  // } axis_data_t;
   axis_data_t axis_out_payload, axis_in_payload;
+  axis_data_t axis_out_data_reg_out;
+  logic axis_out_ready, axis_out_valid;
+  localparam int payloadSize = $bits(axis_data_t);
 
-  logic [$bits(axis_data_t)-1:0] req_data, rsp_data;
+  // the axis data payload also contains the header bit which is why the flit data width is one bit smaller than the payload
+  logic [payloadSize-2:0] req_i_data, rsp_i_data, req_o_data, rsp_o_data;
 
   // Connect incoming flits with the AXIS_out
 
@@ -46,12 +50,15 @@ module floo_axis_noc_bridge
 
 
 
-assign req_data = req_i.data;
-assign rsp_data = rsp_i.data;
+assign req_i_data = req_i.data;
+assign rsp_i_data = rsp_i.data;
+
+assign req_o.data = req_o_data;
+assign rsp_o.data = rsp_o_data;
 
   rr_arb_tree #(
     .NumIn      ( 2                          ),
-    .DataWidth  ( $bits(axis_data_t) -1      ),
+    .DataWidth  ( payloadSize - 1            ),
     .ExtPrio    ( 1'b0                       ),
     .AxiVldRdy  ( 1'b1                       ),
     .LockIn     ( 1'b0                       )
@@ -67,33 +74,57 @@ assign rsp_data = rsp_i.data;
     .gnt_o      ( {req_o.ready, rsp_o.ready} ),
     /* verilator lint_on UNOPTFLAT */
     /// Input data for arbitration.
-    .data_i     ( {req_data, rsp_data}       ),
+    .data_i     ( {req_i_data, rsp_i_data}   ),
     /// Output request is valid.
-    .req_o      ( axis_out_req_o.tvalid      ),
+    .req_o      ( axis_out_valid             ),
     /// Output request is granted.
-    .gnt_i      ( axis_out_rsp_i.tready      ),
+    .gnt_i      ( axis_out_ready             ),
     /// Output data.
     .data_o     ( axis_out_payload.flit_data ),
     /// Index from which input the data came from.
     .idx_o      ( axis_out_payload.hdr       )
   );
 
-  assign axis_out_req_o.t.data = axis_out_payload;
+  stream_fifo #(
+    .DATA_WIDTH ( payloadSize           ),
+    .DEPTH      ( 2                     )
+  ) i_req_out_reg (
+    .clk_i      ( clk_i                 ),
+    .rst_ni     ( rst_ni                ),
+    .flush_i    ( 1'b0                  ),
+    .testmode_i ( 1'b0                  ),
+    .usage_o    (                       ),
+    .valid_i    ( axis_out_valid        ),
+    .ready_o    ( axis_out_ready        ),
+    .data_i     ( axis_out_payload      ),
+    .valid_o    ( axis_out_req_o.tvalid ),
+    .ready_i    ( axis_out_rsp_i.tready ),
+    .data_o     ( axis_out_data_reg_out )
+  );  
+
+  // assign axis_out_req_o.tvalid = axis_out_valid;
+  // assign axis_out_ready = axis_out_rsp_i.tready;
+  // assign axis_out_data_reg_out = axis_out_payload;
+
+  assign axis_out_req_o.t.data = axis_out_data_reg_out;
   assign axis_out_req_o.t.strb = '1;
   assign axis_out_req_o.t.keep = '0;
-  assign axis_out_req_o.t.last = 0;
-  assign axis_out_req_o.t.id   = 0;
-  assign axis_out_req_o.t.dest = 0;
-  assign axis_out_req_o.t.user = 0;
+  assign axis_out_req_o.t.last =  0;
+  assign axis_out_req_o.t.id   =  0;
+  assign axis_out_req_o.t.dest =  0;
+  assign axis_out_req_o.t.user =  0;
   
   // Connect AXIS_in with the outgoing flits
 
-  assign axis_in_payload = axis_data_t'(axis_in_req_i.t.data);
-  assign axis_in_rsp_o.tready = req_i.ready & rsp_i.ready;
-  assign req_o.valid = (axis_in_payload.hdr == 1'b0) ? axis_in_req_i.tvalid : 0;
-  assign rsp_o.valid = (axis_in_payload.hdr == 1'b1) ? axis_in_req_i.tvalid : 0;
-  assign req_o.data = axis_in_payload.flit_data;
-  assign rsp_o.data = axis_in_payload.flit_data;
+  assign axis_in_payload      = axis_data_t'(axis_in_req_i.t.data);
+  assign axis_in_rsp_o.tready = (req_i.ready & req_o.valid) || (rsp_i.ready & rsp_o.valid);
+  assign req_o.valid          = (axis_in_payload.hdr == 1'b1) ? axis_in_req_i.tvalid : 0;
+  assign rsp_o.valid          = (axis_in_payload.hdr == 1'b0) ? axis_in_req_i.tvalid : 0;
+  assign req_o_data           = axis_in_payload.flit_data;
+  assign rsp_o_data           = axis_in_payload.flit_data;
+
+  // assign req_o_data           = (axis_in_payload.hdr == 1'b1) ? axis_in_payload.flit_data : '0;
+  // assign rsp_o_data           = (axis_in_payload.hdr == 1'b0) ? axis_in_payload.flit_data : '0;
 
   // FOR THE TIME BEING THE SIGNALS BELOW ARE IGNORED...
   // assign ??? = axis_in_req_i.t.strb;

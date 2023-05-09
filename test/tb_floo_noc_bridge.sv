@@ -23,9 +23,12 @@ module tb_floo_noc_bridge;
   localparam int unsigned ReorderBufferSize = 64;
   localparam int unsigned MaxTxns = 32;
   localparam int unsigned MaxTxnsPerId = 32;
+  // signals for debugging (no functional use)
+  logic Bridge_0_req_o, Bridge_0_req_i, Bridge_1_req_o, Bridge_1_req_i;
+  logic Bridge_0_rsp_o, Bridge_0_rsp_i, Bridge_1_rsp_o, Bridge_1_rsp_i;
 
   // set to zero if the noc_bridge should be inserted. Assign to one if the bridge should be ignored/bypassede
-  localparam bit BridgeBypass = 1'b1;
+  localparam bit BridgeBypass = 1'b0;
 
   // disable this line if the noc_bridge with virtual channels should be used.
 
@@ -266,6 +269,17 @@ module tb_floo_noc_bridge;
       .axis_in_req_i   ( bridge_req[0]             ),
       .axis_out_rsp_i  ( bridge_rsp[0]             )
     );
+
+    assign Bridge_0_req_o = req_bridge_0_o.valid & chimney_0_req[0].ready ;
+    assign Bridge_0_req_i = chimney_0_req[0].valid & req_bridge_0_o.ready ;
+    assign Bridge_0_rsp_o = rsp_bridge_0_o.valid & chimney_0_rsp[0].ready ;
+    assign Bridge_0_rsp_i = chimney_0_rsp[0].valid & rsp_bridge_0_o.ready ;
+
+    assign Bridge_1_req_o = req_bridge_1_o.valid & chimney_1_req[1].ready ;
+    assign Bridge_1_req_i = chimney_1_req[1].valid & req_bridge_1_o.ready ;
+    assign Bridge_1_rsp_o = rsp_bridge_1_o.valid & chimney_1_rsp[1].ready ;
+    assign Bridge_1_rsp_i = chimney_1_rsp[1].valid & rsp_bridge_1_o.ready ;
+
   end
 
   assign chimney_1_req[0] = BridgeBypass ? chimney_0_req[0] : req_bridge_1_o;
