@@ -10,6 +10,16 @@ on: [push, pull_request]
 
 jobs:
 
+  test-private-git:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Check private git
+        run: git ls-remote git@iis-git.ee.ethz.ch:axi-noc/floo_noc.git
+
   ###############
   # Check Clean #
   ###############
