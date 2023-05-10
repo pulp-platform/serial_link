@@ -3,7 +3,7 @@
 
 module floo_axis_noc_bridge
 #(
-  // If the parameter is set to 1, all the module intern assertion checks will be ignored.
+  // If the parameter is set to 1, all the assertion checks within this module will be ignored.
   parameter bit   ignore_assert = 1'b0,
   parameter type  rsp_flit_t    = logic,
   parameter type  req_flit_t    = logic,
@@ -39,23 +39,16 @@ module floo_axis_noc_bridge
   localparam int payloadSize = $bits(axis_data_t);
 
   // the axis data payload also contains the header bit which is why the flit data width is one bit smaller than the payload
-  logic [payloadSize-2:0] req_i_data, rsp_i_data, req_o_data, rsp_o_data;
+  logic [payloadSize-2:0] req_i_data, rsp_i_data;
 
-  // Connect incoming flits with the AXIS_out
+  ////////////////////////////////////////////////
+  //  CONNECT INCOMING FLITS WITH THE AXIS_OUT  //
+  ////////////////////////////////////////////////
 
-
-
-
-
-
-
-
-assign req_i_data = req_i.data;
-assign rsp_i_data = rsp_i.data;
-
-assign req_o.data = req_o_data;
-assign rsp_o.data = rsp_o_data;
-
+  // Assignment required to match the data width of the two channels (rr_arb_tree needs equi-size signals)
+  assign req_i_data = req_i.data;
+  assign rsp_i_data = rsp_i.data;
+  
   rr_arb_tree #(
     .NumIn      ( 2                          ),
     .DataWidth  ( payloadSize - 1            ),
@@ -88,7 +81,7 @@ assign rsp_o.data = rsp_o_data;
   stream_fifo #(
     .DATA_WIDTH ( payloadSize           ),
     .DEPTH      ( 2                     )
-  ) i_req_out_reg (
+  ) i_axis_out_reg (
     .clk_i      ( clk_i                 ),
     .rst_ni     ( rst_ni                ),
     .flush_i    ( 1'b0                  ),
@@ -102,10 +95,6 @@ assign rsp_o.data = rsp_o_data;
     .data_o     ( axis_out_data_reg_out )
   );  
 
-  // assign axis_out_req_o.tvalid = axis_out_valid;
-  // assign axis_out_ready = axis_out_rsp_i.tready;
-  // assign axis_out_data_reg_out = axis_out_payload;
-
   assign axis_out_req_o.t.data = axis_out_data_reg_out;
   assign axis_out_req_o.t.strb = '1;
   assign axis_out_req_o.t.keep = '0;
@@ -113,18 +102,17 @@ assign rsp_o.data = rsp_o_data;
   assign axis_out_req_o.t.id   =  0;
   assign axis_out_req_o.t.dest =  0;
   assign axis_out_req_o.t.user =  0;
-  
-  // Connect AXIS_in with the outgoing flits
 
+  ///////////////////////////////////////////////
+  //  CONNECT AXIS_IN WITH THE OUTGOING FLITS  //
+  ///////////////////////////////////////////////
+  
   assign axis_in_payload      = axis_data_t'(axis_in_req_i.t.data);
   assign axis_in_rsp_o.tready = (req_i.ready & req_o.valid) || (rsp_i.ready & rsp_o.valid);
   assign req_o.valid          = (axis_in_payload.hdr == 1'b1) ? axis_in_req_i.tvalid : 0;
   assign rsp_o.valid          = (axis_in_payload.hdr == 1'b0) ? axis_in_req_i.tvalid : 0;
-  assign req_o_data           = axis_in_payload.flit_data;
-  assign rsp_o_data           = axis_in_payload.flit_data;
-
-  // assign req_o_data           = (axis_in_payload.hdr == 1'b1) ? axis_in_payload.flit_data : '0;
-  // assign rsp_o_data           = (axis_in_payload.hdr == 1'b0) ? axis_in_payload.flit_data : '0;
+  assign req_o.data           = axis_in_payload.flit_data;
+  assign rsp_o.data           = axis_in_payload.flit_data;
 
   // FOR THE TIME BEING THE SIGNALS BELOW ARE IGNORED...
   // assign ??? = axis_in_req_i.t.strb;

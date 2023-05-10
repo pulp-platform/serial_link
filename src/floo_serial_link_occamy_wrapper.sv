@@ -6,17 +6,10 @@
 // Modified: Yannick Baumann <baumanny@student.ethz.ch>
 // Currently the module is not functional. It is a copy only to be used as a template...!!!
 
-/// A wrapper around the Serial Link intended for integration into Occamy
-/// The wrapper additionally includes AXI isolation, reset controller & clock gating
-  // TODO: This is only a template. I still need to change it to the noc interface...
+// TODO: This is only a template. I still need to change it to the noc interface...
 module floo_serial_link_occamy_wrapper #(
-  parameter type axi_req_t  = logic,
-  parameter type axi_rsp_t  = logic,
-  parameter type aw_chan_t  = logic,
-  parameter type ar_chan_t  = logic,
-  parameter type r_chan_t   = logic,
-  parameter type w_chan_t   = logic,
-  parameter type b_chan_t   = logic,
+  parameter type req_flit_t  = logic,
+  parameter type rsp_flit_t  = logic,
   parameter type cfg_req_t  = logic,
   parameter type cfg_rsp_t  = logic,
   parameter int NumChannels = 1,
@@ -28,10 +21,10 @@ module floo_serial_link_occamy_wrapper #(
   input  logic                      clk_reg_i,
   input  logic                      rst_reg_ni,
   input  logic                      testmode_i,
-  input  axi_req_t                  axi_in_req_i,
-  output axi_rsp_t                  axi_in_rsp_o,
-  output axi_req_t                  axi_out_req_o,
-  input  axi_rsp_t                  axi_out_rsp_i,
+  input  req_flit_t                 req_i,
+  input  rsp_flit_t                 rsp_i,
+  output req_flit_t                 req_o,
+  output rsp_flit_t                 rsp_o,
   input  cfg_req_t                  cfg_req_i,
   output cfg_rsp_t                  cfg_rsp_o,
   input  logic [NumChannels-1:0]    ddr_rcv_clk_i,
@@ -45,9 +38,6 @@ module floo_serial_link_occamy_wrapper #(
 
   logic clk_ena;
   logic reset_n;
-
-  axi_req_t axi_in_req, axi_out_req;
-  axi_rsp_t axi_in_rsp, axi_out_rsp;
 
   // Quadrant clock gate controlled by register
   tc_clk_gating i_tc_clk_gating (
@@ -68,57 +58,10 @@ module floo_serial_link_occamy_wrapper #(
 
   logic [1:0] isolated, isolate;
 
-  axi_isolate #(
-    .TerminateTransaction(0),
-    .AtopSupport(1),
-    .AxiIdWidth($bits(axi_in_req_i.aw.id)),
-    .AxiAddrWidth($bits(axi_in_req_i.aw.addr)),
-    .AxiDataWidth($bits(axi_in_req_i.w.data)),
-    .AxiUserWidth($bits(axi_in_req_i.aw.user)),
-    .axi_req_t    ( axi_req_t                   ),
-    .axi_resp_t   ( axi_rsp_t                   )
-
-  ) i_serial_link_in_isolate  (
-    .clk_i        ( clk_i         ),
-    .rst_ni       ( rst_ni        ),
-    .slv_req_i    ( axi_in_req_i  ),
-    .slv_resp_o   ( axi_in_rsp_o  ),
-    .mst_req_o    ( axi_in_req    ),
-    .mst_resp_i   ( axi_in_rsp    ),
-    .isolate_i    ( isolate[0]    ),
-    .isolated_o   ( isolated[0]   )
-  );
-
-  axi_isolate #(
-    .TerminateTransaction(0),
-    .AtopSupport(1),
-    .AxiIdWidth($bits(axi_in_req_i.aw.id)),
-    .AxiAddrWidth($bits(axi_in_req_i.aw.addr)),
-    .AxiDataWidth($bits(axi_in_req_i.w.data)),
-    .AxiUserWidth($bits(axi_in_req_i.aw.user)),
-    .axi_req_t        ( axi_req_t                   ),
-    .axi_resp_t       ( axi_rsp_t                   )
-
-  ) i_serial_link_out_isolate (
-    .clk_i        ( clk_i         ),
-    .rst_ni       ( rst_ni        ),
-    .slv_req_i    ( axi_out_req   ),
-    .slv_resp_o   ( axi_out_rsp   ),
-    .mst_req_o    ( axi_out_req_o ),
-    .mst_resp_i   ( axi_out_rsp_i ),
-    .isolate_i    ( isolate[1]    ),
-    .isolated_o   ( isolated[1]   )
-  );
-
   if (NumChannels > 1) begin : gen_multi_channel_serial_link
     floo_serial_link #(
-      .axi_req_t        ( axi_req_t   ),
-      .axi_rsp_t        ( axi_rsp_t   ),
-      .aw_chan_t        ( aw_chan_t   ),
-      .w_chan_t         ( w_chan_t    ),
-      .b_chan_t         ( b_chan_t    ),
-      .ar_chan_t        ( ar_chan_t   ),
-      .r_chan_t         ( r_chan_t    ),
+      .req_flit_t       ( req_flit_t  ),
+      .rsp_flit_t       ( rsp_flit_t  ),
       .cfg_req_t        ( cfg_req_t   ),
       .cfg_rsp_t        ( cfg_rsp_t   ),
       .hw2reg_t         ( serial_link_reg_pkg::serial_link_hw2reg_t ),
@@ -134,10 +77,10 @@ module floo_serial_link_occamy_wrapper #(
       .clk_reg_i      ( clk_reg_i         ),
       .rst_reg_ni     ( rst_reg_ni        ),
       .testmode_i     ( 1'b0              ),
-      .axi_in_req_i   ( axi_in_req        ),
-      .axi_in_rsp_o   ( axi_in_rsp        ),
-      .axi_out_req_o  ( axi_out_req       ),
-      .axi_out_rsp_i  ( axi_out_rsp       ),
+      .req_i          ( req_i             ),
+      .rsp_i          ( rsp_i             ),
+      .req_o          ( req_o             ),
+      .rsp_o          ( rsp_o             ),
       .cfg_req_i      ( cfg_req_i         ),
       .cfg_rsp_o      ( cfg_rsp_o         ),
       .ddr_rcv_clk_i  ( ddr_rcv_clk_i     ),
@@ -151,13 +94,8 @@ module floo_serial_link_occamy_wrapper #(
     );
   end else begin : gen_single_channel_serial_link
     floo_serial_link #(
-      .axi_req_t        ( axi_req_t   ),
-      .axi_rsp_t        ( axi_rsp_t   ),
-      .aw_chan_t        ( aw_chan_t   ),
-      .w_chan_t         ( w_chan_t    ),
-      .b_chan_t         ( b_chan_t    ),
-      .ar_chan_t        ( ar_chan_t   ),
-      .r_chan_t         ( r_chan_t    ),
+      .req_flit_t       ( req_flit_t  ),
+      .rsp_flit_t       ( rsp_flit_t  ),
       .cfg_req_t        ( cfg_req_t   ),
       .cfg_rsp_t        ( cfg_rsp_t   ),
       .hw2reg_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_hw2reg_t ),
@@ -173,10 +111,10 @@ module floo_serial_link_occamy_wrapper #(
       .clk_reg_i      ( clk_reg_i         ),
       .rst_reg_ni     ( rst_reg_ni        ),
       .testmode_i     ( 1'b0              ),
-      .axi_in_req_i   ( axi_in_req        ),
-      .axi_in_rsp_o   ( axi_in_rsp        ),
-      .axi_out_req_o  ( axi_out_req       ),
-      .axi_out_rsp_i  ( axi_out_rsp       ),
+      .req_i          ( req_i             ),
+      .rsp_i          ( rsp_i             ),
+      .req_o          ( req_o             ),
+      .rsp_o          ( rsp_o             ),
       .cfg_req_i      ( cfg_req_i         ),
       .cfg_rsp_o      ( cfg_rsp_o         ),
       .ddr_rcv_clk_i  ( ddr_rcv_clk_i     ),

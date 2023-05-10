@@ -13,7 +13,9 @@ module tb_floo_serial_link();
   `include "register_interface/assign.svh"
   `include "register_interface/typedef.svh"
 
+  import floo_pkg::*;
   import serial_link_pkg::*;
+  import floo_axi_flit_pkg::*;
   import serial_link_reg_pkg::*;
   import serial_link_single_channel_reg_pkg::*;
 
@@ -42,6 +44,10 @@ module tb_floo_serial_link();
 
   localparam logic [NumLanes*2-1:0] CalibrationPattern = {{NumLanes/4}{4'b1010, 4'b0101}};
 
+  localparam int unsigned ReorderBufferSize = 64;
+  localparam int unsigned MaxTxns = 32;
+  localparam int unsigned MaxTxnsPerId = 32;  
+
   // ==============
   //    DDR Link
   // ==============
@@ -68,6 +74,10 @@ module tb_floo_serial_link();
   axi_resp_t  axi_out_rsp_1, axi_out_rsp_2;
   axi_req_t   axi_in_req_1,  axi_in_req_2;
   axi_resp_t  axi_in_rsp_1,  axi_in_rsp_2;
+  req_flit_t  flit_req_out_1, flit_req_out_2;
+  rsp_flit_t  flit_rsp_out_1, flit_rsp_out_2;
+  req_flit_t  flit_req_in_1, flit_req_in_2;
+  rsp_flit_t  flit_rsp_in_1, flit_rsp_in_2;
   cfg_req_t   cfg_req_1;
   cfg_rsp_t   cfg_rsp_1;
   cfg_req_t   cfg_req_2;
@@ -107,68 +117,112 @@ module tb_floo_serial_link();
   );
 
   // first serial instance
-  floo_serial_link_occamy_wrapper #(
-    .axi_req_t        ( axi_req_t       ),
-    .axi_rsp_t        ( axi_resp_t      ),
-    .aw_chan_t        ( axi_aw_chan_t   ),
-    .w_chan_t         ( axi_w_chan_t    ),
-    .b_chan_t         ( axi_b_chan_t    ),
-    .ar_chan_t        ( axi_ar_chan_t   ),
-    .r_chan_t         ( axi_r_chan_t    ),
-    .cfg_req_t        ( cfg_req_t       ),
-    .cfg_rsp_t        ( cfg_rsp_t       ),
-    .NumChannels      ( NumChannels     ),
-    .NumLanes         ( NumLanes        ),
-    .MaxClkDiv        ( MaxClkDiv       )
-  ) i_serial_link_1 (
-      .clk_i          ( clk_1           ),
-      .rst_ni         ( rst_1_n         ),
-      .clk_reg_i      ( clk_reg         ),
-      .rst_reg_ni     ( rst_reg_n       ),
-      .testmode_i     ( 1'b0            ),
-      .axi_in_req_i   ( axi_in_req_1    ),
-      .axi_in_rsp_o   ( axi_in_rsp_1    ),
-      .axi_out_req_o  ( axi_out_req_1   ),
-      .axi_out_rsp_i  ( axi_out_rsp_1   ),
-      .cfg_req_i      ( cfg_req_1       ),
-      .cfg_rsp_o      ( cfg_rsp_1       ),
-      .ddr_rcv_clk_i  ( ddr_rcv_clk_2   ),
-      .ddr_rcv_clk_o  ( ddr_rcv_clk_1   ),
-      .ddr_i          ( ddr_i           ),
-      .ddr_o          ( ddr_o           )
+  floo_axi_chimney #(
+    .RouteAlgo          ( floo_pkg::IdTable ),
+    .MaxTxns            ( MaxTxns           ),
+    .MaxTxnsPerId       ( MaxTxnsPerId      ),
+    .ReorderBufferSize  ( ReorderBufferSize )
+  ) i_floo_axi_chimney_0 (
+    .clk_i          ( clk_1          ),
+    .rst_ni         ( rst_1_n        ),
+    .sram_cfg_i     ( '0             ),
+    .test_enable_i  ( 1'b0           ),
+    .axi_in_req_i   ( axi_in_req_1   ),
+    .axi_in_rsp_o   ( axi_in_rsp_1   ),
+    .axi_out_req_o  ( axi_out_req_1  ),
+    .axi_out_rsp_i  ( axi_out_rsp_1  ),
+    .xy_id_i        (                ),
+    .id_i           ( '0             ),
+    .req_o          ( flit_req_out_1 ),
+    .rsp_o          ( flit_rsp_out_1 ),
+    .req_i          ( flit_req_in_1  ),
+    .rsp_i          ( flit_rsp_in_1  )
   );
+
+  floo_serial_link_occamy_wrapper #(
+    .req_flit_t       ( req_flit_t  ),
+    .rsp_flit_t       ( rsp_flit_t  ),
+    .cfg_req_t        ( cfg_req_t   ),
+    .cfg_rsp_t        ( cfg_rsp_t   ),
+    .NumChannels      ( NumChannels ),
+    .NumLanes         ( NumLanes    ),
+    .MaxClkDiv        ( MaxClkDiv   )
+  ) i_serial_link_0 (
+      .clk_i          ( clk_1          ),
+      .rst_ni         ( rst_1_n        ),
+      .clk_reg_i      ( clk_reg        ),
+      .rst_reg_ni     ( rst_reg_n      ),
+      .testmode_i     ( 1'b0           ),
+      .req_i          ( flit_req_out_1 ),
+      .rsp_i          ( flit_rsp_out_1 ),
+      .req_o          ( flit_req_in_1  ),
+      .rsp_o          ( flit_rsp_in_1  ),      
+      .cfg_req_i      ( cfg_req_1      ),
+      .cfg_rsp_o      ( cfg_rsp_1      ),
+      .ddr_rcv_clk_i  ( ddr_rcv_clk_2  ),
+      .ddr_rcv_clk_o  ( ddr_rcv_clk_1  ),
+      .ddr_i          ( ddr_i          ),
+      .ddr_o          ( ddr_o          )
+  );
+
+  // Handshake checks for debugging in QuestaSim
+  assign Bridge_0_rsp_i = flit_rsp_out_1.valid & flit_rsp_in_1.ready;
+  assign Bridge_0_rsp_o = flit_rsp_in_1.valid & flit_rsp_out_1.ready;
+  assign Bridge_0_req_i = flit_req_out_1.valid & flit_req_in_1.ready;
+  assign Bridge_0_req_o = flit_req_in_1.valid & flit_req_out_1.ready;
+  assign Bridge_1_rsp_i = flit_rsp_out_2.valid & flit_rsp_in_2.ready;
+  assign Bridge_1_rsp_o = flit_rsp_in_2.valid & flit_rsp_out_2.ready;
+  assign Bridge_1_req_i = flit_req_out_2.valid & flit_req_in_2.ready;
+  assign Bridge_1_req_o = flit_req_in_2.valid & flit_req_out_2.ready;
 
   // second serial instance
   floo_serial_link_occamy_wrapper #(
-    .axi_req_t        ( axi_req_t       ),
-    .axi_rsp_t        ( axi_resp_t      ),
-    .aw_chan_t        ( axi_aw_chan_t   ),
-    .w_chan_t         ( axi_w_chan_t    ),
-    .b_chan_t         ( axi_b_chan_t    ),
-    .ar_chan_t        ( axi_ar_chan_t   ),
-    .r_chan_t         ( axi_r_chan_t    ),
-    .cfg_req_t        ( cfg_req_t       ),
-    .cfg_rsp_t        ( cfg_rsp_t       ),
-    .NumChannels      ( NumChannels     ),
-    .NumLanes         ( NumLanes        ),
-    .MaxClkDiv        ( MaxClkDiv       )
-  ) i_serial_link_2 (
-      .clk_i          ( clk_2           ),
-      .rst_ni         ( rst_2_n         ),
-      .clk_reg_i      ( clk_reg         ),
-      .rst_reg_ni     ( rst_reg_n       ),
-      .testmode_i     ( 1'b0            ),
-      .axi_in_req_i   ( axi_in_req_2    ),
-      .axi_in_rsp_o   ( axi_in_rsp_2    ),
-      .axi_out_req_o  ( axi_out_req_2   ),
-      .axi_out_rsp_i  ( axi_out_rsp_2   ),
-      .cfg_req_i      ( cfg_req_2       ),
-      .cfg_rsp_o      ( cfg_rsp_2       ),
-      .ddr_rcv_clk_i  ( ddr_rcv_clk_1   ),
-      .ddr_rcv_clk_o  ( ddr_rcv_clk_2   ),
-      .ddr_i          ( ddr_o           ),
-      .ddr_o          ( ddr_i           )
+    .req_flit_t       ( req_flit_t  ),
+    .rsp_flit_t       ( rsp_flit_t  ),
+    .cfg_req_t        ( cfg_req_t   ),
+    .cfg_rsp_t        ( cfg_rsp_t   ),
+    .NumChannels      ( NumChannels ),
+    .NumLanes         ( NumLanes    ),
+    .MaxClkDiv        ( MaxClkDiv   )
+  ) i_serial_link_1 (
+      .clk_i          ( clk_2          ),
+      .rst_ni         ( rst_2_n        ),
+      .clk_reg_i      ( clk_reg        ),
+      .rst_reg_ni     ( rst_reg_n      ),
+      .testmode_i     ( 1'b0           ),
+      .req_i          ( flit_req_out_2 ),
+      .rsp_i          ( flit_rsp_out_2 ),
+      .req_o          ( flit_req_in_2  ),
+      .rsp_o          ( flit_rsp_in_2  ),      
+      .cfg_req_i      ( cfg_req_2      ),
+      .cfg_rsp_o      ( cfg_rsp_2      ),
+      .ddr_rcv_clk_i  ( ddr_rcv_clk_1  ),
+      .ddr_rcv_clk_o  ( ddr_rcv_clk_2  ),
+      .ddr_i          ( ddr_o          ),
+      .ddr_o          ( ddr_i          )
   );
+
+  floo_axi_chimney #(
+    .RouteAlgo          ( floo_pkg::IdTable ),
+    .MaxTxns            ( MaxTxns           ),
+    .MaxTxnsPerId       ( MaxTxnsPerId      ),
+    .ReorderBufferSize  ( ReorderBufferSize )
+  ) i_floo_axi_chimney_1 (
+    .clk_i          ( clk_2          ),
+    .rst_ni         ( rst_2_n        ),
+    .sram_cfg_i     ( '0             ),
+    .test_enable_i  ( 1'b0           ),
+    .axi_in_req_i   ( axi_in_req_2   ),
+    .axi_in_rsp_o   ( axi_in_rsp_2   ),
+    .axi_out_req_o  ( axi_out_req_2  ),
+    .axi_out_rsp_i  ( axi_out_rsp_2  ),
+    .xy_id_i        (                ),
+    .id_i           ( '0             ),
+    .req_o          ( flit_req_out_2 ),
+    .rsp_o          ( flit_rsp_out_2 ),
+    .req_i          ( flit_req_in_2  ),
+    .rsp_i          ( flit_rsp_in_2  )
+  );  
 
   REG_BUS #(
     .ADDR_WIDTH (RegAddrWidth),
@@ -359,7 +413,8 @@ module tb_floo_serial_link();
   //    Checks
   // ==============
 
-  axi_channel_compare #(
+  axi_chan_compare #(
+    .IgnoreId  ( 1'b1          ),
     .aw_chan_t ( axi_aw_chan_t ),
     .w_chan_t  ( axi_w_chan_t  ),
     .b_chan_t  ( axi_b_chan_t  ),
@@ -376,7 +431,8 @@ module tb_floo_serial_link();
     .axi_b_res ( axi_out_rsp_2  )
   );
 
-  axi_channel_compare #(
+  axi_chan_compare #(
+    .IgnoreId  ( 1'b1          ),
     .aw_chan_t ( axi_aw_chan_t ),
     .w_chan_t  ( axi_w_chan_t  ),
     .b_chan_t  ( axi_b_chan_t  ),

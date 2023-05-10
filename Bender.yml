@@ -40,7 +40,8 @@ sources:
     - src/channel_allocator/serial_link_channel_allocator.sv
     - src/serial_link_credit_synchronization.sv
     - src/serial_link_axi_network.sv
-    - src/serial_link_floo_network.sv
+    # I use the noc_bridge module instead. The below module can likely be deleted.
+    # - src/serial_link_floo_network.sv
     - src/serial_link_data_link.sv
     - src/serial_link_physical.sv
 

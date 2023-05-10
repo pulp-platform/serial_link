@@ -15,22 +15,17 @@
 module floo_serial_link
 import serial_link_pkg::*;
 #(
-  parameter type axi_req_t  = logic,
-  parameter type axi_rsp_t  = logic,
-  parameter type aw_chan_t  = logic,
-  parameter type ar_chan_t  = logic,
-  parameter type r_chan_t   = logic,
-  parameter type w_chan_t   = logic,
-  parameter type b_chan_t   = logic,
-  parameter type cfg_req_t  = logic,
-  parameter type cfg_rsp_t  = logic,
-  parameter type hw2reg_t  = logic,
-  parameter type reg2hw_t  = logic,
-  parameter int NumChannels = serial_link_pkg::NumChannels,
-  parameter int NumLanes = serial_link_pkg::NumLanes,
-  parameter int MaxClkDiv = serial_link_pkg::MaxClkDiv,
-  parameter bit NoRegCdc = 1'b0,
-  localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1
+  parameter  type req_flit_t      = logic,
+  parameter  type rsp_flit_t      = logic,
+  parameter  type cfg_req_t       = logic,
+  parameter  type cfg_rsp_t       = logic,
+  parameter  type hw2reg_t        = logic,
+  parameter  type reg2hw_t        = logic,
+  parameter  int  NumChannels     = serial_link_pkg::NumChannels,
+  parameter  int  NumLanes        = serial_link_pkg::NumLanes,
+  parameter  int  MaxClkDiv       = serial_link_pkg::MaxClkDiv,
+  parameter  bit  NoRegCdc        = 1'b0,
+  localparam int  Log2NumChannels = (NumChannels > 1) ? $clog2(NumChannels) : 1
 ) (
   // There are 3 different clock/resets:
   // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
@@ -38,53 +33,42 @@ import serial_link_pkg::*;
   //    i.e. network, data-link and physical layer all run on this clock and can be clock gated if needed. If no clock gating, reset synchronization
   //    is desired, you can tie clk_sl_i -> clk_i resp. rst_sl_ni -> rst_ni
   // 3) clk_reg_i & rst_reg_ni: peripheral clock and reset. Only connected to RegBus CDC. If NoRegCdc is set, this clock must be the same as 1)
-  input  logic                      clk_i,
-  input  logic                      rst_ni,
-  input  logic                      clk_sl_i,
-  input  logic                      rst_sl_ni,
-  input  logic                      clk_reg_i,
-  input  logic                      rst_reg_ni,
-  input  logic                      testmode_i,
-  input  axi_req_t                  axi_in_req_i,
-  output axi_rsp_t                  axi_in_rsp_o,
-  output axi_req_t                  axi_out_req_o,
-  input  axi_rsp_t                  axi_out_rsp_i,
-  input  cfg_req_t                  cfg_req_i,
-  output cfg_rsp_t                  cfg_rsp_o,
-  input  logic [NumChannels-1:0]    ddr_rcv_clk_i,
-  output logic [NumChannels-1:0]    ddr_rcv_clk_o,
+  input  logic                                 clk_i,
+  input  logic                                 rst_ni,
+  input  logic                                 clk_sl_i,
+  input  logic                                 rst_sl_ni,
+  input  logic                                 clk_reg_i,
+  input  logic                                 rst_reg_ni,
+  input  logic                                 testmode_i,
+  input  req_flit_t                            req_i,
+  input  rsp_flit_t                            rsp_i,
+  output req_flit_t                            req_o,
+  output rsp_flit_t                            rsp_o,
+  input  cfg_req_t                             cfg_req_i,
+  output cfg_rsp_t                             cfg_rsp_o,
+  input  logic [NumChannels-1:0]               ddr_rcv_clk_i,
+  output logic [NumChannels-1:0]               ddr_rcv_clk_o,
   input  logic [NumChannels-1:0][NumLanes-1:0] ddr_i,
   output logic [NumChannels-1:0][NumLanes-1:0] ddr_o,
   // AXI isolation signals (in/out), if not used tie to 0
-  input  logic [1:0]                isolated_i,
-  output logic [1:0]                isolate_o,
+  input  logic [1:0]                           isolated_i,
+  output logic [1:0]                           isolate_o,
   // Clock gate register
-  output logic                      clk_ena_o,
+  output logic                                 clk_ena_o,
   // synch-reset register
-  output logic                      reset_no
+  output logic                                 reset_no
 );
 
   import serial_link_pkg::*;
 
-  // Determine the largest sized AXI channel
-  localparam int AxiChannels[5] = {$bits(b_chan_t),
-                          $bits(aw_chan_t),
-                          $bits(w_chan_t),
-                          $bits(ar_chan_t),
-                          $bits(r_chan_t)};
-  localparam int MaxAxiChannelBits =
-  serial_link_pkg::find_max_channel(AxiChannels);
-
-  // The payload that is converted into an AXI stream consists of
-  // 1) AXI Beat
-  // 2) B Channel (which is always transmitted)
-  // 3) Header
+  localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
+  localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
   typedef struct packed {
-    logic [MaxAxiChannelBits-1:0] axi_ch;
-    logic b_valid;
-    b_chan_t b;
-    tag_e hdr;
+    logic hdr;
+    logic [FlitDataSize-1:0] flit_data;
   } payload_t;
+  // TODO: #SelectTheBridgeVersion
+  localparam bit BridgeVirtualChannels = 1'b0;
 
   localparam int BandWidth = NumChannels * NumLanes * 2;
   localparam int PayloadSplits = ($bits(payload_t) + $bits(credit_t) + BandWidth - 1) / BandWidth;
@@ -108,59 +92,77 @@ import serial_link_pkg::*;
   //typedefs for physical layer
   typedef logic [NumLanes*2-1:0] phy_data_t;
 
-  cfg_req_t cfg_req;
-  cfg_rsp_t cfg_rsp;
+  cfg_req_t  cfg_req;
+  cfg_rsp_t  cfg_rsp;
 
-  axis_req_t  axis_out_req, axis_in_req;
-  axis_rsp_t  axis_out_rsp, axis_in_rsp;
+  axis_req_t axis_out_req, axis_in_req;
+  axis_rsp_t axis_out_rsp, axis_in_rsp;
 
-  reg2hw_t reg2hw;
-  hw2reg_t hw2reg;
+  reg2hw_t   reg2hw;
+  hw2reg_t   hw2reg;
 
   phy_data_t [NumChannels-1:0]  data_link2alloc_data_out;
-  logic [NumChannels-1:0]       data_link2alloc_data_out_valid;
+  logic      [NumChannels-1:0]  data_link2alloc_data_out_valid;
   logic                         alloc2data_link_data_out_ready;
 
   phy_data_t [NumChannels-1:0]  alloc2data_link_data_in;
-  logic [NumChannels-1:0]       alloc2data_link_data_in_valid;
-  logic [NumChannels-1:0]       data_link2alloc_data_in_ready;
+  logic      [NumChannels-1:0]  alloc2data_link_data_in_valid;
+  logic      [NumChannels-1:0]  data_link2alloc_data_in_ready;
 
   phy_data_t [NumChannels-1:0]  alloc2phy_data_out;
-  logic [NumChannels-1:0]       alloc2phy_data_out_valid;
-  logic [NumChannels-1:0]       phy2alloc_data_out_ready;
+  logic      [NumChannels-1:0]  alloc2phy_data_out_valid;
+  logic      [NumChannels-1:0]  phy2alloc_data_out_ready;
 
   phy_data_t [NumChannels-1:0]  phy2alloc_data_in;
-  logic [NumChannels-1:0]       phy2alloc_data_in_valid;
-  logic [NumChannels-1:0]       alloc2phy_data_in_ready;
+  logic      [NumChannels-1:0]  phy2alloc_data_in_valid;
+  logic      [NumChannels-1:0]  alloc2phy_data_in_ready;
 
 
-  ///////////////////////
-  //   NETWORK LAYER   //
-  ///////////////////////
+  ////////////////////
+  //   NoC Bridge   //
+  ////////////////////
 
-  serial_link_floo_network #(
-    .axi_req_t      ( axi_req_t     ),
-    .axi_rsp_t      ( axi_rsp_t     ),
-    .axis_req_t     ( axis_req_t    ),
-    .axis_rsp_t     ( axis_rsp_t    ),
-    .aw_chan_t      ( aw_chan_t     ),
-    .w_chan_t       ( w_chan_t      ),
-    .b_chan_t       ( b_chan_t      ),
-    .ar_chan_t      ( ar_chan_t     ),
-    .r_chan_t       ( r_chan_t      ),
-    .payload_t      ( payload_t     )
-  ) i_serial_link_network (
-    .clk_i          ( clk_sl_i        ),
-    .rst_ni         ( rst_sl_ni       ),
-    .axi_in_req_i   ( axi_in_req_i    ),
-    .axi_in_rsp_o   ( axi_in_rsp_o    ),
-    .axi_out_req_o  ( axi_out_req_o   ),
-    .axi_out_rsp_i  ( axi_out_rsp_i   ),
-    .axis_in_req_i  ( axis_in_req     ),
-    .axis_in_rsp_o  ( axis_in_rsp     ),
-    .axis_out_req_o ( axis_out_req    ),
-    .axis_out_rsp_i ( axis_out_rsp    )
-  );
+  if (BridgeVirtualChannels) begin : bridge  
+    floo_axis_noc_bridge_virtual_channels #(
+      .ignore_assert   ( 1'b0         ),
+      .req_flit_t      ( req_flit_t   ),
+      .rsp_flit_t      ( rsp_flit_t   ),
+      .axis_req_t      ( axis_req_t   ),
+      .axis_rsp_t      ( axis_rsp_t   ),
+      .axis_data_t     ( payload_t    )
+    ) i_serial_link_network (
+      .clk_i           ( clk_sl_i     ),
+      .rst_ni          ( rst_sl_ni    ),
+      .req_o           ( req_o        ),
+      .rsp_o           ( rsp_o        ),
+      .req_i           ( req_i        ),
+      .rsp_i           ( rsp_i        ),
+      .axis_out_req_o  ( axis_out_req ),
+      .axis_in_rsp_o   ( axis_in_rsp  ),
+      .axis_in_req_i   ( axis_in_req  ),
+      .axis_out_rsp_i  ( axis_out_rsp )
+    );    
+  end else begin : bridge
+    floo_axis_noc_bridge #(
+      .ignore_assert   ( 1'b0         ),
+      .req_flit_t      ( req_flit_t   ),
+      .rsp_flit_t      ( rsp_flit_t   ),
+      .axis_req_t      ( axis_req_t   ),
+      .axis_rsp_t      ( axis_rsp_t   ),
+      .axis_data_t     ( payload_t    )
+    ) i_serial_link_network (
+      .clk_i           ( clk_sl_i     ),
+      .rst_ni          ( rst_sl_ni    ),
+      .req_o           ( req_o        ),
+      .rsp_o           ( rsp_o        ),
+      .req_i           ( req_i        ),
+      .rsp_i           ( rsp_i        ),
+      .axis_out_req_o  ( axis_out_req ),
+      .axis_in_rsp_o   ( axis_in_rsp  ),
+      .axis_in_req_i   ( axis_in_req  ),
+      .axis_out_rsp_i  ( axis_out_rsp )
+    );
+  end
 
   /////////////////////////
   //   DATA LINK LAYER   //
