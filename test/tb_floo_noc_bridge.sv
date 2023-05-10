@@ -32,7 +32,7 @@ module tb_floo_noc_bridge;
 
   // disable this line if the noc_bridge with virtual channels should be used.
 
-  // `define useVirtualChannels 1
+  `define useVirtualChannels 1
 
   `ifdef useVirtualChannels
     localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
@@ -210,6 +210,8 @@ module tb_floo_noc_bridge;
       .axis_out_rsp_i  ( bridge_rsp[1]             )
     );
 
+    // TODO: insert the serial_link layers in here
+
     floo_axis_noc_bridge_virtual_channels #(
     	.ignore_assert   ( BridgeBypass              ),
       .req_flit_t      ( req_flit_t                ),
@@ -249,6 +251,8 @@ module tb_floo_noc_bridge;
       .axis_in_req_i   ( bridge_req[1]             ),
       .axis_out_rsp_i  ( bridge_rsp[1]             )
     );
+
+    // TODO: insert the serial_link layers in here
 
     floo_axis_noc_bridge #(
     	.ignore_assert   ( BridgeBypass              ),
