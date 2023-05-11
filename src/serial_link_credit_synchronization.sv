@@ -3,30 +3,31 @@
 
 module serial_link_credit_synchronization #(
   parameter type credit_t   = logic,
-  parameter type data_t   = logic,
+  parameter type data_t     = logic,
+  parameter int  data_width = $bits(data_t),
   // For credit-based control flow
-  parameter int NumCredits  = -1,
+  parameter int  NumCredits = -1,
   // Force send out credits belonging to the other side
   // after ForceSendThresh is reached
-  localparam int ForceSendThresh  = NumCredits - 4
+  parameter int ForceSendThresh  = NumCredits - 4
 ) (
-  input  logic    clk_i,
-  input  logic    rst_ni,
+  input  logic                  clk_i,
+  input  logic                  rst_ni,
 
-  input  credit_t credits_received_i,
-  output credit_t credits_to_send_o,
+  input  credit_t               credits_received_i,
+  output credit_t               credits_to_send_o,
 
   // Datastream with which the credits_to_send_o port should be alligned to
-  input  data_t   data_to_send_in,
-  output data_t   data_to_send_out,
+  input  logic [data_width-1:0] data_to_send_in,
+  output logic [data_width-1:0] data_to_send_out,
 
-  input  logic    send_valid_i = 1'b1,
-  input  logic    send_ready_i,
-  input  logic    receive_valid_i,
-  input  logic    receive_ready_i,
+  input  logic                  send_valid_i = 1'b1,
+  input  logic                  send_ready_i,
+  input  logic                  receive_valid_i,
+  input  logic                  receive_ready_i,
   
-  output logic    send_valid_o,
-  output logic    send_ready_o
+  output logic                  send_valid_o,
+  output logic                  send_ready_o
 );
 
   import serial_link_pkg::*;

@@ -34,6 +34,9 @@ module tb_floo_noc_bridge;
 
   `define useVirtualChannels 1
 
+  // Stop the simulation if this simulation time (ns) is exceeded.
+  localparam int stopSimAfter = 1000000;
+
   `ifdef useVirtualChannels
     localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
     localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
@@ -370,8 +373,18 @@ module tb_floo_noc_bridge;
         $display("INFO: The NoC-bridge uses a shared physical channel (no credit-based virtual channel abstraction).");
       end    
     end
-    wait(&end_of_sim);
-    $stop;
+    // wait(&end_of_sim);
+    while(1'b1) begin
+    	@(posedge clk);
+    	if(&end_of_sim) begin
+    		$stop;
+    	end
+			if ($time >= stopSimAfter) begin
+        $error("Simulation terminated");
+        $display("INFO: Simulation timed out after %1d ns. => You may change the stop time in the tb_floo_noc_bridge testbench (localparam).", $time);
+        $stop;
+      end    	
+    end
   end
 
 

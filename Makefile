@@ -60,9 +60,9 @@ update-regs: src/regs/*.hjson
 # --------------
 
 # TB_DUT ?= tb_axi_serial_link
-TB_DUT ?= tb_floo_noc_bridge
+# TB_DUT ?= tb_floo_noc_bridge
 # Below option is not yet available...
-# TB_DUT ?= tb_floo_serial_link
+TB_DUT ?= tb_floo_serial_link
 WaveDo ?= $(TB_DUT)_wave.do
 
 BENDER_FLAGS := -t test -t simulation

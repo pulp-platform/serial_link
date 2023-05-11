@@ -46,6 +46,9 @@ module floo_axis_noc_bridge_virtual_channels
   // the axis data payload also contains the header bit which is why the flit data width is one bit smaller than the payload
   logic [payloadSize-2:0] req_i_data, rsp_i_data;
 
+  axis_data_t synchr_to_axis_data;
+  logic synchr_to_axis_valid, synchr_to_axis_ready;  
+
   ////////////////////////////////////////////////
   //  CONNECT INCOMING FLITS WITH THE AXIS_OUT  //
   ////////////////////////////////////////////////
@@ -53,7 +56,7 @@ module floo_axis_noc_bridge_virtual_channels
   // Assignment required to match the data width of the two channels (rr_arb_tree needs equi-size signals)
   assign req_i_data = req_i.data;
   assign rsp_i_data = rsp_i.data;
-  
+
   rr_arb_tree #(
     .NumIn      ( 2                          ),
     .DataWidth  ( payloadSize - 1            ),
@@ -83,6 +86,34 @@ module floo_axis_noc_bridge_virtual_channels
     .idx_o      ( axis_out_payload.hdr       )
   );
 
+  serial_link_credit_synchronization #(
+    .credit_t           ( logic [$clog2(axis_credits):0] ),
+    .data_t             ( axis_data_t ),
+    .NumCredits         ( axis_credits ),
+    .ForceSendThresh    ( axis_credits )
+  ) i_synchronization_req (
+    .clk_i              ( clk_i ),
+    .rst_ni             ( rst_ni ),
+    // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
+    // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
+    // be made smaller, without loosing any information...
+    .data_to_send_in    ( axis_out_payload ),
+    .data_to_send_out   ( synchr_to_axis_data ),
+    // towards button (internal)
+    .credits_to_send_o  (  ),
+    // top
+    .send_ready_o       ( axis_out_ready ),
+    // top
+    .send_valid_i       ( axis_out_valid ),
+    // button
+    .send_valid_o       ( synchr_to_axis_valid ),
+    // button
+    .send_ready_i       ( synchr_to_axis_ready ),
+    .credits_received_i ( '0 ),
+    .receive_valid_i    ( '0 ),
+    .receive_ready_i    ( '0 )
+  );
+
   stream_fifo #(
     .DATA_WIDTH ( payloadSize           ),
     .DEPTH      ( 2                     )
@@ -92,9 +123,9 @@ module floo_axis_noc_bridge_virtual_channels
     .flush_i    ( 1'b0                  ),
     .testmode_i ( 1'b0                  ),
     .usage_o    (                       ),
-    .valid_i    ( axis_out_valid        ),
-    .ready_o    ( axis_out_ready        ),
-    .data_i     ( axis_out_payload      ),
+    .valid_i    ( synchr_to_axis_valid  ),
+    .ready_o    ( synchr_to_axis_ready  ),
+    .data_i     ( synchr_to_axis_data   ),
     .valid_o    ( axis_out_req_o.tvalid ),
     .ready_i    ( axis_out_rsp_i.tready ),
     .data_o     ( axis_out_data_reg_out )
@@ -111,7 +142,6 @@ module floo_axis_noc_bridge_virtual_channels
   ///////////////////////////////////////////////
   //  CONNECT AXIS_IN WITH THE OUTGOING FLITS  //
   ///////////////////////////////////////////////
-  
 
   stream_fifo #(
     .DATA_WIDTH ( req_flit_data_size        ),
