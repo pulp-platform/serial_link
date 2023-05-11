@@ -104,6 +104,15 @@ for {set i 0} {$i < 2} {incr i} {
 
 }
 
+add wave -noupdate -group axi_channel_compare -group compare_1_to_2 /tb_floo_serial_link/i_axi_channel_compare_1_to_2/axi_a_req
+add wave -noupdate -group axi_channel_compare -group compare_1_to_2 /tb_floo_serial_link/i_axi_channel_compare_1_to_2/axi_a_res
+add wave -noupdate -group axi_channel_compare -group compare_1_to_2 /tb_floo_serial_link/i_axi_channel_compare_1_to_2/axi_b_req
+add wave -noupdate -group axi_channel_compare -group compare_1_to_2 /tb_floo_serial_link/i_axi_channel_compare_1_to_2/axi_b_res
+add wave -noupdate -group axi_channel_compare -group compare_2_to_1 /tb_floo_serial_link/i_axi_channel_compare_2_to_1/axi_a_req
+add wave -noupdate -group axi_channel_compare -group compare_2_to_1 /tb_floo_serial_link/i_axi_channel_compare_2_to_1/axi_a_res
+add wave -noupdate -group axi_channel_compare -group compare_2_to_1 /tb_floo_serial_link/i_axi_channel_compare_2_to_1/axi_b_req
+add wave -noupdate -group axi_channel_compare -group compare_2_to_1 /tb_floo_serial_link/i_axi_channel_compare_2_to_1/axi_b_res
+
 TreeUpdate [SetDefaultTree]
 quietly wave cursor active 1
 configure wave -namecolwidth 220

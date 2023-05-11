@@ -48,6 +48,9 @@ module tb_floo_serial_link();
   localparam int unsigned MaxTxns = 32;
   localparam int unsigned MaxTxnsPerId = 32;  
 
+  // Stop the simulation if this simulation time (ns) is exceeded.
+  localparam int stopSimAfter = 75000000;  
+
   // ==============
   //    DDR Link
   // ==============
@@ -153,10 +156,11 @@ module tb_floo_serial_link();
       .clk_reg_i      ( clk_reg        ),
       .rst_reg_ni     ( rst_reg_n      ),
       .testmode_i     ( 1'b0           ),
-      .req_i          ( flit_req_out_1 ),
-      .rsp_i          ( flit_rsp_out_1 ),
-      .req_o          ( flit_req_in_1  ),
-      .rsp_o          ( flit_rsp_in_1  ),      
+      // TODO: uncomment (commented just for debug purposes)
+      // .req_i          ( flit_req_out_1 ),
+      // .rsp_i          ( flit_rsp_out_1 ),
+      // .req_o          ( flit_req_in_1  ),
+      // .rsp_o          ( flit_rsp_in_1  ),
       .cfg_req_i      ( cfg_req_1      ),
       .cfg_rsp_o      ( cfg_rsp_1      ),
       .ddr_rcv_clk_i  ( ddr_rcv_clk_2  ),
@@ -190,10 +194,11 @@ module tb_floo_serial_link();
       .clk_reg_i      ( clk_reg        ),
       .rst_reg_ni     ( rst_reg_n      ),
       .testmode_i     ( 1'b0           ),
-      .req_i          ( flit_req_out_2 ),
-      .rsp_i          ( flit_rsp_out_2 ),
-      .req_o          ( flit_req_in_2  ),
-      .rsp_o          ( flit_rsp_in_2  ),      
+      // TODO: uncomment (commented just for debug purposes)
+      // .req_i          ( flit_req_out_2 ),
+      // .rsp_i          ( flit_rsp_out_2 ),
+      // .req_o          ( flit_req_in_2  ),
+      // .rsp_o          ( flit_rsp_in_2  ),      
       .cfg_req_i      ( cfg_req_2      ),
       .cfg_rsp_o      ( cfg_rsp_2      ),
       .ddr_rcv_clk_i  ( ddr_rcv_clk_1  ),
@@ -218,10 +223,14 @@ module tb_floo_serial_link();
     .axi_out_rsp_i  ( axi_out_rsp_2  ),
     .xy_id_i        (                ),
     .id_i           ( '0             ),
-    .req_o          ( flit_req_out_2 ),
-    .rsp_o          ( flit_rsp_out_2 ),
-    .req_i          ( flit_req_in_2  ),
-    .rsp_i          ( flit_rsp_in_2  )
+    .req_o          ( flit_req_in_1  ),
+    .rsp_o          ( flit_rsp_in_1  ),
+    .req_i          ( flit_req_out_1 ),
+    .rsp_i          ( flit_rsp_out_1 )
+    // .req_o          ( flit_req_out_2 ),
+    // .rsp_o          ( flit_rsp_out_2 ),
+    // .req_i          ( flit_req_in_2  ),
+    // .rsp_i          ( flit_rsp_in_2  )
   );  
 
   REG_BUS #(
@@ -405,6 +414,11 @@ module tb_floo_serial_link();
     $info("[SYS] Links are ready");
     while (mst_done != '1) begin
       @(posedge clk_1);
+      if ($time >= stopSimAfter) begin
+        $error("Simulation terminated");
+        $display("INFO: Simulation timed out after %1d ns. => You may change the stop time in the tb_floo_serial_link testbench (localparam).", $time);
+        $stop;
+      end
     end
     stop_sim();
   end

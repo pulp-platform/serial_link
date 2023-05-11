@@ -122,7 +122,7 @@ import serial_link_pkg::*;
   //   NoC Bridge   //
   ////////////////////
 
-  if (BridgeVirtualChannels) begin : bridge  
+  if (BridgeVirtualChannels) begin : bridge
     floo_axis_noc_bridge_virtual_channels #(
       .ignore_assert   ( 1'b0         ),
       .req_flit_t      ( req_flit_t   ),
