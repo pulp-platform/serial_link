@@ -113,6 +113,9 @@ add wave -noupdate -group axi_channel_compare -group compare_2_to_1 /tb_floo_ser
 add wave -noupdate -group axi_channel_compare -group compare_2_to_1 /tb_floo_serial_link/i_axi_channel_compare_2_to_1/axi_b_req
 add wave -noupdate -group axi_channel_compare -group compare_2_to_1 /tb_floo_serial_link/i_axi_channel_compare_2_to_1/axi_b_res
 
+add wave -noupdate /tb_floo_serial_link/axi_in_req_1
+add wave -noupdate /tb_floo_serial_link/DEBUG_Signal
+
 TreeUpdate [SetDefaultTree]
 quietly wave cursor active 1
 configure wave -namecolwidth 220

@@ -94,10 +94,10 @@ scripts/compile_vsim.tcl: Bender.lock
 compile_questa: scripts/compile_vsim.tcl
 ifeq ($(SINGLE_CHANNEL),1)
 	@sed 's/NumChannels = [0-9]*/NumChannels = 1/' src/serial_link_pkg.sv -i.prev
-	$(VSIM) -64 -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log
+	$(VSIM) -64 -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log | grep --color -P "Error|"
 	@mv src/serial_link_pkg.sv.prev src/serial_link_pkg.sv
 else
-	$(VSIM) -64 -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log
+	$(VSIM) -64 -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log | grep --color -P "Error|"
 endif
 	@! grep -P "Errors: [1-9]*," $(dir $<)vsim.log
 	@echo -e "\033[1;32m______________________________CompilationSummary______________________________\033[0m"
@@ -117,7 +117,7 @@ clean_questa:
 run_questa:
 	@echo -e "\033[0;34mRunning the testbench: \033[1m$(TB_DUT)\033[0m"
 	@echo -e "\033[0;34mExpected stop time is \033[1m$(StopTime) ns\033[0m"
-	$(VSIM) $(TB_DUT) -work $(WORK) $(RUN_ARGS) -c -do "run -all; exit" | tee $(dir $<)vsim_consoleSimulation.log
+	$(VSIM) $(TB_DUT) -work $(WORK) $(RUN_ARGS) -c -do "run -all; exit" | tee $(dir $<)vsim_consoleSimulation.log | grep --color -P "Error|"
 	@echo -e "\033[0;34mTestbench: \033[1m$(TB_DUT)\033[0m"
 	@echo -e "\033[0;34mStop time of the original design was: \033[1m$(StopTime) ns\033[0m"	
 	@echo -e "\033[1;32m______________________________Simulation-Summary______________________________\033[0m"
