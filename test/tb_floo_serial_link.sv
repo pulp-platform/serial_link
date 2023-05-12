@@ -9,6 +9,7 @@ module tb_floo_serial_link();
 
   `include "axi/assign.svh"
   `include "axi/typedef.svh"
+  `include "axi_type_conversion/assign.svh"
 
   `include "register_interface/assign.svh"
   `include "register_interface/typedef.svh"
@@ -28,7 +29,8 @@ module tb_floo_serial_link();
   localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;
 
   localparam time         TckSys1         = 50ns;
-  localparam time         TckSys2         = 54ns;
+  localparam time         TckSys2         = 50ns;
+  // localparam time         TckSys2         = 54ns;
   localparam time         TckReg          = 200ns;
   localparam int unsigned RstClkCyclesSys = 1;
 
@@ -49,7 +51,7 @@ module tb_floo_serial_link();
   localparam int unsigned MaxTxnsPerId = 32;  
 
   // Stop the simulation if this simulation time (ns) is exceeded.
-  localparam int stopSimAfter = 75000000;  
+  localparam int stopSimAfter = 75000000;
 
   // ==============
   //    DDR Link
@@ -85,6 +87,10 @@ module tb_floo_serial_link();
   cfg_rsp_t   cfg_rsp_1;
   cfg_req_t   cfg_req_2;
   cfg_rsp_t   cfg_rsp_2;
+
+
+  axi_in_req_t DEBUG_Signal;
+  assign DEBUG_Signal = axi_in_req_1;
 
   // link
   wire [NumChannels*NumLanes-1:0] ddr_o;
@@ -169,15 +175,16 @@ module tb_floo_serial_link();
       .ddr_o          ( ddr_o          )
   );
 
-  // Handshake checks for debugging in QuestaSim
-  assign Bridge_0_rsp_i = flit_rsp_out_1.valid & flit_rsp_in_1.ready;
-  assign Bridge_0_rsp_o = flit_rsp_in_1.valid & flit_rsp_out_1.ready;
-  assign Bridge_0_req_i = flit_req_out_1.valid & flit_req_in_1.ready;
-  assign Bridge_0_req_o = flit_req_in_1.valid & flit_req_out_1.ready;
-  assign Bridge_1_rsp_i = flit_rsp_out_2.valid & flit_rsp_in_2.ready;
-  assign Bridge_1_rsp_o = flit_rsp_in_2.valid & flit_rsp_out_2.ready;
-  assign Bridge_1_req_i = flit_req_out_2.valid & flit_req_in_2.ready;
-  assign Bridge_1_req_o = flit_req_in_2.valid & flit_req_out_2.ready;
+  // // Handshake checks for debugging in QuestaSim
+  // logic Bridge_0_rsp_i, Bridge_0_rsp_o, Bridge_0_req_i, Bridge_0_req_o, Bridge_1_rsp_i, Bridge_1_rsp_o, Bridge_1_req_i, Bridge_1_req_o;
+  // assign Bridge_0_rsp_i = flit_rsp_out_1.valid & flit_rsp_in_1.ready;
+  // assign Bridge_0_rsp_o = flit_rsp_in_1.valid & flit_rsp_out_1.ready;
+  // assign Bridge_0_req_i = flit_req_out_1.valid & flit_req_in_1.ready;
+  // assign Bridge_0_req_o = flit_req_in_1.valid & flit_req_out_1.ready;
+  // assign Bridge_1_rsp_i = flit_rsp_out_2.valid & flit_rsp_in_2.ready;
+  // assign Bridge_1_rsp_o = flit_rsp_in_2.valid & flit_rsp_out_2.ready;
+  // assign Bridge_1_req_i = flit_req_out_2.valid & flit_req_in_2.ready;
+  // assign Bridge_1_req_o = flit_req_in_2.valid & flit_req_out_2.ready;
 
   // second serial instance
   floo_serial_link_occamy_wrapper #(
@@ -207,6 +214,11 @@ module tb_floo_serial_link();
       .ddr_o          ( ddr_i          )
   );
 
+  // assign axi_out_req_1 = axi_in_req_2;
+  // assign axi_in_rsp_1 = axi_out_rsp_2;
+  // assign axi_out_req_2 = axi_in_req_1;
+  // assign axi_in_rsp_2 = axi_out_rsp_1;
+
   floo_axi_chimney #(
     .RouteAlgo          ( floo_pkg::IdTable ),
     .MaxTxns            ( MaxTxns           ),
@@ -226,12 +238,12 @@ module tb_floo_serial_link();
     .req_o          ( flit_req_in_1  ),
     .rsp_o          ( flit_rsp_in_1  ),
     .req_i          ( flit_req_out_1 ),
-    .rsp_i          ( flit_rsp_out_1 )
-    // .req_o          ( flit_req_out_2 ),
-    // .rsp_o          ( flit_rsp_out_2 ),
-    // .req_i          ( flit_req_in_2  ),
-    // .rsp_i          ( flit_rsp_in_2  )
-  );  
+    .rsp_i          ( flit_rsp_out_1 )/*,
+    .req_o          ( flit_req_out_2 ),
+    .rsp_o          ( flit_rsp_out_2 ),
+    .req_i          ( flit_req_in_2  ),
+    .rsp_i          ( flit_rsp_in_2  )*/
+  );
 
   REG_BUS #(
     .ADDR_WIDTH (RegAddrWidth),
@@ -400,6 +412,11 @@ module tb_floo_serial_link();
   end
 
   initial begin : stimuli_process
+    if (TckSys2 == TckSys1) begin
+      $display("INFO: The connected chiplets share the same clock frequency.");
+    end else begin
+      $display("INFO: The two sides of the off-chip link do not share the same frequency.");
+    end
     reg_master_1.reset_master();
     reg_master_2.reset_master();
     fork
@@ -419,7 +436,7 @@ module tb_floo_serial_link();
         $display("INFO: Simulation timed out after %1d ns. => You may change the stop time in the tb_floo_serial_link testbench (localparam).", $time);
         $stop;
       end
-    end
+    end 
     stop_sim();
   end
 
@@ -443,7 +460,7 @@ module tb_floo_serial_link();
     .axi_a_res ( axi_in_rsp_1   ),
     .axi_b_req ( axi_out_req_2  ),
     .axi_b_res ( axi_out_rsp_2  )
-  );
+  ); 
 
   axi_chan_compare #(
     .IgnoreId  ( 1'b1          ),
