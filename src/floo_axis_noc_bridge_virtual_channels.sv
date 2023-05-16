@@ -9,8 +9,12 @@ module floo_axis_noc_bridge_virtual_channels
   parameter  type  req_flit_t    = logic,
   parameter  type  axis_req_t    = logic,
   parameter  type  axis_rsp_t    = logic,
-  parameter  type  axis_data_t   = logic,
-  localparam int   axis_credits  = 3
+  parameter  int  flit_data_size   = 1,
+  parameter  int  numberOfChannels = 2,
+
+  localparam int unsigned IdxWidth      = unsigned'($clog2(numberOfChannels)),
+  localparam type         idx_t         = logic [IdxWidth-1:0],
+  localparam int          axis_credits  = 3
 ) (
   // global signals
   input  logic      clk_i,
@@ -30,10 +34,19 @@ module floo_axis_noc_bridge_virtual_channels
   input  axis_req_t axis_in_req_i,
   output axis_rsp_t axis_in_rsp_o
 );
-  // typedef struct packed {
-  //   logic hdr;
-  //   logic [FlitDataSize-1:0] flit_data;
-  // } axis_data_t;
+
+  typedef enum logic [0:0] {
+    response  = 'd0,
+    request   = 'd1
+  } channel_hdr_e;
+
+  idx_t selected_index;
+
+  typedef struct packed {
+    channel_hdr_e hdr;
+    logic [flit_data_size-1:0] flit_data;
+  } axis_data_t;
+
   axis_data_t axis_out_payload, axis_in_payload;
   axis_data_t axis_out_data_reg_out;
   logic axis_out_ready, axis_out_valid;
@@ -44,10 +57,8 @@ module floo_axis_noc_bridge_virtual_channels
   localparam int rsp_flit_data_size = $bits(rsp_flit_t) - 2;
 
   // the axis data payload also contains the header bit which is why the flit data width is one bit smaller than the payload
-  logic [payloadSize-2:0] req_i_data, rsp_i_data;
-
-  axis_data_t synchr_to_axis_data;
-  logic synchr_to_axis_valid, synchr_to_axis_ready;  
+  logic [payloadSize-2:0] req_i_data, rsp_i_data, req_data_synchr_out, rsp_data_synchr_out;
+  logic req_valid_synchr_out, rsp_valid_synchr_out, req_ready_synchr_out, rsp_ready_synchr_out;
 
   ////////////////////////////////////////////////
   //  CONNECT INCOMING FLITS WITH THE AXIS_OUT  //
@@ -56,6 +67,62 @@ module floo_axis_noc_bridge_virtual_channels
   // Assignment required to match the data width of the two channels (rr_arb_tree needs equi-size signals)
   assign req_i_data = req_i.data;
   assign rsp_i_data = rsp_i.data;
+
+  serial_link_credit_synchronization #(
+    .credit_t           ( logic [$clog2(axis_credits)-1:0] ),
+    .data_t             ( logic [payloadSize-2:0] ),
+    .NumCredits         ( axis_credits ),
+    .ForceSendThresh    ( axis_credits )
+  ) i_synchronization_req (
+    .clk_i              ( clk_i ),
+    .rst_ni             ( rst_ni ),
+    // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
+    // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
+    // be made smaller, without loosing any information...
+    .data_to_send_in    ( req_i_data ),
+    .data_to_send_out   ( req_data_synchr_out ),
+    // towards button (internal)
+    .credits_to_send_o  (  ),
+    // top
+    .send_ready_o       ( req_o.ready ),
+    // top
+    .send_valid_i       ( req_i.valid ),
+    // button
+    .send_valid_o       ( req_valid_synchr_out ),
+    // button
+    .send_ready_i       ( req_ready_synchr_out ),
+    .credits_received_i ( '0 ),
+    .receive_valid_i    ( '0 ),
+    .receive_ready_i    ( '0 )
+  );
+
+  serial_link_credit_synchronization #(
+    .credit_t           ( logic [$clog2(axis_credits)-1:0] ),
+    .data_t             ( logic [payloadSize-2:0] ),
+    .NumCredits         ( axis_credits ),
+    .ForceSendThresh    ( axis_credits )
+  ) i_synchronization_rsp (
+    .clk_i              ( clk_i ),
+    .rst_ni             ( rst_ni ),
+    // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
+    // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
+    // be made smaller, without loosing any information...
+    .data_to_send_in    ( rsp_i_data ),
+    .data_to_send_out   ( rsp_data_synchr_out ),
+    // towards button (internal)
+    .credits_to_send_o  (  ),
+    // top
+    .send_ready_o       ( rsp_o.ready ),
+    // top
+    .send_valid_i       ( rsp_i.valid ),
+    // button
+    .send_valid_o       ( rsp_valid_synchr_out ),
+    // button
+    .send_ready_i       ( rsp_ready_synchr_out ),
+    .credits_received_i ( '0 ),
+    .receive_valid_i    ( '0 ),
+    .receive_ready_i    ( '0 )
+  );
 
   rr_arb_tree #(
     .NumIn      ( 2                          ),
@@ -69,13 +136,13 @@ module floo_axis_noc_bridge_virtual_channels
     /// Clears the arbiter state. Only used if `ExtPrio` is `1'b0` or `LockIn` is `1'b1`.
     .flush_i    ( 1'b0                       ),
     /// Input requests arbitration.
-    .req_i      ( {req_i.valid, rsp_i.valid} ),
+    .req_i      ( {req_valid_synchr_out, rsp_valid_synchr_out} ),
     /* verilator lint_off UNOPTFLAT */
     /// Input request is granted.
-    .gnt_o      ( {req_o.ready, rsp_o.ready} ),
+    .gnt_o      ( {req_ready_synchr_out, rsp_ready_synchr_out} ),
     /* verilator lint_on UNOPTFLAT */
     /// Input data for arbitration.
-    .data_i     ( {req_i_data, rsp_i_data}   ),
+    .data_i     ( {req_data_synchr_out, rsp_data_synchr_out}   ),
     /// Output request is valid.
     .req_o      ( axis_out_valid             ),
     /// Output request is granted.
@@ -83,37 +150,12 @@ module floo_axis_noc_bridge_virtual_channels
     /// Output data.
     .data_o     ( axis_out_payload.flit_data ),
     /// Index from which input the data came from.
-    .idx_o      ( axis_out_payload.hdr       )
+    .idx_o      ( selected_index             )
   );
 
-  serial_link_credit_synchronization #(
-    .credit_t           ( logic [$clog2(axis_credits):0] ),
-    .data_t             ( axis_data_t ),
-    .NumCredits         ( axis_credits ),
-    .ForceSendThresh    ( axis_credits )
-  ) i_synchronization_req (
-    .clk_i              ( clk_i ),
-    .rst_ni             ( rst_ni ),
-    // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
-    // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
-    // be made smaller, without loosing any information...
-    .data_to_send_in    ( axis_out_payload ),
-    .data_to_send_out   ( synchr_to_axis_data ),
-    // towards button (internal)
-    .credits_to_send_o  (  ),
-    // top
-    .send_ready_o       ( axis_out_ready ),
-    // top
-    .send_valid_i       ( axis_out_valid ),
-    // button
-    .send_valid_o       ( synchr_to_axis_valid ),
-    // button
-    .send_ready_i       ( synchr_to_axis_ready ),
-    .credits_received_i ( '0 ),
-    .receive_valid_i    ( '0 ),
-    .receive_ready_i    ( '0 )
-  );
+  assign axis_out_payload.hdr = channel_hdr_e'(selected_index);
 
+  // required for a stable AXIS output
   stream_fifo #(
     .DATA_WIDTH ( payloadSize           ),
     .DEPTH      ( 2                     )
@@ -123,9 +165,9 @@ module floo_axis_noc_bridge_virtual_channels
     .flush_i    ( 1'b0                  ),
     .testmode_i ( 1'b0                  ),
     .usage_o    (                       ),
-    .valid_i    ( synchr_to_axis_valid  ),
-    .ready_o    ( synchr_to_axis_ready  ),
-    .data_i     ( synchr_to_axis_data   ),
+    .valid_i    ( axis_out_valid        ),
+    .ready_o    ( axis_out_ready        ),
+    .data_i     ( axis_out_payload      ),
     .valid_o    ( axis_out_req_o.tvalid ),
     .ready_i    ( axis_out_rsp_i.tready ),
     .data_o     ( axis_out_data_reg_out )
@@ -143,6 +185,9 @@ module floo_axis_noc_bridge_virtual_channels
   //  CONNECT AXIS_IN WITH THE OUTGOING FLITS  //
   ///////////////////////////////////////////////
 
+  assign axis_in_req_valid = (axis_in_payload.hdr == request) ? axis_in_req_i.tvalid : 0;
+  assign axis_in_rsp_valid = (axis_in_payload.hdr == response) ? axis_in_req_i.tvalid : 0; 
+
   stream_fifo #(
     .DATA_WIDTH ( req_flit_data_size        ),
     .DEPTH      ( axis_credits              )
@@ -159,9 +204,6 @@ module floo_axis_noc_bridge_virtual_channels
     .ready_i    ( req_i.ready               ),
     .data_o     ( req_o.data                )
   );
-
-  assign axis_in_req_valid = (axis_in_payload.hdr == 1'b1) ? axis_in_req_i.tvalid : 0;
-  assign axis_in_rsp_valid = (axis_in_payload.hdr == 1'b0) ? axis_in_req_i.tvalid : 0;
 
   stream_fifo #(
     .DATA_WIDTH ( rsp_flit_data_size        ),

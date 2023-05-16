@@ -59,14 +59,14 @@ add wave -noupdate -group BridgeData -group rsp_1_to_0 /tb_floo_serial_link/i_se
 add wave -noupdate -group BridgeData -group rsp_1_to_0 /tb_floo_serial_link/i_serial_link_0/gen_multi_channel_serial_link/i_serial_link/bridge/i_serial_link_network/rsp_o_data_gen
 
 add wave -noupdate -color Yellow -group BridgeValidHandshake /tb_floo_serial_link/i_serial_link_0/gen_multi_channel_serial_link/i_serial_link/bridge/i_serial_link_network/clk_i
-add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/Bridge_0_req_o
-add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/Bridge_0_req_i
-add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/Bridge_1_req_o
-add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/Bridge_1_req_i
-add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/Bridge_0_rsp_o
-add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/Bridge_0_rsp_i
-add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/Bridge_1_rsp_o
-add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/Bridge_1_rsp_i
+add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/DEBUG_Bridge_0_req_o
+add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/DEBUG_Bridge_0_req_i
+add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/DEBUG_Bridge_1_req_o
+add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/DEBUG_Bridge_1_req_i
+add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/DEBUG_Bridge_0_rsp_o
+add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/DEBUG_Bridge_0_rsp_i
+add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/DEBUG_Bridge_1_rsp_o
+add wave -noupdate -color Cyan -group BridgeValidHandshake /tb_floo_serial_link/DEBUG_Bridge_1_rsp_i
 
 for {set i 0} {$i < 2} {incr i} {
     set group_name "Adapter $i"
@@ -113,8 +113,12 @@ add wave -noupdate -group axi_channel_compare -group compare_2_to_1 /tb_floo_ser
 add wave -noupdate -group axi_channel_compare -group compare_2_to_1 /tb_floo_serial_link/i_axi_channel_compare_2_to_1/axi_b_req
 add wave -noupdate -group axi_channel_compare -group compare_2_to_1 /tb_floo_serial_link/i_axi_channel_compare_2_to_1/axi_b_res
 
-add wave -noupdate /tb_floo_serial_link/axi_in_req_1
-add wave -noupdate /tb_floo_serial_link/DEBUG_Signal
+# add wave -noupdate /tb_floo_serial_link/DEBUG_axi_req_t
+# add wave -noupdate /tb_floo_serial_link/DEBUG_axi_in_req_t
+# add wave -noupdate /tb_floo_serial_link/DEBUG_axi_out_req_t
+# add wave -noupdate /tb_floo_serial_link/DEBUG_axi_resp_t
+# add wave -noupdate /tb_floo_serial_link/DEBUG_axi_in_resp_t
+# add wave -noupdate /tb_floo_serial_link/DEBUG_axi_out_resp_t
 
 TreeUpdate [SetDefaultTree]
 quietly wave cursor active 1
