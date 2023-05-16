@@ -20,6 +20,8 @@ module tb_floo_noc_bridge;
 
   localparam NumTargets = 2;
 
+  localparam channelCount = 2;
+
   localparam int unsigned ReorderBufferSize = 64;
   localparam int unsigned MaxTxns = 32;
   localparam int unsigned MaxTxnsPerId = 32;
@@ -56,15 +58,11 @@ module tb_floo_noc_bridge;
     // } axis_payload_t;
 		localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
     localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
-    typedef struct packed {
-      logic hdr;
-      logic [FlitDataSize-1:0] flit_data;
-    } axis_payload_t;    
     localparam bit BridgeVirtualChannels = 1'b0;
   `endif
 
   // Axi stream dimension must be a multiple of 8 bits
-  localparam int StreamDataBytes = ($bits(axis_payload_t) + 7) / 8;
+  localparam int StreamDataBytes = (FlitDataSize + $clog2(channelCount) + 7) / 8;
   // Typdefs for Axi Stream interface
   // All except tdata_t are unused at the moment
   localparam type tdata_t = logic [StreamDataBytes*8-1:0];
@@ -194,87 +192,91 @@ module tb_floo_noc_bridge;
 
   if (BridgeVirtualChannels) begin : bridge
     floo_axis_noc_bridge_virtual_channels #(
-    	.ignore_assert   ( BridgeBypass              ),
-      .req_flit_t      ( req_flit_t                ),
-      .rsp_flit_t      ( rsp_flit_t                ),
-      .axis_req_t      ( axis_req_t                ),
-      .axis_rsp_t      ( axis_rsp_t                ),
-      .axis_data_t     ( axis_payload_t            )
+    	.ignore_assert    ( BridgeBypass              ),
+      .req_flit_t       ( req_flit_t                ),
+      .rsp_flit_t       ( rsp_flit_t                ),
+      .axis_req_t       ( axis_req_t                ),
+      .axis_rsp_t       ( axis_rsp_t                ),
+      .flit_data_size   ( FlitDataSize              ),
+      .numberOfChannels ( channelCount              )
     ) i_floo_axis_noc_bridge_0 (
-      .clk_i           ( clk                       ),
-      .rst_ni          ( rst_n                     ),
-      .req_o           ( req_bridge_0_o            ),
-      .rsp_o           ( rsp_bridge_0_o            ),
-      .req_i           ( chimney_0_req[0]          ),
-      .rsp_i           ( chimney_0_rsp[0]          ),
-      .axis_out_req_o  ( bridge_req[0]             ),
-      .axis_in_rsp_o   ( bridge_rsp[0]             ),
-      .axis_in_req_i   ( bridge_req[1]             ),
-      .axis_out_rsp_i  ( bridge_rsp[1]             )
+      .clk_i            ( clk                       ),
+      .rst_ni           ( rst_n                     ),
+      .req_o            ( req_bridge_0_o            ),
+      .rsp_o            ( rsp_bridge_0_o            ),
+      .req_i            ( chimney_0_req[0]          ),
+      .rsp_i            ( chimney_0_rsp[0]          ),
+      .axis_out_req_o   ( bridge_req[0]             ),
+      .axis_in_rsp_o    ( bridge_rsp[0]             ),
+      .axis_in_req_i    ( bridge_req[1]             ),
+      .axis_out_rsp_i   ( bridge_rsp[1]             )
     );
 
     // TODO: insert the serial_link layers in here
 
     floo_axis_noc_bridge_virtual_channels #(
-    	.ignore_assert   ( BridgeBypass              ),
-      .req_flit_t      ( req_flit_t                ),
-      .rsp_flit_t      ( rsp_flit_t                ),
-      .axis_req_t      ( axis_req_t                ),
-      .axis_rsp_t      ( axis_rsp_t                ),
-      .axis_data_t     ( axis_payload_t            )
+    	.ignore_assert    ( BridgeBypass              ),
+      .req_flit_t       ( req_flit_t                ),
+      .rsp_flit_t       ( rsp_flit_t                ),
+      .axis_req_t       ( axis_req_t                ),
+      .axis_rsp_t       ( axis_rsp_t                ),
+      .flit_data_size   ( FlitDataSize              ),
+      .numberOfChannels ( channelCount              )
     ) i_floo_axis_noc_bridge_1 (
-      .clk_i           ( clk                       ),
-      .rst_ni          ( rst_n                     ),
-      .req_o           ( req_bridge_1_o            ),
-      .rsp_o           ( rsp_bridge_1_o            ),
-      .req_i           ( chimney_1_req[1]          ),
-      .rsp_i           ( chimney_1_rsp[1]          ),
-      .axis_out_req_o  ( bridge_req[1]             ),
-      .axis_in_rsp_o   ( bridge_rsp[1]             ),
-      .axis_in_req_i   ( bridge_req[0]             ),
-      .axis_out_rsp_i  ( bridge_rsp[0]             )
+      .clk_i            ( clk                       ),
+      .rst_ni           ( rst_n                     ),
+      .req_o            ( req_bridge_1_o            ),
+      .rsp_o            ( rsp_bridge_1_o            ),
+      .req_i            ( chimney_1_req[1]          ),
+      .rsp_i            ( chimney_1_rsp[1]          ),
+      .axis_out_req_o   ( bridge_req[1]             ),
+      .axis_in_rsp_o    ( bridge_rsp[1]             ),
+      .axis_in_req_i    ( bridge_req[0]             ),
+      .axis_out_rsp_i   ( bridge_rsp[0]             )
     );    
   end else begin : bridge
     floo_axis_noc_bridge #(
-    	.ignore_assert   ( BridgeBypass              ),
-      .req_flit_t      ( req_flit_t                ),
-      .rsp_flit_t      ( rsp_flit_t                ),
-      .axis_req_t      ( axis_req_t                ),
-      .axis_rsp_t      ( axis_rsp_t                ),
-      .axis_data_t     ( axis_payload_t            )
+    	.ignore_assert    ( BridgeBypass              ),
+      .req_flit_t       ( req_flit_t                ),
+      .rsp_flit_t       ( rsp_flit_t                ),
+      .axis_req_t       ( axis_req_t                ),
+      .axis_rsp_t       ( axis_rsp_t                ),
+      .flit_data_size   ( FlitDataSize              ),
+      .numberOfChannels ( channelCount              )
     ) i_floo_axis_noc_bridge_0 (
-      .clk_i           ( clk                       ),
-      .rst_ni          ( rst_n                     ),
-      .req_o           ( req_bridge_0_o            ),
-      .rsp_o           ( rsp_bridge_0_o            ),
-      .req_i           ( chimney_0_req[0]          ),
-      .rsp_i           ( chimney_0_rsp[0]          ),
-      .axis_out_req_o  ( bridge_req[0]             ),
-      .axis_in_rsp_o   ( bridge_rsp[0]             ),
-      .axis_in_req_i   ( bridge_req[1]             ),
-      .axis_out_rsp_i  ( bridge_rsp[1]             )
+      .clk_i            ( clk                       ),
+      .rst_ni           ( rst_n                     ),
+      .req_o            ( req_bridge_0_o            ),
+      .rsp_o            ( rsp_bridge_0_o            ),
+      .req_i            ( chimney_0_req[0]          ),
+      .rsp_i            ( chimney_0_rsp[0]          ),
+      .axis_out_req_o   ( bridge_req[0]             ),
+      .axis_in_rsp_o    ( bridge_rsp[0]             ),
+      .axis_in_req_i    ( bridge_req[1]             ),
+      .axis_out_rsp_i   ( bridge_rsp[1]             )
     );
 
     // TODO: insert the serial_link layers in here
 
     floo_axis_noc_bridge #(
-    	.ignore_assert   ( BridgeBypass              ),
-      .req_flit_t      ( req_flit_t                ),
-      .rsp_flit_t      ( rsp_flit_t                ),
-      .axis_req_t      ( axis_req_t                ),
-      .axis_rsp_t      ( axis_rsp_t                ),
-      .axis_data_t     ( axis_payload_t            )
+    	.ignore_assert    ( BridgeBypass              ),
+      .req_flit_t       ( req_flit_t                ),
+      .rsp_flit_t       ( rsp_flit_t                ),
+      .axis_req_t       ( axis_req_t                ),
+      .axis_rsp_t       ( axis_rsp_t                ),
+      .flit_data_size   ( FlitDataSize              ),
+      .numberOfChannels ( channelCount              )
     ) i_floo_axis_noc_bridge_1 (
-      .clk_i           ( clk                       ),
-      .rst_ni          ( rst_n                     ),
-      .req_o           ( req_bridge_1_o            ),
-      .rsp_o           ( rsp_bridge_1_o            ),
-      .req_i           ( chimney_1_req[1]          ),
-      .rsp_i           ( chimney_1_rsp[1]          ),
-      .axis_out_req_o  ( bridge_req[1]             ),
-      .axis_in_rsp_o   ( bridge_rsp[1]             ),
-      .axis_in_req_i   ( bridge_req[0]             ),
-      .axis_out_rsp_i  ( bridge_rsp[0]             )
+      .clk_i            ( clk                       ),
+      .rst_ni           ( rst_n                     ),
+      .req_o            ( req_bridge_1_o            ),
+      .rsp_o            ( rsp_bridge_1_o            ),
+      .req_i            ( chimney_1_req[1]          ),
+      .rsp_i            ( chimney_1_rsp[1]          ),
+      .axis_out_req_o   ( bridge_req[1]             ),
+      .axis_in_rsp_o    ( bridge_rsp[1]             ),
+      .axis_in_req_i    ( bridge_req[0]             ),
+      .axis_out_rsp_i   ( bridge_rsp[0]             )
     );
 
     assign Bridge_0_req_o = req_bridge_0_o.valid & chimney_0_req[0].ready ;

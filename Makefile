@@ -79,6 +79,8 @@ ifeq ($(TB_DUT),tb_floo_noc_bridge)
 else ifeq ($(TB_DUT),tb_axi_serial_link)
 	StopTime := "25,159,350"
 # 	StopTime := "26,389,950"
+else ifeq ($(TB_DUT),tb_floo_serial_link)
+	StopTime := "30,183,400"
 else 
 	StopTime := "???"
 endif

@@ -19,7 +19,6 @@ dependencies:
 
 export_include_dirs:
   - src/axis/include
-  - src/include
 
 sources:
   files:

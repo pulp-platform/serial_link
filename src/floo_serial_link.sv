@@ -25,7 +25,9 @@ import serial_link_pkg::*;
   parameter  int  NumLanes        = serial_link_pkg::NumLanes,
   parameter  int  MaxClkDiv       = serial_link_pkg::MaxClkDiv,
   parameter  bit  NoRegCdc        = 1'b0,
-  localparam int  Log2NumChannels = (NumChannels > 1) ? $clog2(NumChannels) : 1
+  localparam int  Log2NumChannels = (NumChannels > 1) ? $clog2(NumChannels) : 1,
+  localparam int  channelCount    = 2,
+  parameter  bit  printFeedback   = 1'b0
 ) (
   // There are 3 different clock/resets:
   // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
@@ -64,9 +66,9 @@ import serial_link_pkg::*;
   localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
   localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
   typedef struct packed {
-    logic hdr;
+    logic [$clog2(channelCount)-1:0] hdr;
     logic [FlitDataSize-1:0] flit_data;
-  } payload_t;
+  } payload_t;  
   // TODO: #SelectTheBridgeVersion
   localparam bit BridgeVirtualChannels = 1'b0;
 
@@ -124,45 +126,61 @@ import serial_link_pkg::*;
 
   if (BridgeVirtualChannels) begin : bridge
     floo_axis_noc_bridge_virtual_channels #(
-      .ignore_assert   ( 1'b0         ),
-      .req_flit_t      ( req_flit_t   ),
-      .rsp_flit_t      ( rsp_flit_t   ),
-      .axis_req_t      ( axis_req_t   ),
-      .axis_rsp_t      ( axis_rsp_t   ),
-      .axis_data_t     ( payload_t    )
+      .ignore_assert    ( 1'b0         ),
+      .req_flit_t       ( req_flit_t   ),
+      .rsp_flit_t       ( rsp_flit_t   ),
+      .axis_req_t       ( axis_req_t   ),
+      .axis_rsp_t       ( axis_rsp_t   ),
+      .flit_data_size   ( FlitDataSize ),
+      .numberOfChannels ( channelCount )
     ) i_serial_link_network (
-      .clk_i           ( clk_sl_i     ),
-      .rst_ni          ( rst_sl_ni    ),
-      .req_o           ( req_o        ),
-      .rsp_o           ( rsp_o        ),
-      .req_i           ( req_i        ),
-      .rsp_i           ( rsp_i        ),
-      .axis_out_req_o  ( axis_out_req ),
-      .axis_in_rsp_o   ( axis_in_rsp  ),
-      .axis_in_req_i   ( axis_in_req  ),
-      .axis_out_rsp_i  ( axis_out_rsp )
-    );    
+      .clk_i            ( clk_sl_i     ),
+      .rst_ni           ( rst_sl_ni    ),
+      .req_o            ( req_o        ),
+      .rsp_o            ( rsp_o        ),
+      .req_i            ( req_i        ),
+      .rsp_i            ( rsp_i        ),
+      .axis_out_req_o   ( axis_out_req ),
+      .axis_in_rsp_o    ( axis_in_rsp  ),
+      .axis_in_req_i    ( axis_in_req  ),
+      .axis_out_rsp_i   ( axis_out_rsp )
+    );
   end else begin : bridge
     floo_axis_noc_bridge #(
-      .ignore_assert   ( 1'b0         ),
-      .req_flit_t      ( req_flit_t   ),
-      .rsp_flit_t      ( rsp_flit_t   ),
-      .axis_req_t      ( axis_req_t   ),
-      .axis_rsp_t      ( axis_rsp_t   ),
-      .axis_data_t     ( payload_t    )
+      .ignore_assert    ( 1'b0         ),
+      .req_flit_t       ( req_flit_t   ),
+      .rsp_flit_t       ( rsp_flit_t   ),
+      .axis_req_t       ( axis_req_t   ),
+      .axis_rsp_t       ( axis_rsp_t   ),
+      .flit_data_size   ( FlitDataSize ),
+      .numberOfChannels ( channelCount )
     ) i_serial_link_network (
-      .clk_i           ( clk_sl_i     ),
-      .rst_ni          ( rst_sl_ni    ),
-      .req_o           ( req_o        ),
-      .rsp_o           ( rsp_o        ),
-      .req_i           ( req_i        ),
-      .rsp_i           ( rsp_i        ),
-      .axis_out_req_o  ( axis_out_req ),
-      .axis_in_rsp_o   ( axis_in_rsp  ),
-      .axis_in_req_i   ( axis_in_req  ),
-      .axis_out_rsp_i  ( axis_out_rsp )
+      .clk_i            ( clk_sl_i     ),
+      .rst_ni           ( rst_sl_ni    ),
+      .req_o            ( req_o        ),
+      .rsp_o            ( rsp_o        ),
+      .req_i            ( req_i        ),
+      .rsp_i            ( rsp_i        ),
+      .axis_out_req_o   ( axis_out_req ),
+      .axis_in_rsp_o    ( axis_in_rsp  ),
+      .axis_in_req_i    ( axis_in_req  ),
+      .axis_out_rsp_i   ( axis_out_rsp )
     );
   end
+
+  /////////////////////////////////////////////////////////
+  //   CONSOLE FEEDBACK ON THE SELECTED BRIDGE VERSION   //
+  /////////////////////////////////////////////////////////
+
+  initial begin
+    if (printFeedback) begin
+      if (BridgeVirtualChannels) begin
+        $display("INFO: The virtual channel NoC bridge is being used");
+      end else begin
+        $display("INFO: The simple NoC bridge version without virtual channels is being used");
+      end
+    end
+  end  
 
   /////////////////////////
   //   DATA LINK LAYER   //

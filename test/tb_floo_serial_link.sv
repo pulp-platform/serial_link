@@ -9,7 +9,6 @@ module tb_floo_serial_link();
 
   `include "axi/assign.svh"
   `include "axi/typedef.svh"
-  `include "axi_type_conversion/assign.svh"
 
   `include "register_interface/assign.svh"
   `include "register_interface/typedef.svh"
@@ -34,12 +33,6 @@ module tb_floo_serial_link();
   localparam time         TckReg          = 200ns;
   localparam int unsigned RstClkCyclesSys = 1;
 
-  localparam int unsigned AxiIdWidth      = 8;
-  localparam int unsigned AxiAddrWidth    = 48;
-  localparam int unsigned AxiDataWidth    = 512;
-  localparam int unsigned AxiStrbWidth    = AxiDataWidth / 8;
-  localparam int unsigned AxiUserWidth    = 1;
-
   localparam int unsigned RegAddrWidth    = 32;
   localparam int unsigned RegDataWidth    = 32;
   localparam int unsigned RegStrbWidth    = RegDataWidth / 8;
@@ -48,7 +41,7 @@ module tb_floo_serial_link();
 
   localparam int unsigned ReorderBufferSize = 64;
   localparam int unsigned MaxTxns = 32;
-  localparam int unsigned MaxTxnsPerId = 32;  
+  localparam int unsigned MaxTxnsPerId = 32;
 
   // Stop the simulation if this simulation time (ns) is exceeded.
   localparam int stopSimAfter = 75000000;
@@ -58,13 +51,21 @@ module tb_floo_serial_link();
   // ==============
 
   // AXI types for typedefs
-  typedef logic [AxiIdWidth-1:0  ]  axi_id_t;
-  typedef logic [AxiAddrWidth-1:0]  axi_addr_t;
-  typedef logic [AxiDataWidth-1:0]  axi_data_t;
-  typedef logic [AxiStrbWidth-1:0]  axi_strb_t;
-  typedef logic [AxiUserWidth-1:0]  axi_user_t;
+  typedef logic [AxiInIdWidth-1:0  ]  axi_in_id_t;
+  typedef logic [AxiInAddrWidth-1:0]  axi_in_addr_t;
+  typedef logic [AxiInDataWidth-1:0]  axi_in_data_t;
+  typedef logic [AxiInDataWidth/8-1:0]  axi_in_strb_t;
+  typedef logic [AxiInUserWidth-1:0]  axi_in_user_t;
 
-  `AXI_TYPEDEF_ALL(axi, axi_addr_t, axi_id_t, axi_data_t, axi_strb_t, axi_user_t)
+  `AXI_TYPEDEF_ALL(axi_in, axi_in_addr_t, axi_in_id_t, axi_in_data_t, axi_in_strb_t, axi_in_user_t)
+
+  typedef logic [AxiOutIdWidth-1:0  ]  axi_out_id_t;
+  typedef logic [AxiOutAddrWidth-1:0]  axi_out_addr_t;
+  typedef logic [AxiOutDataWidth-1:0]  axi_out_data_t;
+  typedef logic [AxiOutDataWidth/8-1:0]  axi_out_strb_t;
+  typedef logic [AxiOutUserWidth-1:0]  axi_out_user_t;
+
+  `AXI_TYPEDEF_ALL(axi_out, axi_out_addr_t, axi_out_id_t, axi_out_data_t, axi_out_strb_t, axi_out_user_t)  
 
   // RegBus types for typedefs
   typedef logic [RegAddrWidth-1:0]  cfg_addr_t;
@@ -75,10 +76,10 @@ module tb_floo_serial_link();
 
   // Model signals
   logic [NumChannels-1:0]  ddr_rcv_clk_1, ddr_rcv_clk_2;
-  axi_req_t   axi_out_req_1, axi_out_req_2;
-  axi_resp_t  axi_out_rsp_1, axi_out_rsp_2;
-  axi_req_t   axi_in_req_1,  axi_in_req_2;
-  axi_resp_t  axi_in_rsp_1,  axi_in_rsp_2;
+  axi_out_req_t   axi_out_req_1, axi_out_req_2;
+  axi_out_resp_t  axi_out_rsp_1, axi_out_rsp_2;
+  axi_in_req_t   axi_in_req_1,  axi_in_req_2;
+  axi_in_resp_t  axi_in_rsp_1,  axi_in_rsp_2;
   req_flit_t  flit_req_out_1, flit_req_out_2;
   rsp_flit_t  flit_rsp_out_1, flit_rsp_out_2;
   req_flit_t  flit_req_in_1, flit_req_in_2;
@@ -88,9 +89,19 @@ module tb_floo_serial_link();
   cfg_req_t   cfg_req_2;
   cfg_rsp_t   cfg_rsp_2;
 
-
-  axi_in_req_t DEBUG_Signal;
-  assign DEBUG_Signal = axi_in_req_1;
+// TODO: Remove the debug signals below...
+  // axi_in_req_t DEBUG_axi_req_t;
+  // axi_in_req_t DEBUG_axi_in_req_t;
+  // axi_in_resp_t DEBUG_axi_in_resp_t;
+  // axi_out_req_t DEBUG_axi_out_req_t;
+  // axi_out_resp_t DEBUG_axi_out_resp_t;
+  // axi_out_resp_t DEBUG_axi_resp_t;
+  // assign DEBUG_axi_req_t = axi_in_req_1;
+  // assign DEBUG_axi_in_req_t = axi_in_req_1;
+  // assign DEBUG_axi_in_resp_t = axi_out_rsp_1;
+  // assign DEBUG_axi_out_req_t = axi_in_req_1;
+  // assign DEBUG_axi_out_resp_t = axi_out_rsp_1;
+  // assign DEBUG_axi_resp_t = axi_out_rsp_1;
 
   // link
   wire [NumChannels*NumLanes-1:0] ddr_o;
@@ -155,7 +166,8 @@ module tb_floo_serial_link();
     .cfg_rsp_t        ( cfg_rsp_t   ),
     .NumChannels      ( NumChannels ),
     .NumLanes         ( NumLanes    ),
-    .MaxClkDiv        ( MaxClkDiv   )
+    .MaxClkDiv        ( MaxClkDiv   ),
+    .printFeedback    ( 1'b1        )
   ) i_serial_link_0 (
       .clk_i          ( clk_1          ),
       .rst_ni         ( rst_1_n        ),
@@ -163,10 +175,10 @@ module tb_floo_serial_link();
       .rst_reg_ni     ( rst_reg_n      ),
       .testmode_i     ( 1'b0           ),
       // TODO: uncomment (commented just for debug purposes)
-      // .req_i          ( flit_req_out_1 ),
-      // .rsp_i          ( flit_rsp_out_1 ),
-      // .req_o          ( flit_req_in_1  ),
-      // .rsp_o          ( flit_rsp_in_1  ),
+      .req_i          ( flit_req_out_1 ),
+      .rsp_i          ( flit_rsp_out_1 ),
+      .req_o          ( flit_req_in_1  ),
+      .rsp_o          ( flit_rsp_in_1  ),
       .cfg_req_i      ( cfg_req_1      ),
       .cfg_rsp_o      ( cfg_rsp_1      ),
       .ddr_rcv_clk_i  ( ddr_rcv_clk_2  ),
@@ -176,15 +188,15 @@ module tb_floo_serial_link();
   );
 
   // // Handshake checks for debugging in QuestaSim
-  // logic Bridge_0_rsp_i, Bridge_0_rsp_o, Bridge_0_req_i, Bridge_0_req_o, Bridge_1_rsp_i, Bridge_1_rsp_o, Bridge_1_req_i, Bridge_1_req_o;
-  // assign Bridge_0_rsp_i = flit_rsp_out_1.valid & flit_rsp_in_1.ready;
-  // assign Bridge_0_rsp_o = flit_rsp_in_1.valid & flit_rsp_out_1.ready;
-  // assign Bridge_0_req_i = flit_req_out_1.valid & flit_req_in_1.ready;
-  // assign Bridge_0_req_o = flit_req_in_1.valid & flit_req_out_1.ready;
-  // assign Bridge_1_rsp_i = flit_rsp_out_2.valid & flit_rsp_in_2.ready;
-  // assign Bridge_1_rsp_o = flit_rsp_in_2.valid & flit_rsp_out_2.ready;
-  // assign Bridge_1_req_i = flit_req_out_2.valid & flit_req_in_2.ready;
-  // assign Bridge_1_req_o = flit_req_in_2.valid & flit_req_out_2.ready;
+  // logic  DEBUG_Bridge_0_rsp_i, DEBUG_Bridge_0_rsp_o, DEBUG_Bridge_0_req_i, DEBUG_Bridge_0_req_o, DEBUG_Bridge_1_rsp_i, DEBUG_Bridge_1_rsp_o, DEBUG_Bridge_1_req_i, DEBUG_Bridge_1_req_o;
+  // assign DEBUG_Bridge_0_rsp_i = flit_rsp_out_1.valid & flit_rsp_in_1.ready;
+  // assign DEBUG_Bridge_0_rsp_o = flit_rsp_in_1.valid & flit_rsp_out_1.ready;
+  // assign DEBUG_Bridge_0_req_i = flit_req_out_1.valid & flit_req_in_1.ready;
+  // assign DEBUG_Bridge_0_req_o = flit_req_in_1.valid & flit_req_out_1.ready;
+  // assign DEBUG_Bridge_1_rsp_i = flit_rsp_out_2.valid & flit_rsp_in_2.ready;
+  // assign DEBUG_Bridge_1_rsp_o = flit_rsp_in_2.valid & flit_rsp_out_2.ready;
+  // assign DEBUG_Bridge_1_req_i = flit_req_out_2.valid & flit_req_in_2.ready;
+  // assign DEBUG_Bridge_1_req_o = flit_req_in_2.valid & flit_req_out_2.ready;
 
   // second serial instance
   floo_serial_link_occamy_wrapper #(
@@ -202,10 +214,10 @@ module tb_floo_serial_link();
       .rst_reg_ni     ( rst_reg_n      ),
       .testmode_i     ( 1'b0           ),
       // TODO: uncomment (commented just for debug purposes)
-      // .req_i          ( flit_req_out_2 ),
-      // .rsp_i          ( flit_rsp_out_2 ),
-      // .req_o          ( flit_req_in_2  ),
-      // .rsp_o          ( flit_rsp_in_2  ),      
+      .req_i          ( flit_req_out_2 ),
+      .rsp_i          ( flit_rsp_out_2 ),
+      .req_o          ( flit_req_in_2  ),
+      .rsp_o          ( flit_rsp_in_2  ),
       .cfg_req_i      ( cfg_req_2      ),
       .cfg_rsp_o      ( cfg_rsp_2      ),
       .ddr_rcv_clk_i  ( ddr_rcv_clk_1  ),
@@ -235,14 +247,14 @@ module tb_floo_serial_link();
     .axi_out_rsp_i  ( axi_out_rsp_2  ),
     .xy_id_i        (                ),
     .id_i           ( '0             ),
-    .req_o          ( flit_req_in_1  ),
-    .rsp_o          ( flit_rsp_in_1  ),
-    .req_i          ( flit_req_out_1 ),
-    .rsp_i          ( flit_rsp_out_1 )/*,
+    // .req_o          ( flit_req_in_1  ),
+    // .rsp_o          ( flit_rsp_in_1  ),
+    // .req_i          ( flit_req_out_1 ),
+    // .rsp_i          ( flit_rsp_out_1 )
     .req_o          ( flit_req_out_2 ),
     .rsp_o          ( flit_rsp_out_2 ),
     .req_i          ( flit_req_in_2  ),
-    .rsp_i          ( flit_rsp_in_2  )*/
+    .rsp_i          ( flit_rsp_in_2  )
   );
 
   REG_BUS #(
@@ -267,17 +279,17 @@ module tb_floo_serial_link();
   static reg_master_t reg_master_2 = new ( cfg_2 );
 
   AXI_BUS_DV #(
-    .AXI_ADDR_WIDTH ( AxiAddrWidth  ),
-    .AXI_DATA_WIDTH ( AxiDataWidth  ),
-    .AXI_ID_WIDTH   ( AxiIdWidth    ),
-    .AXI_USER_WIDTH ( AxiUserWidth  )
+    .AXI_ADDR_WIDTH ( AxiInAddrWidth  ),
+    .AXI_DATA_WIDTH ( AxiInDataWidth  ),
+    .AXI_ID_WIDTH   ( AxiInIdWidth    ),
+    .AXI_USER_WIDTH ( AxiInUserWidth  )
   ) axi_in_1(clk_1), axi_out_2(clk_2);
 
   AXI_BUS_DV #(
-    .AXI_ADDR_WIDTH ( AxiAddrWidth  ),
-    .AXI_DATA_WIDTH ( AxiDataWidth  ),
-    .AXI_ID_WIDTH   ( AxiIdWidth    ),
-    .AXI_USER_WIDTH ( AxiUserWidth  )
+    .AXI_ADDR_WIDTH ( AxiInAddrWidth  ),
+    .AXI_DATA_WIDTH ( AxiInDataWidth  ),
+    .AXI_ID_WIDTH   ( AxiInIdWidth    ),
+    .AXI_USER_WIDTH ( AxiInUserWidth  )
   ) axi_in_2(clk_2), axi_out_1(clk_1);
 
   `AXI_ASSIGN_TO_REQ(axi_in_req_1, axi_in_1)
@@ -294,10 +306,10 @@ module tb_floo_serial_link();
 
   // master type
   typedef axi_test::axi_rand_master #(
-    .AW                   ( AxiAddrWidth  ),
-    .DW                   ( AxiDataWidth  ),
-    .IW                   ( AxiIdWidth    ),
-    .UW                   ( AxiUserWidth  ),
+    .AW                   ( AxiInAddrWidth  ),
+    .DW                   ( AxiInDataWidth  ),
+    .IW                   ( AxiInIdWidth    ),
+    .UW                   ( AxiInUserWidth  ),
     .TA                   ( 100ps         ),
     .TT                   ( 500ps         ),
     .MAX_READ_TXNS        ( 2             ),
@@ -319,10 +331,10 @@ module tb_floo_serial_link();
 
   // slave type
   typedef axi_test::axi_rand_slave #(
-    .AW                   ( AxiAddrWidth  ),
-    .DW                   ( AxiDataWidth  ),
-    .IW                   ( AxiIdWidth    ),
-    .UW                   ( AxiUserWidth  ),
+    .AW                   ( AxiOutAddrWidth  ),
+    .DW                   ( AxiOutDataWidth  ),
+    .IW                   ( AxiOutIdWidth    ),
+    .UW                   ( AxiOutUserWidth  ),
     .TA                   ( 100ps         ),
     .TT                   ( 500ps         ),
     .RAND_RESP            ( 0             ),
@@ -444,41 +456,50 @@ module tb_floo_serial_link();
   //    Checks
   // ==============
 
-  axi_chan_compare #(
-    .IgnoreId  ( 1'b1          ),
-    .aw_chan_t ( axi_aw_chan_t ),
-    .w_chan_t  ( axi_w_chan_t  ),
-    .b_chan_t  ( axi_b_chan_t  ),
-    .ar_chan_t ( axi_ar_chan_t ),
-    .r_chan_t  ( axi_r_chan_t  ),
-    .req_t     ( axi_req_t     ),
-    .resp_t    ( axi_resp_t    )
-  ) i_axi_channel_compare_1_to_2 (
-    .clk_a_i   ( clk_1          ),
-    .clk_b_i   ( clk_2          ),
-    .axi_a_req ( axi_in_req_1   ),
-    .axi_a_res ( axi_in_rsp_1   ),
-    .axi_b_req ( axi_out_req_2  ),
-    .axi_b_res ( axi_out_rsp_2  )
-  ); 
+  axi_in_req_t axi_remapped_out_req_1, axi_remapped_out_req_2;
+  axi_in_resp_t axi_remapped_out_rsp_1, axi_remapped_out_rsp_2;
 
   axi_chan_compare #(
-    .IgnoreId  ( 1'b1          ),
-    .aw_chan_t ( axi_aw_chan_t ),
-    .w_chan_t  ( axi_w_chan_t  ),
-    .b_chan_t  ( axi_b_chan_t  ),
-    .ar_chan_t ( axi_ar_chan_t ),
-    .r_chan_t  ( axi_r_chan_t  ),
-    .req_t     ( axi_req_t     ),
-    .resp_t    ( axi_resp_t    )
-  ) i_axi_channel_compare_2_to_1 (
-    .clk_a_i   ( clk_2          ),
-    .clk_b_i   ( clk_1          ),
-    .axi_a_req ( axi_in_req_2   ),
-    .axi_a_res ( axi_in_rsp_2   ),
-    .axi_b_req ( axi_out_req_1  ),
-    .axi_b_res ( axi_out_rsp_1  )
+    .IgnoreId  ( 1'b1                   ),
+    .aw_chan_t ( axi_in_aw_chan_t       ),
+    .w_chan_t  ( axi_in_w_chan_t        ),
+    .b_chan_t  ( axi_in_b_chan_t        ),
+    .ar_chan_t ( axi_in_ar_chan_t       ),
+    .r_chan_t  ( axi_in_r_chan_t        ),
+    .req_t     ( axi_in_req_t           ),
+    .resp_t    ( axi_in_resp_t          )
+  ) i_axi_channel_compare_1_to_2 (
+    .clk_a_i   ( clk_1                  ),
+    .clk_b_i   ( clk_2                  ),
+    .axi_a_req ( axi_in_req_1           ),
+    .axi_a_res ( axi_in_rsp_1           ),
+    .axi_b_req ( axi_remapped_out_req_2 ),
+    .axi_b_res ( axi_remapped_out_rsp_2 )
   );
+
+  `AXI_ASSIGN_REQ_STRUCT(axi_remapped_out_req_2, axi_out_req_2)
+  `AXI_ASSIGN_RESP_STRUCT(axi_remapped_out_rsp_2, axi_out_rsp_2)
+
+  axi_chan_compare #(
+    .IgnoreId  ( 1'b1                   ),
+    .aw_chan_t ( axi_in_aw_chan_t       ),
+    .w_chan_t  ( axi_in_w_chan_t        ),
+    .b_chan_t  ( axi_in_b_chan_t        ),
+    .ar_chan_t ( axi_in_ar_chan_t       ),
+    .r_chan_t  ( axi_in_r_chan_t        ),
+    .req_t     ( axi_in_req_t           ),
+    .resp_t    ( axi_in_resp_t          )
+  ) i_axi_channel_compare_2_to_1 (
+    .clk_a_i   ( clk_2                  ),
+    .clk_b_i   ( clk_1                  ),
+    .axi_a_req ( axi_in_req_2           ),
+    .axi_a_res ( axi_in_rsp_2           ),
+    .axi_b_req ( axi_remapped_out_req_1 ),
+    .axi_b_res ( axi_remapped_out_rsp_1 )
+  );
+
+  `AXI_ASSIGN_REQ_STRUCT(axi_remapped_out_req_1, axi_out_req_1)
+  `AXI_ASSIGN_RESP_STRUCT(axi_remapped_out_rsp_1, axi_out_rsp_1)
 
   // ==============
   //    Tasks

@@ -4,12 +4,16 @@
 module floo_axis_noc_bridge
 #(
   // If the parameter is set to 1, all the assertion checks within this module will be ignored.
-  parameter bit   ignore_assert = 1'b0,
-  parameter type  rsp_flit_t    = logic,
-  parameter type  req_flit_t    = logic,
-  parameter type  axis_req_t    = logic,
-  parameter type  axis_rsp_t    = logic,
-  parameter type  axis_data_t   = logic
+  parameter  bit  ignore_assert    = 1'b0,
+  parameter  type rsp_flit_t       = logic,
+  parameter  type req_flit_t       = logic,
+  parameter  type axis_req_t       = logic,
+  parameter  type axis_rsp_t       = logic,
+  parameter  int  flit_data_size   = 1,
+  parameter  int  numberOfChannels = 2,
+
+  localparam int unsigned IdxWidth   = unsigned'($clog2(numberOfChannels)),
+  localparam type         idx_t      = logic [IdxWidth-1:0]
 ) (
   // global signals
   input  logic      clk_i,
@@ -29,10 +33,19 @@ module floo_axis_noc_bridge
   input  axis_req_t axis_in_req_i,
   output axis_rsp_t axis_in_rsp_o
 );
-  // typedef struct packed {
-  //   logic hdr;
-  //   logic [FlitDataSize-1:0] flit_data;
-  // } axis_data_t;
+
+  typedef enum logic [0:0] {
+    response  = 'd0,
+    request   = 'd1
+  } channel_hdr_e;
+
+  idx_t selected_index;
+
+  typedef struct packed {
+    channel_hdr_e hdr;
+    logic [flit_data_size-1:0] flit_data;
+  } axis_data_t;
+
   axis_data_t axis_out_payload, axis_in_payload;
   axis_data_t axis_out_data_reg_out;
   logic axis_out_ready, axis_out_valid;
@@ -50,7 +63,7 @@ module floo_axis_noc_bridge
   assign rsp_i_data = rsp_i.data;
   
   rr_arb_tree #(
-    .NumIn      ( 2                          ),
+    .NumIn      ( numberOfChannels           ),
     .DataWidth  ( payloadSize - 1            ),
     .ExtPrio    ( 1'b0                       ),
     .AxiVldRdy  ( 1'b1                       ),
@@ -75,8 +88,10 @@ module floo_axis_noc_bridge
     /// Output data.
     .data_o     ( axis_out_payload.flit_data ),
     /// Index from which input the data came from.
-    .idx_o      ( axis_out_payload.hdr       )
+    .idx_o      ( selected_index             )
   );
+
+  assign axis_out_payload.hdr = channel_hdr_e'(selected_index);
 
   stream_fifo #(
     .DATA_WIDTH ( payloadSize           ),
@@ -109,8 +124,8 @@ module floo_axis_noc_bridge
   
   assign axis_in_payload      = axis_data_t'(axis_in_req_i.t.data);
   assign axis_in_rsp_o.tready = (req_i.ready & req_o.valid) || (rsp_i.ready & rsp_o.valid);
-  assign req_o.valid          = (axis_in_payload.hdr == 1'b1) ? axis_in_req_i.tvalid : 0;
-  assign rsp_o.valid          = (axis_in_payload.hdr == 1'b0) ? axis_in_req_i.tvalid : 0;
+  assign req_o.valid          = (axis_in_payload.hdr == request) ? axis_in_req_i.tvalid : 0;
+  assign rsp_o.valid          = (axis_in_payload.hdr == response) ? axis_in_req_i.tvalid : 0;
   assign req_o.data           = axis_in_payload.flit_data;
   assign rsp_o.data           = axis_in_payload.flit_data;
 

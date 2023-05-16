@@ -8,13 +8,14 @@
 
 // TODO: This is only a template. I still need to change it to the noc interface...
 module floo_serial_link_occamy_wrapper #(
-  parameter type req_flit_t  = logic,
-  parameter type rsp_flit_t  = logic,
-  parameter type cfg_req_t  = logic,
-  parameter type cfg_rsp_t  = logic,
-  parameter int NumChannels = 1,
-  parameter int NumLanes = 4,
-  parameter int MaxClkDiv = 32
+  parameter type req_flit_t   = logic,
+  parameter type rsp_flit_t   = logic,
+  parameter type cfg_req_t    = logic,
+  parameter type cfg_rsp_t    = logic,
+  parameter int NumChannels   = 1,
+  parameter int NumLanes      = 4,
+  parameter int MaxClkDiv     = 32,
+  parameter bit printFeedback = 1'b0
 ) (
   input  logic                      clk_i,
   input  logic                      rst_ni,
@@ -30,7 +31,7 @@ module floo_serial_link_occamy_wrapper #(
   input  logic [NumChannels-1:0]    ddr_rcv_clk_i,
   output logic [NumChannels-1:0]    ddr_rcv_clk_o,
   input  logic [NumChannels-1:0][NumLanes-1:0] ddr_i,
-  output logic [NumChannels-1:0][NumLanes-1:0] ddr_o
+  output logic [NumChannels-1:0][NumLanes-1:0] ddr_o  
 );
 
   logic clk_serial_link;
@@ -60,15 +61,16 @@ module floo_serial_link_occamy_wrapper #(
 
   if (NumChannels > 1) begin : gen_multi_channel_serial_link
     floo_serial_link #(
-      .req_flit_t       ( req_flit_t  ),
-      .rsp_flit_t       ( rsp_flit_t  ),
-      .cfg_req_t        ( cfg_req_t   ),
-      .cfg_rsp_t        ( cfg_rsp_t   ),
+      .req_flit_t       ( req_flit_t    ),
+      .rsp_flit_t       ( rsp_flit_t    ),
+      .cfg_req_t        ( cfg_req_t     ),
+      .cfg_rsp_t        ( cfg_rsp_t     ),
       .hw2reg_t         ( serial_link_reg_pkg::serial_link_hw2reg_t ),
       .reg2hw_t         ( serial_link_reg_pkg::serial_link_reg2hw_t ),
-      .NumChannels      ( NumChannels ),
-      .NumLanes         ( NumLanes    ),
-      .MaxClkDiv        ( MaxClkDiv   )
+      .NumChannels      ( NumChannels   ),
+      .NumLanes         ( NumLanes      ),
+      .MaxClkDiv        ( MaxClkDiv     ),
+      .printFeedback    ( printFeedback )
     ) i_serial_link (
       .clk_i          ( clk_i             ),
       .rst_ni         ( rst_ni            ),
@@ -94,15 +96,16 @@ module floo_serial_link_occamy_wrapper #(
     );
   end else begin : gen_single_channel_serial_link
     floo_serial_link #(
-      .req_flit_t       ( req_flit_t  ),
-      .rsp_flit_t       ( rsp_flit_t  ),
-      .cfg_req_t        ( cfg_req_t   ),
-      .cfg_rsp_t        ( cfg_rsp_t   ),
+      .req_flit_t       ( req_flit_t    ),
+      .rsp_flit_t       ( rsp_flit_t    ),
+      .cfg_req_t        ( cfg_req_t     ),
+      .cfg_rsp_t        ( cfg_rsp_t     ),
       .hw2reg_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_hw2reg_t ),
       .reg2hw_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg2hw_t ),
-      .NumChannels      ( NumChannels ),
-      .NumLanes         ( NumLanes    ),
-      .MaxClkDiv        ( MaxClkDiv   )
+      .NumChannels      ( NumChannels   ),
+      .NumLanes         ( NumLanes      ),
+      .MaxClkDiv        ( MaxClkDiv     ),
+      .printFeedback    ( printFeedback )
     ) i_serial_link (
       .clk_i          ( clk_i             ),
       .rst_ni         ( rst_ni            ),
