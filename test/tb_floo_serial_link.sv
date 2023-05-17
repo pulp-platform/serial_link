@@ -4,6 +4,7 @@
 
 // Authors:
 //  - Tim Fischer <fischeti@iis.ee.ethz.ch>
+//  - Yannick Baumann <baumanny@ethz.student.ch>
 
 module tb_floo_serial_link();
 
@@ -28,8 +29,7 @@ module tb_floo_serial_link();
   localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;
 
   localparam time         TckSys1         = 50ns;
-  localparam time         TckSys2         = 50ns;
-  // localparam time         TckSys2         = 54ns;
+  localparam time         TckSys2         = 54ns;
   localparam time         TckReg          = 200ns;
   localparam int unsigned RstClkCyclesSys = 1;
 
@@ -40,8 +40,8 @@ module tb_floo_serial_link();
   localparam logic [NumLanes*2-1:0] CalibrationPattern = {{NumLanes/4}{4'b1010, 4'b0101}};
 
   localparam int unsigned ReorderBufferSize = 64;
-  localparam int unsigned MaxTxns = 32;
-  localparam int unsigned MaxTxnsPerId = 32;
+  localparam int unsigned MaxTxns           = 32;
+  localparam int unsigned MaxTxnsPerId      = 32;
 
   // Stop the simulation if this simulation time (ns) is exceeded.
   localparam int stopSimAfter = 75000000;
@@ -89,20 +89,6 @@ module tb_floo_serial_link();
   cfg_req_t   cfg_req_2;
   cfg_rsp_t   cfg_rsp_2;
 
-// TODO: Remove the debug signals below...
-  // axi_in_req_t DEBUG_axi_req_t;
-  // axi_in_req_t DEBUG_axi_in_req_t;
-  // axi_in_resp_t DEBUG_axi_in_resp_t;
-  // axi_out_req_t DEBUG_axi_out_req_t;
-  // axi_out_resp_t DEBUG_axi_out_resp_t;
-  // axi_out_resp_t DEBUG_axi_resp_t;
-  // assign DEBUG_axi_req_t = axi_in_req_1;
-  // assign DEBUG_axi_in_req_t = axi_in_req_1;
-  // assign DEBUG_axi_in_resp_t = axi_out_rsp_1;
-  // assign DEBUG_axi_out_req_t = axi_in_req_1;
-  // assign DEBUG_axi_out_resp_t = axi_out_rsp_1;
-  // assign DEBUG_axi_resp_t = axi_out_rsp_1;
-
   // link
   wire [NumChannels*NumLanes-1:0] ddr_o;
   wire [NumChannels*NumLanes-1:0] ddr_i;
@@ -110,7 +96,6 @@ module tb_floo_serial_link();
   // clock and reset
   logic clk_1, clk_2, clk_reg;
   logic rst_1_n, rst_2_n, rst_reg_n;
-  logic rst_2_sl_n, clk_2_sl, rst_1_sl_n, clk_1_sl;
 
   // system clock and reset
   clk_rst_gen #(
@@ -139,13 +124,13 @@ module tb_floo_serial_link();
 
   // first serial instance
   floo_axi_chimney #(
-    .RouteAlgo          ( floo_pkg::IdTable ),
-    .MaxTxns            ( MaxTxns           ),
-    .MaxTxnsPerId       ( MaxTxnsPerId      ),
-    .ReorderBufferSize  ( ReorderBufferSize )
+    .RouteAlgo         ( floo_pkg::IdTable ),
+    .MaxTxns           ( MaxTxns           ),
+    .MaxTxnsPerId      ( MaxTxnsPerId      ),
+    .ReorderBufferSize ( ReorderBufferSize )
   ) i_floo_axi_chimney_0 (
-    .clk_i          ( clk_1_sl          ),
-    .rst_ni         ( rst_1_sl_n        ),
+    .clk_i          ( clk_1          ),
+    .rst_ni         ( rst_1_n        ),
     .sram_cfg_i     ( '0             ),
     .test_enable_i  ( 1'b0           ),
     .axi_in_req_i   ( axi_in_req_1   ),
@@ -160,90 +145,78 @@ module tb_floo_serial_link();
     .rsp_i          ( flit_rsp_in_1  )
   );
 
-  floo_serial_link_occamy_wrapper #(
-    .req_flit_t       ( req_flit_t  ),
-    .rsp_flit_t       ( rsp_flit_t  ),
-    .cfg_req_t        ( cfg_req_t   ),
-    .cfg_rsp_t        ( cfg_rsp_t   ),
-    .NumChannels      ( NumChannels ),
-    .NumLanes         ( NumLanes    ),
-    .MaxClkDiv        ( MaxClkDiv   ),
-    .printFeedback    ( 1'b1        )
+  floo_serial_link #(
+    .req_flit_t     ( req_flit_t     ),
+    .rsp_flit_t     ( rsp_flit_t     ),
+    .cfg_req_t      ( cfg_req_t      ),
+    .cfg_rsp_t      ( cfg_rsp_t      ),
+    .hw2reg_t       ( serial_link_reg_pkg::serial_link_hw2reg_t ),
+    // .hw2reg_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_hw2reg_t ),
+    .reg2hw_t       ( serial_link_reg_pkg::serial_link_reg2hw_t ),
+    // .reg2hw_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg2hw_t ),
+    .NumChannels    ( NumChannels    ),
+    .NumLanes       ( NumLanes       ),
+    .MaxClkDiv      ( MaxClkDiv      ),
+    .printFeedback  ( 1'b1           )
   ) i_serial_link_0 (
-      .clk_i          ( clk_1          ),
-      .rst_ni         ( rst_1_n        ),
-      .clk_sl_o       ( clk_1_sl       ),
-      .rst_sl_no      ( rst_1_sl_n     ),
-      .clk_reg_i      ( clk_reg        ),
-      .rst_reg_ni     ( rst_reg_n      ),
-      .testmode_i     ( 1'b0           ),
-      // TODO: uncomment (commented just for debug purposes)
-      .req_i          ( flit_req_out_1 ),
-      .rsp_i          ( flit_rsp_out_1 ),
-      .req_o          ( flit_req_in_1  ),
-      .rsp_o          ( flit_rsp_in_1  ),
-      .cfg_req_i      ( cfg_req_1      ),
-      .cfg_rsp_o      ( cfg_rsp_1      ),
-      .ddr_rcv_clk_i  ( ddr_rcv_clk_2  ),
-      .ddr_rcv_clk_o  ( ddr_rcv_clk_1  ),
-      .ddr_i          ( ddr_i          ),
-      .ddr_o          ( ddr_o          )
+    .clk_i          ( clk_1          ),
+    .rst_ni         ( rst_1_n        ),
+    .clk_sl_i       ( clk_1          ),
+    .rst_sl_ni      ( rst_1_n        ),
+    .clk_reg_i      ( clk_reg        ),
+    .rst_reg_ni     ( rst_reg_n      ),
+    .req_i          ( flit_req_out_1 ),
+    .rsp_i          ( flit_rsp_out_1 ),
+    .req_o          ( flit_req_in_1  ),
+    .rsp_o          ( flit_rsp_in_1  ),
+    .cfg_req_i      ( cfg_req_1      ),
+    .cfg_rsp_o      ( cfg_rsp_1      ),
+    .ddr_rcv_clk_i  ( ddr_rcv_clk_2  ),
+    .ddr_rcv_clk_o  ( ddr_rcv_clk_1  ),
+    .ddr_i          ( ddr_i          ),
+    .ddr_o          ( ddr_o          )
   );
-
-  // // Handshake checks for debugging in QuestaSim
-  // logic  DEBUG_Bridge_0_rsp_i, DEBUG_Bridge_0_rsp_o, DEBUG_Bridge_0_req_i, DEBUG_Bridge_0_req_o, DEBUG_Bridge_1_rsp_i, DEBUG_Bridge_1_rsp_o, DEBUG_Bridge_1_req_i, DEBUG_Bridge_1_req_o;
-  // assign DEBUG_Bridge_0_rsp_i = flit_rsp_out_1.valid & flit_rsp_in_1.ready;
-  // assign DEBUG_Bridge_0_rsp_o = flit_rsp_in_1.valid & flit_rsp_out_1.ready;
-  // assign DEBUG_Bridge_0_req_i = flit_req_out_1.valid & flit_req_in_1.ready;
-  // assign DEBUG_Bridge_0_req_o = flit_req_in_1.valid & flit_req_out_1.ready;
-  // assign DEBUG_Bridge_1_rsp_i = flit_rsp_out_2.valid & flit_rsp_in_2.ready;
-  // assign DEBUG_Bridge_1_rsp_o = flit_rsp_in_2.valid & flit_rsp_out_2.ready;
-  // assign DEBUG_Bridge_1_req_i = flit_req_out_2.valid & flit_req_in_2.ready;
-  // assign DEBUG_Bridge_1_req_o = flit_req_in_2.valid & flit_req_out_2.ready;
 
   // second serial instance
-  floo_serial_link_occamy_wrapper #(
-    .req_flit_t       ( req_flit_t  ),
-    .rsp_flit_t       ( rsp_flit_t  ),
-    .cfg_req_t        ( cfg_req_t   ),
-    .cfg_rsp_t        ( cfg_rsp_t   ),
-    .NumChannels      ( NumChannels ),
-    .NumLanes         ( NumLanes    ),
-    .MaxClkDiv        ( MaxClkDiv   )
+  floo_serial_link #(
+    .req_flit_t     ( req_flit_t     ),
+    .rsp_flit_t     ( rsp_flit_t     ),
+    .cfg_req_t      ( cfg_req_t      ),
+    .cfg_rsp_t      ( cfg_rsp_t      ),
+    .hw2reg_t       ( serial_link_reg_pkg::serial_link_hw2reg_t ),
+    // .hw2reg_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_hw2reg_t ),
+    .reg2hw_t       ( serial_link_reg_pkg::serial_link_reg2hw_t ),
+    // .reg2hw_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg2hw_t ),
+    .NumChannels    ( NumChannels    ),
+    .NumLanes       ( NumLanes       ),
+    .MaxClkDiv      ( MaxClkDiv      )
   ) i_serial_link_1 (
-      .clk_i          ( clk_2          ),
-      .rst_ni         ( rst_2_n        ),
-      .clk_sl_o       ( clk_2_sl       ),
-      .rst_sl_no      ( rst_2_sl_n     ),      
-      .clk_reg_i      ( clk_reg        ),
-      .rst_reg_ni     ( rst_reg_n      ),
-      .testmode_i     ( 1'b0           ),
-      // TODO: uncomment (commented just for debug purposes)
-      .req_i          ( flit_req_out_2 ),
-      .rsp_i          ( flit_rsp_out_2 ),
-      .req_o          ( flit_req_in_2  ),
-      .rsp_o          ( flit_rsp_in_2  ),
-      .cfg_req_i      ( cfg_req_2      ),
-      .cfg_rsp_o      ( cfg_rsp_2      ),
-      .ddr_rcv_clk_i  ( ddr_rcv_clk_1  ),
-      .ddr_rcv_clk_o  ( ddr_rcv_clk_2  ),
-      .ddr_i          ( ddr_o          ),
-      .ddr_o          ( ddr_i          )
+    .clk_i          ( clk_2          ),
+    .rst_ni         ( rst_2_n        ),
+    .clk_sl_i       ( clk_2          ),
+    .rst_sl_ni      ( rst_2_n        ),
+    .clk_reg_i      ( clk_reg        ),
+    .rst_reg_ni     ( rst_reg_n      ),
+    .req_i          ( flit_req_out_2 ),
+    .rsp_i          ( flit_rsp_out_2 ),
+    .req_o          ( flit_req_in_2  ),
+    .rsp_o          ( flit_rsp_in_2  ),
+    .cfg_req_i      ( cfg_req_2      ),
+    .cfg_rsp_o      ( cfg_rsp_2      ),
+    .ddr_rcv_clk_i  ( ddr_rcv_clk_1  ),
+    .ddr_rcv_clk_o  ( ddr_rcv_clk_2  ),
+    .ddr_i          ( ddr_o          ),
+    .ddr_o          ( ddr_i          )
   );
 
-  // assign axi_out_req_1 = axi_in_req_2;
-  // assign axi_in_rsp_1 = axi_out_rsp_2;
-  // assign axi_out_req_2 = axi_in_req_1;
-  // assign axi_in_rsp_2 = axi_out_rsp_1;
-
   floo_axi_chimney #(
-    .RouteAlgo          ( floo_pkg::IdTable ),
-    .MaxTxns            ( MaxTxns           ),
-    .MaxTxnsPerId       ( MaxTxnsPerId      ),
-    .ReorderBufferSize  ( ReorderBufferSize )
+    .RouteAlgo         ( floo_pkg::IdTable ),
+    .MaxTxns           ( MaxTxns           ),
+    .MaxTxnsPerId      ( MaxTxnsPerId      ),
+    .ReorderBufferSize ( ReorderBufferSize )
   ) i_floo_axi_chimney_1 (
-    .clk_i          ( clk_2_sl          ),
-    .rst_ni         ( rst_2_sl_n        ),
+    .clk_i          ( clk_2          ),
+    .rst_ni         ( rst_2_n        ),
     .sram_cfg_i     ( '0             ),
     .test_enable_i  ( 1'b0           ),
     .axi_in_req_i   ( axi_in_req_2   ),
@@ -252,10 +225,6 @@ module tb_floo_serial_link();
     .axi_out_rsp_i  ( axi_out_rsp_2  ),
     .xy_id_i        (                ),
     .id_i           ( '0             ),
-    // .req_o          ( flit_req_in_1  ),
-    // .rsp_o          ( flit_rsp_in_1  ),
-    // .req_i          ( flit_req_out_1 ),
-    // .rsp_i          ( flit_rsp_out_1 )
     .req_o          ( flit_req_out_2 ),
     .rsp_o          ( flit_rsp_out_2 ),
     .req_i          ( flit_req_in_2  ),
@@ -288,14 +257,14 @@ module tb_floo_serial_link();
     .AXI_DATA_WIDTH ( AxiInDataWidth  ),
     .AXI_ID_WIDTH   ( AxiInIdWidth    ),
     .AXI_USER_WIDTH ( AxiInUserWidth  )
-  ) axi_in_1(clk_1_sl), axi_out_2(clk_2_sl);
+  ) axi_in_1(clk_1), axi_out_2(clk_2);
 
   AXI_BUS_DV #(
     .AXI_ADDR_WIDTH ( AxiInAddrWidth  ),
     .AXI_DATA_WIDTH ( AxiInDataWidth  ),
     .AXI_ID_WIDTH   ( AxiInIdWidth    ),
     .AXI_USER_WIDTH ( AxiInUserWidth  )
-  ) axi_in_2(clk_2_sl), axi_out_1(clk_1_sl);
+  ) axi_in_2(clk_2), axi_out_1(clk_1);
 
   `AXI_ASSIGN_TO_REQ(axi_in_req_1, axi_in_1)
   `AXI_ASSIGN_FROM_RESP(axi_in_1, axi_in_rsp_1)
@@ -474,8 +443,8 @@ module tb_floo_serial_link();
     .req_t     ( axi_in_req_t           ),
     .resp_t    ( axi_in_resp_t          )
   ) i_axi_channel_compare_1_to_2 (
-    .clk_a_i   ( clk_1_sl                  ),
-    .clk_b_i   ( clk_2_sl                  ),
+    .clk_a_i   ( clk_1                  ),
+    .clk_b_i   ( clk_2                  ),
     .axi_a_req ( axi_in_req_1           ),
     .axi_a_res ( axi_in_rsp_1           ),
     .axi_b_req ( axi_remapped_out_req_2 ),
@@ -495,8 +464,8 @@ module tb_floo_serial_link();
     .req_t     ( axi_in_req_t           ),
     .resp_t    ( axi_in_resp_t          )
   ) i_axi_channel_compare_2_to_1 (
-    .clk_a_i   ( clk_2_sl                  ),
-    .clk_b_i   ( clk_1_sl                  ),
+    .clk_a_i   ( clk_2                  ),
+    .clk_b_i   ( clk_1                  ),
     .axi_a_req ( axi_in_req_2           ),
     .axi_a_res ( axi_in_rsp_2           ),
     .axi_b_req ( axi_remapped_out_req_1 ),

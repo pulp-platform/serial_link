@@ -5,13 +5,13 @@
 // Authors:
 //  - Tim Fischer <fischeti@iis.ee.ethz.ch>
 //  - Manuel Eggimann <meggimann@iis.ee.ethz.ch>
-// Modified: Yannick Baumann <baumanny@student.ethz.ch>
+//  - Yannick Baumann <baumanny@student.ethz.ch>
 
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
 `include "axis/typedef.svh"
 
-/// A simple serial link to go off-chip: currently only a template (work in progress)
+/// A simple serial link to go off-chip
 module floo_serial_link
 import serial_link_pkg::*;
 #(
@@ -41,7 +41,8 @@ import serial_link_pkg::*;
   input  logic                                 rst_sl_ni,
   input  logic                                 clk_reg_i,
   input  logic                                 rst_reg_ni,
-  input  logic                                 testmode_i,
+  // Testmode is an optional input pin. Tie to zero if not used.
+  input  logic                                 testmode_i = '0,
   input  req_flit_t                            req_i,
   input  rsp_flit_t                            rsp_i,
   output req_flit_t                            req_o,
@@ -52,8 +53,8 @@ import serial_link_pkg::*;
   output logic [NumChannels-1:0]               ddr_rcv_clk_o,
   input  logic [NumChannels-1:0][NumLanes-1:0] ddr_i,
   output logic [NumChannels-1:0][NumLanes-1:0] ddr_o,
-  // AXI isolation signals (in/out), if not used tie to 0
-  input  logic [1:0]                           isolated_i,
+  // AXI isolation signals (in/out). Optional input pin: Tie to zero if not used
+  input  logic [1:0]                           isolated_i = '0,
   output logic [1:0]                           isolate_o,
   // Clock gate register
   output logic                                 clk_ena_o,
@@ -69,10 +70,10 @@ import serial_link_pkg::*;
     logic [$clog2(channelCount)-1:0] hdr;
     logic [FlitDataSize-1:0] flit_data;
   } payload_t;  
-  // TODO: #SelectTheBridgeVersion
+  // SelectTheBridgeVersion (choose between 1'b0 & 1'b1)
   localparam bit BridgeVirtualChannels = 1'b0;
 
-  localparam int BandWidth = NumChannels * NumLanes * 2;
+  localparam int BandWidth     = NumChannels * NumLanes * 2;
   localparam int PayloadSplits = ($bits(payload_t) + $bits(credit_t) + BandWidth - 1) / BandWidth;
   localparam int RecvFifoDepth = NumCredits * PayloadSplits;
 
@@ -298,7 +299,6 @@ import serial_link_pkg::*;
       .data_in_ready_i           ( data_link2alloc_data_in_ready                  )
     );
   end
-
 
   ////////////////////////
   //   PHYSICAL LAYER   //
