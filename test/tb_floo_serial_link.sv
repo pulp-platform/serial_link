@@ -110,6 +110,7 @@ module tb_floo_serial_link();
   // clock and reset
   logic clk_1, clk_2, clk_reg;
   logic rst_1_n, rst_2_n, rst_reg_n;
+  logic rst_2_sl_n, clk_2_sl, rst_1_sl_n, clk_1_sl;
 
   // system clock and reset
   clk_rst_gen #(
@@ -143,8 +144,8 @@ module tb_floo_serial_link();
     .MaxTxnsPerId       ( MaxTxnsPerId      ),
     .ReorderBufferSize  ( ReorderBufferSize )
   ) i_floo_axi_chimney_0 (
-    .clk_i          ( clk_1          ),
-    .rst_ni         ( rst_1_n        ),
+    .clk_i          ( clk_1_sl          ),
+    .rst_ni         ( rst_1_sl_n        ),
     .sram_cfg_i     ( '0             ),
     .test_enable_i  ( 1'b0           ),
     .axi_in_req_i   ( axi_in_req_1   ),
@@ -171,6 +172,8 @@ module tb_floo_serial_link();
   ) i_serial_link_0 (
       .clk_i          ( clk_1          ),
       .rst_ni         ( rst_1_n        ),
+      .clk_sl_o       ( clk_1_sl       ),
+      .rst_sl_no      ( rst_1_sl_n     ),
       .clk_reg_i      ( clk_reg        ),
       .rst_reg_ni     ( rst_reg_n      ),
       .testmode_i     ( 1'b0           ),
@@ -210,6 +213,8 @@ module tb_floo_serial_link();
   ) i_serial_link_1 (
       .clk_i          ( clk_2          ),
       .rst_ni         ( rst_2_n        ),
+      .clk_sl_o       ( clk_2_sl       ),
+      .rst_sl_no      ( rst_2_sl_n     ),      
       .clk_reg_i      ( clk_reg        ),
       .rst_reg_ni     ( rst_reg_n      ),
       .testmode_i     ( 1'b0           ),
@@ -237,8 +242,8 @@ module tb_floo_serial_link();
     .MaxTxnsPerId       ( MaxTxnsPerId      ),
     .ReorderBufferSize  ( ReorderBufferSize )
   ) i_floo_axi_chimney_1 (
-    .clk_i          ( clk_2          ),
-    .rst_ni         ( rst_2_n        ),
+    .clk_i          ( clk_2_sl          ),
+    .rst_ni         ( rst_2_sl_n        ),
     .sram_cfg_i     ( '0             ),
     .test_enable_i  ( 1'b0           ),
     .axi_in_req_i   ( axi_in_req_2   ),
@@ -283,14 +288,14 @@ module tb_floo_serial_link();
     .AXI_DATA_WIDTH ( AxiInDataWidth  ),
     .AXI_ID_WIDTH   ( AxiInIdWidth    ),
     .AXI_USER_WIDTH ( AxiInUserWidth  )
-  ) axi_in_1(clk_1), axi_out_2(clk_2);
+  ) axi_in_1(clk_1_sl), axi_out_2(clk_2_sl);
 
   AXI_BUS_DV #(
     .AXI_ADDR_WIDTH ( AxiInAddrWidth  ),
     .AXI_DATA_WIDTH ( AxiInDataWidth  ),
     .AXI_ID_WIDTH   ( AxiInIdWidth    ),
     .AXI_USER_WIDTH ( AxiInUserWidth  )
-  ) axi_in_2(clk_2), axi_out_1(clk_1);
+  ) axi_in_2(clk_2_sl), axi_out_1(clk_1_sl);
 
   `AXI_ASSIGN_TO_REQ(axi_in_req_1, axi_in_1)
   `AXI_ASSIGN_FROM_RESP(axi_in_1, axi_in_rsp_1)
@@ -469,8 +474,8 @@ module tb_floo_serial_link();
     .req_t     ( axi_in_req_t           ),
     .resp_t    ( axi_in_resp_t          )
   ) i_axi_channel_compare_1_to_2 (
-    .clk_a_i   ( clk_1                  ),
-    .clk_b_i   ( clk_2                  ),
+    .clk_a_i   ( clk_1_sl                  ),
+    .clk_b_i   ( clk_2_sl                  ),
     .axi_a_req ( axi_in_req_1           ),
     .axi_a_res ( axi_in_rsp_1           ),
     .axi_b_req ( axi_remapped_out_req_2 ),
@@ -490,8 +495,8 @@ module tb_floo_serial_link();
     .req_t     ( axi_in_req_t           ),
     .resp_t    ( axi_in_resp_t          )
   ) i_axi_channel_compare_2_to_1 (
-    .clk_a_i   ( clk_2                  ),
-    .clk_b_i   ( clk_1                  ),
+    .clk_a_i   ( clk_2_sl                  ),
+    .clk_b_i   ( clk_1_sl                  ),
     .axi_a_req ( axi_in_req_2           ),
     .axi_a_res ( axi_in_rsp_2           ),
     .axi_b_req ( axi_remapped_out_req_1 ),

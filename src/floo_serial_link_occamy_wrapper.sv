@@ -19,6 +19,8 @@ module floo_serial_link_occamy_wrapper #(
 ) (
   input  logic                      clk_i,
   input  logic                      rst_ni,
+  output logic                      clk_sl_o,
+  output logic                      rst_sl_no,
   input  logic                      clk_reg_i,
   input  logic                      rst_reg_ni,
   input  logic                      testmode_i,
@@ -33,9 +35,12 @@ module floo_serial_link_occamy_wrapper #(
   input  logic [NumChannels-1:0][NumLanes-1:0] ddr_i,
   output logic [NumChannels-1:0][NumLanes-1:0] ddr_o  
 );
-
+  
   logic clk_serial_link;
   logic rst_serial_link_n;
+
+  assign clk_sl_o = clk_serial_link;
+  assign rst_sl_no = rst_serial_link_n;
 
   logic clk_ena;
   logic reset_n;
