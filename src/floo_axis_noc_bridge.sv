@@ -10,9 +10,9 @@ module floo_axis_noc_bridge
   parameter  type axis_req_t       = logic,
   parameter  type axis_rsp_t       = logic,
   parameter  int  flit_data_size   = 1,
-  parameter  int  numberOfChannels = 2,
+  parameter  int  numNocChanPerDir = 2,
 
-  localparam int unsigned IdxWidth   = unsigned'($clog2(numberOfChannels)),
+  localparam int unsigned IdxWidth   = unsigned'($clog2(numNocChanPerDir)),
   localparam type         idx_t      = logic [IdxWidth-1:0]
 ) (
   // global signals
@@ -63,7 +63,7 @@ module floo_axis_noc_bridge
   assign rsp_i_data = rsp_i.data;
   
   rr_arb_tree #(
-    .NumIn      ( numberOfChannels           ),
+    .NumIn      ( numNocChanPerDir           ),
     .DataWidth  ( payloadSize - 1            ),
     .ExtPrio    ( 1'b0                       ),
     .AxiVldRdy  ( 1'b1                       ),
@@ -113,10 +113,10 @@ module floo_axis_noc_bridge
   assign axis_out_req_o.t.data = axis_out_data_reg_out;
   assign axis_out_req_o.t.strb = '1;
   assign axis_out_req_o.t.keep = '0;
-  assign axis_out_req_o.t.last =  0;
-  assign axis_out_req_o.t.id   =  0;
-  assign axis_out_req_o.t.dest =  0;
-  assign axis_out_req_o.t.user =  0;
+  assign axis_out_req_o.t.last = '0;
+  assign axis_out_req_o.t.id   = '0;
+  assign axis_out_req_o.t.dest = '0;
+  assign axis_out_req_o.t.user = '0;
 
   ///////////////////////////////////////////////
   //  CONNECT AXIS_IN WITH THE OUTGOING FLITS  //

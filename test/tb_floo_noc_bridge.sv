@@ -9,52 +9,54 @@ module tb_floo_noc_bridge;
   import floo_axi_flit_pkg::*;
   import serial_link_pkg::*;
 
+  // set to zero if the noc_bridge should be inserted. Assign to one if the bridge should be ignored/bypassede
+  localparam bit BridgeBypass   = 1'b0;
+  // Declare the amount of credits used in case of the virtual channels being enabled. If set to 0 the non-virtual
+  // channel version is being used...
+  localparam int numOfCredits   = 8;
+
+
+
   localparam time CyclTime = 10ns;
   localparam time ApplTime = 2ns;
   localparam time TestTime = 8ns;
 
-  localparam NumReads0 = 100;
-  localparam NumWrites0 = 100;
-  localparam NumReads1 = 100;
-  localparam NumWrites1 = 100;
+  localparam NumReads0    = 100;
+  localparam NumWrites0   = 100;
+  localparam NumReads1    = 100;
+  localparam NumWrites1   = 100;
 
-  localparam NumTargets = 2;
+  localparam NumTargets   = 2;
 
   localparam channelCount = 2;
 
   localparam int unsigned ReorderBufferSize = 64;
-  localparam int unsigned MaxTxns = 32;
-  localparam int unsigned MaxTxnsPerId = 32;
+  localparam int unsigned MaxTxns           = 32;
+  localparam int unsigned MaxTxnsPerId      = 32;
   // signals for debugging (no functional use)
   logic Bridge_0_req_o, Bridge_0_req_i, Bridge_1_req_o, Bridge_1_req_i;
   logic Bridge_0_rsp_o, Bridge_0_rsp_i, Bridge_1_rsp_o, Bridge_1_rsp_i;
 
-  // set to zero if the noc_bridge should be inserted. Assign to one if the bridge should be ignored/bypassede
-  localparam bit BridgeBypass = 1'b0;
-
-  // disable this line if the noc_bridge with virtual channels should be used.
-
-  `define useVirtualChannels 1
-
+  localparam bit BridgeVirtualChannels = (numOfCredits>0);
   // Stop the simulation if this simulation time (ns) is exceeded.
-  localparam int stopSimAfter = 1000000;
+  localparam int stopSimAfter   = 1000000;
 
-  `ifdef useVirtualChannels
-    localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
-    localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
-    typedef struct packed {
-      logic hdr;
-      logic [FlitDataSize-1:0] flit_data;
-    } axis_payload_t;
-    localparam bit BridgeVirtualChannels = 1'b1;
-  `else
-		localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
-    localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
-    localparam bit BridgeVirtualChannels = 1'b0;
-  `endif
+  // identify the larger of the two types
+	localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
+  // the minimal flit-data-size requirement corresponds to the larger of the two channels, exclusive the handshake signals.
+  localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
+  // minimal AXIS data size (also contain the hdr-bit, thus + 1)
+  localparam int axis_data_size = FlitDataSize + 1;
+  
+  localparam type credits_t = logic [$clog2(numOfCredits+1)-1:0];
+
+  typedef struct packed {
+    logic data_validity;
+    credits_t credits;
+  } user_bits_t;
 
   // Axi stream dimension must be a multiple of 8 bits
-  localparam int StreamDataBytes = (FlitDataSize + $clog2(channelCount) + 7) / 8;
+  localparam int StreamDataBytes = (axis_data_size + 7) / 8;
   // Typdefs for Axi Stream interface
   // All except tdata_t are unused at the moment
   localparam type tdata_t  = logic [StreamDataBytes*8-1:0];
@@ -63,7 +65,9 @@ module tb_floo_noc_bridge;
   localparam type tlast_t  = logic;
   localparam type tid_t    = logic;
   localparam type tdest_t  = logic;
-  localparam type tuser_t  = logic;
+  // The user bits serve as transfer line for the credit information utilized in the virtual-channel version of the noc-bridge.
+  // The first bit of the user-bits is reserved for a data-specific valid field. (consider the hdr bit in the data_line)
+  localparam type tuser_t  = user_bits_t;
   localparam type tready_t = logic;
   `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, tuser_t, tready_t)
 
@@ -189,8 +193,9 @@ module tb_floo_noc_bridge;
       .rsp_flit_t       ( rsp_flit_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
+      .number_of_credits( numOfCredits     ),
       .flit_data_size   ( FlitDataSize     ),
-      .numberOfChannels ( channelCount     )
+      .numNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_0 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),
@@ -210,8 +215,9 @@ module tb_floo_noc_bridge;
       .rsp_flit_t       ( rsp_flit_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
+      .number_of_credits( numOfCredits     ),
       .flit_data_size   ( FlitDataSize     ),
-      .numberOfChannels ( channelCount     )
+      .numNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_1 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),
@@ -232,7 +238,7 @@ module tb_floo_noc_bridge;
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
       .flit_data_size   ( FlitDataSize     ),
-      .numberOfChannels ( channelCount     )
+      .numNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_0 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),
@@ -253,7 +259,7 @@ module tb_floo_noc_bridge;
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
       .flit_data_size   ( FlitDataSize     ),
-      .numberOfChannels ( channelCount     )
+      .numNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_1 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),
@@ -266,17 +272,17 @@ module tb_floo_noc_bridge;
       .axis_in_req_i    ( bridge_req[0]    ),
       .axis_out_rsp_i   ( bridge_rsp[0]    )
     );
-
-    assign Bridge_0_req_o = req_bridge_0_o.valid & chimney_0_req[0].ready ;
-    assign Bridge_0_req_i = chimney_0_req[0].valid & req_bridge_0_o.ready ;
-    assign Bridge_0_rsp_o = rsp_bridge_0_o.valid & chimney_0_rsp[0].ready ;
-    assign Bridge_0_rsp_i = chimney_0_rsp[0].valid & rsp_bridge_0_o.ready ;
-
-    assign Bridge_1_req_o = req_bridge_1_o.valid & chimney_1_req[1].ready ;
-    assign Bridge_1_req_i = chimney_1_req[1].valid & req_bridge_1_o.ready ;
-    assign Bridge_1_rsp_o = rsp_bridge_1_o.valid & chimney_1_rsp[1].ready ;
-    assign Bridge_1_rsp_i = chimney_1_rsp[1].valid & rsp_bridge_1_o.ready ;
   end
+
+  assign Bridge_0_req_o = req_bridge_0_o.valid & chimney_0_req[0].ready ;
+  assign Bridge_0_req_i = chimney_0_req[0].valid & req_bridge_0_o.ready ;
+  assign Bridge_0_rsp_o = rsp_bridge_0_o.valid & chimney_0_rsp[0].ready ;
+  assign Bridge_0_rsp_i = chimney_0_rsp[0].valid & rsp_bridge_0_o.ready ;
+
+  assign Bridge_1_req_o = req_bridge_1_o.valid & chimney_1_req[1].ready ;
+  assign Bridge_1_req_i = chimney_1_req[1].valid & req_bridge_1_o.ready ;
+  assign Bridge_1_rsp_o = rsp_bridge_1_o.valid & chimney_1_rsp[1].ready ;
+  assign Bridge_1_rsp_i = chimney_1_rsp[1].valid & rsp_bridge_1_o.ready ;
 
   assign chimney_1_req[0] = BridgeBypass ? chimney_0_req[0] : req_bridge_1_o;
   assign chimney_1_rsp[0] = BridgeBypass ? chimney_0_rsp[0] : rsp_bridge_1_o;

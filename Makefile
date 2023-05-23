@@ -61,7 +61,6 @@ update-regs: src/regs/*.hjson
 
 # TB_DUT ?= tb_axi_serial_link
 # TB_DUT ?= tb_floo_noc_bridge
-# Below option is not yet available...
 TB_DUT ?= tb_floo_serial_link
 WaveDo ?= $(TB_DUT)_wave.do
 
@@ -126,6 +125,7 @@ run_questa:
 	@cat $(dir $<)vsim_consoleSimulation.log | grep --color -e Error -e Warning -e "AW queue is empty!" -e "AW mismatch!" -e "W queue is empty!" -e "W mismatch!" -e "AR queue is empty!" -e "AR mismatch!" -e "B queue is empty!" -e "B mismatch!" -e "R queue is empty!" -e "R mismatch!" -e "ASSERT FAILED" || true
 	@cat $(dir $<)vsim_consoleSimulation.log | grep --color "INFO: " | sed "s/INFO/`printf '\033[1;35mINFO\033[0m'`/g" || true
 	@cat $(dir $<)vsim_consoleSimulation.log | grep -o -e "# Errors\: [0-9]*," | tr -d "#,:Erso " | sed -e "s/\(.*\)/'\1'/" | sed "s/'0'/good/g" | sed -e "s/'\([0-9]\+\)'/error/g" | sed "s/good/`printf '\033[1;37;42mStatus: It all looks good!\033[0m'`/g" | sed "s/error/`printf '\033[1;37;41mStatus: There are errors!\033[0m'`/g" || true
+	@cat $(dir $<)vsim_consoleSimulation.log | grep --color "Loop found at time" || true
 	@echo -e "\033[1;32m________________________________Simulation-End________________________________\033[0m"
 
 run_questa_gui:

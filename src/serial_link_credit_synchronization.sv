@@ -1,38 +1,63 @@
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
 
+// Can be used to implement credit-base synchronization. It contains the control-logic and is meant to intercept with
+// the handshake interface.
 module serial_link_credit_synchronization #(
-  parameter type credit_t   = logic,
-  parameter type data_t     = logic,
-  parameter int  data_width = $bits(data_t),
+  parameter type credit_t       = logic,
+  // declare eighter the data_t type or alternatively assign the data-width directly. In the latter case the type will
+  // not be considered.
+  parameter type data_t         = logic,
+  parameter int  data_width     = $bits(data_t),
   // For credit-based control flow
-  parameter int  NumCredits = -1,
+  parameter int  NumCredits     = -1,
   // Force send out credits belonging to the other side
   // after ForceSendThresh is reached
-  parameter int ForceSendThresh  = NumCredits - 4
+  parameter int ForceSendThresh = NumCredits - 4
 ) (
-  input  logic                  clk_i,
-  input  logic                  rst_ni,
-
-  input  credit_t               credits_received_i,
-  output credit_t               credits_to_send_o,
-
-  // Datastream with which the credits_to_send_o port should be alligned to
-  input  logic [data_width-1:0] data_to_send_in,
-  output logic [data_width-1:0] data_to_send_out,
-
-  input  logic                  send_valid_i = 1'b1,
-  input  logic                  send_ready_i,
-  input  logic                  receive_valid_i,
-  input  logic                  receive_ready_i,
-  
-  output logic                  send_valid_o,
-  output logic                  send_ready_o
+  // clock signal
+  input  logic                    clk_i,
+  // reset on low
+  input  logic                    rst_ni,
+  // when the receive_valid & receive_ready signals indicate a handshake, this value is used to signal the control
+  // unit the amount of credits that where released by the target side: The amount of elements that where consumed
+  // from the data queue of the receiving side of data_to_send_out.
+  // Should correspond to the amount of credits received by the time the receive_valid/ready handshake occurs.
+  // Therefore, these credits might need to be buffered in the receiving data-queue as well.
+  input  credit_t                 credits_received_i,
+  // Whenever I receive data (receive_valid & receive_ready indicate a handshake) the value is being increased
+  // indicating that further packets can be received. In order to work propperly, it is important to correctly
+  // connect the receive_ready/valid signals. => See description below.
+  output credit_t                 credits_to_send_o,
+  // Data which should be sent to the receiver side.
+  input  logic [data_width-1:0]   data_to_send_in,
+  // Data being sent to the receiver. The control logic of this module may disconnect from the incoming data-stream
+  // and tie this value to zero instead in case of the force-send credit scenario. The credits_only_packet signal
+  // below contains information on the type of data-packet (valid-data packet or credits-only packet without valid data.)
+  output logic [data_width-1:0]   data_to_send_out,
+  // The valid signal indicating if the data received on data_to_send_in is valid.
+  input  logic                    send_valid_i,
+  // Signal coming from the receiver indicating whether or not the receiver is ready to receive data.
+  input  logic                    send_ready_i,
+  // This signal indicates if the queue (to be provided externally. Should be able to buffer NumCredits amount of data)
+  // Has valid data to be released. A handshake with receive_ready_i indicates that a data element has been consumed and
+  // therefore will increment the amount of credits that can be returned.
+  input  logic                    receive_valid_i,
+  // The ready signal of the data sink signaling to the queue that data can be consumed.
+  input  logic                    receive_ready_i,
+  // Asserted if the data_to_send_out port (and the credits_to_send_o port for that matter) contains valid data.
+  output logic                    send_valid_o,
+  // Connect to the data source feeding data_to_send_in to signal that new data can be received.
+  output logic                    send_ready_o,
+  // If a credits only packet is being sent, this value is driven to high. This value might be wrapped into the data-stream
+  // to indicate if it also contains valid data or not.
+  output logic                    credits_only_packet
 );
 
   import serial_link_pkg::*;
 
   logic send_normal_packet_d, send_normal_packet_q, send_valid_i_q;
+  assign credits_only_packet = ~send_normal_packet_d;
 
   credit_t credits_available_q, credits_available_d;
   credit_t credits_to_send_q, credits_to_send_d;
@@ -41,7 +66,8 @@ module serial_link_credit_synchronization #(
   credit_t credits_to_send_hidden_q, credits_to_send_hidden_d;
   logic and_valid_condition, force_send_credits_d, force_send_credits_q;
 
-  assign send_ready_o = send_ready_i & send_normal_packet_d;
+  assign send_ready_o = send_ready_i & send_normal_packet_d & send_valid_o;
+  assign force_send_o = force_send_credits_d;
 
   // stabalize the output data if a credit_only packet needs to be sent
   always_comb begin : ouput_data_control
@@ -101,23 +127,23 @@ module serial_link_credit_synchronization #(
     if (send_valid_o & send_ready_i) begin
       // I also received a axis_in packet
       if (receive_valid_i & receive_ready_i) begin
-        credits_to_send_d = credits_to_send_hidden_q+1;
-        credits_available_d += (credits_received_i-1);
+        credits_to_send_d = credits_to_send_hidden_q + 1;
+        credits_available_d = credits_available_q + credits_received_i - 1;
       // A packet is send, but non was received meanwhile
       end else begin
         credits_to_send_d = credits_to_send_hidden_q;
-        credits_available_d--;
+        credits_available_d = credits_available_q - 1;
       end
       credits_to_send_hidden_d = '0;
     end else begin
       // If an axis_in packet arives I regain available credits
       if (receive_valid_i & receive_ready_i) begin
-        credits_available_d += credits_received_i;
+        credits_available_d = credits_available_q + credits_received_i;
         // The packet was consumed, so I can signal to the other side that we now have free credits
         if (send_valid_o) begin
-          credits_to_send_hidden_d++;
+          credits_to_send_hidden_d = credits_to_send_hidden_q + 1;
         end else begin
-          credits_to_send_d++;
+          credits_to_send_d = credits_to_send_q + 1;
         end
       end
     end
@@ -143,7 +169,8 @@ module serial_link_credit_synchronization #(
   //   ASSERTIONS   //
   ////////////////////
   
-  `ASSERT_INIT(ForceSendTh, ForceSendThresh > 0)
+  // The threshold should be larger than 1
+  `ASSERT_INIT(ForceSendTh, ForceSendThresh > 1)
   `ASSERT(MaxCredits, credits_available_q <= NumCredits)
   `ASSERT(MaxSendCredits, credits_to_send_q <= NumCredits)
 
