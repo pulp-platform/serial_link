@@ -221,7 +221,7 @@ module serial_link_axi_network #(
   logic aw_sent_q, aw_sent_d;
   logic w_sent_q, w_sent_d;
   logic r_sent_q, r_sent_d;
-  logic two_ch_packet, credit_only_packet;
+  logic two_ch_packet;
 
   typedef enum logic { Normal, Sync } unpack_state_e;
 
@@ -241,7 +241,6 @@ module serial_link_axi_network #(
 
   assign payload_in = payload_t'(axis_in_req_i.t.data);
   assign two_ch_packet = (payload_in.hdr != TagIdle) & payload_in.b_valid;
-  assign credit_only_packet = (payload_in.hdr == TagIdle) & ~payload_in.b_valid;
 
   always_comb begin : unpacker
     axi_out_req_o.aw_valid = 1'b0;
@@ -283,8 +282,6 @@ module serial_link_axi_network #(
             end else if (axi_ch_sent_d & b_sent_d) begin
               axis_in_rsp_o.tready = 1'b1;
             end
-          end else if (credit_only_packet) begin
-            axis_in_rsp_o.tready = 1'b1;
           end else begin
             // accept payload if either one of them was able to send
             if (axi_ch_sent_d | b_sent_d) begin

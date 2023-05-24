@@ -86,10 +86,6 @@ import serial_link_pkg::*;
     tag_e hdr;
   } payload_t;
 
-  localparam int BandWidth = NumChannels * NumLanes * 2;
-  localparam int PayloadSplits = ($bits(payload_t) + $bits(credit_t) + BandWidth - 1) / BandWidth;
-  localparam int RecvFifoDepth = NumCredits * PayloadSplits;
-
   // Axi stream dimension must be a multiple of 8 bits
   localparam int StreamDataBytes = ($bits(payload_t) + 7) / 8;
 
@@ -181,9 +177,6 @@ import serial_link_pkg::*;
     .phy_data_t       ( phy_data_t        ),
     .NumChannels      ( NumChannels       ),
     .NumLanes         ( NumLanes          ),
-    .RecvFifoDepth    ( RecvFifoDepth     ),
-    .RawModeFifoDepth ( RawModeFifoDepth  ),
-    .PayloadSplits    ( PayloadSplits     ),
     .credit_t         ( credit_t          ),
     .NumCredits       ( NumCredits        )    
   ) i_serial_link_data_link (
@@ -366,11 +359,5 @@ import serial_link_pkg::*;
   assign isolate_o = {reg2hw.ctrl.axi_out_isolate.q, reg2hw.ctrl.axi_in_isolate.q};
   assign hw2reg.isolated.axi_in.d = isolated_i[0];
   assign hw2reg.isolated.axi_out.d = isolated_i[1];
-
-  ////////////////////
-  //   ASSERTIONS   //
-  ////////////////////
-
-  `ASSERT_INIT(RawModeFifoDim, RecvFifoDepth >= RawModeFifoDepth)
 
 endmodule : axi_serial_link

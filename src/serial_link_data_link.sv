@@ -13,24 +13,31 @@
 module serial_link_data_link
 import serial_link_pkg::*;
 #(
-  parameter type axis_req_t = logic,
-  parameter type axis_rsp_t = logic,
-  parameter type payload_t  = logic,
-  parameter type phy_data_t = serial_link_pkg::phy_data_t,
-  parameter int NumChannels = serial_link_pkg::NumChannels,
-  parameter int NumLanes    = serial_link_pkg::NumLanes,
-  parameter int RecvFifoDepth = -1,
-  parameter int RawModeFifoDepth = 8,
-  parameter int PayloadSplits = -1,
-  localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1,
-  localparam int unsigned Log2RawModeFifoDepth = $clog2(RawModeFifoDepth),
-
+  parameter type axis_req_t      = logic,
+  parameter type axis_rsp_t      = logic,
+  parameter type payload_t       = logic,
+  parameter type phy_data_t      = serial_link_pkg::phy_data_t,
+  parameter int  NumChannels     = serial_link_pkg::NumChannels,
+  parameter int  NumLanes        = serial_link_pkg::NumLanes,
   // For credit-based control flow
-  parameter type credit_t = logic,
-  parameter int NumCredits  = -1,
-  // Force send out credits belonging to the other side
-  // after ForceSendThresh is reached
-  localparam int ForceSendThresh  = NumCredits - 4
+  parameter type credit_t        = logic,
+  parameter int  NumCredits      = -1,
+  parameter int  ForceSendThresh = NumCredits - 4,
+
+  //////////////////////////
+  // Dependant parameters //
+  //////////////////////////
+
+  localparam int NumUserBits      = $bits(axis_in_req_i.t.user),
+  // The width used to transfer all the data contained in one axis-packet (so far data & user bits are supported)
+  localparam int axis_pak_width   = $bits(payload_t) + NumUserBits,
+  localparam int Log2NumChannels  = (NumChannels > 1)? $clog2(NumChannels) : 1,
+  localparam int RawModeFifoDepth = serial_link_pkg::RawModeFifoDepth,
+  localparam int BandWidth        = NumChannels * NumLanes * 2,
+  // (the +1 is required to transmit the info whether or not it is a credits_only packet which is being sent)
+  localparam int PayloadSplits    = (1 + $bits(payload_t) + $bits(credit_t) + NumUserBits + BandWidth - 1) / BandWidth,
+  localparam int RecvFifoDepth    = NumCredits * PayloadSplits,
+  localparam int unsigned Log2RawModeFifoDepth = $clog2(RawModeFifoDepth)
 ) (
   input  logic                            clk_i,
   input  logic                            rst_ni,
@@ -62,19 +69,17 @@ import serial_link_pkg::*;
   output logic                            cfg_raw_mode_out_data_fifo_is_full_o
 );
 
-  localparam int NumUserBits = $bits(axis_in_req_i.t.user);
-  localparam int data_width  = $bits(payload_t) + NumUserBits;
-
   // These unfiltered axis_out signals will have to be analyzed for credits_only packets
   // which will not be allowed to propagate to the axis output.
   axis_req_t axis_out_req_unfiltered;
   axis_rsp_t axis_out_rsp_unfiltered;
 
   // credit-based-flow-control related signals (The axis user-bits are now also packed and transfered)
-  logic [data_width-1:0] axis_in_data_to_physical;
+  logic [axis_pak_width-1:0] axis_in_data_to_physical;
   logic axis_in_req_tvalid_afterFlowControl;
   logic axis_in_rsp_tready_afterFlowControl;
   credit_t credits_to_send, credits_incoming;
+  logic credits_only_packet_out, credits_only_packet_in;
 
   logic [PayloadSplits-1:0] recv_reg_in_valid, recv_reg_in_ready;
   logic [PayloadSplits-1:0] recv_reg_out_valid, recv_reg_out_ready;
@@ -88,13 +93,18 @@ import serial_link_pkg::*;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
   phy_data_t raw_mode_fifo_data_in, raw_mode_fifo_data_out;
 
+  // Declare the stream of data to be sent via the off-chip link
+  localparam int transfer_data_width = $bits({axis_in_data_to_physical, credits_to_send, credits_only_packet_out});
+  logic [transfer_data_width-1:0] wrapped_output_data;
+  assign wrapped_output_data = {axis_in_data_to_physical, credits_to_send, credits_only_packet_out};
+
   ////////////////////////////////
   //   FLOW-CONTROL-INSERTION   //
   ////////////////////////////////
 
   serial_link_credit_synchronization #(
     .credit_t   ( credit_t   ),
-    .data_width ( data_width ),
+    .data_width ( axis_pak_width ),
     .NumCredits ( NumCredits )
   ) i_synchronization_flow_control (
     .clk_i               ( clk_i                   ),
@@ -103,7 +113,6 @@ import serial_link_pkg::*;
     // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
     // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
     // be made smaller, without loosing any information...
-    // .data_to_send_in    ( axis_in_req_i.t.data ),
     .data_to_send_in     ( {axis_in_req_i.t.data, axis_in_req_i.t.user} ),
     .data_to_send_out    ( axis_in_data_to_physical ),
 
@@ -121,7 +130,8 @@ import serial_link_pkg::*;
     .credits_received_i  ( credits_incoming  ),
     .receive_valid_i     ( axis_out_req_unfiltered.tvalid   ),
     .receive_ready_i     ( axis_out_rsp_unfiltered.tready   ),
-    .credits_only_packet ()
+    // TODO: append this bit in the data load and therewith avoid the need to reconstruct if it is a credit only packet
+    .credits_only_packet ( credits_only_packet_out )
   );
 
   /////////////////
@@ -173,7 +183,7 @@ import serial_link_pkg::*;
     data_in_ready_o = '0;
     recv_reg_index_d = recv_reg_index_q;
     axis_out_req_unfiltered.tvalid = 1'b0;
-    {axis_out_req_unfiltered.t.data, axis_out_req_unfiltered.t.user, credits_incoming} = recv_reg_data;
+    {axis_out_req_unfiltered.t.data, axis_out_req_unfiltered.t.user, credits_incoming, credits_only_packet_in} = recv_reg_data;
     recv_reg_out_ready = '0;
     cfg_raw_mode_in_data_o = '0;
     cfg_raw_mode_in_data_valid_o = '0;
@@ -244,10 +254,10 @@ import serial_link_pkg::*;
           if (axis_in_req_tvalid_afterFlowControl) begin
             link_out_index_d = NumChannels * NumLanes * 2;
             data_out_valid_o = '1;
-            data_out_o = {axis_in_data_to_physical, credits_to_send};
+            data_out_o = wrapped_output_data;
             if (data_out_ready_i) begin
               link_state_d = LinkSendBusy;
-              if (link_out_index_d >= $bits({axis_in_data_to_physical, credits_to_send})) begin
+              if (link_out_index_d >= $bits(wrapped_output_data)) begin
                 link_state_d = LinkSendIdle;
                 axis_in_rsp_tready_afterFlowControl = 1'b1;
               end
@@ -257,10 +267,10 @@ import serial_link_pkg::*;
 
         LinkSendBusy: begin
           data_out_valid_o = '1;
-          data_out_o = {axis_in_data_to_physical, credits_to_send} >> link_out_index_q;
+          data_out_o = wrapped_output_data >> link_out_index_q;
           if (data_out_ready_i) begin
             link_out_index_d = link_out_index_q + NumChannels * NumLanes * 2;
-            if (link_out_index_d >= $bits({axis_in_data_to_physical, credits_to_send})) begin
+            if (link_out_index_d >= $bits(wrapped_output_data)) begin
               link_state_d = LinkSendIdle;
               axis_in_rsp_tready_afterFlowControl = 1'b1;
             end
@@ -273,17 +283,17 @@ import serial_link_pkg::*;
 
   // Credit only packets should not be forwarded as they do not contain valid data
   always_comb begin
-    axis_out_req_o.tvalid = ({axis_out_req_unfiltered.t.data, axis_out_req_unfiltered.t.user} == '0) ? 0 : axis_out_req_unfiltered.tvalid;
+    axis_out_req_o.tvalid = (credits_only_packet_in == 1) ? 0 : axis_out_req_unfiltered.tvalid;
     axis_out_req_o.t.data = axis_out_req_unfiltered.t.data;
     axis_out_req_o.t.user = axis_out_req_unfiltered.t.user;
     // make the credit only packet disappear (consume it)
-    axis_out_rsp_unfiltered.tready = axis_out_rsp_i.tready || ({axis_out_req_unfiltered.t.data, axis_out_req_unfiltered.t.user} == '0);
+    axis_out_rsp_unfiltered.tready = axis_out_rsp_i.tready || (credits_only_packet_in == 1);
   end
 
   // // This Block is for debuggin only: Uncomment if not used...
   // always_ff @(posedge clk_i) begin
   //   if (axis_out_req_unfiltered.tvalid & axis_out_rsp_unfiltered.tready) begin
-  //     if ({axis_out_req_unfiltered.t.data, axis_out_req_unfiltered.t.user} == '0) begin
+  //     if (credits_only_packet_in == 1) begin
   //       $display("INFO: axis pack to be sent (@%8d) = | %1d | %30d | %1d | %2d | => not forwarded", $time, axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-6], axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-7:0], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-1], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-2:0]);
   //     end else begin
   //       $display("INFO: axis pack to be sent (@%8d) = | %1d | %30d | %1d | %2d |", $time, axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-6], axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-7:0], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-1], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-2:0]);
@@ -314,5 +324,11 @@ import serial_link_pkg::*;
 
   `FF(link_out_index_q, link_out_index_d, '0)
   `FF(link_state_q, link_state_d, LinkSendIdle)
+
+  ////////////////////
+  //   ASSERTIONS   //
+  ////////////////////
+
+  `ASSERT_INIT(RawModeFifoDim, RecvFifoDepth >= RawModeFifoDepth)
 
 endmodule

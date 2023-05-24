@@ -25,10 +25,11 @@ import serial_link_pkg::*;
   parameter  int  NumLanes        = serial_link_pkg::NumLanes,
   parameter  int  MaxClkDiv       = serial_link_pkg::MaxClkDiv,
   parameter  bit  NoRegCdc        = 1'b0,
-  parameter  int  MaxCredits      = 0,
+  // It the noc_bridge has zero credits, the non-virtual channel version of the noc-bridge is being used
+  parameter  int  MaxCredVirtChan = 0,
   localparam int  Log2NumChannels = (NumChannels > 1) ? $clog2(NumChannels) : 1,
   localparam int  channelCount    = 2,
-  localparam bit  BridgeVirtualChannels = (MaxCredits == 0) ? 1'b0 : 1'b1,
+  localparam bit  BridgeVirtualChannels = (MaxCredVirtChan == 0) ? 1'b0 : 1'b1,
   parameter  bit  printFeedback   = 1'b0
 ) (
   // There are 3 different clock/resets:
@@ -74,20 +75,15 @@ import serial_link_pkg::*;
     logic [FlitDataSize-1:0] flit_data;
   } payload_t;
 
-  localparam type credits_t = logic [$clog2(MaxCredits+1)-1:0];
+  localparam type credits_noc_bridge_t = logic [$clog2(MaxCredVirtChan + 1) - 1:0];
 
   typedef struct packed {
     logic data_validity;
-    credits_t credits;
+    credits_noc_bridge_t credits;
   } user_bits_t;
 
-  localparam int BandWidth     = NumChannels * NumLanes * 2;
-  // localparam int PayloadSplits = ($bits(payload_t) + $bits(credit_t) + BandWidth - 1) / BandWidth;
-  localparam int PayloadSplits = ($bits(payload_t) + $bits(credit_t) + $bits(user_bits_t) + BandWidth - 1) / BandWidth;
-  localparam int RecvFifoDepth = NumCredits * PayloadSplits;
-
-  localparam int StreamDataBytes = ($bits(payload_t) + 7) / 8;
   // Axi stream dimension must be a multiple of 8 bits
+  localparam int StreamDataBytes = ($bits(payload_t) + 7) / 8;
 
   // Typdefs for Axi Stream interface
   // All except tdata_t are unused at the moment
@@ -137,26 +133,26 @@ import serial_link_pkg::*;
 
   if (BridgeVirtualChannels) begin : bridge
     floo_axis_noc_bridge_virtual_channels #(
-      .ignore_assert     ( 1'b0         ),
-      // .allow_debug_msg   ( 1'b1         ),
-      .req_flit_t        ( req_flit_t   ),
-      .rsp_flit_t        ( rsp_flit_t   ),
-      .axis_req_t        ( axis_req_t   ),
-      .axis_rsp_t        ( axis_rsp_t   ),
-      .flit_data_size    ( FlitDataSize ),
-      .number_of_credits ( MaxCredits   ),
-      .numNocChanPerDir  ( channelCount )
+      .ignore_assert     ( 1'b0            ),
+      // .allow_debug_msg   ( 1'b1            ),
+      .req_flit_t        ( req_flit_t      ),
+      .rsp_flit_t        ( rsp_flit_t      ),
+      .axis_req_t        ( axis_req_t      ),
+      .axis_rsp_t        ( axis_rsp_t      ),
+      .flit_data_size    ( FlitDataSize    ),
+      .number_of_credits ( MaxCredVirtChan ),
+      .numNocChanPerDir  ( channelCount    )
     ) i_serial_link_network (
-      .clk_i             ( clk_sl_i     ),
-      .rst_ni            ( rst_sl_ni    ),
-      .req_o             ( req_o        ),
-      .rsp_o             ( rsp_o        ),
-      .req_i             ( req_i        ),
-      .rsp_i             ( rsp_i        ),
-      .axis_out_req_o    ( axis_out_req ),
-      .axis_in_rsp_o     ( axis_in_rsp  ),
-      .axis_in_req_i     ( axis_in_req  ),
-      .axis_out_rsp_i    ( axis_out_rsp )
+      .clk_i             ( clk_sl_i        ),
+      .rst_ni            ( rst_sl_ni       ),
+      .req_o             ( req_o           ),
+      .rsp_o             ( rsp_o           ),
+      .req_i             ( req_i           ),
+      .rsp_i             ( rsp_i           ),
+      .axis_out_req_o    ( axis_out_req    ),
+      .axis_in_rsp_o     ( axis_in_rsp     ),
+      .axis_in_req_i     ( axis_in_req     ),
+      .axis_out_rsp_i    ( axis_out_rsp    )
     );
   end else begin : bridge
     floo_axis_noc_bridge #(
@@ -214,9 +210,6 @@ import serial_link_pkg::*;
     .phy_data_t       ( phy_data_t        ),
     .NumChannels      ( NumChannels       ),
     .NumLanes         ( NumLanes          ),
-    .RecvFifoDepth    ( RecvFifoDepth     ),
-    .RawModeFifoDepth ( RawModeFifoDepth  ),
-    .PayloadSplits    ( PayloadSplits     ),
     .credit_t         ( credit_t          ),
     .NumCredits       ( NumCredits        )    
   ) i_serial_link_data_link (
@@ -398,11 +391,5 @@ import serial_link_pkg::*;
   assign isolate_o = {reg2hw.ctrl.axi_out_isolate.q, reg2hw.ctrl.axi_in_isolate.q};
   assign hw2reg.isolated.axi_in.d = isolated_i[0];
   assign hw2reg.isolated.axi_out.d = isolated_i[1];
-
-  ////////////////////
-  //   ASSERTIONS   //
-  ////////////////////
-
-  `ASSERT_INIT(RawModeFifoDim, RecvFifoDepth >= RawModeFifoDepth)
 
 endmodule : floo_serial_link
