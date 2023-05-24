@@ -43,6 +43,10 @@ module tb_floo_serial_link();
   localparam int unsigned MaxTxns           = 32;
   localparam int unsigned MaxTxnsPerId      = 32;
 
+  // With this parameter you can set the maximal credit count for the NoC bridge. If set to 0, the NoC-bridge without
+  // virtualization will be used instead.
+  localparam int unsigned NumCred_NocBridge = 8;
+
   // Stop the simulation if this simulation time (ns) is exceeded.
   localparam int stopSimAfter = 75000000;
 
@@ -146,18 +150,19 @@ module tb_floo_serial_link();
   );
 
   floo_serial_link #(
-    .req_flit_t     ( req_flit_t     ),
-    .rsp_flit_t     ( rsp_flit_t     ),
-    .cfg_req_t      ( cfg_req_t      ),
-    .cfg_rsp_t      ( cfg_rsp_t      ),
+    .req_flit_t     ( req_flit_t        ),
+    .rsp_flit_t     ( rsp_flit_t        ),
+    .cfg_req_t      ( cfg_req_t         ),
+    .cfg_rsp_t      ( cfg_rsp_t         ),
     .hw2reg_t       ( serial_link_reg_pkg::serial_link_hw2reg_t ),
     // .hw2reg_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_hw2reg_t ),
     .reg2hw_t       ( serial_link_reg_pkg::serial_link_reg2hw_t ),
     // .reg2hw_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg2hw_t ),
-    .NumChannels    ( NumChannels    ),
-    .NumLanes       ( NumLanes       ),
-    .MaxClkDiv      ( MaxClkDiv      ),
-    .printFeedback  ( 1'b1           )
+    .NumChannels    ( NumChannels       ),
+    .NumLanes       ( NumLanes          ),
+    .MaxClkDiv      ( MaxClkDiv         ),
+    .MaxCredits     ( NumCred_NocBridge ),
+    .printFeedback  ( 1'b1              )
   ) i_serial_link_0 (
     .clk_i          ( clk_1          ),
     .rst_ni         ( rst_1_n        ),
@@ -179,17 +184,18 @@ module tb_floo_serial_link();
 
   // second serial instance
   floo_serial_link #(
-    .req_flit_t     ( req_flit_t     ),
-    .rsp_flit_t     ( rsp_flit_t     ),
-    .cfg_req_t      ( cfg_req_t      ),
-    .cfg_rsp_t      ( cfg_rsp_t      ),
+    .req_flit_t     ( req_flit_t        ),
+    .rsp_flit_t     ( rsp_flit_t        ),
+    .cfg_req_t      ( cfg_req_t         ),
+    .cfg_rsp_t      ( cfg_rsp_t         ),
     .hw2reg_t       ( serial_link_reg_pkg::serial_link_hw2reg_t ),
     // .hw2reg_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_hw2reg_t ),
     .reg2hw_t       ( serial_link_reg_pkg::serial_link_reg2hw_t ),
     // .reg2hw_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg2hw_t ),
-    .NumChannels    ( NumChannels    ),
-    .NumLanes       ( NumLanes       ),
-    .MaxClkDiv      ( MaxClkDiv      )
+    .NumChannels    ( NumChannels       ),
+    .NumLanes       ( NumLanes          ),
+    .MaxClkDiv      ( MaxClkDiv         ),
+    .MaxCredits     ( NumCred_NocBridge )
   ) i_serial_link_1 (
     .clk_i          ( clk_2          ),
     .rst_ni         ( rst_2_n        ),
@@ -333,9 +339,6 @@ module tb_floo_serial_link();
   int NumReads_1 = TestDuration;
   int NumWrites_2 = TestDuration;
   int NumReads_2 = TestDuration;
-
-  initial begin
-  end
 
   initial begin
     axi_rand_slave_1.reset();

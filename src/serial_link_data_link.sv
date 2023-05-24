@@ -30,7 +30,7 @@ import serial_link_pkg::*;
   parameter int NumCredits  = -1,
   // Force send out credits belonging to the other side
   // after ForceSendThresh is reached
-  localparam int ForceSendThresh  = NumCredits - 4  
+  localparam int ForceSendThresh  = NumCredits - 4
 ) (
   input  logic                            clk_i,
   input  logic                            rst_ni,
@@ -62,8 +62,16 @@ import serial_link_pkg::*;
   output logic                            cfg_raw_mode_out_data_fifo_is_full_o
 );
 
-  // credit-based-flow-control related signals
-  payload_t axis_in_data_to_physical;
+  localparam int NumUserBits = $bits(axis_in_req_i.t.user);
+  localparam int data_width  = $bits(payload_t) + NumUserBits;
+
+  // These unfiltered axis_out signals will have to be analyzed for credits_only packets
+  // which will not be allowed to propagate to the axis output.
+  axis_req_t axis_out_req_unfiltered;
+  axis_rsp_t axis_out_rsp_unfiltered;
+
+  // credit-based-flow-control related signals (The axis user-bits are now also packed and transfered)
+  logic [data_width-1:0] axis_in_data_to_physical;
   logic axis_in_req_tvalid_afterFlowControl;
   logic axis_in_rsp_tready_afterFlowControl;
   credit_t credits_to_send, credits_incoming;
@@ -86,32 +94,34 @@ import serial_link_pkg::*;
 
   serial_link_credit_synchronization #(
     .credit_t   ( credit_t   ),
-    .data_t     ( payload_t  ),
+    .data_width ( data_width ),
     .NumCredits ( NumCredits )
   ) i_synchronization_flow_control (
-    .clk_i              ( clk_i                   ),
-    .rst_ni             ( rst_ni                  ),
+    .clk_i               ( clk_i                   ),
+    .rst_ni              ( rst_ni                  ),
 
     // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
     // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
     // be made smaller, without loosing any information...
-    .data_to_send_in    ( axis_in_req_i.t.data ),
-    .data_to_send_out   ( axis_in_data_to_physical ),
+    // .data_to_send_in    ( axis_in_req_i.t.data ),
+    .data_to_send_in     ( {axis_in_req_i.t.data, axis_in_req_i.t.user} ),
+    .data_to_send_out    ( axis_in_data_to_physical ),
 
     // towards button (internal)
-    .credits_to_send_o  ( credits_to_send ),
+    .credits_to_send_o   ( credits_to_send ),
     // top
-    .send_ready_o       ( axis_in_rsp_o.tready    ),
+    .send_ready_o        ( axis_in_rsp_o.tready    ),
     // top
-    .send_valid_i       ( axis_in_req_i.tvalid    ),
+    .send_valid_i        ( axis_in_req_i.tvalid    ),
     // button
-    .send_valid_o       ( axis_in_req_tvalid_afterFlowControl  ),
+    .send_valid_o        ( axis_in_req_tvalid_afterFlowControl  ),
     // button
-    .send_ready_i       ( axis_in_rsp_tready_afterFlowControl  ),
+    .send_ready_i        ( axis_in_rsp_tready_afterFlowControl  ),
     
-    .credits_received_i ( credits_incoming  ),
-    .receive_valid_i    ( axis_out_req_o.tvalid   ),
-    .receive_ready_i    ( axis_out_rsp_i.tready   )
+    .credits_received_i  ( credits_incoming  ),
+    .receive_valid_i     ( axis_out_req_unfiltered.tvalid   ),
+    .receive_ready_i     ( axis_out_rsp_unfiltered.tready   ),
+    .credits_only_packet ()
   );
 
   /////////////////
@@ -158,13 +168,12 @@ import serial_link_pkg::*;
     );
   end
 
-
   always_comb begin
     recv_reg_in_valid = '0;
     data_in_ready_o = '0;
     recv_reg_index_d = recv_reg_index_q;
-    axis_out_req_o.tvalid = 1'b0;
-    {axis_out_req_o.t.data, credits_incoming} = recv_reg_data;
+    axis_out_req_unfiltered.tvalid = 1'b0;
+    {axis_out_req_unfiltered.t.data, axis_out_req_unfiltered.t.user, credits_incoming} = recv_reg_data;
     recv_reg_out_ready = '0;
     cfg_raw_mode_in_data_o = '0;
     cfg_raw_mode_in_data_valid_o = '0;
@@ -200,8 +209,8 @@ import serial_link_pkg::*;
       end
 
       // Once all Recv Stream Registers are filled -> generate AXI stream request
-      axis_out_req_o.tvalid = &recv_reg_out_valid;
-      recv_reg_out_ready = {PayloadSplits{axis_out_rsp_i.tready}};
+      axis_out_req_unfiltered.tvalid = &recv_reg_out_valid;
+      recv_reg_out_ready = {PayloadSplits{axis_out_rsp_unfiltered.tready}};
     end
   end
 
@@ -261,6 +270,26 @@ import serial_link_pkg::*;
       endcase
     end
   end
+
+  // Credit only packets should not be forwarded as they do not contain valid data
+  always_comb begin
+    axis_out_req_o.tvalid = ({axis_out_req_unfiltered.t.data, axis_out_req_unfiltered.t.user} == '0) ? 0 : axis_out_req_unfiltered.tvalid;
+    axis_out_req_o.t.data = axis_out_req_unfiltered.t.data;
+    axis_out_req_o.t.user = axis_out_req_unfiltered.t.user;
+    // make the credit only packet disappear (consume it)
+    axis_out_rsp_unfiltered.tready = axis_out_rsp_i.tready || ({axis_out_req_unfiltered.t.data, axis_out_req_unfiltered.t.user} == '0);
+  end
+
+  // // This Block is for debuggin only: Uncomment if not used...
+  // always_ff @(posedge clk_i) begin
+  //   if (axis_out_req_unfiltered.tvalid & axis_out_rsp_unfiltered.tready) begin
+  //     if ({axis_out_req_unfiltered.t.data, axis_out_req_unfiltered.t.user} == '0) begin
+  //       $display("INFO: axis pack to be sent (@%8d) = | %1d | %30d | %1d | %2d | => not forwarded", $time, axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-6], axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-7:0], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-1], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-2:0]);
+  //     end else begin
+  //       $display("INFO: axis pack to be sent (@%8d) = | %1d | %30d | %1d | %2d |", $time, axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-6], axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-7:0], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-1], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-2:0]);
+  //     end
+  //   end    
+  // end  
 
   fifo_v3 #(
     .dtype  ( phy_data_t        ),
