@@ -24,6 +24,7 @@ import serial_link_pkg::*;
   parameter int  NumCredits      = -1,
   parameter int  ForceSendThresh = NumCredits - 4,
 
+
   //////////////////////////
   // Dependant parameters //
   //////////////////////////
@@ -80,6 +81,7 @@ import serial_link_pkg::*;
   logic axis_in_rsp_tready_afterFlowControl;
   credit_t credits_to_send, credits_incoming;
   logic credits_only_packet_out, credits_only_packet_in;
+  logic consume_incoming_credits;
 
   logic [PayloadSplits-1:0] recv_reg_in_valid, recv_reg_in_ready;
   logic [PayloadSplits-1:0] recv_reg_out_valid, recv_reg_out_ready;
@@ -98,41 +100,37 @@ import serial_link_pkg::*;
   logic [transfer_data_width-1:0] wrapped_output_data;
   assign wrapped_output_data = {axis_in_data_to_physical, credits_to_send, credits_only_packet_out};
 
+
   ////////////////////////////////
   //   FLOW-CONTROL-INSERTION   //
   ////////////////////////////////
 
   serial_link_credit_synchronization #(
-    .credit_t   ( credit_t   ),
+    .credit_t   ( credit_t       ),
     .data_width ( axis_pak_width ),
-    .NumCredits ( NumCredits )
+    .NumCredits ( NumCredits     )
   ) i_synchronization_flow_control (
-    .clk_i               ( clk_i                   ),
-    .rst_ni              ( rst_ni                  ),
-
+    .clk_i                  ( clk_i                                        ),
+    .rst_ni                 ( rst_ni                                       ),
     // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
     // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
     // be made smaller, without loosing any information...
-    .data_to_send_in     ( {axis_in_req_i.t.data, axis_in_req_i.t.user} ),
-    .data_to_send_out    ( axis_in_data_to_physical ),
-
-    // towards button (internal)
-    .credits_to_send_o   ( credits_to_send ),
-    // top
-    .send_ready_o        ( axis_in_rsp_o.tready    ),
-    // top
-    .send_valid_i        ( axis_in_req_i.tvalid    ),
-    // button
-    .send_valid_o        ( axis_in_req_tvalid_afterFlowControl  ),
-    // button
-    .send_ready_i        ( axis_in_rsp_tready_afterFlowControl  ),
-    
-    .credits_received_i  ( credits_incoming  ),
-    .receive_valid_i     ( axis_out_req_unfiltered.tvalid   ),
-    .receive_ready_i     ( axis_out_rsp_unfiltered.tready   ),
-    // TODO: append this bit in the data load and therewith avoid the need to reconstruct if it is a credit only packet
-    .credits_only_packet ( credits_only_packet_out )
+    .data_to_send_i         ( {axis_in_req_i.t.data, axis_in_req_i.t.user} ),
+    .data_to_send_o         ( axis_in_data_to_physical                     ),
+    .credits_to_send_o      ( credits_to_send                              ),
+    .send_ready_o           ( axis_in_rsp_o.tready                         ),
+    .send_valid_i           ( axis_in_req_i.tvalid                         ),
+    .send_valid_o           ( axis_in_req_tvalid_afterFlowControl          ),
+    .send_ready_i           ( axis_in_rsp_tready_afterFlowControl          ),
+    .credits_received_i     ( credits_incoming                             ),
+    .receive_cred_i         ( consume_incoming_credits                     ),
+    .buffer_queue_out_val_i ( axis_out_req_unfiltered.tvalid               ),
+    .buffer_queue_out_rdy_i ( axis_out_rsp_unfiltered.tready               ),
+    .credits_only_packet_o  ( credits_only_packet_out                      )
   );
+
+  assign consume_incoming_credits = axis_out_req_unfiltered.tvalid & axis_out_rsp_unfiltered.tready;
+
 
   /////////////////
   //   DATA IN   //
@@ -145,8 +143,8 @@ import serial_link_pkg::*;
   logic flow_control_fifo_valid_in, flow_control_fifo_ready_in;
 
   stream_fifo #(
-    .T(phy_data_chan_t),
-    .DEPTH (RecvFifoDepth)
+    .T     ( phy_data_chan_t ),
+    .DEPTH ( RecvFifoDepth   )
   ) i_flow_control_fifo (
     .clk_i      ( clk_i                         ),
     .rst_ni     ( rst_ni                        ),
@@ -163,7 +161,7 @@ import serial_link_pkg::*;
 
   for (genvar i = 0; i < PayloadSplits; i++) begin : gen_recv_reg
     stream_register #(
-      .T (phy_data_chan_t)
+      .T ( phy_data_chan_t )
     ) i_recv_reg (
       .clk_i      ( clk_i                       ),
       .rst_ni     ( rst_ni                      ),
@@ -225,6 +223,7 @@ import serial_link_pkg::*;
   end
 
   `FF(recv_reg_index_q, recv_reg_index_d, '0)
+
 
   //////////////////
   //   DATA OUT   //
@@ -290,17 +289,6 @@ import serial_link_pkg::*;
     axis_out_rsp_unfiltered.tready = axis_out_rsp_i.tready || (credits_only_packet_in == 1);
   end
 
-  // // This Block is for debuggin only: Uncomment if not used...
-  // always_ff @(posedge clk_i) begin
-  //   if (axis_out_req_unfiltered.tvalid & axis_out_rsp_unfiltered.tready) begin
-  //     if (credits_only_packet_in == 1) begin
-  //       $display("INFO: axis pack to be sent (@%8d) = | %1d | %30d | %1d | %2d | => not forwarded", $time, axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-6], axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-7:0], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-1], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-2:0]);
-  //     end else begin
-  //       $display("INFO: axis pack to be sent (@%8d) = | %1d | %30d | %1d | %2d |", $time, axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-6], axis_out_req_unfiltered.t.data[$bits(axis_out_req_unfiltered.t.data)-7:0], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-1], axis_out_req_unfiltered.t.user[$bits(axis_out_req_unfiltered.t.user)-2:0]);
-  //     end
-  //   end    
-  // end  
-
   fifo_v3 #(
     .dtype  ( phy_data_t        ),
     .DEPTH  ( RawModeFifoDepth  )
@@ -324,6 +312,7 @@ import serial_link_pkg::*;
 
   `FF(link_out_index_q, link_out_index_d, '0)
   `FF(link_state_q, link_state_d, LinkSendIdle)
+
 
   ////////////////////
   //   ASSERTIONS   //

@@ -48,11 +48,17 @@ module tb_floo_noc_bridge;
   // minimal AXIS data size (also contain the hdr-bit, thus + 1)
   localparam int axis_data_size = FlitDataSize + 1;
   
-  localparam type credits_t = logic [$clog2(numOfCredits+1)-1:0];
+  localparam type credits_noc_bridge_t = logic [$clog2(numOfCredits+1)-1:0];
+
+  typedef enum logic [0:0] {
+    response  = 'd0,
+    request   = 'd1
+  } channel_hdr_e;
 
   typedef struct packed {
     logic data_validity;
-    credits_t credits;
+    channel_hdr_e credits_hdr;
+    credits_noc_bridge_t credits;
   } user_bits_t;
 
   // Axi stream dimension must be a multiple of 8 bits

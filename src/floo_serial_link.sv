@@ -77,8 +77,14 @@ import serial_link_pkg::*;
 
   localparam type credits_noc_bridge_t = logic [$clog2(MaxCredVirtChan + 1) - 1:0];
 
+  typedef enum logic [0:0] {
+    response  = 'd0,
+    request   = 'd1
+  } channel_hdr_e;  
+
   typedef struct packed {
     logic data_validity;
+    channel_hdr_e credits_hdr;
     credits_noc_bridge_t credits;
   } user_bits_t;
 

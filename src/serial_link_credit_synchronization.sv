@@ -21,7 +21,7 @@ module serial_link_credit_synchronization #(
   input  logic                    rst_ni,
   // when the receive_valid & receive_ready signals indicate a handshake, this value is used to signal the control
   // unit the amount of credits that where released by the target side: The amount of elements that where consumed
-  // from the data queue of the receiving side of data_to_send_out.
+  // from the data queue of the receiving side of data_to_send_o.
   // Should correspond to the amount of credits received by the time the receive_valid/ready handshake occurs.
   // Therefore, these credits might need to be buffered in the receiving data-queue as well.
   input  credit_t                 credits_received_i,
@@ -30,57 +30,83 @@ module serial_link_credit_synchronization #(
   // connect the receive_ready/valid signals. => See description below.
   output credit_t                 credits_to_send_o,
   // Data which should be sent to the receiver side.
-  input  logic [data_width-1:0]   data_to_send_in,
+  input  logic [data_width-1:0]   data_to_send_i,
   // Data being sent to the receiver. The control logic of this module may disconnect from the incoming data-stream
-  // and tie this value to zero instead in case of the force-send credit scenario. The credits_only_packet signal
+  // and tie this value to zero instead in case of the force-send credit scenario. The credits_only_packet_o signal
   // below contains information on the type of data-packet (valid-data packet or credits-only packet without valid data.)
-  output logic [data_width-1:0]   data_to_send_out,
-  // The valid signal indicating if the data received on data_to_send_in is valid.
+  output logic [data_width-1:0]   data_to_send_o,
+  // The valid signal indicating if the data received on data_to_send_i is valid.
   input  logic                    send_valid_i,
   // Signal coming from the receiver indicating whether or not the receiver is ready to receive data.
   input  logic                    send_ready_i,
-  // This signal indicates if the queue (to be provided externally. Should be able to buffer NumCredits amount of data)
-  // Has valid data to be released. A handshake with receive_ready_i indicates that a data element has been consumed and
+  // TODO: This signal indicates if the queue (to be provided externally & should be able to buffer NumCredits amount of data)
+  // has valid data to be released. A handshake with buffer_queue_out_rdy_i indicates that a data element has been consumed and
   // therefore will increment the amount of credits that can be returned.
-  input  logic                    receive_valid_i,
-  // The ready signal of the data sink signaling to the queue that data can be consumed.
-  input  logic                    receive_ready_i,
-  // Asserted if the data_to_send_out port (and the credits_to_send_o port for that matter) contains valid data.
+  input  logic                    buffer_queue_out_val_i,
+  // TODO: The ready signal of the data sink signaling to the queue that data can be consumed.
+  input  logic                    buffer_queue_out_rdy_i,
+  // TODO: add a description
+  input  logic                    receive_cred_i,
+  // Asserted if the data_to_send_o port (and the credits_to_send_o port for that matter) contains valid data.
   output logic                    send_valid_o,
-  // Connect to the data source feeding data_to_send_in to signal that new data can be received.
+  // Connect to the data source feeding data_to_send_i to signal that new data can be received.
   output logic                    send_ready_o,
   // If a credits only packet is being sent, this value is driven to high. This value might be wrapped into the data-stream
   // to indicate if it also contains valid data or not.
-  output logic                    credits_only_packet
+  output logic                    credits_only_packet_o,
+  // Optional input pin to specify if the credits_to_send_o port can be forwarded. If the input is set to zero, the
+  // credits_to_send_o port might be updated, but in case of a valid data_transfer (data_to_send_o is sent) the 
+  // credits are not assumed to be consumed as well. This feature is meant to be used if multiple channels are to be
+  // arbitrated and send over a virtual channel. In this case, it allows decoupling of the selected channel data and
+  // the credits to be sent. For example: I might forward the data of channel 1, but sent the credits info of channel 2.
+  input logic                     allow_cred_consume_i    = 1'b1,
+  // Optional input pin: This pin can be used in combination with the above optional pin. While the previous pin blocks
+  // credits_to_send_o to be consumed in the case of a valid data output handshake, this pin (consume_cred_to_send_i)
+  // can signal the consumption of the credits. This allows the credits to be consumed and sent, while the data might
+  // not be forwarded.
+  input logic                     consume_cred_to_send_i = 1'b0
+  // Example usage of the above two pins when having 2 channels to be sent over one physical channel (virtual channel
+  // principle): The consume_cred_to_send_i has the data-output-handshake signals of the other channels synch. unit
+  // assigned, such that the credits of the respective unit might be consumed in the case of eighter a output handshake
+  // of the data-out port of this module, or of the other module. Via the allow_cred_consume_i one can signal which
+  // channels credits should be forwarded.
 );
 
   import serial_link_pkg::*;
 
   logic send_normal_packet_d, send_normal_packet_q, send_valid_i_q;
-  assign credits_only_packet = ~send_normal_packet_d;
 
   credit_t credits_available_q, credits_available_d;
   credit_t credits_to_send_q, credits_to_send_d;
   // The hidden counter values are supposed to allow the credits_to_send_o value to be fixed once the output valid signal is
   // driven high, while still keeping track of the incoming credits
   credit_t credits_to_send_hidden_q, credits_to_send_hidden_d;
-  logic and_valid_condition, force_send_credits_d, force_send_credits_q;
+  logic force_send_credits_d, force_send_credits_q;
 
-  assign send_ready_o = send_ready_i & send_normal_packet_d & send_valid_o;
-  assign force_send_o = force_send_credits_d;
+  logic credits_available_decrement, credits_to_send_increment, credits_to_send_hidden_increment;
+  credit_t credits_available_increment, credits_to_send_offset, credits_to_send_decrement, credits_to_send_hidden_decrement;
+
+  assign send_ready_o          = send_ready_i & send_normal_packet_d & send_valid_o;
+  assign credits_to_send_o     = credits_to_send_q;
+  assign credits_only_packet_o = ~send_normal_packet_d;
+
+
+  //////////////////////////
+  //  FLOW-CONTROL LOGIC  //
+  //////////////////////////
 
   // stabalize the output data if a credit_only packet needs to be sent
   always_comb begin : ouput_data_control
     // Though it might be unsusual to read from the D-side, this prevents us from loosing an additional clock cycle
     if (send_normal_packet_d) begin
-      data_to_send_out = data_to_send_in;      
+      data_to_send_o = data_to_send_i;      
     end else begin
-      data_to_send_out = '0;
+      data_to_send_o = '0;
     end
   end
 
-// whenever I initiate a force_send_credits or I get valid data at the input, I evaluate whether or not
-// to send an empty (credits only) packet.
+  // whenever I initiate a force_send_credits or I get valid data at the input, I evaluate whether or not
+  // to send an empty (credits only) packet.
   always_comb begin : packet_source_selection
     send_normal_packet_d = send_normal_packet_q;
     // (positive & negative) edge detection
@@ -100,7 +126,6 @@ module serial_link_credit_synchronization #(
   end
 
   always_comb begin : output_valid_control
-    and_valid_condition = 1'b1;
     force_send_credits_d = 1'b0;
     // Send empty packets with credits if there are too many
     // credits to send but no AXI request transaction
@@ -111,59 +136,88 @@ module serial_link_credit_synchronization #(
     // is consumed and all the credits from the other side are currently in-flight.
     // To prevent this situation, the last credit is only consumed if credit is also sent back
     // => force the output valid signal to zero if no credits are available or I want to prevent the deadlock situation from above
-    if (credits_available_q == 0) begin
-      and_valid_condition = 1'b0;
-    end else if (credits_available_q == 1 && credits_to_send_q == 0) begin
-      and_valid_condition = 1'b0;
-    end
-    send_valid_o = (send_valid_i | force_send_credits_d) & and_valid_condition ;
-  end
-
-  always_comb begin : credit_counters
-    credits_available_d = credits_available_q;
-    credits_to_send_d = credits_to_send_q;
-    credits_to_send_hidden_d = credits_to_send_hidden_q;
-    // I am releasing data, so I can reset the credits that are to be sent back
-    if (send_valid_o & send_ready_i) begin
-      // I also received a axis_in packet
-      if (receive_valid_i & receive_ready_i) begin
-        credits_to_send_d = credits_to_send_hidden_q + 1;
-        credits_available_d = credits_available_q + credits_received_i - 1;
-      // A packet is send, but non was received meanwhile
-      end else begin
-        credits_to_send_d = credits_to_send_hidden_q;
-        credits_available_d = credits_available_q - 1;
-      end
-      credits_to_send_hidden_d = '0;
-    end else begin
-      // If an axis_in packet arives I regain available credits
-      if (receive_valid_i & receive_ready_i) begin
-        credits_available_d = credits_available_q + credits_received_i;
-        // The packet was consumed, so I can signal to the other side that we now have free credits
-        if (send_valid_o) begin
-          credits_to_send_hidden_d = credits_to_send_hidden_q + 1;
-        end else begin
-          credits_to_send_d = credits_to_send_q + 1;
-        end
-      end
+    send_valid_o = '0;
+    if ((credits_available_q > 1) || ( credits_available_q == 1 && credits_to_send_q > 0 && allow_cred_consume_i)) begin
+      send_valid_o = (send_valid_i | force_send_credits_d);
     end
   end
 
-  assign credits_to_send_o = credits_to_send_q;
 
-  /////////////////////
-  //    FlipFlops    //
-  ///////////////////// 
+  ///////////////////////
+  //  CREDIT COUNTERS  //
+  ///////////////////////
+
+  always_comb begin : available_credit_counter  // => keeps track of the remaining credits
+    // When a valid output handshake occurs, there is one less credit available (decrement counter by 1).
+    credits_available_decrement = (send_valid_o & send_ready_i);
+
+    credits_available_increment = 0;
+    if (receive_cred_i) begin
+      // increment the available credits counter by the amount of credits received.
+      credits_available_increment = credits_received_i;
+    end
+  end
+
+  assign credits_available_d = credits_available_q + credits_available_increment - credits_available_decrement;
+
+  always_comb begin : credits_to_send_counter  // => keeps track of the credits that can be returned (released from the queue)
+    credits_to_send_increment = '0;
+    credits_to_send_offset = '0;
+    credits_to_send_decrement = '0;
+
+    // There is a valid output handshake and credits are allowed to be consumed
+    if ((send_valid_o & send_ready_i & allow_cred_consume_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+      // The hidden credits are transfered to the visible counter
+      credits_to_send_offset = credits_to_send_hidden_q;
+      // The counter is decremented by the amount of credits being released
+      credits_to_send_decrement = credits_to_send_q;
+    end
+    // potential increments are only ignored if (send_valid_o & ~send_ready_i) as in this case the hidden counter
+    // is incremented instead.
+    if (~send_valid_o | (send_valid_o & send_ready_i)) begin
+      credits_to_send_increment = (buffer_queue_out_val_i & buffer_queue_out_rdy_i);
+    end
+  end
+
+  assign credits_to_send_d = credits_to_send_q + credits_to_send_offset + credits_to_send_increment - credits_to_send_decrement;
+
+  always_comb begin : credits_to_send_hidden_counter // => complements the previous counter: used if send_valid_o is asserted
+    // When the buffer queue releases one element, I can increment the amount of credits to be returned by one.
+    credits_to_send_hidden_increment = '0;
+    credits_to_send_hidden_decrement = '0;
+
+    // I don't have a handshake yet, but valid is set to high. Therefore, the hidden counter is being increased instead
+    // such as not to change the credits_to_send_o while valid data is being available.
+    if (send_valid_o & ~send_ready_i) begin
+      // increment if the buffer queue releases an element.
+      credits_to_send_hidden_increment = (buffer_queue_out_val_i & buffer_queue_out_rdy_i);
+    end
+
+    if ((send_valid_o & send_ready_i & allow_cred_consume_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+      // In the case of a valid data-out handshake (and credits are allowed to be consumed), the hidden counter
+      // value will be assigned to the visible counter after releasing the packet. Therefore, these assigned credits
+      // can be removed from the hidden counter.
+      credits_to_send_hidden_decrement = credits_to_send_hidden_q;
+    end
+  end
+
+  assign credits_to_send_hidden_d = credits_to_send_hidden_q + credits_to_send_hidden_increment - credits_to_send_hidden_decrement; 
+
+
+  //////////////////////
+  //    FLIP-FLOPS    //
+  ////////////////////// 
 
   `FF(credits_available_q, credits_available_d, NumCredits)
   `FF(credits_to_send_q, credits_to_send_d, 0)
   `FF(credits_to_send_hidden_q, credits_to_send_hidden_d, 0)
   // This is additional logic to prevent datapackages from being stalled in case of a force send.
-  // By removing all the force_send_credits_q related parts, this additional logic might be removed...
+  // By removing all the force_send_credits_q related parts, this additional logic could be removed...
   `FF(send_normal_packet_q, send_normal_packet_d, 1)
   // FF for edge detection
   `FF(force_send_credits_q, force_send_credits_d, 0)
   `FF(send_valid_i_q, send_valid_i, 0)
+
 
   ////////////////////
   //   ASSERTIONS   //

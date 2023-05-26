@@ -16,7 +16,6 @@ module floo_axis_noc_bridge_virtual_channels
   parameter  int  number_of_credits = 6,
   parameter  int  ForceSendThresh   = number_of_credits-4,
   localparam type credit_t          = logic [$clog2(number_of_credits+1)-1:0],
-
   // currently this parameter should not be changed!
   parameter  int  numNocChanPerDir  = 2
 ) (
@@ -45,16 +44,16 @@ module floo_axis_noc_bridge_virtual_channels
   } channel_hdr_e;
 
   typedef struct packed {
-    channel_hdr_e hdr;
+    channel_hdr_e data_hdr;
     logic [flit_data_size-1:0] data;
     logic data_validity;
+    channel_hdr_e credits_hdr;
     credit_t credits;
   } axis_packet_info_t;
 
   logic axis_out_ready, axis_out_valid;
-  logic axis_in_req_valid, axis_in_rsp_valid;
-  logic axis_in_req_ready, axis_in_rsp_ready;
-  logic axis_in_valid;
+  logic axis_data_in_req_valid, axis_data_in_rsp_valid;
+  logic axis_data_in_req_ready, axis_data_in_rsp_ready;
 
   axis_packet_info_t req_rsp_queue_in, req_queue_out, rsp_queue_out, req_arbiter_in, rsp_arbiter_in, req_rsp_arbiter_out, req_rsp_axis_out;
 
@@ -65,6 +64,8 @@ module floo_axis_noc_bridge_virtual_channels
 
   credit_t credits_to_send_req, credits_to_send_rsp;
   logic credits_only_packet_req, credits_only_packet_rsp;
+  logic forward_req_credits, forward_rsp_credits;
+  logic force_consume_req_credits, force_consume_rsp_credits;
 
 
   ////////////////////////////////////////////////
@@ -75,35 +76,44 @@ module floo_axis_noc_bridge_virtual_channels
   assign req_i_data = req_i.data;
   assign rsp_i_data = rsp_i.data;
 
+  // Credit channel selection
+  always_comb begin
+    if (credits_to_send_req > credits_to_send_rsp) begin
+      forward_req_credits = 1'b1;
+      // forward_rsp_credits = 1'b1;
+      forward_rsp_credits = 1'b0;
+    end else begin
+      // forward_req_credits = 1'b1;
+      forward_req_credits = 1'b0;
+      forward_rsp_credits = 1'b1;
+    end
+  end
+
   serial_link_credit_synchronization #(
-    .credit_t            ( credit_t                   ),
-    .data_t              ( logic [flit_data_size-1:0] ),
-    .NumCredits          ( number_of_credits          ),
-    .ForceSendThresh     ( ForceSendThresh            )
+    .credit_t               ( credit_t                   ),
+    .data_t                 ( logic [flit_data_size-1:0] ),
+    .NumCredits             ( number_of_credits          ),
+    .ForceSendThresh        ( ForceSendThresh            )
   ) i_synchronization_req (
-    .clk_i               ( clk_i                      ),
-    .rst_ni              ( rst_ni                     ),
-    // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
-    // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
-    // be made smaller, without loosing any information...
-    .data_to_send_in     ( req_i_data                 ),
-    .data_to_send_out    ( req_data_synchr_out        ),
-    // towards button (internal)
-    .credits_to_send_o   ( credits_to_send_req        ),
-    // top
-    .send_ready_o        ( req_o.ready                ),
-    // top
-    .send_valid_i        ( req_i.valid                ),
-    // button
-    .send_valid_o        ( req_valid_synchr_out       ),
-    // button
-    .send_ready_i        ( req_ready_synchr_out       ),
-    .credits_received_i  ( req_queue_out.credits      ),
-    // .credits_received_i  ( '0      ),
-    .receive_valid_i     ( req_queue_valid            ),
-    .receive_ready_i     ( req_i.ready                ),
-    .credits_only_packet ( credits_only_packet_req    )
+    .clk_i                  ( clk_i                      ),
+    .rst_ni                 ( rst_ni                     ),
+    .data_to_send_i         ( req_i_data                 ),
+    .data_to_send_o         ( req_data_synchr_out        ),
+    .credits_to_send_o      ( credits_to_send_req        ),
+    .send_ready_o           ( req_o.ready                ),
+    .send_valid_i           ( req_i.valid                ),
+    .send_valid_o           ( req_valid_synchr_out       ),
+    .send_ready_i           ( req_ready_synchr_out       ),
+    .credits_received_i     ( req_rsp_queue_in.credits   ),
+    .receive_cred_i         ( axis_cred_in_req_valid     ),
+    .buffer_queue_out_val_i ( req_queue_valid            ),
+    .buffer_queue_out_rdy_i ( req_i.ready                ),
+    .credits_only_packet_o  ( credits_only_packet_req    ),
+    .allow_cred_consume_i   ( forward_req_credits        ),
+    .consume_cred_to_send_i ( force_consume_req_credits  )
   );
+
+  assign force_consume_req_credits = axis_out_valid & axis_out_ready & (req_rsp_arbiter_out.credits_hdr == request);
 
   always_ff @(posedge clk_i) begin
     if (req_queue_valid & req_i.ready & allow_debug_msg) begin
@@ -113,38 +123,35 @@ module floo_axis_noc_bridge_virtual_channels
 
   assign req_arbiter_in.data          = req_data_synchr_out;
   assign req_arbiter_in.data_validity = ~credits_only_packet_req;
-  assign req_arbiter_in.credits       = credits_to_send_req;
-  assign req_arbiter_in.hdr           = request;
+  assign req_arbiter_in.credits       = ( forward_req_credits ) ? credits_to_send_req : credits_to_send_rsp;
+  assign req_arbiter_in.data_hdr      = request;
+  assign req_arbiter_in.credits_hdr   = ( forward_req_credits ) ? request : response;
 
   serial_link_credit_synchronization #(
-    .credit_t            ( credit_t                   ),
-    .data_t              ( logic [flit_data_size-1:0] ),
-    .NumCredits          ( number_of_credits          ),
-    .ForceSendThresh     ( ForceSendThresh            )
+    .credit_t               ( credit_t                   ),
+    .data_t                 ( logic [flit_data_size-1:0] ),
+    .NumCredits             ( number_of_credits          ),
+    .ForceSendThresh        ( ForceSendThresh            )
   ) i_synchronization_rsp (
-    .clk_i               ( clk_i                      ),
-    .rst_ni              ( rst_ni                     ),
-    // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
-    // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
-    // be made smaller, without loosing any information...
-    .data_to_send_in     ( rsp_i_data                 ),
-    .data_to_send_out    ( rsp_data_synchr_out        ),
-    // towards button (internal)
-    .credits_to_send_o   ( credits_to_send_rsp        ),
-    // top
-    .send_ready_o        ( rsp_o.ready                ),
-    // top
-    .send_valid_i        ( rsp_i.valid                ),
-    // button
-    .send_valid_o        ( rsp_valid_synchr_out       ),
-    // button
-    .send_ready_i        ( rsp_ready_synchr_out       ),
-    .credits_received_i  ( rsp_queue_out.credits      ),
-    // .credits_received_i  ( '0      ),
-    .receive_valid_i     ( rsp_queue_valid            ),
-    .receive_ready_i     ( rsp_i.ready                ),
-    .credits_only_packet ( credits_only_packet_rsp    )
+    .clk_i                  ( clk_i                      ),
+    .rst_ni                 ( rst_ni                     ),
+    .data_to_send_i         ( rsp_i_data                 ),
+    .data_to_send_o         ( rsp_data_synchr_out        ),
+    .credits_to_send_o      ( credits_to_send_rsp        ),
+    .send_ready_o           ( rsp_o.ready                ),
+    .send_valid_i           ( rsp_i.valid                ),
+    .send_valid_o           ( rsp_valid_synchr_out       ),
+    .send_ready_i           ( rsp_ready_synchr_out       ),
+    .credits_received_i     ( req_rsp_queue_in.credits   ),
+    .receive_cred_i         ( axis_cred_in_rsp_valid     ),
+    .buffer_queue_out_val_i ( rsp_queue_valid            ),
+    .buffer_queue_out_rdy_i ( rsp_i.ready                ),
+    .credits_only_packet_o  ( credits_only_packet_rsp    ),
+    .allow_cred_consume_i   ( forward_rsp_credits        ),
+    .consume_cred_to_send_i ( force_consume_rsp_credits  )
   );
+
+  assign force_consume_rsp_credits = axis_out_valid & axis_out_ready & (req_rsp_arbiter_out.credits_hdr == response);
 
   always_ff @(posedge clk_i) begin
     if (rsp_queue_valid & rsp_i.ready & allow_debug_msg) begin
@@ -154,15 +161,16 @@ module floo_axis_noc_bridge_virtual_channels
 
   assign rsp_arbiter_in.data          = rsp_data_synchr_out;
   assign rsp_arbiter_in.data_validity = ~credits_only_packet_rsp;
-  assign rsp_arbiter_in.credits       = credits_to_send_rsp;
-  assign rsp_arbiter_in.hdr           = response;
+  assign rsp_arbiter_in.credits       = ( forward_rsp_credits ) ? credits_to_send_rsp : credits_to_send_req;
+  assign rsp_arbiter_in.data_hdr      = response;
+  assign rsp_arbiter_in.credits_hdr   = ( forward_rsp_credits ) ? response : request;
 
   rr_arb_tree #(
-    .NumIn      ( numNocChanPerDir          ),
-    .DataType   ( axis_packet_info_t        ),
-    .ExtPrio    ( 1'b0                      ),
-    .AxiVldRdy  ( 1'b1                      ),
-    .LockIn     ( 1'b0                      )
+    .NumIn      ( numNocChanPerDir   ),
+    .DataType   ( axis_packet_info_t ),
+    .ExtPrio    ( 1'b0               ),
+    .AxiVldRdy  ( 1'b1               ),
+    .LockIn     ( 1'b0               )
   ) i_rr_arb_tree (
     .clk_i      ( clk_i                                        ),
     .rst_ni     ( rst_ni                                       ),
@@ -170,10 +178,8 @@ module floo_axis_noc_bridge_virtual_channels
     .flush_i    ( 1'b0                                         ),
     /// Input requests arbitration.
     .req_i      ( {req_valid_synchr_out, rsp_valid_synchr_out} ),
-    /* verilator lint_off UNOPTFLAT */
     /// Input request is granted.
     .gnt_o      ( {req_ready_synchr_out, rsp_ready_synchr_out} ),
-    /* verilator lint_on UNOPTFLAT */
     /// Input data for arbitration.
     .data_i     ( {req_arbiter_in, rsp_arbiter_in}             ),
     /// Output request is valid.
@@ -204,28 +210,25 @@ module floo_axis_noc_bridge_virtual_channels
     .data_o     ( req_rsp_axis_out      )
   );
 
-  assign axis_out_req_o.t.data = {req_rsp_axis_out.hdr, req_rsp_axis_out.data};
+  assign axis_out_req_o.t.data = {req_rsp_axis_out.data_hdr, req_rsp_axis_out.data};
   assign axis_out_req_o.t.strb = '1;
   assign axis_out_req_o.t.keep = '0;
   assign axis_out_req_o.t.last = '0;
   assign axis_out_req_o.t.id   = '0;
   assign axis_out_req_o.t.dest = '0;
-  // assign axis_out_req_o.t.user = '0;
-  assign axis_out_req_o.t.user = {req_rsp_axis_out.data_validity, req_rsp_axis_out.credits};
+  assign axis_out_req_o.t.user = {req_rsp_axis_out.data_validity, req_rsp_axis_out.credits_hdr, req_rsp_axis_out.credits};
 
 
   ///////////////////////////////////////////////
   //  CONNECT AXIS_IN WITH THE OUTGOING FLITS  //
   ///////////////////////////////////////////////
 
-  assign {req_rsp_queue_in.hdr, req_rsp_queue_in.data}              = axis_in_req_i.t.data;
-  assign {req_rsp_queue_in.data_validity, req_rsp_queue_in.credits} = axis_in_req_i.t.user;
-  // assign req_rsp_queue_in.data_validity = '1;
-  // assign req_rsp_queue_in.credits = '0;
+  assign {req_rsp_queue_in.data_hdr, req_rsp_queue_in.data}                                       = axis_in_req_i.t.data;
+  assign {req_rsp_queue_in.data_validity, req_rsp_queue_in.credits_hdr, req_rsp_queue_in.credits} = axis_in_req_i.t.user;
 
   always_ff @(posedge clk_i) begin
-    if (axis_in_valid & axis_in_rsp_o.tready & allow_debug_msg) begin
-      $display("INFO: received axis packet (@%8d) = | %1d | %30d | %1d | %2d |", $time, req_rsp_queue_in.hdr, req_rsp_queue_in.data, req_rsp_queue_in.data_validity, req_rsp_queue_in.credits);
+    if (axis_in_req_i.tvalid & axis_in_rsp_o.tready & allow_debug_msg) begin
+      $display("INFO: received axis packet (@%8d) = | %1d | %30d | %1d | %1d | %2d |", $time, req_rsp_queue_in.data_hdr, req_rsp_queue_in.data, req_rsp_queue_in.data_validity, req_rsp_queue_in.credits_hdr, req_rsp_queue_in.credits);
     end    
   end
   // FOR THE TIME BEING THE SIGNALS BELOW ARE IGNORED...
@@ -235,60 +238,54 @@ module floo_axis_noc_bridge_virtual_channels
   // assign ??? = axis_in_req_i.t.id;
   // assign ??? = axis_in_req_i.t.dest;
 
-  // If the entire axis content is zero, the packet is not valid and the data must not propagate
-  // One possible reason for such a packet to arrive in the first place is the credit synchronization in the serial_link
-  // sending a credits_only packet.
+  assign axis_data_in_req_valid = (req_rsp_queue_in.data_hdr    == request)  ? axis_in_req_i.tvalid : 0;
+  assign axis_data_in_rsp_valid = (req_rsp_queue_in.data_hdr    == response) ? axis_in_req_i.tvalid : 0; 
+  assign axis_cred_in_req_valid = (req_rsp_queue_in.credits_hdr == request)  ? axis_in_req_i.tvalid : 0;
+  assign axis_cred_in_rsp_valid = (req_rsp_queue_in.credits_hdr == response) ? axis_in_req_i.tvalid : 0; 
 
-  assign axis_in_valid = axis_in_req_i.tvalid;
-  // assign axis_in_valid = (axis_in_req_i.t.data != '0) ? axis_in_req_i.tvalid : 0;
-  // assign axis_in_valid = (axis_in_req_i.t.user != '0) ? axis_in_req_i.tvalid : 0;
-
-  assign axis_in_req_valid = (req_rsp_queue_in.hdr == request)  ? axis_in_valid : 0;
-  assign axis_in_rsp_valid = (req_rsp_queue_in.hdr == response) ? axis_in_valid : 0; 
-
-  assign axis_in_rsp_o.tready = (axis_in_req_ready & axis_in_req_valid) || (axis_in_rsp_ready & axis_in_rsp_valid);
-  // assign axis_in_rsp_o.tready = (axis_in_req_ready & axis_in_req_valid) || (axis_in_rsp_ready & axis_in_rsp_valid) || (axis_in_req_i.t.user == '0);
+  assign axis_in_rsp_o.tready = (axis_data_in_req_ready & axis_data_in_req_valid) || (axis_data_in_rsp_ready & axis_data_in_rsp_valid);
 
   // Input queue for the req channel.
   stream_fifo #(
-    .T          ( axis_packet_info_t ),
-    .DEPTH      ( number_of_credits  )
+    .T          ( axis_packet_info_t     ),
+    .DEPTH      ( number_of_credits      )
   ) i_axis_in_req_reg (
-    .clk_i      ( clk_i              ),
-    .rst_ni     ( rst_ni             ),
-    .flush_i    ( 1'b0               ),
-    .testmode_i ( 1'b0               ),
-    .usage_o    (                    ),
-    .valid_i    ( axis_in_req_valid  ),
-    .ready_o    ( axis_in_req_ready  ),
-    .data_i     ( req_rsp_queue_in   ),
-    .valid_o    ( req_queue_valid    ),
-    .ready_i    ( req_i.ready        ),
-    .data_o     ( req_queue_out      )
+    .clk_i      ( clk_i                  ),
+    .rst_ni     ( rst_ni                 ),
+    .flush_i    ( 1'b0                   ),
+    .testmode_i ( 1'b0                   ),
+    .usage_o    (                        ),
+    .valid_i    ( axis_data_in_req_valid ),
+    .ready_o    ( axis_data_in_req_ready ),
+    .data_i     ( req_rsp_queue_in       ),
+    .valid_o    ( req_queue_valid        ),
+    .ready_i    ( req_i.ready            ),
+    .data_o     ( req_queue_out          )
   );
 
   // Input queue for the rsp channel.
   stream_fifo #(
-    .T          ( axis_packet_info_t ),
-    .DEPTH      ( number_of_credits  )
+    .T          ( axis_packet_info_t     ),
+    .DEPTH      ( number_of_credits      )
   ) i_axis_in_rsp_reg (
-    .clk_i      ( clk_i              ),
-    .rst_ni     ( rst_ni             ),
-    .flush_i    ( 1'b0               ),
-    .testmode_i ( 1'b0               ),
-    .usage_o    (                    ),
-    .valid_i    ( axis_in_rsp_valid  ),
-    .ready_o    ( axis_in_rsp_ready  ),
-    .data_i     ( req_rsp_queue_in   ),
-    .valid_o    ( rsp_queue_valid    ),
-    .ready_i    ( rsp_i.ready        ),
-    .data_o     ( rsp_queue_out      )
+    .clk_i      ( clk_i                  ),
+    .rst_ni     ( rst_ni                 ),
+    .flush_i    ( 1'b0                   ),
+    .testmode_i ( 1'b0                   ),
+    .usage_o    (                        ),
+    .valid_i    ( axis_data_in_rsp_valid ),
+    .ready_o    ( axis_data_in_rsp_ready ),
+    .data_i     ( req_rsp_queue_in       ),
+    .valid_o    ( rsp_queue_valid        ),
+    .ready_i    ( rsp_i.ready            ),
+    .data_o     ( rsp_queue_out          )
   );
 
   assign req_o.data  = req_queue_out.data;
   assign req_o.valid = req_queue_valid & req_queue_out.data_validity;
   assign rsp_o.data  = rsp_queue_out.data;
   assign rsp_o.valid = rsp_queue_valid & rsp_queue_out.data_validity;
+
 
   //////////////////
   //  ASSERTIONS  //
