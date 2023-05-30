@@ -55,7 +55,7 @@ module serial_link_credit_synchronization #(
   // to indicate if it also contains valid data or not.
   output logic                    credits_only_packet_o,
   // Optional input pin to specify if the credits_to_send_o port can be forwarded. If the input is set to zero, the
-  // credits_to_send_o port might be updated, but in case of a valid data_transfer (data_to_send_o is sent) the 
+  // credits_to_send_o port might be updated, but in case of a valid data_transfer (data_to_send_o is sent) the
   // credits are not assumed to be consumed as well. This feature is meant to be used if multiple channels are to be
   // arbitrated and send over a virtual channel. In this case, it allows decoupling of the selected channel data and
   // the credits to be sent. For example: I might forward the data of channel 1, but sent the credits info of channel 2.
@@ -99,7 +99,7 @@ module serial_link_credit_synchronization #(
   always_comb begin : ouput_data_control
     // Though it might be unsusual to read from the D-side, this prevents us from loosing an additional clock cycle
     if (send_normal_packet_d) begin
-      data_to_send_o = data_to_send_i;      
+      data_to_send_o = data_to_send_i;
     end else begin
       data_to_send_o = '0;
     end
@@ -201,12 +201,12 @@ module serial_link_credit_synchronization #(
     end
   end
 
-  assign credits_to_send_hidden_d = credits_to_send_hidden_q + credits_to_send_hidden_increment - credits_to_send_hidden_decrement; 
+  assign credits_to_send_hidden_d = credits_to_send_hidden_q + credits_to_send_hidden_increment - credits_to_send_hidden_decrement;
 
 
   //////////////////////
   //    FLIP-FLOPS    //
-  ////////////////////// 
+  //////////////////////
 
   `FF(credits_available_q, credits_available_d, NumCredits)
   `FF(credits_to_send_q, credits_to_send_d, 0)
@@ -222,7 +222,7 @@ module serial_link_credit_synchronization #(
   ////////////////////
   //   ASSERTIONS   //
   ////////////////////
-  
+
   // The threshold should be larger than 1
   `ASSERT_INIT(ForceSendTh, ForceSendThresh > 1)
   `ASSERT(MaxCredits, credits_available_q <= NumCredits)

@@ -69,8 +69,7 @@ module tb_floo_serial_link();
   typedef logic [AxiOutDataWidth/8-1:0]  axi_out_strb_t;
   typedef logic [AxiOutUserWidth-1:0]  axi_out_user_t;
 
-  `AXI_TYPEDEF_ALL(axi_out, axi_out_addr_t, axi_out_id_t, axi_out_data_t, axi_out_strb_t, axi_out_user_t)  
-
+  `AXI_TYPEDEF_ALL(axi_out, axi_out_addr_t, axi_out_id_t, axi_out_data_t, axi_out_strb_t, axi_out_user_t)
   // RegBus types for typedefs
   typedef logic [RegAddrWidth-1:0]  cfg_addr_t;
   typedef logic [RegDataWidth-1:0]  cfg_data_t;
@@ -425,7 +424,7 @@ module tb_floo_serial_link();
         $display("INFO: Simulation timed out after %1d ns. => You may change the stop time in the tb_floo_serial_link testbench (localparam).", $time);
         $stop;
       end
-    end 
+    end
     stop_sim();
   end
 
