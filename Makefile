@@ -41,7 +41,7 @@ Bender.lock:
 
 clean_bender:
 	rm -rf .bender
-	rm -rf Bender.lock
+# 	rm -rf Bender.lock
 
 
 # --------------
@@ -80,7 +80,7 @@ else ifeq ($(TB_DUT),tb_axi_serial_link)
 # 	StopTime := "26,389,950"
 else ifeq ($(TB_DUT),tb_floo_serial_link)
 	StopTime := "30,183,400"
-else 
+else
 	StopTime := "???"
 endif
 
@@ -120,7 +120,7 @@ run_questa:
 	@echo -e "\033[0;34mExpected stop time is \033[1m$(StopTime) ns\033[0m"
 	$(VSIM) $(TB_DUT) -work $(WORK) $(RUN_ARGS) -c -do "run -all; exit" | tee $(dir $<)vsim_consoleSimulation.log | grep --color -P "Error|"
 	@echo -e "\033[0;34mTestbench: \033[1m$(TB_DUT)\033[0m"
-	@echo -e "\033[0;34mStop time of the original design was: \033[1m$(StopTime) ns\033[0m"	
+	@echo -e "\033[0;34mStop time of the original design was: \033[1m$(StopTime) ns\033[0m"
 	@echo -e "\033[1;32m______________________________Simulation-Summary______________________________\033[0m"
 	@cat $(dir $<)vsim_consoleSimulation.log | grep --color -e Error -e Warning -e "AW queue is empty!" -e "AW mismatch!" -e "W queue is empty!" -e "W mismatch!" -e "AR queue is empty!" -e "AR mismatch!" -e "B queue is empty!" -e "B mismatch!" -e "R queue is empty!" -e "R mismatch!" -e "ASSERT FAILED" || true
 	@cat $(dir $<)vsim_consoleSimulation.log | grep --color "INFO: " | sed "s/INFO/`printf '\033[1;35mINFO\033[0m'`/g" || true

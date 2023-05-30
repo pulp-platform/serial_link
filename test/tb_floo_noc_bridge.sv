@@ -47,7 +47,7 @@ module tb_floo_noc_bridge;
   localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
   // minimal AXIS data size (also contain the hdr-bit, thus + 1)
   localparam int axis_data_size = FlitDataSize + 1;
-  
+
   localparam type credits_noc_bridge_t = logic [$clog2(numOfCredits+1)-1:0];
 
   typedef enum logic [0:0] {
@@ -235,7 +235,7 @@ module tb_floo_noc_bridge;
       .axis_in_rsp_o    ( bridge_rsp[1]    ),
       .axis_in_req_i    ( bridge_req[0]    ),
       .axis_out_rsp_i   ( bridge_rsp[0]    )
-    );    
+    );
   end else begin : bridge
     floo_axis_noc_bridge #(
     	.ignore_assert    ( BridgeBypass     ),
@@ -280,15 +280,15 @@ module tb_floo_noc_bridge;
     );
   end
 
-  assign Bridge_0_req_o = req_bridge_0_o.valid & chimney_0_req[0].ready ;
-  assign Bridge_0_req_i = chimney_0_req[0].valid & req_bridge_0_o.ready ;
-  assign Bridge_0_rsp_o = rsp_bridge_0_o.valid & chimney_0_rsp[0].ready ;
-  assign Bridge_0_rsp_i = chimney_0_rsp[0].valid & rsp_bridge_0_o.ready ;
+  assign Bridge_0_req_o = req_bridge_0_o.valid & chimney_0_req[0].ready;
+  assign Bridge_0_req_i = chimney_0_req[0].valid & req_bridge_0_o.ready;
+  assign Bridge_0_rsp_o = rsp_bridge_0_o.valid & chimney_0_rsp[0].ready;
+  assign Bridge_0_rsp_i = chimney_0_rsp[0].valid & rsp_bridge_0_o.ready;
 
-  assign Bridge_1_req_o = req_bridge_1_o.valid & chimney_1_req[1].ready ;
-  assign Bridge_1_req_i = chimney_1_req[1].valid & req_bridge_1_o.ready ;
-  assign Bridge_1_rsp_o = rsp_bridge_1_o.valid & chimney_1_rsp[1].ready ;
-  assign Bridge_1_rsp_i = chimney_1_rsp[1].valid & rsp_bridge_1_o.ready ;
+  assign Bridge_1_req_o = req_bridge_1_o.valid & chimney_1_req[1].ready;
+  assign Bridge_1_req_i = chimney_1_req[1].valid & req_bridge_1_o.ready;
+  assign Bridge_1_rsp_o = rsp_bridge_1_o.valid & chimney_1_rsp[1].ready;
+  assign Bridge_1_rsp_i = chimney_1_rsp[1].valid & rsp_bridge_1_o.ready;
 
   assign chimney_1_req[0] = BridgeBypass ? chimney_0_req[0] : req_bridge_1_o;
   assign chimney_1_rsp[0] = BridgeBypass ? chimney_0_rsp[0] : rsp_bridge_1_o;
@@ -372,18 +372,18 @@ module tb_floo_noc_bridge;
         $display("INFO: The NoC-bridge uses virtual channels (credit-based non-blocking channels).");
       end else begin
         $display("INFO: The NoC-bridge uses a shared physical channel (no credit-based virtual channel abstraction).");
-      end    
+      end
     end
-    while(1'b1) begin
+    while (1'b1) begin
     	@(posedge clk);
-    	if(&end_of_sim) begin
+    	if (&end_of_sim) begin
     		$stop;
     	end
 			if ($time >= stopSimAfter) begin
         $error("Simulation terminated");
         $display("INFO: Simulation timed out after %1d ns. => You may change the stop time in the tb_floo_noc_bridge testbench (localparam).", $time);
         $stop;
-      end    	
+      end
     end
   end
 

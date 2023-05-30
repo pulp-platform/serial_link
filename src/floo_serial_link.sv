@@ -80,7 +80,7 @@ import serial_link_pkg::*;
   typedef enum logic [0:0] {
     response  = 'd0,
     request   = 'd1
-  } channel_hdr_e;  
+  } channel_hdr_e;
 
   typedef struct packed {
     logic data_validity;
@@ -195,7 +195,7 @@ import serial_link_pkg::*;
         $display("INFO: The simple NoC bridge version without virtual channels is being used");
       end
     end
-  end  
+  end
 
   /////////////////////////
   //   DATA LINK LAYER   //
@@ -217,7 +217,7 @@ import serial_link_pkg::*;
     .NumChannels      ( NumChannels       ),
     .NumLanes         ( NumLanes          ),
     .credit_t         ( credit_t          ),
-    .NumCredits       ( NumCredits        )    
+    .NumCredits       ( NumCredits        )
   ) i_serial_link_data_link (
     .clk_i                                   ( clk_sl_i                                         ),
     .rst_ni                                  ( rst_sl_ni                                        ),

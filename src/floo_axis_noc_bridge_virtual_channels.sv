@@ -118,7 +118,7 @@ module floo_axis_noc_bridge_virtual_channels
   always_ff @(posedge clk_i) begin
     if (req_queue_valid & req_i.ready & allow_debug_msg) begin
       $display("INFO: received credits for req-channel = %1d", req_queue_out.credits);
-    end    
+    end
   end
 
   assign req_arbiter_in.data          = req_data_synchr_out;
@@ -156,7 +156,7 @@ module floo_axis_noc_bridge_virtual_channels
   always_ff @(posedge clk_i) begin
     if (rsp_queue_valid & rsp_i.ready & allow_debug_msg) begin
       $display("INFO: received credits for rsp-channel = %1d", rsp_queue_out.credits);
-    end    
+    end
   end
 
   assign rsp_arbiter_in.data          = rsp_data_synchr_out;
@@ -229,7 +229,7 @@ module floo_axis_noc_bridge_virtual_channels
   always_ff @(posedge clk_i) begin
     if (axis_in_req_i.tvalid & axis_in_rsp_o.tready & allow_debug_msg) begin
       $display("INFO: received axis packet (@%8d) = | %1d | %30d | %1d | %1d | %2d |", $time, req_rsp_queue_in.data_hdr, req_rsp_queue_in.data, req_rsp_queue_in.data_validity, req_rsp_queue_in.credits_hdr, req_rsp_queue_in.credits);
-    end    
+    end
   end
   // FOR THE TIME BEING THE SIGNALS BELOW ARE IGNORED...
   // assign ??? = axis_in_req_i.t.strb;
@@ -239,9 +239,9 @@ module floo_axis_noc_bridge_virtual_channels
   // assign ??? = axis_in_req_i.t.dest;
 
   assign axis_data_in_req_valid = (req_rsp_queue_in.data_hdr    == request)  ? axis_in_req_i.tvalid : 0;
-  assign axis_data_in_rsp_valid = (req_rsp_queue_in.data_hdr    == response) ? axis_in_req_i.tvalid : 0; 
+  assign axis_data_in_rsp_valid = (req_rsp_queue_in.data_hdr    == response) ? axis_in_req_i.tvalid : 0;
   assign axis_cred_in_req_valid = (req_rsp_queue_in.credits_hdr == request)  ? axis_in_req_i.tvalid : 0;
-  assign axis_cred_in_rsp_valid = (req_rsp_queue_in.credits_hdr == response) ? axis_in_req_i.tvalid : 0; 
+  assign axis_cred_in_rsp_valid = (req_rsp_queue_in.credits_hdr == response) ? axis_in_req_i.tvalid : 0;
 
   assign axis_in_rsp_o.tready = (axis_data_in_req_ready & axis_data_in_req_valid) || (axis_data_in_rsp_ready & axis_data_in_rsp_valid);
 
