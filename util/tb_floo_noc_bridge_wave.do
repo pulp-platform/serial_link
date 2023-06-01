@@ -72,7 +72,7 @@ for {set i 0} {$i < 2} {incr i} {
     set group_name "Adapter $i"
 
     add wave -noupdate -group $group_name -ports tb_floo_noc_bridge/i_floo_axi_chimney_${i}/*
-    
+
     add wave -noupdate -group BridgeSignals -expand -group NocBridge_${i} -ports tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_${i}/*
 
     add wave -noupdate -group $group_name -group Arbiter -group ArbiterReq -ports tb_floo_noc_bridge/i_floo_axi_chimney_${i}/i_req_wormhole_arbiter/*
@@ -104,47 +104,47 @@ for {set i 0} {$i < 2} {incr i} {
 
 }
 
-add wave -noupdate -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_available_q
-add wave -noupdate -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_to_send_o
-add wave -noupdate -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/send_valid_i
-add wave -noupdate -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/send_valid_o
-add wave -noupdate -color Orange -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/receive_valid_i
-add wave -noupdate -color Orange -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/receive_ready_i
-add wave -noupdate -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_received_i
-add wave -noupdate -color Magenta -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_only_packet
-add wave -noupdate -color Cyan -group floo_axis_noc_bridge_0 -group req_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/data_to_send_out
-add wave -noupdate -color Cyan -group floo_axis_noc_bridge_0 -group req_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/data_to_send_in
-add wave -noupdate -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/credits_available_q
-add wave -noupdate -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/credits_to_send_o
-add wave -noupdate -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/send_valid_i
-add wave -noupdate -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/send_valid_o
-add wave -noupdate -color Orange -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/receive_valid_i
-add wave -noupdate -color Orange -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/receive_ready_i
-add wave -noupdate -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/credits_received_i
-add wave -noupdate -color Magenta -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/credits_only_packet
-add wave -noupdate -color Cyan -group floo_axis_noc_bridge_0 -group rsp_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/data_to_send_out
-add wave -noupdate -color Cyan -group floo_axis_noc_bridge_0 -group rsp_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/data_to_send_in
+# add wave -noupdate -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_available_q
+# add wave -noupdate -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_to_send_o
+# add wave -noupdate -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/send_valid_i
+# add wave -noupdate -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/send_valid_o
+# add wave -noupdate -color Orange -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/receive_valid_i
+# add wave -noupdate -color Orange -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/receive_ready_i
+# add wave -noupdate -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_received_i
+# add wave -noupdate -color Magenta -group floo_axis_noc_bridge_0 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_only_packet
+# add wave -noupdate -color Cyan -group floo_axis_noc_bridge_0 -group req_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/data_to_send_out
+# add wave -noupdate -color Cyan -group floo_axis_noc_bridge_0 -group req_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/data_to_send_in
+# add wave -noupdate -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/credits_available_q
+# add wave -noupdate -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/credits_to_send_o
+# add wave -noupdate -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/send_valid_i
+# add wave -noupdate -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/send_valid_o
+# add wave -noupdate -color Orange -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/receive_valid_i
+# add wave -noupdate -color Orange -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/receive_ready_i
+# add wave -noupdate -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/credits_received_i
+# add wave -noupdate -color Magenta -group floo_axis_noc_bridge_0 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/credits_only_packet
+# add wave -noupdate -color Cyan -group floo_axis_noc_bridge_0 -group rsp_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/data_to_send_out
+# add wave -noupdate -color Cyan -group floo_axis_noc_bridge_0 -group rsp_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/data_to_send_in
 
-add wave -noupdate -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/credits_available_q
-add wave -noupdate -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/credits_to_send_o
-add wave -noupdate -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/send_valid_i
-add wave -noupdate -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/send_valid_o
-add wave -noupdate -color Orange -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/receive_valid_i
-add wave -noupdate -color Orange -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/receive_ready_i
-add wave -noupdate -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/credits_received_i
-add wave -noupdate -color Magenta -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/credits_only_packet
-add wave -noupdate -color Cyan -group floo_axis_noc_bridge_1 -group req_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/data_to_send_out
-add wave -noupdate -color Cyan -group floo_axis_noc_bridge_1 -group req_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/data_to_send_in
-add wave -noupdate -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/credits_available_q
-add wave -noupdate -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/credits_to_send_o
-add wave -noupdate -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/send_valid_i
-add wave -noupdate -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/send_valid_o
-add wave -noupdate -color Orange -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/receive_valid_i
-add wave -noupdate -color Orange -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/receive_ready_i
-add wave -noupdate -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/credits_received_i
-add wave -noupdate -color Magenta -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/credits_only_packet
-add wave -noupdate -color Cyan -group floo_axis_noc_bridge_1 -group rsp_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/data_to_send_out
-add wave -noupdate -color Cyan -group floo_axis_noc_bridge_1 -group rsp_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/data_to_send_in
+# add wave -noupdate -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/credits_available_q
+# add wave -noupdate -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/credits_to_send_o
+# add wave -noupdate -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/send_valid_i
+# add wave -noupdate -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/send_valid_o
+# add wave -noupdate -color Orange -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/receive_valid_i
+# add wave -noupdate -color Orange -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/receive_ready_i
+# add wave -noupdate -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/credits_received_i
+# add wave -noupdate -color Magenta -group floo_axis_noc_bridge_1 -group req_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/credits_only_packet
+# add wave -noupdate -color Cyan -group floo_axis_noc_bridge_1 -group req_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/data_to_send_out
+# add wave -noupdate -color Cyan -group floo_axis_noc_bridge_1 -group req_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_req/data_to_send_in
+# add wave -noupdate -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/credits_available_q
+# add wave -noupdate -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/credits_to_send_o
+# add wave -noupdate -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/send_valid_i
+# add wave -noupdate -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/send_valid_o
+# add wave -noupdate -color Orange -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/receive_valid_i
+# add wave -noupdate -color Orange -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/receive_ready_i
+# add wave -noupdate -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/credits_received_i
+# add wave -noupdate -color Magenta -group floo_axis_noc_bridge_1 -group rsp_channel -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/credits_only_packet
+# add wave -noupdate -color Cyan -group floo_axis_noc_bridge_1 -group rsp_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/data_to_send_out
+# add wave -noupdate -color Cyan -group floo_axis_noc_bridge_1 -group rsp_channel /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_synchronization_rsp/data_to_send_in
 
 
 quietly virtual function -install /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0 -env /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1 { &{/tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.rob_req, /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.rob_idx, /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.id, /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.src_id, /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.last, /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.axi_ch, /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.rsvd }} data
@@ -162,6 +162,38 @@ add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group flit_in -group rsp_flit_in -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_o.ready
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group flit_in -group rsp_flit_in -color Cyan -label data /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/data_rsp_flit_in
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group flit_in -group rsp_flit_in -color Aquamarine -label data_axi_style -subitemconfig {/tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.axi_in_b {-color Aquamarine} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.axi_in_r {-color Aquamarine} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen {-color Aquamarine} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.rob_req {-color Aquamarine} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.rob_idx {-color Aquamarine} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.id {-color Aquamarine} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.src_id {-color Aquamarine} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.last {-color Aquamarine} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.axi_ch {-color Aquamarine} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data.gen.rsvd {-color Aquamarine}} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_i.data
+
+
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_received_i
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -color Violet /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_to_send_o
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -color Cyan /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/data_to_send_i
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -color Red /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_only_packet_o
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -color Cyan /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/data_to_send_o
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/send_valid_i
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/send_ready_o
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -color {Pale Green} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/buffer_queue_out_val_i
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -color {Pale Green} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/buffer_queue_out_rdy_i
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/receive_cred_i
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -color {Pale Green} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/send_valid_o
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -color {Pale Green} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/send_ready_i
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/allow_cred_consume_i
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/consume_cred_to_send_i
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/send_normal_packet_d
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/send_normal_packet_q
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/send_valid_i_q
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -color {Yellow Green} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_available_q
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -color {Yellow Green} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_to_send_q
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_to_send_hidden_q
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -color {Orange Red} /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/force_send_credits_q
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -group logic_counters -color Gray60 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_available_increment
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -group logic_counters -color Khaki /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_available_decrement
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -group logic_counters -color Gray60 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_to_send_increment
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -group logic_counters -color Khaki /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_to_send_decrement
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -group logic_counters -color Goldenrod /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_to_send_offset
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -group logic_counters -color Gray60 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_to_send_hidden_increment
+    add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group i_synchronization_req -group logic_counters -color Khaki /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_req/credits_to_send_hidden_decrement
+
+
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group synchronization_credits_out -group req_synchronization_out -label valid -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_valid_synchr_out
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group synchronization_credits_out -group req_synchronization_out -label ready -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_ready_synchr_out
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group synchronization_credits_out -group req_synchronization_out -color Violet -label credits_to_send -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/credits_to_send_req
@@ -175,28 +207,32 @@ add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group synchronization_credits_out -group rsp_synchronization_out -color {Yellow Green} -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/credits_available_q
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group synchronization_credits_out -group rsp_synchronization_out -color {Yellow Green} -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_synchronization_rsp/credits_to_send_q
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group req_arbiter_in -color Orange -label data_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_arbiter_in.data_hdr
-add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group req_arbiter_in -label { valid} -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_valid_synchr_out
-add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group req_arbiter_in -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_ready_synchr_out
+add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group req_arbiter_in -label { valid} -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_rr_arb_tree/req_i[1]
+add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group req_arbiter_in -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_rr_arb_tree/gnt_o[1]
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group req_arbiter_in -color Cyan -label data /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_arbiter_in.data
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group req_arbiter_in -color Red -label data_validity /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_arbiter_in.data_validity
+add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group req_arbiter_in -color Orange -label credits_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_arbiter_in.credits_hdr
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group req_arbiter_in -color Violet -label credits -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_arbiter_in.credits
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group rsp_arbiter_in -color Orange -label data_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_arbiter_in.data_hdr
-add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group rsp_arbiter_in -label valid -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_valid_synchr_out
-add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group rsp_arbiter_in -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_ready_synchr_out
+add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group rsp_arbiter_in -label valid -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_rr_arb_tree/req_i[0]
+add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group rsp_arbiter_in -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_rr_arb_tree/gnt_o[0]
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group rsp_arbiter_in -color Cyan -label data /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_arbiter_in.data
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group rsp_arbiter_in -color Red -label data_validity /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_arbiter_in.data_validity
+add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group rsp_arbiter_in -color Orange -label credits_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_arbiter_in.credits_hdr
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_in -group rsp_arbiter_in -color Violet -label credits -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/rsp_arbiter_in.credits
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_out -color Orange -label data_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_rsp_arbiter_out.data_hdr
-add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_out -label valdi -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/axis_out_valid
-add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_out -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/axis_out_ready
+add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_out -label valid -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_axis_out_reg/valid_i
+add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_out -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/i_axis_out_reg/ready_o
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_out -color Cyan -label data /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_rsp_arbiter_out.data
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_out -color Red -label data_validity /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_rsp_arbiter_out.data_validity
+add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_out -color Orange -label credits_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_rsp_arbiter_out.credits_hdr
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group arbiter_out -color Violet -label credits -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_rsp_arbiter_out.credits
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group axis_out -color Orange -label data_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_rsp_axis_out.data_hdr
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group axis_out -label valid -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/axis_out_req_o.tvalid
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group axis_out -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/axis_out_rsp_i.tready
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group axis_out -color Cyan -label data /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_rsp_axis_out.data
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group axis_out -color Red -label data_validity /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_rsp_axis_out.data_validity
+add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group axis_out -color Orange -label credits_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_rsp_axis_out.credits_hdr
 add wave -noupdate -group full_data_path_debugging -group flit_to_axis_bridge_0 -group axis_out -color Violet -label credits -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_0/req_rsp_axis_out.credits
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -color Yellow /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/clk_i
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group axis_in -color Orange -label data_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.data_hdr
@@ -204,30 +240,35 @@ add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group axis_in -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/axis_in_rsp_o.tready
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group axis_in -color Cyan -label data /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.data
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group axis_in -color Red -label data_validity /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.data_validity
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group axis_in -color Orange -label credits_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.credits_hdr
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group axis_in -color Violet -label credits -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.credits
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group req_queue_in -color Orange -label data_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.data_hdr
-add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group req_queue_in -label valid -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/axis_data_in_req_valid
-add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group req_queue_in -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/axis_data_in_req_ready
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group req_queue_in -label valid -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_axis_in_req_reg/valid_i
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group req_queue_in -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_axis_in_req_reg/ready_o
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group req_queue_in -color Cyan -label data /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.data
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group req_queue_in -color Red -label data_validity /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.data_validity
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group req_queue_in -color Orange -label credits_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.credits_hdr
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group req_queue_in -color Violet -label credits -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.credits
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group rsp_queue_in -color Orange -label data_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.data_hdr
-add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group rsp_queue_in -label valid -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/axis_data_in_rsp_valid
-add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group rsp_queue_in -label ready -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/axis_data_in_rsp_ready
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group rsp_queue_in -label valid -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_axis_in_rsp_reg/valid_i
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group rsp_queue_in -label ready -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_axis_in_rsp_reg/ready_o
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group rsp_queue_in -color Cyan -label data /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.data
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group rsp_queue_in -color Red -label data_validity /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.data_validity
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group rsp_queue_in -color Orange -label credits_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.credits_hdr
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_in -group rsp_queue_in -color Violet -label credits -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_rsp_queue_in.credits
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group req_queue_out -color Orange -label data_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_queue_out.data_hdr
-add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group req_queue_out -label valid -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_queue_valid
-add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group req_queue_out -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_i.ready
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group req_queue_out -label valid -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_axis_in_req_reg/valid_o
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group req_queue_out -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_axis_in_req_reg/ready_i
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group req_queue_out -color Cyan -label data /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_queue_out.data
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group req_queue_out -color Red -label data_validity /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_queue_out.data_validity
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group req_queue_out -color Orange -label credits_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_queue_out.credits_hdr
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group req_queue_out -color Violet -label credits -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_queue_out.credits
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group rsp_queue_out -color Orange -label data_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/rsp_queue_out.data_hdr
-add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group rsp_queue_out -label valid -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/rsp_queue_valid
-add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group rsp_queue_out -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/rsp_i.ready
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group rsp_queue_out -label valid -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_axis_in_rsp_reg/valid_o
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group rsp_queue_out -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/i_axis_in_rsp_reg/ready_i
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group rsp_queue_out -color Cyan -label data /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/rsp_queue_out.data
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group rsp_queue_out -color Red -label data_validity /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/rsp_queue_out.data_validity
+add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group rsp_queue_out -color Orange -label credits_hdr /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/rsp_queue_out.credits_hdr
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group queue_out -group rsp_queue_out -color Violet -label credits -radix unsigned /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/rsp_queue_out.credits
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group synchronization_credits_in -group req_synchronization_in -label valid -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_queue_valid
 add wave -noupdate -group full_data_path_debugging -group axis_to_flit_bridge_1 -group synchronization_credits_in -group req_synchronization_in -label ready -radix ufixed -radixshowbase 1 /tb_floo_noc_bridge/bridge/i_floo_axis_noc_bridge_1/req_i.ready

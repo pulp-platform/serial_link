@@ -9,7 +9,6 @@ module floo_axis_noc_bridge
   parameter  type req_flit_t       = logic,
   parameter  type axis_req_t       = logic,
   parameter  type axis_rsp_t       = logic,
-  parameter  int  flit_data_size   = 1,
   parameter  int  numNocChanPerDir = 2,
 
   localparam int unsigned IdxWidth   = unsigned'($clog2(numNocChanPerDir)),
@@ -34,16 +33,13 @@ module floo_axis_noc_bridge
   output axis_rsp_t axis_in_rsp_o
 );
 
-  typedef enum logic [0:0] {
-    response  = 'd0,
-    request   = 'd1
-  } channel_hdr_e;
+  import noc_bridge_pkg::*;
 
   idx_t selected_index;
 
   typedef struct packed {
     channel_hdr_e hdr;
-    logic [flit_data_size-1:0] flit_data;
+    logic [FlitDataSize-1:0] flit_data;
   } axis_data_t;
 
   axis_data_t axis_out_payload, axis_in_payload;
@@ -61,7 +57,7 @@ module floo_axis_noc_bridge
   // Assignment required to match the data width of the two channels (rr_arb_tree needs equi-size signals)
   assign req_i_data = req_i.data;
   assign rsp_i_data = rsp_i.data;
-  
+
   rr_arb_tree #(
     .NumIn      ( numNocChanPerDir           ),
     .DataWidth  ( payloadSize - 1            ),
@@ -108,7 +104,7 @@ module floo_axis_noc_bridge
     .valid_o    ( axis_out_req_o.tvalid ),
     .ready_i    ( axis_out_rsp_i.tready ),
     .data_o     ( axis_out_data_reg_out )
-  );  
+  );
 
   assign axis_out_req_o.t.data = axis_out_data_reg_out;
   assign axis_out_req_o.t.strb = '1;
@@ -121,7 +117,7 @@ module floo_axis_noc_bridge
   ///////////////////////////////////////////////
   //  CONNECT AXIS_IN WITH THE OUTGOING FLITS  //
   ///////////////////////////////////////////////
-  
+
   assign axis_in_payload      = axis_data_t'(axis_in_req_i.t.data);
   assign axis_in_rsp_o.tready = (req_i.ready & req_o.valid) || (rsp_i.ready & rsp_o.valid);
   assign req_o.valid          = (axis_in_payload.hdr == request) ? axis_in_req_i.tvalid : 0;

@@ -13,7 +13,6 @@
 
 /// A simple serial link to go off-chip
 module floo_serial_link
-import serial_link_pkg::*;
 #(
   parameter  type req_flit_t      = logic,
   parameter  type rsp_flit_t      = logic,
@@ -26,10 +25,9 @@ import serial_link_pkg::*;
   parameter  int  MaxClkDiv       = serial_link_pkg::MaxClkDiv,
   parameter  bit  NoRegCdc        = 1'b0,
   // It the noc_bridge has zero credits, the non-virtual channel version of the noc-bridge is being used
-  parameter  int  MaxCredVirtChan = 0,
   localparam int  Log2NumChannels = (NumChannels > 1) ? $clog2(NumChannels) : 1,
   localparam int  channelCount    = 2,
-  localparam bit  BridgeVirtualChannels = (MaxCredVirtChan == 0) ? 1'b0 : 1'b1,
+  localparam bit  BridgeVirtualChannels = (noc_bridge_pkg::NumCred_NocBridge == 0) ? 1'b0 : 1'b1,
   parameter  bit  printFeedback   = 1'b0
 ) (
   // There are 3 different clock/resets:
@@ -65,28 +63,13 @@ import serial_link_pkg::*;
   output logic                                 reset_no
 );
 
+  import noc_bridge_pkg::*;
   import serial_link_pkg::*;
-
-  localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
-  localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
 
   typedef struct packed {
     logic hdr;
     logic [FlitDataSize-1:0] flit_data;
   } payload_t;
-
-  localparam type credits_noc_bridge_t = logic [$clog2(MaxCredVirtChan + 1) - 1:0];
-
-  typedef enum logic [0:0] {
-    response  = 'd0,
-    request   = 'd1
-  } channel_hdr_e;
-
-  typedef struct packed {
-    logic data_validity;
-    channel_hdr_e credits_hdr;
-    credits_noc_bridge_t credits;
-  } user_bits_t;
 
   // Axi stream dimension must be a multiple of 8 bits
   localparam int StreamDataBytes = ($bits(payload_t) + 7) / 8;
@@ -145,8 +128,6 @@ import serial_link_pkg::*;
       .rsp_flit_t        ( rsp_flit_t      ),
       .axis_req_t        ( axis_req_t      ),
       .axis_rsp_t        ( axis_rsp_t      ),
-      .flit_data_size    ( FlitDataSize    ),
-      .number_of_credits ( MaxCredVirtChan ),
       .numNocChanPerDir  ( channelCount    )
     ) i_serial_link_network (
       .clk_i             ( clk_sl_i        ),
@@ -167,7 +148,6 @@ import serial_link_pkg::*;
       .rsp_flit_t        ( rsp_flit_t   ),
       .axis_req_t        ( axis_req_t   ),
       .axis_rsp_t        ( axis_rsp_t   ),
-      .flit_data_size    ( FlitDataSize ),
       .numNocChanPerDir  ( channelCount )
     ) i_serial_link_network (
       .clk_i             ( clk_sl_i     ),

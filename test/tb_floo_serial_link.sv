@@ -15,6 +15,7 @@ module tb_floo_serial_link();
   `include "register_interface/typedef.svh"
 
   import floo_pkg::*;
+  import noc_bridge_pkg::*;
   import serial_link_pkg::*;
   import floo_axi_flit_pkg::*;
   import serial_link_reg_pkg::*;
@@ -42,10 +43,6 @@ module tb_floo_serial_link();
   localparam int unsigned ReorderBufferSize = 64;
   localparam int unsigned MaxTxns           = 32;
   localparam int unsigned MaxTxnsPerId      = 32;
-
-  // With this parameter you can set the maximal credit count for the NoC bridge. If set to 0, the NoC-bridge without
-  // virtualization will be used instead.
-  localparam int unsigned NumCred_NocBridge = 8;
 
   // Stop the simulation if this simulation time (ns) is exceeded.
   localparam int stopSimAfter = 75000000;
@@ -160,7 +157,6 @@ module tb_floo_serial_link();
     .NumChannels     ( NumChannels       ),
     .NumLanes        ( NumLanes          ),
     .MaxClkDiv       ( MaxClkDiv         ),
-    .MaxCredVirtChan ( NumCred_NocBridge ),
     .printFeedback   ( 1'b1              )
   ) i_serial_link_0 (
     .clk_i           ( clk_1          ),
@@ -193,8 +189,7 @@ module tb_floo_serial_link();
     // .reg2hw_t          ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg2hw_t ),
     .NumChannels     ( NumChannels       ),
     .NumLanes        ( NumLanes          ),
-    .MaxClkDiv       ( MaxClkDiv         ),
-    .MaxCredVirtChan ( NumCred_NocBridge )
+    .MaxClkDiv       ( MaxClkDiv         )
   ) i_serial_link_1 (
     .clk_i           ( clk_2          ),
     .rst_ni          ( rst_2_n        ),

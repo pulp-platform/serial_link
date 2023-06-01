@@ -6,16 +6,12 @@
 module tb_floo_noc_bridge;
 
   import floo_pkg::*;
-  import floo_axi_flit_pkg::*;
+  import noc_bridge_pkg::*;
   import serial_link_pkg::*;
+  import floo_axi_flit_pkg::*;
 
   // set to zero if the noc_bridge should be inserted. Assign to one if the bridge should be ignored/bypassede
-  localparam bit BridgeBypass   = 1'b0;
-  // Declare the amount of credits used in case of the virtual channels being enabled. If set to 0 the non-virtual
-  // channel version is being used...
-  localparam int numOfCredits   = 8;
-
-
+  localparam bit BridgeBypass = 1'b0;
 
   localparam time CyclTime = 10ns;
   localparam time ApplTime = 2ns;
@@ -37,29 +33,12 @@ module tb_floo_noc_bridge;
   logic Bridge_0_req_o, Bridge_0_req_i, Bridge_1_req_o, Bridge_1_req_i;
   logic Bridge_0_rsp_o, Bridge_0_rsp_i, Bridge_1_rsp_o, Bridge_1_rsp_i;
 
-  localparam bit BridgeVirtualChannels = (numOfCredits>0);
+  localparam bit BridgeVirtualChannels = (NumCred_NocBridge>0);
   // Stop the simulation if this simulation time (ns) is exceeded.
   localparam int stopSimAfter   = 1000000;
 
-  // identify the larger of the two types
-	localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
-  // the minimal flit-data-size requirement corresponds to the larger of the two channels, exclusive the handshake signals.
-  localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
   // minimal AXIS data size (also contain the hdr-bit, thus + 1)
   localparam int axis_data_size = FlitDataSize + 1;
-
-  localparam type credits_noc_bridge_t = logic [$clog2(numOfCredits+1)-1:0];
-
-  typedef enum logic [0:0] {
-    response  = 'd0,
-    request   = 'd1
-  } channel_hdr_e;
-
-  typedef struct packed {
-    logic data_validity;
-    channel_hdr_e credits_hdr;
-    credits_noc_bridge_t credits;
-  } user_bits_t;
 
   // Axi stream dimension must be a multiple of 8 bits
   localparam int StreamDataBytes = (axis_data_size + 7) / 8;
@@ -199,8 +178,6 @@ module tb_floo_noc_bridge;
       .rsp_flit_t       ( rsp_flit_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
-      .number_of_credits( numOfCredits     ),
-      .flit_data_size   ( FlitDataSize     ),
       .numNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_0 (
       .clk_i            ( clk              ),
@@ -221,8 +198,6 @@ module tb_floo_noc_bridge;
       .rsp_flit_t       ( rsp_flit_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
-      .number_of_credits( numOfCredits     ),
-      .flit_data_size   ( FlitDataSize     ),
       .numNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_1 (
       .clk_i            ( clk              ),
@@ -243,7 +218,6 @@ module tb_floo_noc_bridge;
       .rsp_flit_t       ( rsp_flit_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
-      .flit_data_size   ( FlitDataSize     ),
       .numNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_0 (
       .clk_i            ( clk              ),
@@ -264,7 +238,6 @@ module tb_floo_noc_bridge;
       .rsp_flit_t       ( rsp_flit_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
-      .flit_data_size   ( FlitDataSize     ),
       .numNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_1 (
       .clk_i            ( clk              ),
