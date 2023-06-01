@@ -13,7 +13,9 @@ module serial_link_credit_synchronization #(
   parameter int  NumCredits     = -1,
   // Force send out credits belonging to the other side
   // after ForceSendThresh is reached
-  parameter int ForceSendThresh = NumCredits - 4
+  parameter int ForceSendThresh = NumCredits - 4,
+  // Assign this parameter to one in order to prevent the credit_only_packets from consuming credits when sent out.
+  parameter bit CredOnlyPktMode = 1'b0
 ) (
   // clock signal
   input  logic                    clk_i,
@@ -54,17 +56,18 @@ module serial_link_credit_synchronization #(
   // If a credits only packet is being sent, this value is driven to high. This value might be wrapped into the data-stream
   // to indicate if it also contains valid data or not.
   output logic                    credits_only_packet_o,
-  // Optional input pin to specify if the credits_to_send_o port can be forwarded. If the input is set to zero, the
+  // Optional input pin: Tie to 1 if not used.
+  // Intended to specify if the credits_to_send_o port can be forwarded. If the input is set to zero, the
   // credits_to_send_o port might be updated, but in case of a valid data_transfer (data_to_send_o is sent) the
   // credits are not assumed to be consumed as well. This feature is meant to be used if multiple channels are to be
   // arbitrated and send over a virtual channel. In this case, it allows decoupling of the selected channel data and
   // the credits to be sent. For example: I might forward the data of channel 1, but sent the credits info of channel 2.
-  input logic                     allow_cred_consume_i    = 1'b1,
+  input logic                     allow_cred_consume_i,
   // Optional input pin: This pin can be used in combination with the above optional pin. While the previous pin blocks
   // credits_to_send_o to be consumed in the case of a valid data output handshake, this pin (consume_cred_to_send_i)
   // can signal the consumption of the credits. This allows the credits to be consumed and sent, while the data might
   // not be forwarded.
-  input logic                     consume_cred_to_send_i = 1'b0
+  input logic                     consume_cred_to_send_i
   // Example usage of the above two pins when having 2 channels to be sent over one physical channel (virtual channel
   // principle): The consume_cred_to_send_i has the data-output-handshake signals of the other channels synch. unit
   // assigned, such that the credits of the respective unit might be consumed in the case of eighter a output handshake
@@ -98,10 +101,10 @@ module serial_link_credit_synchronization #(
   // stabalize the output data if a credit_only packet needs to be sent
   always_comb begin : ouput_data_control
     // Though it might be unsusual to read from the D-side, this prevents us from loosing an additional clock cycle
-    if (send_normal_packet_d) begin
-      data_to_send_o = data_to_send_i;
-    end else begin
+    if (credits_only_packet_o) begin
       data_to_send_o = '0;
+    end else begin
+      data_to_send_o = data_to_send_i;
     end
   end
 
@@ -123,6 +126,11 @@ module serial_link_credit_synchronization #(
         send_normal_packet_d = 1;
       end
     end
+    // TODO: remove the below code alternative (does not seem to be correct)
+    // send_normal_packet_d = 1;
+    // if (~send_valid_i & force_send_credits_d) begin
+    //   send_normal_packet_d = 0;
+    // end
   end
 
   always_comb begin : output_valid_control
@@ -150,6 +158,11 @@ module serial_link_credit_synchronization #(
   always_comb begin : available_credit_counter  // => keeps track of the remaining credits
     // When a valid output handshake occurs, there is one less credit available (decrement counter by 1).
     credits_available_decrement = (send_valid_o & send_ready_i);
+    if (CredOnlyPktMode) begin
+      if (credits_only_packet_o) begin
+        credits_available_decrement = 0;
+      end
+    end
 
     credits_available_increment = 0;
     if (receive_cred_i) begin

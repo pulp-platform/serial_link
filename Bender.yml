@@ -31,6 +31,7 @@ sources:
 
     # Parametrization
     - src/serial_link_pkg.sv
+    - src/noc_bridge_pkg.sv
 
     # Abstraction Layers
     - src/channel_allocator/stream_chopper.sv

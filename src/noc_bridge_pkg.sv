@@ -1,0 +1,57 @@
+// Author: Yannick Baumann <baumanny@student.ethz.ch>
+
+/// A package declareing some type definitions.
+package noc_bridge_pkg;
+
+  ////////////////////////////////////////////
+  // PARAMETRIZATION - VARIABLE PARAMETERS  //
+  ////////////////////////////////////////////
+
+  // With this parameter you can set the maximal credit count for the NoC bridge. If set to 0, the NoC-bridge without
+  // virtualization will be used instead.
+  localparam int NumCred_NocBridge = 8;
+
+  ///////////////////////////////////////////
+  // DEPENDANT PARAMETERS - DO NOT CHANGE  //
+  ///////////////////////////////////////////
+
+  // load the flit types
+  import floo_axi_flit_pkg::*;
+
+  // identify the larger of the two types
+  localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
+  // the minimal flit-data-size requirement corresponds to the larger of the two channels, exclusive the handshake signals.
+  localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
+
+  typedef logic [FlitDataSize-1:0] flit_data_t;
+
+  typedef enum logic [0:0] {
+    response  = 'd0,
+    request   = 'd1
+  } channel_hdr_e;
+
+  typedef logic [$clog2(NumCred_NocBridge+1)-1:0] bridge_credit_t;
+
+  // User bits utilized in the AXIS interface
+  typedef struct packed {
+    logic data_validity;
+    channel_hdr_e credits_hdr;
+    bridge_credit_t credits;
+  } user_bits_t;
+
+  // Data bits utilized in the AXIS interface
+  typedef struct packed {
+    channel_hdr_e data_hdr;
+    flit_data_t data;
+  } data_bits_t;
+
+  // packet type used in the virtual-channel noc_bridge
+  typedef struct packed {
+    channel_hdr_e data_hdr;
+    flit_data_t data;
+    logic data_validity;
+    channel_hdr_e credits_hdr;
+    bridge_credit_t credits;
+  } axis_packet_t;
+
+endpackage : noc_bridge_pkg

@@ -126,7 +126,9 @@ import serial_link_pkg::*;
     .receive_cred_i         ( consume_incoming_credits                     ),
     .buffer_queue_out_val_i ( axis_out_req_unfiltered.tvalid               ),
     .buffer_queue_out_rdy_i ( axis_out_rsp_unfiltered.tready               ),
-    .credits_only_packet_o  ( credits_only_packet_out                      )
+    .credits_only_packet_o  ( credits_only_packet_out                      ),
+    .allow_cred_consume_i   ( 1'b1                                         ),
+    .consume_cred_to_send_i ( 1'b0                                         )
   );
 
   assign consume_incoming_credits = axis_out_req_unfiltered.tvalid & axis_out_rsp_unfiltered.tready;
