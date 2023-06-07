@@ -18,12 +18,16 @@ package noc_bridge_pkg;
   // load the flit types
   import floo_axi_flit_pkg::*;
 
+  localparam int ReqFlitSize  = $bits(req_flit_t);
+  localparam int RspFlitSize  = $bits(rsp_flit_t);
   // identify the larger of the two types
-  localparam int FlitTypes[5] = {$bits(req_flit_t), $bits(rsp_flit_t), 0, 0, 0};
+  localparam int FlitTypes[5] = {ReqFlitSize, RspFlitSize, 0, 0, 0};
   // the minimal flit-data-size requirement corresponds to the larger of the two channels, exclusive the handshake signals.
   localparam int FlitDataSize = serial_link_pkg::find_max_channel(FlitTypes)-2;
 
   typedef logic [FlitDataSize-1:0] flit_data_t;
+  typedef logic [ReqFlitSize-3:0] flit_req_data_t;
+  typedef logic [RspFlitSize-3:0] flit_rsp_data_t;
 
   typedef enum logic [0:0] {
     response  = 'd0,
