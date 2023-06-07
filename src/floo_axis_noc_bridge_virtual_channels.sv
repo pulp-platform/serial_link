@@ -57,6 +57,8 @@ module floo_axis_noc_bridge_virtual_channels
   logic credit_only_pack_val, response_ready, request_ready;
   logic req_read_incoming_credits, rsp_read_incoming_credits;
 
+  flit_req_data_t req_reg_data_in;
+  flit_rsp_data_t rsp_reg_data_in;
 
   ////////////////////////////////////////////////
   //  CONNECT INCOMING FLITS WITH THE AXIS_OUT  //
@@ -242,7 +244,7 @@ module floo_axis_noc_bridge_virtual_channels
 
   // Input queue for the req channel.
   stream_fifo #(
-    .T          ( flit_data_t            ),
+    .T          ( flit_req_data_t        ),
     .DEPTH      ( NumCred_NocBridge      )
   ) i_axis_in_req_reg (
     .clk_i      ( clk_i                  ),
@@ -252,15 +254,17 @@ module floo_axis_noc_bridge_virtual_channels
     .usage_o    (                        ),
     .valid_i    ( axis_data_in_req_valid ),
     .ready_o    ( axis_data_in_req_ready ),
-    .data_i     ( req_rsp_queue_in.data  ),
+    .data_i     ( req_reg_data_in        ),
     .valid_o    ( req_o.valid            ),
     .ready_i    ( req_i.ready            ),
     .data_o     ( req_o.data             )
   );
+  // size casting to avoid error msg
+  assign req_reg_data_in = req_rsp_queue_in.data;
 
   // Input queue for the rsp channel.
   stream_fifo #(
-    .T          ( flit_data_t            ),
+    .T          ( flit_rsp_data_t        ),
     .DEPTH      ( NumCred_NocBridge      )
   ) i_axis_in_rsp_reg (
     .clk_i      ( clk_i                  ),
@@ -270,11 +274,13 @@ module floo_axis_noc_bridge_virtual_channels
     .usage_o    (                        ),
     .valid_i    ( axis_data_in_rsp_valid ),
     .ready_o    ( axis_data_in_rsp_ready ),
-    .data_i     ( req_rsp_queue_in.data  ),
+    .data_i     ( rsp_reg_data_in        ),
     .valid_o    ( rsp_o.valid            ),
     .ready_i    ( rsp_i.ready            ),
     .data_o     ( rsp_o.data             )
   );
+  // size casting to avoid error msg
+  assign rsp_reg_data_in = req_rsp_queue_in.data;
 
 
   //////////////////

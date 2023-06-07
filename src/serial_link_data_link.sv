@@ -23,21 +23,17 @@ import serial_link_pkg::*;
   parameter type credit_t        = logic,
   parameter int  NumCredits      = -1,
   parameter int  ForceSendThresh = NumCredits - 4,
+  // Enable new feature to support valiable data sizes (of the AXIS)
+  parameter bit  AllowVarAxisLen = 0'b1,
 
 
   //////////////////////////
   // Dependant parameters //
   //////////////////////////
 
-  localparam int NumUserBits      = $bits(axis_in_req_i.t.user),
-  // The width used to transfer all the data contained in one axis-packet (so far data & user bits are supported)
-  localparam int axis_pak_width   = $bits(payload_t) + NumUserBits,
   localparam int Log2NumChannels  = (NumChannels > 1)? $clog2(NumChannels) : 1,
   localparam int RawModeFifoDepth = serial_link_pkg::RawModeFifoDepth,
   localparam int BandWidth        = NumChannels * NumLanes * 2,
-  // (the +1 is required to transmit the info whether or not it is a credits_only packet which is being sent)
-  localparam int PayloadSplits    = (1 + $bits(payload_t) + $bits(credit_t) + NumUserBits + BandWidth - 1) / BandWidth,
-  localparam int RecvFifoDepth    = NumCredits * PayloadSplits,
   localparam int unsigned Log2RawModeFifoDepth = $clog2(RawModeFifoDepth)
 ) (
   input  logic                            clk_i,
@@ -70,35 +66,73 @@ import serial_link_pkg::*;
   output logic                            cfg_raw_mode_out_data_fifo_is_full_o
 );
 
+  // TODO: AllowVarAxisLen to be used...
+  localparam int NumUserBits = $bits(axis_in_req_i.t.user);
+  typedef  logic [NumUserBits-1:0] axis_user_bits_t;
+
+  localparam int NumStrbBits = $bits(axis_in_req_i.t.strb);
+  typedef  logic [NumStrbBits-1:0] axis_strb_bits_t;
+
+  // TODO: find a was to assign a suitable size for the split counter type
+  typedef logic [3:0] split_cntr_t;
+
+  typedef struct packed {
+    split_cntr_t req_num_splits;
+    credit_t amount_of_credits;
+    logic is_credits_only;
+  } data_hdr_info_t;
+
+  typedef struct packed {
+    logic [$bits(payload_t)-1:0] data_bits;
+    axis_strb_bits_t strb_bits;
+    axis_user_bits_t user_bits;
+  } axis_packet_t;
+
+  // The width used to transfer all the data contained in one axis-packet (so far data, user & strb bits are supported)
+  localparam int NumberOfBitsToBeTransfered = $bits(axis_packet_t) + $bits(data_hdr_info_t);
+  localparam int MaxPossibleTransferSplits  = (NumberOfBitsToBeTransfered + BandWidth - 1) / BandWidth;
+  localparam int RecvFifoDepth = NumCredits * MaxPossibleTransferSplits;
+
+  // TODO: remove the initial begin block below. Only for debugging purposes...
+  initial begin
+    $display("INFO: Number of required splits: %0d (Bandwidth: %0d & Transfer_size: %0d)",MaxPossibleTransferSplits, BandWidth, NumberOfBitsToBeTransfered);
+  end
+
+  data_hdr_info_t received_hdr, send_hdr;
+
   // These unfiltered axis_out signals will have to be analyzed for credits_only packets
   // which will not be allowed to propagate to the axis output.
   axis_req_t axis_out_req_unfiltered;
   axis_rsp_t axis_out_rsp_unfiltered;
 
   // credit-based-flow-control related signals (The axis user-bits are now also packed and transfered)
-  logic [axis_pak_width-1:0] axis_in_data_to_physical;
+  axis_packet_t axis_packet_in_synch_out, axis_packet_in_synch_in, axis_packet_out;
   logic axis_in_req_tvalid_afterFlowControl;
   logic axis_in_rsp_tready_afterFlowControl;
   credit_t credits_to_send, credits_incoming;
   logic credits_only_packet_out, credits_only_packet_in;
   logic consume_incoming_credits;
 
-  logic [PayloadSplits-1:0] recv_reg_in_valid, recv_reg_in_ready;
-  logic [PayloadSplits-1:0] recv_reg_out_valid, recv_reg_out_ready;
-  phy_data_t [PayloadSplits-1:0][NumChannels-1:0] recv_reg_data;
-  logic [$clog2(PayloadSplits)-1:0] recv_reg_index_q, recv_reg_index_d;
+  logic [MaxPossibleTransferSplits-1:0] recv_reg_in_valid, recv_reg_in_ready;
+  logic [MaxPossibleTransferSplits-1:0] recv_reg_out_valid, recv_reg_out_ready;
+  phy_data_t [MaxPossibleTransferSplits-1:0][NumChannels-1:0] recv_reg_data;
+  logic [$clog2(MaxPossibleTransferSplits)-1:0] recv_reg_index_q, recv_reg_index_d;
 
   link_state_e link_state_q, link_state_d;
-  logic [$clog2(PayloadSplits*NumChannels*NumLanes*2):0] link_out_index_q, link_out_index_d;
+  logic [$clog2(MaxPossibleTransferSplits*NumChannels*NumLanes*2):0] link_out_index_q, link_out_index_d;
 
   logic raw_mode_fifo_full, raw_mode_fifo_empty;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
   phy_data_t raw_mode_fifo_data_in, raw_mode_fifo_data_out;
 
   // Declare the stream of data to be sent via the off-chip link
-  localparam int transfer_data_width = $bits({axis_in_data_to_physical, credits_to_send, credits_only_packet_out});
+  assign send_hdr.amount_of_credits  = credits_to_send;
+  assign send_hdr.is_credits_only    = credits_only_packet_out;
+  // TODO: change...
+  assign send_hdr.req_num_splits     = '0;
+  localparam int transfer_data_width = $bits({axis_packet_in_synch_out, send_hdr});
   logic [transfer_data_width-1:0] wrapped_output_data;
-  assign wrapped_output_data = {axis_in_data_to_physical, credits_to_send, credits_only_packet_out};
+  assign wrapped_output_data = {axis_packet_in_synch_out, send_hdr};
 
 
   ////////////////////////////////
@@ -107,7 +141,7 @@ import serial_link_pkg::*;
 
   serial_link_credit_synchronization #(
     .credit_t   ( credit_t       ),
-    .data_width ( axis_pak_width ),
+    .data_t     ( axis_packet_t  ),
     .NumCredits ( NumCredits     )
   ) i_synchronization_flow_control (
     .clk_i                  ( clk_i                                        ),
@@ -115,8 +149,8 @@ import serial_link_pkg::*;
     // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
     // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
     // be made smaller, without loosing any information...
-    .data_to_send_i         ( {axis_in_req_i.t.data, axis_in_req_i.t.user} ),
-    .data_to_send_o         ( axis_in_data_to_physical                     ),
+    .data_to_send_i         ( axis_packet_in_synch_in                      ),
+    .data_to_send_o         ( axis_packet_in_synch_out                     ),
     .credits_to_send_o      ( credits_to_send                              ),
     .send_ready_o           ( axis_in_rsp_o.tready                         ),
     .send_valid_i           ( axis_in_req_i.tvalid                         ),
@@ -133,6 +167,9 @@ import serial_link_pkg::*;
 
   assign consume_incoming_credits = axis_out_req_unfiltered.tvalid & axis_out_rsp_unfiltered.tready;
 
+  assign axis_packet_in_synch_in.data_bits = axis_in_req_i.t.data;
+  assign axis_packet_in_synch_in.user_bits = axis_in_req_i.t.user;
+  assign axis_packet_in_synch_in.strb_bits = axis_in_req_i.t.strb;
 
   /////////////////
   //   DATA IN   //
@@ -161,7 +198,7 @@ import serial_link_pkg::*;
     .ready_i    ( flow_control_fifo_ready_out   )
   );
 
-  for (genvar i = 0; i < PayloadSplits; i++) begin : gen_recv_reg
+  for (genvar i = 0; i < MaxPossibleTransferSplits; i++) begin : gen_recv_reg
     stream_register #(
       .T ( phy_data_chan_t )
     ) i_recv_reg (
@@ -183,7 +220,12 @@ import serial_link_pkg::*;
     data_in_ready_o = '0;
     recv_reg_index_d = recv_reg_index_q;
     axis_out_req_unfiltered.tvalid = 1'b0;
-    {axis_out_req_unfiltered.t.data, axis_out_req_unfiltered.t.user, credits_incoming, credits_only_packet_in} = recv_reg_data;
+    {axis_packet_out, received_hdr} = recv_reg_data;
+    axis_out_req_unfiltered.t.data = axis_packet_out.data_bits;
+    axis_out_req_unfiltered.t.user = axis_packet_out.user_bits;
+    axis_out_req_unfiltered.t.strb = axis_packet_out.strb_bits;
+    credits_incoming = received_hdr.amount_of_credits;
+    credits_only_packet_in = received_hdr.is_credits_only;
     recv_reg_out_ready = '0;
     cfg_raw_mode_in_data_o = '0;
     cfg_raw_mode_in_data_valid_o = '0;
@@ -215,12 +257,12 @@ import serial_link_pkg::*;
         recv_reg_in_valid[recv_reg_index_q] = 1'b1;
         flow_control_fifo_ready_out = 1'b1;
         // Increment recv reg counter
-        recv_reg_index_d = (recv_reg_index_q == PayloadSplits - 1)? 0 : recv_reg_index_q + 1;
+        recv_reg_index_d = (recv_reg_index_q == MaxPossibleTransferSplits - 1)? 0 : recv_reg_index_q + 1;
       end
 
       // Once all Recv Stream Registers are filled -> generate AXI stream request
       axis_out_req_unfiltered.tvalid = &recv_reg_out_valid;
-      recv_reg_out_ready = {PayloadSplits{axis_out_rsp_unfiltered.tready}};
+      recv_reg_out_ready = {MaxPossibleTransferSplits{axis_out_rsp_unfiltered.tready & axis_out_req_unfiltered.tvalid}};
     end
   end
 
