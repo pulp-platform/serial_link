@@ -12,23 +12,23 @@
 `include "axis/typedef.svh"
 
 /// A simple serial link to go off-chip
-module floo_serial_link
+module floo_serial_link_narrow_wide
 #(
-  parameter  type req_flit_t      = logic,
-  parameter  type rsp_flit_t      = logic,
-  parameter  type cfg_req_t       = logic,
-  parameter  type cfg_rsp_t       = logic,
-  parameter  type hw2reg_t        = logic,
-  parameter  type reg2hw_t        = logic,
-  parameter  int  NumChannels     = serial_link_pkg::NumChannels,
-  parameter  int  NumLanes        = serial_link_pkg::NumLanes,
-  parameter  int  MaxClkDiv       = serial_link_pkg::MaxClkDiv,
-  parameter  bit  NoRegCdc        = 1'b0,
+  parameter  type narrow_req_flit_t = logic,
+  parameter  type narrow_rsp_flit_t = logic,
+  parameter  type cfg_req_t         = logic,
+  parameter  type cfg_rsp_t         = logic,
+  parameter  type hw2reg_t          = logic,
+  parameter  type reg2hw_t          = logic,
+  parameter  int  NumChannels       = serial_link_pkg::NumChannels,
+  parameter  int  NumLanes          = serial_link_pkg::NumLanes,
+  parameter  int  MaxClkDiv         = serial_link_pkg::MaxClkDiv,
+  parameter  bit  NoRegCdc          = 1'b0,
   // If the noc_bridge has zero credits, the non-virtual channel version of the noc-bridge is being used
-  localparam int  Log2NumChannels = (NumChannels > 1) ? $clog2(NumChannels) : 1,
-  localparam int  channelCount    = 2,
-  localparam bit  BridgeVirtualChannels = (noc_bridge_pkg::NumCred_NocBridge == 0) ? 1'b0 : 1'b1,
-  parameter  bit  printFeedback   = 1'b0
+  localparam int  Log2NumChannels   = (NumChannels > 1) ? $clog2(NumChannels) : 1,
+  localparam int  channelCount      = 2,
+  localparam bit  BridgeVirtualChannels = (noc_bridge_narrow_wide_pkg::NumCred_NocBridge == 0) ? 1'b0 : 1'b1,
+  parameter  bit  printFeedback     = 1'b0
 ) (
   // There are 3 different clock/resets:
   // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
@@ -44,10 +44,11 @@ module floo_serial_link
   input  logic                                 rst_reg_ni,
   // Testmode is an optional input pin. Tie to zero if not used.
   input  logic                                 testmode_i = '0,
-  input  req_flit_t                            req_i,
-  input  rsp_flit_t                            rsp_i,
-  output req_flit_t                            req_o,
-  output rsp_flit_t                            rsp_o,
+  // TODO: rename intput channel to narrow_sth
+  input  narrow_req_flit_t                     narrow_req_i,
+  input  narrow_rsp_flit_t                     narrow_rsp_i,
+  output narrow_req_flit_t                     narrow_req_o,
+  output narrow_rsp_flit_t                     narrow_rsp_o,
   input  cfg_req_t                             cfg_req_i,
   output cfg_rsp_t                             cfg_rsp_o,
   input  logic [NumChannels-1:0]               ddr_rcv_clk_i,
@@ -63,12 +64,12 @@ module floo_serial_link
   output logic                                 reset_no
 );
 
-  import noc_bridge_pkg::*;
   import serial_link_pkg::*;
+  import noc_bridge_narrow_wide_pkg::*;
 
   typedef struct packed {
     logic hdr;
-    logic [FlitDataSize-1:0] flit_data;
+    logic [NarrowFlitDataSize-1:0] flit_data;
   } payload_t;
 
   // Axi stream dimension must be a multiple of 8 bits
@@ -121,45 +122,51 @@ module floo_serial_link
   ////////////////////
 
   if (BridgeVirtualChannels) begin : bridge
-    floo_axis_noc_bridge_virtual_channels #(
-      .ignore_assert     ( 1'b0            ),
-      // .allow_debug_msg   ( 1'b1            ),
-      .req_flit_t        ( req_flit_t      ),
-      .rsp_flit_t        ( rsp_flit_t      ),
-      .axis_req_t        ( axis_req_t      ),
-      .axis_rsp_t        ( axis_rsp_t      ),
-      .numNocChanPerDir  ( channelCount    )
+    floo_axis_noc_bridge_virtual_channels_narrow_wide #(
+      .ignore_assert     ( 1'b0              ),
+      // .allow_debug_msg   ( 1'b1              ),
+      .narrow_req_flit_t ( narrow_req_flit_t ),
+      .narrow_rsp_flit_t ( narrow_rsp_flit_t ),
+      .axis_req_t        ( axis_req_t        ),
+      .axis_rsp_t        ( axis_rsp_t        ),
+      .numNocChanPerDir  ( channelCount      )
     ) i_serial_link_network (
-      .clk_i             ( clk_sl_i        ),
-      .rst_ni            ( rst_sl_ni       ),
-      .req_o             ( req_o           ),
-      .rsp_o             ( rsp_o           ),
-      .req_i             ( req_i           ),
-      .rsp_i             ( rsp_i           ),
-      .axis_out_req_o    ( axis_out_req    ),
-      .axis_in_rsp_o     ( axis_in_rsp     ),
-      .axis_in_req_i     ( axis_in_req     ),
-      .axis_out_rsp_i    ( axis_out_rsp    )
+      .clk_i             ( clk_sl_i          ),
+      .rst_ni            ( rst_sl_ni         ),
+      .narrow_req_o      ( narrow_req_o      ),
+      .narrow_rsp_o      ( narrow_rsp_o      ),
+      .narrow_req_i      ( narrow_req_i      ),
+      .narrow_rsp_i      ( narrow_rsp_i      ),
+      /*// TODO: add connection for wide channel
+      .wide_i            ( TODO              ),
+      .wide_o            ( TODO              ),*/
+      .axis_out_req_o    ( axis_out_req      ),
+      .axis_in_rsp_o     ( axis_in_rsp       ),
+      .axis_in_req_i     ( axis_in_req       ),
+      .axis_out_rsp_i    ( axis_out_rsp      )
     );
   end else begin : bridge
-    floo_axis_noc_bridge #(
-      .ignore_assert     ( 1'b0         ),
-      .req_flit_t        ( req_flit_t   ),
-      .rsp_flit_t        ( rsp_flit_t   ),
-      .axis_req_t        ( axis_req_t   ),
-      .axis_rsp_t        ( axis_rsp_t   ),
-      .numNocChanPerDir  ( channelCount )
+    floo_axis_noc_bridge_narrow_wide #(
+      .ignore_assert     ( 1'b0              ),
+      .narrow_req_flit_t ( narrow_req_flit_t ),
+      .narrow_rsp_flit_t ( narrow_rsp_flit_t ),
+      .axis_req_t        ( axis_req_t        ),
+      .axis_rsp_t        ( axis_rsp_t        ),
+      .numNocChanPerDir  ( channelCount      )
     ) i_serial_link_network (
-      .clk_i             ( clk_sl_i     ),
-      .rst_ni            ( rst_sl_ni    ),
-      .req_o             ( req_o        ),
-      .rsp_o             ( rsp_o        ),
-      .req_i             ( req_i        ),
-      .rsp_i             ( rsp_i        ),
-      .axis_out_req_o    ( axis_out_req ),
-      .axis_in_rsp_o     ( axis_in_rsp  ),
-      .axis_in_req_i     ( axis_in_req  ),
-      .axis_out_rsp_i    ( axis_out_rsp )
+      .clk_i             ( clk_sl_i          ),
+      .rst_ni            ( rst_sl_ni         ),
+      .narrow_req_o      ( narrow_req_o      ),
+      .narrow_rsp_o      ( narrow_rsp_o      ),
+      .narrow_req_i      ( narrow_req_i      ),
+      .narrow_rsp_i      ( narrow_rsp_i      ),
+      /*// TODO: add connection for wide channel
+      .wide_i            ( TODO              ),
+      .wide_o            ( TODO              ),*/
+      .axis_out_req_o    ( axis_out_req      ),
+      .axis_in_rsp_o     ( axis_in_rsp       ),
+      .axis_in_req_i     ( axis_in_req       ),
+      .axis_out_rsp_i    ( axis_out_rsp      )
     );
   end
 
@@ -190,40 +197,42 @@ module floo_serial_link
     & reg2hw.raw_mode_out_data_fifo_ctrl.clear.qe;
 
   serial_link_data_link #(
-    .axis_req_t       ( axis_req_t        ),
-    .axis_rsp_t       ( axis_rsp_t        ),
-    .payload_t        ( payload_t         ),
-    .phy_data_t       ( phy_data_t        ),
-    .NumChannels      ( NumChannels       ),
-    .NumLanes         ( NumLanes          ),
-    .credit_t         ( credit_t          ),
-    .NumCredits       ( NumCredits        )
+    .axis_req_t       ( axis_req_t  ),
+    .axis_rsp_t       ( axis_rsp_t  ),
+    .payload_t        ( payload_t   ),
+    .phy_data_t       ( phy_data_t  ),
+    .NumChannels      ( NumChannels ),
+    .NumLanes         ( NumLanes    ),
+    .credit_t         ( credit_t    ),
+    .NumCredits       ( NumCredits  ),
+    .AllowVarAxisLen  ( 1'b1        ),
+    .TransferStrobe   ( 1'b0        )
   ) i_serial_link_data_link (
-    .clk_i                                   ( clk_sl_i                                         ),
-    .rst_ni                                  ( rst_sl_ni                                        ),
-    .axis_in_req_i                           ( axis_out_req                                     ),
-    .axis_in_rsp_o                           ( axis_out_rsp                                     ),
-    .axis_out_req_o                          ( axis_in_req                                      ),
-    .axis_out_rsp_i                          ( axis_in_rsp                                      ),
-    .data_out_o                              ( data_link2alloc_data_out                         ),
-    .data_out_valid_o                        ( data_link2alloc_data_out_valid                   ),
-    .data_out_ready_i                        ( alloc2data_link_data_out_ready                   ),
-    .data_in_i                               ( alloc2data_link_data_in                          ),
-    .data_in_valid_i                         ( alloc2data_link_data_in_valid                    ),
-    .data_in_ready_o                         ( data_link2alloc_data_in_ready                    ),
-    .cfg_flow_control_fifo_clear_i           ( cfg_flow_control_fifo_clear                      ),
-    .cfg_raw_mode_en_i                       ( reg2hw.raw_mode_en                               ),
-    .cfg_raw_mode_in_ch_sel_i                ( reg2hw.raw_mode_in_ch_sel                        ),
-    .cfg_raw_mode_in_data_o                  ( hw2reg.raw_mode_in_data                          ),
-    .cfg_raw_mode_in_data_valid_o            ( hw2reg.raw_mode_in_data_valid                    ),
-    .cfg_raw_mode_in_data_ready_i            ( reg2hw.raw_mode_in_data.re                       ),
-    .cfg_raw_mode_out_ch_mask_i              ( reg2hw.raw_mode_out_ch_mask                      ),
-    .cfg_raw_mode_out_data_i                 ( reg2hw.raw_mode_out_data_fifo.q                  ),
-    .cfg_raw_mode_out_data_valid_i           ( reg2hw.raw_mode_out_data_fifo.qe                 ),
-    .cfg_raw_mode_out_en_i                   ( reg2hw.raw_mode_out_en                           ),
-    .cfg_raw_mode_out_data_fifo_clear_i      ( cfg_raw_mode_out_data_fifo_clear                 ),
-    .cfg_raw_mode_out_data_fifo_fill_state_o ( hw2reg.raw_mode_out_data_fifo_ctrl.fill_state.d  ),
-    .cfg_raw_mode_out_data_fifo_is_full_o    ( hw2reg.raw_mode_out_data_fifo_ctrl.is_full.d     )
+    .clk_i                                   ( clk_sl_i                                        ),
+    .rst_ni                                  ( rst_sl_ni                                       ),
+    .axis_in_req_i                           ( axis_out_req                                    ),
+    .axis_in_rsp_o                           ( axis_out_rsp                                    ),
+    .axis_out_req_o                          ( axis_in_req                                     ),
+    .axis_out_rsp_i                          ( axis_in_rsp                                     ),
+    .data_out_o                              ( data_link2alloc_data_out                        ),
+    .data_out_valid_o                        ( data_link2alloc_data_out_valid                  ),
+    .data_out_ready_i                        ( alloc2data_link_data_out_ready                  ),
+    .data_in_i                               ( alloc2data_link_data_in                         ),
+    .data_in_valid_i                         ( alloc2data_link_data_in_valid                   ),
+    .data_in_ready_o                         ( data_link2alloc_data_in_ready                   ),
+    .cfg_flow_control_fifo_clear_i           ( cfg_flow_control_fifo_clear                     ),
+    .cfg_raw_mode_en_i                       ( reg2hw.raw_mode_en                              ),
+    .cfg_raw_mode_in_ch_sel_i                ( reg2hw.raw_mode_in_ch_sel                       ),
+    .cfg_raw_mode_in_data_o                  ( hw2reg.raw_mode_in_data                         ),
+    .cfg_raw_mode_in_data_valid_o            ( hw2reg.raw_mode_in_data_valid                   ),
+    .cfg_raw_mode_in_data_ready_i            ( reg2hw.raw_mode_in_data.re                      ),
+    .cfg_raw_mode_out_ch_mask_i              ( reg2hw.raw_mode_out_ch_mask                     ),
+    .cfg_raw_mode_out_data_i                 ( reg2hw.raw_mode_out_data_fifo.q                 ),
+    .cfg_raw_mode_out_data_valid_i           ( reg2hw.raw_mode_out_data_fifo.qe                ),
+    .cfg_raw_mode_out_en_i                   ( reg2hw.raw_mode_out_en                          ),
+    .cfg_raw_mode_out_data_fifo_clear_i      ( cfg_raw_mode_out_data_fifo_clear                ),
+    .cfg_raw_mode_out_data_fifo_fill_state_o ( hw2reg.raw_mode_out_data_fifo_ctrl.fill_state.d ),
+    .cfg_raw_mode_out_data_fifo_is_full_o    ( hw2reg.raw_mode_out_data_fifo_ctrl.is_full.d    )
   );
 
   ///////////////////////
@@ -297,10 +306,10 @@ module floo_serial_link
 
   for (genvar i = 0; i < NumChannels; i++) begin : gen_phy_channels
     serial_link_physical #(
-      .phy_data_t       ( phy_data_t        ),
-      .NumLanes         ( NumLanes          ),
-      .FifoDepth        ( RawModeFifoDepth  ),
-      .MaxClkDiv        ( MaxClkDiv         )
+      .phy_data_t       ( phy_data_t       ),
+      .NumLanes         ( NumLanes         ),
+      .FifoDepth        ( RawModeFifoDepth ),
+      .MaxClkDiv        ( MaxClkDiv        )
     ) i_serial_link_physical (
       .clk_i             ( clk_sl_i                                 ),
       .rst_ni            ( rst_sl_ni                                ),
@@ -329,15 +338,15 @@ module floo_serial_link
       .req_t  ( cfg_req_t ),
       .rsp_t  ( cfg_rsp_t )
     ) i_cdc_cfg (
-      .src_clk_i  ( clk_reg_i   ),
-      .src_rst_ni ( rst_reg_ni  ),
-      .src_req_i  ( cfg_req_i   ),
-      .src_rsp_o  ( cfg_rsp_o   ),
+      .src_clk_i  ( clk_reg_i  ),
+      .src_rst_ni ( rst_reg_ni ),
+      .src_req_i  ( cfg_req_i  ),
+      .src_rsp_o  ( cfg_rsp_o  ),
 
-      .dst_clk_i  ( clk_i       ),
-      .dst_rst_ni ( rst_ni      ),
-      .dst_req_o  ( cfg_req     ),
-      .dst_rsp_i  ( cfg_rsp     )
+      .dst_clk_i  ( clk_i      ),
+      .dst_rst_ni ( rst_ni     ),
+      .dst_req_o  ( cfg_req    ),
+      .dst_rsp_i  ( cfg_rsp    )
     );
   end else begin : gen_no_reg_cdc
     assign cfg_req = cfg_req_i;
@@ -349,26 +358,26 @@ module floo_serial_link
       .reg_req_t (cfg_req_t),
       .reg_rsp_t (cfg_rsp_t)
     ) i_serial_link_reg_top (
-      .clk_i      ( clk_i       ),
-      .rst_ni     ( rst_ni      ),
-      .reg_req_i  ( cfg_req     ),
-      .reg_rsp_o  ( cfg_rsp     ),
-      .reg2hw     ( reg2hw      ),
-      .hw2reg     ( hw2reg      ),
-      .devmode_i  ( testmode_i  )
+      .clk_i      ( clk_i      ),
+      .rst_ni     ( rst_ni     ),
+      .reg_req_i  ( cfg_req    ),
+      .reg_rsp_o  ( cfg_rsp    ),
+      .reg2hw     ( reg2hw     ),
+      .hw2reg     ( hw2reg     ),
+      .devmode_i  ( testmode_i )
     );
   end else begin : gen_multi_channel_cfg_regs
     serial_link_reg_top #(
     .reg_req_t (cfg_req_t),
     .reg_rsp_t (cfg_rsp_t)
   ) i_serial_link_reg_top (
-    .clk_i      ( clk_i       ),
-    .rst_ni     ( rst_ni      ),
-    .reg_req_i  ( cfg_req     ),
-    .reg_rsp_o  ( cfg_rsp     ),
-    .reg2hw     ( reg2hw      ),
-    .hw2reg     ( hw2reg      ),
-    .devmode_i  ( testmode_i  )
+    .clk_i      ( clk_i      ),
+    .rst_ni     ( rst_ni     ),
+    .reg_req_i  ( cfg_req    ),
+    .reg_rsp_o  ( cfg_rsp    ),
+    .reg2hw     ( reg2hw     ),
+    .hw2reg     ( hw2reg     ),
+    .devmode_i  ( testmode_i )
   );
   end
 
@@ -378,4 +387,4 @@ module floo_serial_link
   assign hw2reg.isolated.axi_in.d = isolated_i[0];
   assign hw2reg.isolated.axi_out.d = isolated_i[1];
 
-endmodule : floo_serial_link
+endmodule : floo_serial_link_narrow_wide

@@ -32,6 +32,7 @@ sources:
     # Parametrization
     - src/serial_link_pkg.sv
     - src/noc_bridge_pkg.sv
+    - src/noc_bridge_narrow_wide_pkg.sv
 
     # Abstraction Layers
     - src/channel_allocator/stream_chopper.sv
@@ -48,11 +49,14 @@ sources:
 
     # NoC-bridge versions
     - src/floo_axis_noc_bridge.sv
+    - src/floo_axis_noc_bridge_narrow_wide.sv
     - src/floo_axis_noc_bridge_virtual_channels.sv
+    - src/floo_axis_noc_bridge_virtual_channels_narrow_wide.sv
 
     # Serial Link Wrapper
     - src/axi_serial_link.sv
     - src/floo_serial_link.sv
+    - src/floo_serial_link_narrow_wide.sv
 
     # Wrapper for Occamy
     - src/axi_serial_link_occamy_wrapper.sv
@@ -65,7 +69,9 @@ sources:
       files:
       - test/tb_axi_serial_link.sv
       - test/tb_floo_serial_link.sv
+      - test/tb_floo_serial_link_narrow_wide.sv
       - test/tb_floo_noc_bridge.sv
+      - test/tb_floo_noc_bridge_narrow_wide.sv
       - test/tb_ch_calib_serial_link.sv
       - test/tb_stream_chopper.sv
       - test/tb_stream_chopper_dechopper.sv

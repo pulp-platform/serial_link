@@ -175,13 +175,16 @@ module serial_link_credit_synchronization #(
 
   always_comb begin : credits_to_send_counter  // => keeps track of the credits that can be returned (released from the queue)
     credits_to_send_increment = '0;
-    credits_to_send_offset = '0;
     credits_to_send_decrement = '0;
+    credits_to_send_offset    = '0;
 
-    // There is a valid output handshake and credits are allowed to be consumed
-    if ((send_valid_o & send_ready_i & allow_cred_consume_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+    // There is a valid output handshake or credits are force consumed, allowing the shadow (hidden) counter to be transfered
+    if ((send_valid_o & send_ready_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
       // The hidden credits are transfered to the visible counter
       credits_to_send_offset = credits_to_send_hidden_q;
+    end
+    // Credits are only released if they are allowed to be consumed & I have a valid packet or force consume credits.
+    if ((send_valid_o & send_ready_i & allow_cred_consume_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
       // The counter is decremented by the amount of credits being released
       credits_to_send_decrement = credits_to_send_q;
     end
@@ -206,8 +209,8 @@ module serial_link_credit_synchronization #(
       credits_to_send_hidden_increment = (buffer_queue_out_val_i & buffer_queue_out_rdy_i);
     end
 
-    if ((send_valid_o & send_ready_i & allow_cred_consume_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
-      // In the case of a valid data-out handshake (and credits are allowed to be consumed), the hidden counter
+    if ((send_valid_o & send_ready_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+      // In the case of a valid data-out handshake, the hidden counter
       // value will be assigned to the visible counter after releasing the packet. Therefore, these assigned credits
       // can be removed from the hidden counter.
       credits_to_send_hidden_decrement = credits_to_send_hidden_q;
