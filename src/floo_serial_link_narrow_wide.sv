@@ -16,6 +16,7 @@ module floo_serial_link_narrow_wide
 #(
   parameter  type narrow_req_flit_t = logic,
   parameter  type narrow_rsp_flit_t = logic,
+  parameter  type wide_flit_t       = logic,
   parameter  type cfg_req_t         = logic,
   parameter  type cfg_rsp_t         = logic,
   parameter  type hw2reg_t          = logic,
@@ -26,7 +27,6 @@ module floo_serial_link_narrow_wide
   parameter  bit  NoRegCdc          = 1'b0,
   // If the noc_bridge has zero credits, the non-virtual channel version of the noc-bridge is being used
   localparam int  Log2NumChannels   = (NumChannels > 1) ? $clog2(NumChannels) : 1,
-  localparam int  channelCount      = 2,
   localparam bit  BridgeVirtualChannels = (noc_bridge_narrow_wide_pkg::NumCred_NocBridge == 0) ? 1'b0 : 1'b1,
   parameter  bit  printFeedback     = 1'b0
 ) (
@@ -49,6 +49,8 @@ module floo_serial_link_narrow_wide
   input  narrow_rsp_flit_t                     narrow_rsp_i,
   output narrow_req_flit_t                     narrow_req_o,
   output narrow_rsp_flit_t                     narrow_rsp_o,
+  input  wide_flit_t                           wide_i,
+  output wide_flit_t                           wide_o,
   input  cfg_req_t                             cfg_req_i,
   output cfg_rsp_t                             cfg_rsp_o,
   input  logic [NumChannels-1:0]               ddr_rcv_clk_i,
@@ -68,8 +70,8 @@ module floo_serial_link_narrow_wide
   import noc_bridge_narrow_wide_pkg::*;
 
   typedef struct packed {
-    logic hdr;
-    logic [NarrowFlitDataSize-1:0] flit_data;
+    logic [WideChannelHdr-1:0] hdr;
+    logic [WideFlitDataSize-1:0] flit_data;
   } payload_t;
 
   // Axi stream dimension must be a multiple of 8 bits
@@ -127,9 +129,9 @@ module floo_serial_link_narrow_wide
       // .allow_debug_msg   ( 1'b1              ),
       .narrow_req_flit_t ( narrow_req_flit_t ),
       .narrow_rsp_flit_t ( narrow_rsp_flit_t ),
+      .wide_flit_t       ( wide_flit_t       ),
       .axis_req_t        ( axis_req_t        ),
-      .axis_rsp_t        ( axis_rsp_t        ),
-      .numNocChanPerDir  ( channelCount      )
+      .axis_rsp_t        ( axis_rsp_t        )
     ) i_serial_link_network (
       .clk_i             ( clk_sl_i          ),
       .rst_ni            ( rst_sl_ni         ),
@@ -137,9 +139,9 @@ module floo_serial_link_narrow_wide
       .narrow_rsp_o      ( narrow_rsp_o      ),
       .narrow_req_i      ( narrow_req_i      ),
       .narrow_rsp_i      ( narrow_rsp_i      ),
-      /*// TODO: add connection for wide channel
-      .wide_i            ( TODO              ),
-      .wide_o            ( TODO              ),*/
+      // TODO: add connection for wide channel
+      .wide_i            ( wide_i            ),
+      .wide_o            ( wide_o            ),
       .axis_out_req_o    ( axis_out_req      ),
       .axis_in_rsp_o     ( axis_in_rsp       ),
       .axis_in_req_i     ( axis_in_req       ),
@@ -150,9 +152,9 @@ module floo_serial_link_narrow_wide
       .ignore_assert     ( 1'b0              ),
       .narrow_req_flit_t ( narrow_req_flit_t ),
       .narrow_rsp_flit_t ( narrow_rsp_flit_t ),
+      .wide_flit_t       ( wide_flit_t       ),
       .axis_req_t        ( axis_req_t        ),
-      .axis_rsp_t        ( axis_rsp_t        ),
-      .numNocChanPerDir  ( channelCount      )
+      .axis_rsp_t        ( axis_rsp_t        )
     ) i_serial_link_network (
       .clk_i             ( clk_sl_i          ),
       .rst_ni            ( rst_sl_ni         ),
@@ -160,9 +162,9 @@ module floo_serial_link_narrow_wide
       .narrow_rsp_o      ( narrow_rsp_o      ),
       .narrow_req_i      ( narrow_req_i      ),
       .narrow_rsp_i      ( narrow_rsp_i      ),
-      /*// TODO: add connection for wide channel
-      .wide_i            ( TODO              ),
-      .wide_o            ( TODO              ),*/
+      // TODO: add connection for wide channel
+      .wide_i            ( wide_i            ),
+      .wide_o            ( wide_o            ),
       .axis_out_req_o    ( axis_out_req      ),
       .axis_in_rsp_o     ( axis_in_rsp       ),
       .axis_in_req_i     ( axis_in_req       ),

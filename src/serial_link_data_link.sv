@@ -90,6 +90,7 @@ import serial_link_pkg::*;
   } axis_packet_t;
 
   // Assuming that the size of the split counter will at most result in one more split, its size is found as:
+  // (Adjust in case data_hdr_info_t is adjusted. Should contain size of data_hdr_info_t without credit_t)
   localparam int MaxSplitsWithoutCntr  = (($bits(credit_t) + 1 + $bits(axis_packet_t)) + BandWidth - 1) / BandWidth;
   localparam int SplitCntrRequiredBits = $clog2(MaxSplitsWithoutCntr + 1);
   typedef logic [SplitCntrRequiredBits-1:0] split_cntr_t;
@@ -139,6 +140,8 @@ import serial_link_pkg::*;
   logic [$clog2(NumStrbBitsIncoming+1):0] numLeadZero;
   split_cntr_t trailing_zero_counter;
   logic all_zeros;
+  logic [NumStrbBitsIncoming-1:0] strb_after_synchronization;
+
 
   /////////////////////////////////////////////////
   //  Find the amount of data to be transmitted  //
@@ -150,7 +153,7 @@ import serial_link_pkg::*;
         .WIDTH ( NumStrbBitsIncoming ),
         .MODE  ( 1'b1        )
       ) i_leading_zero_counter (
-        .in_i    ( axis_in_req_i.t.strb ),
+        .in_i    ( strb_after_synchronization ),
         .cnt_o   ( numLeadZero ),
         .empty_o ()
       );
@@ -169,7 +172,7 @@ import serial_link_pkg::*;
       );
 
       // lzc module does not output the correct amount of trailing zeroes when the entire input consists of zeroes only.
-      assign send_hdr.req_num_splits = (all_zeros) ? MaxPossibleTransferSplits : trailing_zero_counter;
+      assign send_hdr.req_num_splits = ((all_zeros) ? MaxPossibleTransferSplits : trailing_zero_counter);
       assign remainingBitsToBeSent = (MaxNumOfBitsToBeTransfered - ({numLeadZero,3'b0} + numLeadZero));
 
     end else begin
@@ -182,7 +185,7 @@ import serial_link_pkg::*;
   initial begin
     #3;
     $display("INFO: Parameter and sizes | Number of required splits: %0d (Bandwidth: %0d & Transfer_size: %0d => strb_data_bits: %0d & user_bits: %0d & req_num_splits: %0d & amount_of_credits: %0d & is_credits_only: 1 => strb %0d)",MaxPossibleTransferSplits, BandWidth, MaxNumOfBitsToBeTransfered, ($bits(payload_t)+NumStrbBitsToSend), NumUserBits, SplitCntrRequiredBits, $bits(credit_t), NumStrbBitsToSend);
-    $display("INFO: Packet-size definit | Strobe to be sent: %150b", axis_in_req_i.t.strb);
+    $display("INFO: Packet-size definit | Strobe to be sent: %76b", axis_in_req_i.t.strb);
     $display("INFO: Analytics and stats | splitSegmentsToBeSent: %b", splitSegmentsToBeSent);
     $display("INFO: Analytics and stats | trailing_zero_counter: %0d", trailing_zero_counter);
     $display("INFO: Analytics and stats | all_zeros: %1b", all_zeros);
@@ -297,15 +300,22 @@ import serial_link_pkg::*;
       end
     end else begin
       // Normal operating mode
+
+      // Once all Recv Stream Registers are filled -> generate AXI stream request
+      if (recv_reg_out_valid[0]) begin
+        // It is important to have this line at the beginning. Due to the sequential evaluation, the code might not work otherwise.
+        axis_out_req_unfiltered.tvalid = recv_reg_out_valid[received_hdr.req_num_splits-1];
+      end
+      recv_reg_out_ready = {MaxPossibleTransferSplits{axis_out_rsp_unfiltered.tready & axis_out_req_unfiltered.tvalid}};
+
       // If all inputs of each channel have valid data, push it to fifo
       flow_control_fifo_valid_in = &data_in_valid_i;
       data_in_ready_o = {NumChannels{flow_control_fifo_valid_in & flow_control_fifo_ready_in}};
-      // Pop from Fifo and assemble in register
       if (flow_control_fifo_valid_out & recv_reg_in_ready[recv_reg_index_q]) begin
         recv_reg_in_valid[recv_reg_index_q] = 1'b1;
         flow_control_fifo_ready_out = 1'b1;
         // Increment recv reg counter
-        if (recv_reg_out_valid[0]) begin
+        if (recv_reg_out_valid[0] & !(axis_out_rsp_unfiltered.tready & axis_out_req_unfiltered.tvalid)) begin
           // The header info is received and savely stored in the first stream_register
           recv_reg_index_d = (recv_reg_index_q == received_hdr.req_num_splits - 1) ? 0 : recv_reg_index_q + 1;
         end else begin
@@ -314,12 +324,6 @@ import serial_link_pkg::*;
           pre_received_hdr_valid = 1'b1;
         end
       end
-
-      // Once all Recv Stream Registers are filled -> generate AXI stream request
-      if (recv_reg_out_valid[0]) begin
-        axis_out_req_unfiltered.tvalid = recv_reg_out_valid[received_hdr.req_num_splits-1];
-      end
-      recv_reg_out_ready = {MaxPossibleTransferSplits{axis_out_rsp_unfiltered.tready & axis_out_req_unfiltered.tvalid}};
     end
   end
 
@@ -330,31 +334,55 @@ import serial_link_pkg::*;
   //   FLOW-CONTROL-INSERTION   //
   ////////////////////////////////
 
-  serial_link_credit_synchronization #(
-    .credit_t   ( credit_t      ),
-    .data_t     ( axis_packet_t ),
-    .NumCredits ( NumCredits    )
-  ) i_synchronization_flow_control (
-    .clk_i                  ( clk_i                               ),
-    .rst_ni                 ( rst_ni                              ),
-    // It is likely, that the port size is smaller than the .t.data size. This is because the .t.data line is extended
-    // to consist of an integer number of bytes, whereas the port does not have any such restrictions and therefore can
-    // be made smaller, without loosing any information...
-    .data_to_send_i         ( axis_packet_in_synch_in             ),
-    .data_to_send_o         ( axis_packet_in_synch_out            ),
-    .credits_to_send_o      ( send_hdr.amount_of_credits          ),
-    .send_ready_o           ( axis_in_rsp_o.tready                ),
-    .send_valid_i           ( axis_in_req_i.tvalid                ),
-    .send_valid_o           ( axis_in_req_tvalid_afterFlowControl ),
-    .send_ready_i           ( axis_in_rsp_tready_afterFlowControl ),
-    .credits_received_i     ( credits_incoming                    ),
-    .receive_cred_i         ( consume_incoming_credits            ),
-    .buffer_queue_out_val_i ( axis_out_req_unfiltered.tvalid      ),
-    .buffer_queue_out_rdy_i ( axis_out_rsp_unfiltered.tready      ),
-    .credits_only_packet_o  ( send_hdr.is_credits_only            ),
-    .allow_cred_consume_i   ( 1'b1                                ),
-    .consume_cred_to_send_i ( 1'b0                                )
-  );
+generate
+    if (TransferStrobe | AllowVarAxisLen) begin
+      serial_link_credit_synchronization #(
+        .credit_t   ( credit_t                                   ),
+        .data_width ( $bits(axis_packet_t) + NumStrbBitsIncoming ),
+        .NumCredits ( NumCredits                                 )
+      ) i_synchronization_flow_control (
+        .clk_i                  ( clk_i                                                  ),
+        .rst_ni                 ( rst_ni                                                 ),
+        .data_to_send_i         ( {axis_in_req_i.t.strb, axis_packet_in_synch_in}        ),
+        .data_to_send_o         ( {strb_after_synchronization, axis_packet_in_synch_out} ),
+        .credits_to_send_o      ( send_hdr.amount_of_credits                             ),
+        .send_ready_o           ( axis_in_rsp_o.tready                                   ),
+        .send_valid_i           ( axis_in_req_i.tvalid                                   ),
+        .send_valid_o           ( axis_in_req_tvalid_afterFlowControl                    ),
+        .send_ready_i           ( axis_in_rsp_tready_afterFlowControl                    ),
+        .credits_received_i     ( credits_incoming                                       ),
+        .receive_cred_i         ( consume_incoming_credits                               ),
+        .buffer_queue_out_val_i ( axis_out_req_unfiltered.tvalid                         ),
+        .buffer_queue_out_rdy_i ( axis_out_rsp_unfiltered.tready                         ),
+        .credits_only_packet_o  ( send_hdr.is_credits_only                               ),
+        .allow_cred_consume_i   ( 1'b1                                                   ),
+        .consume_cred_to_send_i ( 1'b0                                                   )
+      );
+    end else begin
+      serial_link_credit_synchronization #(
+        .credit_t   ( credit_t      ),
+        .data_t     ( axis_packet_t ),
+        .NumCredits ( NumCredits    )
+      ) i_synchronization_flow_control (
+        .clk_i                  ( clk_i                               ),
+        .rst_ni                 ( rst_ni                              ),
+        .data_to_send_i         ( axis_packet_in_synch_in             ),
+        .data_to_send_o         ( axis_packet_in_synch_out            ),
+        .credits_to_send_o      ( send_hdr.amount_of_credits          ),
+        .send_ready_o           ( axis_in_rsp_o.tready                ),
+        .send_valid_i           ( axis_in_req_i.tvalid                ),
+        .send_valid_o           ( axis_in_req_tvalid_afterFlowControl ),
+        .send_ready_i           ( axis_in_rsp_tready_afterFlowControl ),
+        .credits_received_i     ( credits_incoming                    ),
+        .receive_cred_i         ( consume_incoming_credits            ),
+        .buffer_queue_out_val_i ( axis_out_req_unfiltered.tvalid      ),
+        .buffer_queue_out_rdy_i ( axis_out_rsp_unfiltered.tready      ),
+        .credits_only_packet_o  ( send_hdr.is_credits_only            ),
+        .allow_cred_consume_i   ( 1'b1                                ),
+        .consume_cred_to_send_i ( 1'b0                                )
+      );
+    end
+  endgenerate
 
   assign credits_incoming = received_hdr.amount_of_credits;
   assign consume_incoming_credits = axis_out_req_unfiltered.tvalid & axis_out_rsp_unfiltered.tready;
@@ -370,10 +398,10 @@ import serial_link_pkg::*;
     if (TransferStrobe) begin
       for (genvar i = 0; i < NumStrbBitsToSend; i++) begin
         if (8*i+7 < $bits(payload_t)) begin
-          assign axis_packet_in_synch_in.strb_data_bits[9*i+8:9*i] = {axis_in_req_i.t.data[8*i+7:8*i], axis_in_req_i.t.strb[i]};
+          assign axis_packet_in_synch_in.strb_data_bits[9*i+8:9*i] = {axis_in_req_i.t.data[8*i+7:8*i], strb_after_synchronization[i]};
         end else begin
           // prevent out of bounds warning:
-          assign axis_packet_in_synch_in.strb_data_bits[i+$bits(payload_t):9*i] = {axis_in_req_i.t.data[$bits(payload_t)-1:8*i], axis_in_req_i.t.strb[i]};
+          assign axis_packet_in_synch_in.strb_data_bits[i+$bits(payload_t):9*i] = {axis_in_req_i.t.data[$bits(payload_t)-1:8*i], strb_after_synchronization[i]};
         end
       end
     end else begin
