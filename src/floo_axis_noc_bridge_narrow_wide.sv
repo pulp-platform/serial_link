@@ -71,36 +71,38 @@ module floo_axis_noc_bridge_narrow_wide
   assign narrow_rsp_i_data = { narrow_rsp_i.data, narrow_response };
 
   rr_arb_tree #(
-    .NumIn      ( 2                  ),
-    .DataType   ( narrow_axis_data_t ),
-    .ExtPrio    ( 1'b0               ),
-    .AxiVldRdy  ( 1'b1               ),
-    .LockIn     ( 1'b0               )
+    .NumIn     ( 2                  ),
+    .DataType  ( narrow_axis_data_t ),
+    .ExtPrio   ( 1'b0               ),
+    .AxiVldRdy ( 1'b1               ),
+    .LockIn    ( 1'b0               )
   ) i_rr_arb_tree (
-    .clk_i      ( clk_i                                    ),
-    .rst_ni     ( rst_ni                                   ),
+    .clk_i     ( clk_i                                    ),
+    .rst_ni    ( rst_ni                                   ),
     /// Clears the arbiter state. Only used if `ExtPrio` is `1'b0` or `LockIn` is `1'b1`.
-    .flush_i    ( 1'b0                                     ),
+    .flush_i   ( 1'b0                                     ),
     /// Input requests arbitration.
-    .req_i      ( {narrow_req_i.valid, narrow_rsp_i.valid} ),
+    .req_i     ( {narrow_req_i.valid, narrow_rsp_i.valid} ),
     /* verilator lint_off UNOPTFLAT */
     /// Input request is granted.
-    .gnt_o      ( {narrow_req_o.ready, narrow_rsp_o.ready} ),
+    .gnt_o     ( {narrow_req_o.ready, narrow_rsp_o.ready} ),
     /* verilator lint_on UNOPTFLAT */
     /// Input data for arbitration.
-    .data_i     ( {narrow_req_i_data, narrow_rsp_i_data}   ),
+    .data_i    ( {narrow_req_i_data, narrow_rsp_i_data}   ),
     /// Output request is valid.
-    .req_o      ( arbiter_valid_out                        ),
+    .req_o     ( arbiter_valid_out                        ),
     /// Output request is granted.
-    .gnt_i      ( arbiter_ready_in                         ),
+    .gnt_i     ( arbiter_ready_in                         ),
     /// Output data.
-    .data_o     ( {arbiter_out_payload.flit_data, arbiter_out_payload.hdr} )
+    .data_o    ( {arbiter_out_payload.flit_data, arbiter_out_payload.hdr} )
   );
 
   always_comb begin
-    selChanType_d = selChanType_q;
-    arbiter_ready_in = 0;
-    wide_o.ready = 0;
+    selChanType_d    = selChanType_q;
+    wide_o.ready     = '0;
+    axis_out_valid   = '0;
+    arbiter_ready_in = '0;
+    axis_out_payload = '0;
     unique case (selChanType_q)
       narrowChan : begin
         axis_out_payload.hdr = arbiter_out_payload.hdr;

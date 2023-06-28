@@ -34,6 +34,11 @@ module tb_floo_serial_link();
   localparam time         TckReg          = 200ns;
   localparam int unsigned RstClkCyclesSys = 1;
 
+  // Random-master/slave behaviour (randomized delays)
+  localparam int          min_wait_cycles = 0;
+  localparam int          max_wait_cycles = 0;
+  // localparam int          max_wait_cycles = 100;
+
   localparam int unsigned RegAddrWidth    = 32;
   localparam int unsigned RegDataWidth    = 32;
   localparam int unsigned RegStrbWidth    = RegDataWidth / 8;
@@ -174,7 +179,12 @@ module tb_floo_serial_link();
     .ddr_rcv_clk_i   ( ddr_rcv_clk_2  ),
     .ddr_rcv_clk_o   ( ddr_rcv_clk_1  ),
     .ddr_i           ( ddr_i          ),
-    .ddr_o           ( ddr_o          )
+    .ddr_o           ( ddr_o          ),
+    .isolated_i      ( '0             ),
+    .testmode_i      ( '0             ),
+    .isolate_o       (                ),
+    .clk_ena_o       (                ),
+    .reset_no        (                )
   );
 
   // second serial instance
@@ -206,7 +216,12 @@ module tb_floo_serial_link();
     .ddr_rcv_clk_i   ( ddr_rcv_clk_1  ),
     .ddr_rcv_clk_o   ( ddr_rcv_clk_2  ),
     .ddr_i           ( ddr_o          ),
-    .ddr_o           ( ddr_i          )
+    .ddr_o           ( ddr_i          ),
+    .isolated_i      ( '0             ),
+    .testmode_i      ( '0             ),
+    .isolate_o       (                ),
+    .clk_ena_o       (                ),
+    .reset_no        (                )
   );
 
   floo_axi_chimney #(
@@ -284,40 +299,40 @@ module tb_floo_serial_link();
     .DW                   ( AxiInDataWidth  ),
     .IW                   ( AxiInIdWidth    ),
     .UW                   ( AxiInUserWidth  ),
-    .TA                   ( 100ps         ),
-    .TT                   ( 500ps         ),
-    .MAX_READ_TXNS        ( 2             ),
-    .MAX_WRITE_TXNS       ( 2             ),
-    .AX_MIN_WAIT_CYCLES   ( 0             ),
-    .AX_MAX_WAIT_CYCLES   ( 100           ),
-    .W_MIN_WAIT_CYCLES    ( 0             ),
-    .W_MAX_WAIT_CYCLES    ( 100           ),
-    .RESP_MIN_WAIT_CYCLES ( 0             ),
-    .RESP_MAX_WAIT_CYCLES ( 100           ),
-    .AXI_MAX_BURST_LEN    ( 0             ),
-    .TRAFFIC_SHAPING      ( 0             ),
-    .AXI_EXCLS            ( 1'b1          ),
-    .AXI_ATOPS            ( 1'b0          ),
-    .AXI_BURST_FIXED      ( 1'b1          ),
-    .AXI_BURST_INCR       ( 1'b1          ),
-    .AXI_BURST_WRAP       ( 1'b0          )
+    .TA                   ( 100ps           ),
+    .TT                   ( 500ps           ),
+    .MAX_READ_TXNS        ( 2               ),
+    .MAX_WRITE_TXNS       ( 2               ),
+    .AX_MIN_WAIT_CYCLES   ( min_wait_cycles ),
+    .AX_MAX_WAIT_CYCLES   ( max_wait_cycles ),
+    .W_MIN_WAIT_CYCLES    ( min_wait_cycles ),
+    .W_MAX_WAIT_CYCLES    ( max_wait_cycles ),
+    .RESP_MIN_WAIT_CYCLES ( min_wait_cycles ),
+    .RESP_MAX_WAIT_CYCLES ( max_wait_cycles ),
+    .AXI_MAX_BURST_LEN    ( 0               ),
+    .TRAFFIC_SHAPING      ( 0               ),
+    .AXI_EXCLS            ( 1'b1            ),
+    .AXI_ATOPS            ( 1'b0            ),
+    .AXI_BURST_FIXED      ( 1'b1            ),
+    .AXI_BURST_INCR       ( 1'b1            ),
+    .AXI_BURST_WRAP       ( 1'b0            )
   ) axi_rand_master_t;
 
   // slave type
   typedef axi_test::axi_rand_slave #(
-    .AW                   ( AxiOutAddrWidth  ),
-    .DW                   ( AxiOutDataWidth  ),
-    .IW                   ( AxiOutIdWidth    ),
-    .UW                   ( AxiOutUserWidth  ),
-    .TA                   ( 100ps         ),
-    .TT                   ( 500ps         ),
-    .RAND_RESP            ( 0             ),
-    .AX_MIN_WAIT_CYCLES   ( 0             ),
-    .AX_MAX_WAIT_CYCLES   ( 100           ),
-    .R_MIN_WAIT_CYCLES    ( 0             ),
-    .R_MAX_WAIT_CYCLES    ( 100           ),
-    .RESP_MIN_WAIT_CYCLES ( 0             ),
-    .RESP_MAX_WAIT_CYCLES ( 100           )
+    .AW                   ( AxiOutAddrWidth ),
+    .DW                   ( AxiOutDataWidth ),
+    .IW                   ( AxiOutIdWidth   ),
+    .UW                   ( AxiOutUserWidth ),
+    .TA                   ( 100ps           ),
+    .TT                   ( 500ps           ),
+    .RAND_RESP            ( 0               ),
+    .AX_MIN_WAIT_CYCLES   ( min_wait_cycles ),
+    .AX_MAX_WAIT_CYCLES   ( max_wait_cycles ),
+    .R_MIN_WAIT_CYCLES    ( min_wait_cycles ),
+    .R_MAX_WAIT_CYCLES    ( max_wait_cycles ),
+    .RESP_MIN_WAIT_CYCLES ( min_wait_cycles ),
+    .RESP_MAX_WAIT_CYCLES ( max_wait_cycles )
   ) axi_rand_slave_t;
 
   static axi_rand_master_t axi_rand_master_1 = new ( axi_in_1  );

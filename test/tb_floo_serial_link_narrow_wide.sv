@@ -228,7 +228,12 @@ module tb_floo_serial_link_narrow_wide();
     .ddr_rcv_clk_i ( ddr_rcv_clk_2         ),
     .ddr_rcv_clk_o ( ddr_rcv_clk_1         ),
     .ddr_i         ( ddr_i                 ),
-    .ddr_o         ( ddr_o                 )
+    .ddr_o         ( ddr_o                 ),
+    .isolated_i    ( '0                    ),
+    .testmode_i    ( '0                    ),
+    .isolate_o     (                       ),
+    .clk_ena_o     (                       ),
+    .reset_no      (                       )
   );
 
   // second serial instance
@@ -261,7 +266,12 @@ module tb_floo_serial_link_narrow_wide();
     .ddr_rcv_clk_i ( ddr_rcv_clk_1         ),
     .ddr_rcv_clk_o ( ddr_rcv_clk_2         ),
     .ddr_i         ( ddr_o                 ),
-    .ddr_o         ( ddr_i                 )
+    .ddr_o         ( ddr_i                 ),
+    .isolated_i    ( '0                    ),
+    .testmode_i    ( '0                    ),
+    .isolate_o     (                       ),
+    .clk_ena_o     (                       ),
+    .reset_no      (                       )
   );
 
   floo_narrow_wide_chimney #(
