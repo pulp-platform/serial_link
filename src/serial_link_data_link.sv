@@ -260,8 +260,8 @@ import serial_link_pkg::*;
         end
       end
     end else begin
-      // TODO: assign strb bits if they are not sent along (reconstructing)
-      assign axis_out_req_unfiltered.t.data = axis_packet_out.strb_data_bits[$bits(payload_t):0];
+      // TODO: assign strb bits if they are not sent along (reconstructing) => Do I need the -1?
+      assign axis_out_req_unfiltered.t.data = axis_packet_out.strb_data_bits[$bits(payload_t)-1:0];
     end
   endgenerate
 
@@ -314,7 +314,8 @@ import serial_link_pkg::*;
       if (flow_control_fifo_valid_out & recv_reg_in_ready[recv_reg_index_q]) begin
         recv_reg_in_valid[recv_reg_index_q] = 1'b1;
         flow_control_fifo_ready_out = 1'b1;
-        // Increment recv reg counter
+        // Increment recv reg counter (if I have a valid handshake at the output, consuming the data in the stream_registers, while
+        // a new packet is being shifted in, the new header is accessible from the pre_received_hdr and not from the received_hdr)
         if (recv_reg_out_valid[0] & !(axis_out_rsp_unfiltered.tready & axis_out_req_unfiltered.tvalid)) begin
           // The header info is received and savely stored in the first stream_register
           recv_reg_index_d = (recv_reg_index_q == received_hdr.req_num_splits - 1) ? 0 : recv_reg_index_q + 1;
