@@ -110,7 +110,7 @@ module tb_ch_calib_serial_link();
   );
 
   // first serial instance
-  serial_link_occamy_wrapper #(
+  axi_serial_link_occamy_wrapper #(
     .axi_req_t        ( axi_req_t       ),
     .axi_rsp_t        ( axi_resp_t      ),
     .aw_chan_t        ( axi_aw_chan_t   ),
@@ -143,7 +143,7 @@ module tb_ch_calib_serial_link();
 
 
   // second serial instance
-  serial_link_occamy_wrapper #(
+  axi_serial_link_occamy_wrapper #(
     .axi_req_t        ( axi_req_t       ),
     .axi_rsp_t        ( axi_resp_t      ),
     .aw_chan_t        ( axi_aw_chan_t   ),
@@ -357,7 +357,7 @@ module tb_ch_calib_serial_link();
   //    Checks
   // ==============
 
-  axi_channel_compare #(
+  axi_chan_compare #(
     .aw_chan_t ( axi_aw_chan_t ),
     .w_chan_t  ( axi_w_chan_t  ),
     .b_chan_t  ( axi_b_chan_t  ),
@@ -374,7 +374,7 @@ module tb_ch_calib_serial_link();
     .axi_b_res ( axi_out_rsp_2  )
   );
 
-  axi_channel_compare #(
+  axi_chan_compare #(
     .aw_chan_t ( axi_aw_chan_t ),
     .w_chan_t  ( axi_w_chan_t  ),
     .b_chan_t  ( axi_b_chan_t  ),
