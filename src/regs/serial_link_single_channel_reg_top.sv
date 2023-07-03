@@ -84,15 +84,15 @@ module serial_link_single_channel_reg_top #(
   logic isolated_axi_in_re;
   logic isolated_axi_out_qs;
   logic isolated_axi_out_re;
-  logic [10:0] tx_phy_ctrl1_qs;
-  logic [10:0] tx_phy_ctrl1_wd;
-  logic tx_phy_ctrl1_we;
-  logic [10:0] tx_phy_ctrl2_clk_shift_start_0_qs;
-  logic [10:0] tx_phy_ctrl2_clk_shift_start_0_wd;
-  logic tx_phy_ctrl2_clk_shift_start_0_we;
-  logic [10:0] tx_phy_ctrl2_clk_shift_end_0_qs;
-  logic [10:0] tx_phy_ctrl2_clk_shift_end_0_wd;
-  logic tx_phy_ctrl2_clk_shift_end_0_we;
+  logic [10:0] tx_phy_clk_div_qs;
+  logic [10:0] tx_phy_clk_div_wd;
+  logic tx_phy_clk_div_we;
+  logic [10:0] tx_phy_clk_start_qs;
+  logic [10:0] tx_phy_clk_start_wd;
+  logic tx_phy_clk_start_we;
+  logic [10:0] tx_phy_clk_end_qs;
+  logic [10:0] tx_phy_clk_end_wd;
+  logic tx_phy_clk_end_we;
   logic raw_mode_en_wd;
   logic raw_mode_en_we;
   logic raw_mode_in_ch_sel_wd;
@@ -257,20 +257,20 @@ module serial_link_single_channel_reg_top #(
 
 
 
-  // Subregister 0 of Multireg tx_phy_ctrl1
-  // R[tx_phy_ctrl1]: V(False)
+  // Subregister 0 of Multireg tx_phy_clk_div
+  // R[tx_phy_clk_div]: V(False)
 
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
     .RESVAL  (11'h8)
-  ) u_tx_phy_ctrl1 (
+  ) u_tx_phy_clk_div (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (tx_phy_ctrl1_we),
-    .wd     (tx_phy_ctrl1_wd),
+    .we     (tx_phy_clk_div_we),
+    .wd     (tx_phy_clk_div_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -278,29 +278,28 @@ module serial_link_single_channel_reg_top #(
 
     // to internal hardware
     .qe     (),
-    .q      (reg2hw.tx_phy_ctrl1[0].q ),
+    .q      (reg2hw.tx_phy_clk_div[0].q ),
 
     // to register interface (read)
-    .qs     (tx_phy_ctrl1_qs)
+    .qs     (tx_phy_clk_div_qs)
   );
 
 
 
-  // Subregister 0 of Multireg tx_phy_ctrl2
-  // R[tx_phy_ctrl2]: V(False)
+  // Subregister 0 of Multireg tx_phy_clk_start
+  // R[tx_phy_clk_start]: V(False)
 
-  // F[clk_shift_start_0]: 10:0
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
     .RESVAL  (11'h2)
-  ) u_tx_phy_ctrl2_clk_shift_start_0 (
+  ) u_tx_phy_clk_start (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (tx_phy_ctrl2_clk_shift_start_0_we),
-    .wd     (tx_phy_ctrl2_clk_shift_start_0_wd),
+    .we     (tx_phy_clk_start_we),
+    .wd     (tx_phy_clk_start_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -308,25 +307,28 @@ module serial_link_single_channel_reg_top #(
 
     // to internal hardware
     .qe     (),
-    .q      (reg2hw.tx_phy_ctrl2[0].clk_shift_start.q ),
+    .q      (reg2hw.tx_phy_clk_start[0].q ),
 
     // to register interface (read)
-    .qs     (tx_phy_ctrl2_clk_shift_start_0_qs)
+    .qs     (tx_phy_clk_start_qs)
   );
 
 
-  // F[clk_shift_end_0]: 10:0
+
+  // Subregister 0 of Multireg tx_phy_clk_end
+  // R[tx_phy_clk_end]: V(False)
+
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
     .RESVAL  (11'h6)
-  ) u_tx_phy_ctrl2_clk_shift_end_0 (
+  ) u_tx_phy_clk_end (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (tx_phy_ctrl2_clk_shift_end_0_we),
-    .wd     (tx_phy_ctrl2_clk_shift_end_0_wd),
+    .we     (tx_phy_clk_end_we),
+    .wd     (tx_phy_clk_end_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -334,12 +336,11 @@ module serial_link_single_channel_reg_top #(
 
     // to internal hardware
     .qe     (),
-    .q      (reg2hw.tx_phy_ctrl2[0].clk_shift_end.q ),
+    .q      (reg2hw.tx_phy_clk_end[0].q ),
 
     // to register interface (read)
-    .qs     (tx_phy_ctrl2_clk_shift_end_0_qs)
+    .qs     (tx_phy_clk_end_qs)
   );
-
 
 
   // R[raw_mode_en]: V(False)
@@ -570,22 +571,23 @@ module serial_link_single_channel_reg_top #(
 
 
 
-  logic [12:0] addr_hit;
+  logic [13:0] addr_hit;
   always_comb begin
     addr_hit = '0;
     addr_hit[ 0] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_CTRL_OFFSET);
     addr_hit[ 1] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_ISOLATED_OFFSET);
-    addr_hit[ 2] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CTRL1_OFFSET);
-    addr_hit[ 3] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CTRL2_OFFSET);
-    addr_hit[ 4] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_EN_OFFSET);
-    addr_hit[ 5] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_CH_SEL_OFFSET);
-    addr_hit[ 6] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_DATA_VALID_OFFSET);
-    addr_hit[ 7] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_DATA_OFFSET);
-    addr_hit[ 8] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_OUT_CH_MASK_OFFSET);
-    addr_hit[ 9] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_OUT_DATA_FIFO_OFFSET);
-    addr_hit[10] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_OUT_DATA_FIFO_CTRL_OFFSET);
-    addr_hit[11] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_OUT_EN_OFFSET);
-    addr_hit[12] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_FLOW_CONTROL_FIFO_CLEAR_OFFSET);
+    addr_hit[ 2] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_DIV_OFFSET);
+    addr_hit[ 3] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_START_OFFSET);
+    addr_hit[ 4] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_END_OFFSET);
+    addr_hit[ 5] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_EN_OFFSET);
+    addr_hit[ 6] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_CH_SEL_OFFSET);
+    addr_hit[ 7] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_DATA_VALID_OFFSET);
+    addr_hit[ 8] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_DATA_OFFSET);
+    addr_hit[ 9] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_OUT_CH_MASK_OFFSET);
+    addr_hit[10] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_OUT_DATA_FIFO_OFFSET);
+    addr_hit[11] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_OUT_DATA_FIFO_CTRL_OFFSET);
+    addr_hit[12] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_OUT_EN_OFFSET);
+    addr_hit[13] = (reg_addr == SERIAL_LINK_SINGLE_CHANNEL_FLOW_CONTROL_FIFO_CLEAR_OFFSET);
   end
 
   assign addrmiss = (reg_re || reg_we) ? ~|addr_hit : 1'b0 ;
@@ -605,7 +607,8 @@ module serial_link_single_channel_reg_top #(
                (addr_hit[ 9] & (|(SERIAL_LINK_SINGLE_CHANNEL_PERMIT[ 9] & ~reg_be))) |
                (addr_hit[10] & (|(SERIAL_LINK_SINGLE_CHANNEL_PERMIT[10] & ~reg_be))) |
                (addr_hit[11] & (|(SERIAL_LINK_SINGLE_CHANNEL_PERMIT[11] & ~reg_be))) |
-               (addr_hit[12] & (|(SERIAL_LINK_SINGLE_CHANNEL_PERMIT[12] & ~reg_be)))));
+               (addr_hit[12] & (|(SERIAL_LINK_SINGLE_CHANNEL_PERMIT[12] & ~reg_be))) |
+               (addr_hit[13] & (|(SERIAL_LINK_SINGLE_CHANNEL_PERMIT[13] & ~reg_be)))));
   end
 
   assign ctrl_clk_ena_we = addr_hit[0] & reg_we & !reg_error;
@@ -624,42 +627,42 @@ module serial_link_single_channel_reg_top #(
 
   assign isolated_axi_out_re = addr_hit[1] & reg_re & !reg_error;
 
-  assign tx_phy_ctrl1_we = addr_hit[2] & reg_we & !reg_error;
-  assign tx_phy_ctrl1_wd = reg_wdata[10:0];
+  assign tx_phy_clk_div_we = addr_hit[2] & reg_we & !reg_error;
+  assign tx_phy_clk_div_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_clk_shift_start_0_we = addr_hit[3] & reg_we & !reg_error;
-  assign tx_phy_ctrl2_clk_shift_start_0_wd = reg_wdata[10:0];
+  assign tx_phy_clk_start_we = addr_hit[3] & reg_we & !reg_error;
+  assign tx_phy_clk_start_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_clk_shift_end_0_we = addr_hit[3] & reg_we & !reg_error;
-  assign tx_phy_ctrl2_clk_shift_end_0_wd = reg_wdata[10:0];
+  assign tx_phy_clk_end_we = addr_hit[4] & reg_we & !reg_error;
+  assign tx_phy_clk_end_wd = reg_wdata[10:0];
 
-  assign raw_mode_en_we = addr_hit[4] & reg_we & !reg_error;
+  assign raw_mode_en_we = addr_hit[5] & reg_we & !reg_error;
   assign raw_mode_en_wd = reg_wdata[0];
 
-  assign raw_mode_in_ch_sel_we = addr_hit[5] & reg_we & !reg_error;
+  assign raw_mode_in_ch_sel_we = addr_hit[6] & reg_we & !reg_error;
   assign raw_mode_in_ch_sel_wd = reg_wdata[0];
 
-  assign raw_mode_in_data_valid_re = addr_hit[6] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_re = addr_hit[7] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_re = addr_hit[7] & reg_re & !reg_error;
+  assign raw_mode_in_data_re = addr_hit[8] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_we = addr_hit[8] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_we = addr_hit[9] & reg_we & !reg_error;
   assign raw_mode_out_ch_mask_wd = reg_wdata[0];
 
-  assign raw_mode_out_data_fifo_we = addr_hit[9] & reg_we & !reg_error;
+  assign raw_mode_out_data_fifo_we = addr_hit[10] & reg_we & !reg_error;
   assign raw_mode_out_data_fifo_wd = reg_wdata[15:0];
 
-  assign raw_mode_out_data_fifo_ctrl_clear_we = addr_hit[10] & reg_we & !reg_error;
+  assign raw_mode_out_data_fifo_ctrl_clear_we = addr_hit[11] & reg_we & !reg_error;
   assign raw_mode_out_data_fifo_ctrl_clear_wd = reg_wdata[0];
 
-  assign raw_mode_out_data_fifo_ctrl_fill_state_re = addr_hit[10] & reg_re & !reg_error;
+  assign raw_mode_out_data_fifo_ctrl_fill_state_re = addr_hit[11] & reg_re & !reg_error;
 
-  assign raw_mode_out_data_fifo_ctrl_is_full_re = addr_hit[10] & reg_re & !reg_error;
+  assign raw_mode_out_data_fifo_ctrl_is_full_re = addr_hit[11] & reg_re & !reg_error;
 
-  assign raw_mode_out_en_we = addr_hit[11] & reg_we & !reg_error;
+  assign raw_mode_out_en_we = addr_hit[12] & reg_we & !reg_error;
   assign raw_mode_out_en_wd = reg_wdata[0];
 
-  assign flow_control_fifo_clear_we = addr_hit[12] & reg_we & !reg_error;
+  assign flow_control_fifo_clear_we = addr_hit[13] & reg_we & !reg_error;
   assign flow_control_fifo_clear_wd = reg_wdata[0];
 
   // Read data return
@@ -679,16 +682,15 @@ module serial_link_single_channel_reg_top #(
       end
 
       addr_hit[2]: begin
-        reg_rdata_next[10:0] = tx_phy_ctrl1_qs;
+        reg_rdata_next[10:0] = tx_phy_clk_div_qs;
       end
 
       addr_hit[3]: begin
-        reg_rdata_next[10:0] = tx_phy_ctrl2_clk_shift_start_0_qs;
-        reg_rdata_next[10:0] = tx_phy_ctrl2_clk_shift_end_0_qs;
+        reg_rdata_next[10:0] = tx_phy_clk_start_qs;
       end
 
       addr_hit[4]: begin
-        reg_rdata_next[0] = '0;
+        reg_rdata_next[10:0] = tx_phy_clk_end_qs;
       end
 
       addr_hit[5]: begin
@@ -696,32 +698,36 @@ module serial_link_single_channel_reg_top #(
       end
 
       addr_hit[6]: begin
-        reg_rdata_next[0] = raw_mode_in_data_valid_qs;
-      end
-
-      addr_hit[7]: begin
-        reg_rdata_next[15:0] = raw_mode_in_data_qs;
-      end
-
-      addr_hit[8]: begin
         reg_rdata_next[0] = '0;
       end
 
+      addr_hit[7]: begin
+        reg_rdata_next[0] = raw_mode_in_data_valid_qs;
+      end
+
+      addr_hit[8]: begin
+        reg_rdata_next[15:0] = raw_mode_in_data_qs;
+      end
+
       addr_hit[9]: begin
-        reg_rdata_next[15:0] = '0;
+        reg_rdata_next[0] = '0;
       end
 
       addr_hit[10]: begin
+        reg_rdata_next[15:0] = '0;
+      end
+
+      addr_hit[11]: begin
         reg_rdata_next[0] = '0;
         reg_rdata_next[10:8] = raw_mode_out_data_fifo_ctrl_fill_state_qs;
         reg_rdata_next[31] = raw_mode_out_data_fifo_ctrl_is_full_qs;
       end
 
-      addr_hit[11]: begin
+      addr_hit[12]: begin
         reg_rdata_next[0] = raw_mode_out_en_qs;
       end
 
-      addr_hit[12]: begin
+      addr_hit[13]: begin
         reg_rdata_next[0] = '0;
       end
 

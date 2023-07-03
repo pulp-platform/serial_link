@@ -291,21 +291,21 @@ import serial_link_pkg::*;
       .FifoDepth        ( RawModeFifoDepth  ),
       .MaxClkDiv        ( MaxClkDiv         )
     ) i_serial_link_physical (
-      .clk_i             ( clk_sl_i                                 ),
-      .rst_ni            ( rst_sl_ni                                ),
-      .clk_div_i         ( reg2hw.tx_phy_ctrl1[i].q                 ),
-      .clk_shift_start_i ( reg2hw.tx_phy_ctrl2[i].clk_shift_start.q ),
-      .clk_shift_end_i   ( reg2hw.tx_phy_ctrl2[i].clk_shift_end.q   ),
-      .ddr_rcv_clk_i     ( ddr_rcv_clk_i[i]                         ),
-      .ddr_rcv_clk_o     ( ddr_rcv_clk_o[i]                         ),
-      .data_out_i        ( alloc2phy_data_out[i]                    ),
-      .data_out_valid_i  ( alloc2phy_data_out_valid[i]              ),
-      .data_out_ready_o  ( phy2alloc_data_out_ready[i]              ),
-      .data_in_o         ( phy2alloc_data_in[i]                     ),
-      .data_in_valid_o   ( phy2alloc_data_in_valid[i]               ),
-      .data_in_ready_i   ( alloc2phy_data_in_ready[i]               ),
-      .ddr_i             ( ddr_i[i]                                 ),
-      .ddr_o             ( ddr_o[i]                                 )
+      .clk_i             ( clk_sl_i                     ),
+      .rst_ni            ( rst_sl_ni                    ),
+      .clk_div_i         ( reg2hw.tx_phy_clk_div[i].q   ),
+      .clk_shift_start_i ( reg2hw.tx_phy_clk_start[i].q ),
+      .clk_shift_end_i   ( reg2hw.tx_phy_clk_end[i].q   ),
+      .ddr_rcv_clk_i     ( ddr_rcv_clk_i[i]             ),
+      .ddr_rcv_clk_o     ( ddr_rcv_clk_o[i]             ),
+      .data_out_i        ( alloc2phy_data_out[i]        ),
+      .data_out_valid_i  ( alloc2phy_data_out_valid[i]  ),
+      .data_out_ready_o  ( phy2alloc_data_out_ready[i]  ),
+      .data_in_o         ( phy2alloc_data_in[i]         ),
+      .data_in_valid_o   ( phy2alloc_data_in_valid[i]   ),
+      .data_in_ready_i   ( alloc2phy_data_in_ready[i]   ),
+      .ddr_i             ( ddr_i[i]                     ),
+      .ddr_o             ( ddr_o[i]                     )
     );
   end
 
