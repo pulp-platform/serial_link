@@ -37,15 +37,15 @@ package serial_link_single_channel_reg_pkg;
 
   typedef struct packed {
     logic [10:0] q;
-  } serial_link_single_channel_reg2hw_tx_phy_ctrl1_mreg_t;
+  } serial_link_single_channel_reg2hw_tx_phy_clk_div_mreg_t;
 
   typedef struct packed {
     logic [10:0] q;
-  } serial_link_single_channel_reg2hw_tx_phy_ctrl2_mreg_t;
+  } serial_link_single_channel_reg2hw_tx_phy_clk_start_mreg_t;
 
   typedef struct packed {
     logic [10:0] q;
-  } serial_link_single_channel_reg2hw_tx_phy_ctrl3_mreg_t;
+  } serial_link_single_channel_reg2hw_tx_phy_clk_end_mreg_t;
 
   typedef struct packed {
     logic        q;
@@ -114,9 +114,9 @@ package serial_link_single_channel_reg_pkg;
   // Register -> HW type
   typedef struct packed {
     serial_link_single_channel_reg2hw_ctrl_reg_t ctrl; // [78:75]
-    serial_link_single_channel_reg2hw_tx_phy_ctrl1_mreg_t [0:0] tx_phy_ctrl1; // [74:64]
-    serial_link_single_channel_reg2hw_tx_phy_ctrl2_mreg_t [0:0] tx_phy_ctrl2; // [63:53]
-    serial_link_single_channel_reg2hw_tx_phy_ctrl3_mreg_t [0:0] tx_phy_ctrl3; // [52:42]
+    serial_link_single_channel_reg2hw_tx_phy_clk_div_mreg_t [0:0] tx_phy_clk_div; // [74:64]
+    serial_link_single_channel_reg2hw_tx_phy_clk_start_mreg_t [0:0] tx_phy_clk_start; // [63:53]
+    serial_link_single_channel_reg2hw_tx_phy_clk_end_mreg_t [0:0] tx_phy_clk_end; // [52:42]
     serial_link_single_channel_reg2hw_raw_mode_en_reg_t raw_mode_en; // [41:41]
     serial_link_single_channel_reg2hw_raw_mode_in_ch_sel_reg_t raw_mode_in_ch_sel; // [40:40]
     serial_link_single_channel_reg2hw_raw_mode_in_data_reg_t raw_mode_in_data; // [39:23]
@@ -138,9 +138,9 @@ package serial_link_single_channel_reg_pkg;
   // Register offsets
   parameter logic [BlockAw-1:0] SERIAL_LINK_SINGLE_CHANNEL_CTRL_OFFSET = 6'h 0;
   parameter logic [BlockAw-1:0] SERIAL_LINK_SINGLE_CHANNEL_ISOLATED_OFFSET = 6'h 4;
-  parameter logic [BlockAw-1:0] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CTRL1_OFFSET = 6'h 8;
-  parameter logic [BlockAw-1:0] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CTRL2_OFFSET = 6'h c;
-  parameter logic [BlockAw-1:0] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CTRL3_OFFSET = 6'h 10;
+  parameter logic [BlockAw-1:0] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_DIV_OFFSET = 6'h 8;
+  parameter logic [BlockAw-1:0] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_START_OFFSET = 6'h c;
+  parameter logic [BlockAw-1:0] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_END_OFFSET = 6'h 10;
   parameter logic [BlockAw-1:0] SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_EN_OFFSET = 6'h 14;
   parameter logic [BlockAw-1:0] SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_CH_SEL_OFFSET = 6'h 18;
   parameter logic [BlockAw-1:0] SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_DATA_VALID_OFFSET = 6'h 1c;
@@ -167,9 +167,9 @@ package serial_link_single_channel_reg_pkg;
   typedef enum int {
     SERIAL_LINK_SINGLE_CHANNEL_CTRL,
     SERIAL_LINK_SINGLE_CHANNEL_ISOLATED,
-    SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CTRL1,
-    SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CTRL2,
-    SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CTRL3,
+    SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_DIV,
+    SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_START,
+    SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_END,
     SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_EN,
     SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_CH_SEL,
     SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_DATA_VALID,
@@ -185,9 +185,9 @@ package serial_link_single_channel_reg_pkg;
   parameter logic [3:0] SERIAL_LINK_SINGLE_CHANNEL_PERMIT [14] = '{
     4'b 0011, // index[ 0] SERIAL_LINK_SINGLE_CHANNEL_CTRL
     4'b 0001, // index[ 1] SERIAL_LINK_SINGLE_CHANNEL_ISOLATED
-    4'b 0011, // index[ 2] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CTRL1
-    4'b 0011, // index[ 3] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CTRL2
-    4'b 0011, // index[ 4] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CTRL3
+    4'b 0011, // index[ 2] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_DIV
+    4'b 0011, // index[ 3] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_START
+    4'b 0011, // index[ 4] SERIAL_LINK_SINGLE_CHANNEL_TX_PHY_CLK_END
     4'b 0001, // index[ 5] SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_EN
     4'b 0001, // index[ 6] SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_CH_SEL
     4'b 0001, // index[ 7] SERIAL_LINK_SINGLE_CHANNEL_RAW_MODE_IN_DATA_VALID

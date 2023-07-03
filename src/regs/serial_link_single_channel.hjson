@@ -97,10 +97,10 @@
     },
     { multireg:
       {
-        name: "TX_PHY_CTRL1",
+        name: "TX_PHY_CLK_DIV",
         desc: "Holds clock divider factor for forwarded clock of the TX Phys",
         count: "NumChannels",
-        cname: "TX_PHY_CTRL1",
+        cname: "TX_PHY_CLK_DIV",
         swaccess: "rw",
         hwaccess: "hro",
         compact: false,
@@ -115,10 +115,10 @@
     },
     { multireg:
       {
-        name: "TX_PHY_CTRL2",
+        name: "TX_PHY_CLK_START",
         desc: "Controls duty cycle and phase of rising edge in TX Phys",
         count: "NumChannels",
-        cname: "TX_PHY_CTRL2",
+        cname: "TX_PHY_CLK_START",
         compact: false,
         swaccess: "rw",
         hwaccess: "hro",
@@ -133,10 +133,10 @@
     },
     { multireg:
       {
-        name: "TX_PHY_CTRL3",
+        name: "TX_PHY_CLK_END",
         desc: "Controls duty cycle and phase of falling edge in TX Phys",
         count: "NumChannels",
-        cname: "TX_PHY_CTRL3",
+        cname: "TX_PHY_CLK_END",
         compact: false,
         swaccess: "rw",
         hwaccess: "hro",
