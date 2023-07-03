@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 1.1.0 - 2023-07-03
+
+### Changed
+- Renamed clock division configuration registers to deliberately introduce breaking changes when using the old incorrect configuration registers.
+
 ### Fixed
 - SW Clock division configuration
 
