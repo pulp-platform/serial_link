@@ -41,42 +41,51 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
 
   import noc_bridge_narrow_wide_pkg::*;
 
-  logic axis_out_ready, axis_out_valid;
+  // axis signals
+  logic axis_out_valid, axis_out_ready;
   logic axis_data_in_req_valid, axis_data_in_rsp_valid, axis_data_in_wide_valid;
   logic axis_data_in_req_ready, axis_data_in_rsp_ready, axis_data_in_wide_ready;
   logic axis_cred_in_req_valid, axis_cred_in_rsp_valid, axis_cred_in_wide_valid;
 
+  // axis_in channel selection signals
+  logic axis_in_is_cred_only, axis_in_rsp_ready, axis_in_req_ready, axis_in_wide_ready;
+
+  // arbiter signals
   narrow_axis_packet_t narrow_arb_req_in, narrow_arb_rsp_in, narrow_arb_data_out;
-  // TODO: regroup signal definitions.
   logic narrow_arb_valid_out, narrow_arb_ready_out;
   axis_packet_t wide_arb_wide_in, wide_arb_out;
   axis_packet_t narr_wide_queue_in, narrow_wide_axis_out;
 
-  // the axis data payload also contains the header bit which is why the flit data width is one bit smaller than the payload
-  narrow_flit_data_t narrow_req_i_data, narrow_rsp_i_data, req_data_synchr_out, rsp_data_synchr_out;
+  // narrow credit counter signals in, used for size conversion
+  narrow_flit_data_t narrow_req_i_data, narrow_rsp_i_data;
+
+  // credit counter signals out
+  narrow_flit_data_t req_data_synchr_out, rsp_data_synchr_out;
   wide_flit_data_t wide_data_synchr_out;
   logic req_valid_synchr_out, rsp_valid_synchr_out, wide_valid_synchr_out;
   logic req_ready_synchr_out, rsp_ready_synchr_out, wide_ready_synchr_out;
 
+  // credit channel selection and control signals
   bridge_credit_t credits_to_send_req, credits_to_send_rsp, credits_to_send_wide;
   logic credits_only_packet_req, credits_only_packet_rsp, credits_only_packet_wide;
   logic forward_req_credits, forward_rsp_credits, forward_wide_credits;
   logic force_consume_req_credits, force_consume_rsp_credits, force_consume_wide_credits;
-
-  logic credit_only_pack_val, response_ready, request_ready, wide_ready;
   logic req_read_incoming_credits, rsp_read_incoming_credits, wide_read_incoming_credits;
 
+  // signals for size casting to avoid error msg
   narrow_flit_req_data_t req_reg_data_in;
   narrow_flit_rsp_data_t rsp_reg_data_in;
 
+  // narrow_wide arbitration state variables
   selected_channel_type_e selChanType_q, selChanType_d;
+
 
   ////////////////////////////////////////////////
   //  CONNECT INCOMING FLITS WITH THE AXIS_OUT  //
   ////////////////////////////////////////////////
 
   // credit channel arbitration
-  always_comb begin
+  always_comb begin : credit_channel_arbitration
     if (credits_to_send_rsp > credits_to_send_req & credits_to_send_rsp > credits_to_send_wide) begin
       // forward the credits of the rsp-channel
       forward_req_credits           = 1'b0;
@@ -119,6 +128,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   assign narrow_req_i_data = narrow_req_i.data;
   assign narrow_rsp_i_data = narrow_rsp_i.data;
 
+
   //-------------------//
   //--NARROW CHANNELS--//
   //-------------------//
@@ -140,6 +150,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .send_valid_i           ( narrow_req_i.valid         ),
     .send_valid_o           ( req_valid_synchr_out       ),
     .send_ready_i           ( req_ready_synchr_out       ),
+    .req_cred_to_buffer_msg ( 1'b1                       ),
     .credits_received_i     ( narr_wide_queue_in.credits ),
     .receive_cred_i         ( req_read_incoming_credits  ),
     .buffer_queue_out_val_i ( narrow_req_o.valid         ),
@@ -149,10 +160,12 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .consume_cred_to_send_i ( force_consume_req_credits  )
   );
 
-  // TODO: add comment
+  // force consume the credits to send out (if this credit channel is selected) or
+  // restore available credits by consuming incoming credits
   assign req_read_incoming_credits = (axis_cred_in_req_valid & axis_in_rsp_o.tready);
   assign force_consume_req_credits = axis_out_valid & axis_out_ready & (wide_arb_out.credits_hdr == narrow_request);
 
+  // TODO: for debugging only. Please remove the always_ff block...
   always_ff @(posedge clk_i) begin
     if (req_read_incoming_credits & allow_debug_msg) begin
       $display("INFO: received credits for req-channel = %1d", narr_wide_queue_in.credits);
@@ -180,6 +193,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .send_valid_i           ( narrow_rsp_i.valid         ),
     .send_valid_o           ( rsp_valid_synchr_out       ),
     .send_ready_i           ( rsp_ready_synchr_out       ),
+    .req_cred_to_buffer_msg ( 1'b1                       ),
     .credits_received_i     ( narr_wide_queue_in.credits ),
     .receive_cred_i         ( rsp_read_incoming_credits  ),
     .buffer_queue_out_val_i ( narrow_rsp_o.valid         ),
@@ -189,10 +203,12 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .consume_cred_to_send_i ( force_consume_rsp_credits  )
   );
 
-  // TODO: add comment
+  // force consume the credits to send out (if this credit channel is selected) or
+  // restore available credits by consuming incoming credits
   assign rsp_read_incoming_credits = (axis_cred_in_rsp_valid & axis_in_rsp_o.tready);
   assign force_consume_rsp_credits = axis_out_valid & axis_out_ready & (wide_arb_out.credits_hdr == narrow_response);
 
+  // TODO: for debugging only. Please remove the always_ff block...
   always_ff @(posedge clk_i) begin
     if (rsp_read_incoming_credits & allow_debug_msg) begin
       $display("INFO: received credits for rsp-channel = %1d", narr_wide_queue_in.credits);
@@ -202,9 +218,6 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   assign narrow_arb_rsp_in.data_hdr      = narrow_response;
   assign narrow_arb_rsp_in.data          = rsp_data_synchr_out;
   assign narrow_arb_rsp_in.data_validity = ~credits_only_packet_rsp;
-
-// _____________________________________________________________________________________________________________________________________
-// TONOTDO: wide channel section start
 
 
   //----------------//
@@ -228,6 +241,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .send_valid_i           ( wide_i.valid               ),
     .send_valid_o           ( wide_valid_synchr_out      ),
     .send_ready_i           ( wide_ready_synchr_out      ),
+    .req_cred_to_buffer_msg ( 1'b1                       ),
     .credits_received_i     ( narr_wide_queue_in.credits ),
     .receive_cred_i         ( wide_read_incoming_credits ),
     .buffer_queue_out_val_i ( wide_o.valid               ),
@@ -237,10 +251,12 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .consume_cred_to_send_i ( force_consume_wide_credits )
   );
 
-  // TODO: add comment
+  // force consume the credits to send out (if this credit channel is selected) or
+  // restore available credits by consuming incoming credits
   assign wide_read_incoming_credits = (axis_cred_in_wide_valid & axis_in_rsp_o.tready);
   assign force_consume_wide_credits = axis_out_valid & axis_out_ready & (wide_arb_out.credits_hdr == wide_channel);
 
+  // TODO: for debugging only. Please remove the always_ff block...
   always_ff @(posedge clk_i) begin
     if (wide_read_incoming_credits & allow_debug_msg) begin
       $display("INFO: received credits for wide-channel = %1d", wide_arb_out.credits);
@@ -251,11 +267,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   assign wide_arb_wide_in.data          = wide_data_synchr_out;
   assign wide_arb_wide_in.data_validity = ~credits_only_packet_wide;
 
-
-// TONOTDO: wide channel section end
-// _____________________________________________________________________________________________________________________________________
-
-
+  // arbitrate between the two narrow channels
   rr_arb_tree #(
     .NumIn      ( 2                    ),
     .DataType   ( narrow_axis_packet_t ),
@@ -280,13 +292,12 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     /// Output data.
     .data_o     ( narrow_arb_data_out                          ),
     /// Index from which input the data came from. => I don't need the index anymore as the info is contained in the data-line
-    .idx_o      (                                              )
+    .idx_o      (                                              ),
+    .rr_i       (                                              )
   );
 
-// _____________________________________________________________________________________________________________________________________
-// TONOTDO: wide narrow arbitration start
-
-  always_comb begin
+  // arbitrate between the narrow channels and the wide channel (the narrow channels always have priority)
+  always_comb begin : narrow_wide_arbitration
     selChanType_d         = selChanType_q;
     wide_arb_out          = '0;
     axis_out_valid        = '0;
@@ -325,10 +336,6 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
 
   `FF(selChanType_q, selChanType_d, narrowChan);
 
-// TONOTDO: wide narrow arbitration end
-// _____________________________________________________________________________________________________________________________________
-
-
   // required for a stable AXIS output
   stream_fifo #(
     .T          ( axis_packet_t           ),
@@ -341,12 +348,13 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .usage_o    (                         ),
     .valid_i    ( axis_out_valid          ),
     .ready_o    ( axis_out_ready          ),
-    .data_i     ( wide_arb_out ),
+    .data_i     ( wide_arb_out            ),
     .valid_o    ( axis_out_req_o.tvalid   ),
     .ready_i    ( axis_out_rsp_i.tready   ),
     .data_o     ( narrow_wide_axis_out    )
   );
 
+  // assign signals to the axis_out interface
   assign axis_out_req_o.t.data = {narrow_wide_axis_out.data, narrow_wide_axis_out.data_hdr};
   assign axis_out_req_o.t.strb = (narrow_wide_axis_out.data_hdr == wide_channel) ? WideStrobe : NarrowStrobe;
   assign axis_out_req_o.t.keep = '0;
@@ -360,40 +368,38 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   //  CONNECT AXIS_IN WITH THE OUTGOING FLITS  //
   ///////////////////////////////////////////////
 
+  // unpack axis_in
   assign {narr_wide_queue_in.data, narr_wide_queue_in.data_hdr}                                         = axis_in_req_i.t.data;
   assign {narr_wide_queue_in.data_validity, narr_wide_queue_in.credits_hdr, narr_wide_queue_in.credits} = axis_in_req_i.t.user;
 
+  // TODO: for debugging only. Please remove the always_ff block...
   always_ff @(posedge clk_i) begin
     if (axis_in_req_i.tvalid & axis_in_rsp_o.tready & allow_debug_msg) begin
       $display("INFO: received axis packet (@%8d) = | %1d | %30d | %1d | %1d | %2d |", $time, narr_wide_queue_in.data_hdr, narr_wide_queue_in.data, narr_wide_queue_in.data_validity, narr_wide_queue_in.credits_hdr, narr_wide_queue_in.credits);
     end
   end
-  // FOR THE TIME BEING THE SIGNALS BELOW ARE IGNORED...
-  // assign ??? = axis_in_req_i.t.strb;
-  // assign ??? = axis_in_req_i.t.keep;
-  // assign ??? = axis_in_req_i.t.last;
-  // assign ??? = axis_in_req_i.t.id;
-  // assign ??? = axis_in_req_i.t.dest;
 
+  // calculate channel related handshake signals
   assign axis_data_in_req_valid  = (narr_wide_queue_in.data_hdr    == narrow_request)  ? (axis_in_req_i.tvalid & narr_wide_queue_in.data_validity) : 0;
   assign axis_data_in_rsp_valid  = (narr_wide_queue_in.data_hdr    == narrow_response) ? (axis_in_req_i.tvalid & narr_wide_queue_in.data_validity) : 0;
-// TONOTDO: axis_data_in_wide_valid start
   assign axis_data_in_wide_valid = (narr_wide_queue_in.data_hdr    == wide_channel)    ? (axis_in_req_i.tvalid & narr_wide_queue_in.data_validity) : 0;
-// TONOTDO: axis_data_in_wide_valid end
   assign axis_cred_in_req_valid  = (narr_wide_queue_in.credits_hdr == narrow_request)  ? axis_in_req_i.tvalid : 0;
   assign axis_cred_in_rsp_valid  = (narr_wide_queue_in.credits_hdr == narrow_response) ? axis_in_req_i.tvalid : 0;
-// TONOTDO: axis_cred_in_wide_valid start
   assign axis_cred_in_wide_valid = (narr_wide_queue_in.credits_hdr == wide_channel)    ? axis_in_req_i.tvalid : 0;
-// TONOTDO: axis_cred_in_wide_valid end
+
+  assign axis_in_req_ready    = (axis_data_in_req_ready  & axis_data_in_req_valid);
+  assign axis_in_rsp_ready    = (axis_data_in_rsp_ready  & axis_data_in_rsp_valid);
+  assign axis_in_wide_ready   = (axis_data_in_wide_ready & axis_data_in_wide_valid);
+  assign axis_in_is_cred_only = (axis_in_req_i.tvalid    & ~narr_wide_queue_in.data_validity);
+  // TODO: I don't think that I still need all of these handshakes to happen in order to assign the ready to one. The credit_counters
+  // ought to ensure that a channel is not forwarded if the queue is expected to be full. => verify & possibly remove the above lines...
+  // assign axis_in_rsp_o.tready = axis_in_req_ready || axis_in_rsp_ready || axis_in_wide_ready || axis_in_is_cred_only;
+  assign axis_in_rsp_o.tready = axis_data_in_req_ready || axis_data_in_rsp_ready || axis_data_in_wide_ready || axis_in_is_cred_only;
 
 
-  assign request_ready        = (axis_data_in_req_ready  & axis_data_in_req_valid);
-  assign response_ready       = (axis_data_in_rsp_ready  & axis_data_in_rsp_valid);
-// TONOTDO: wide_ready start
-  assign wide_ready           = (axis_data_in_wide_ready & axis_data_in_wide_valid);
-// TONOTDO: wide_ready end
-  assign credit_only_pack_val = (axis_in_req_i.tvalid    & ~narr_wide_queue_in.data_validity);
-  assign axis_in_rsp_o.tready = request_ready || response_ready || wide_ready || credit_only_pack_val;
+  //-----------------------------------//
+  //--ASSIGN AXIS TO CORRECT CHANNELS--//
+  //-----------------------------------//
 
   // Input queue for the req channel.
   stream_fifo #(
@@ -435,9 +441,6 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   // size casting to avoid error msg
   assign rsp_reg_data_in = narr_wide_queue_in.data;
 
-// _____________________________________________________________________________________________________________________________________
-// TONOTDO: wide input queue implementation start
-
   // Input queue for the wide channel.
   stream_fifo #(
     .T          ( wide_flit_data_t          ),
@@ -455,9 +458,6 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .ready_i    ( wide_i.ready              ),
     .data_o     ( wide_o.data               )
   );
-
-// TONOTDO: wide input queue implementation end
-// _____________________________________________________________________________________________________________________________________
 
 
   //////////////////

@@ -94,7 +94,9 @@ module floo_axis_noc_bridge_narrow_wide
     /// Output request is granted.
     .gnt_i     ( arbiter_ready_in                         ),
     /// Output data.
-    .data_o    ( {arbiter_out_payload.flit_data, arbiter_out_payload.hdr} )
+    .data_o    ( {arbiter_out_payload.flit_data, arbiter_out_payload.hdr} ),
+    .idx_o     (                                          ),
+    .rr_i      (                                          )
   );
 
   always_comb begin

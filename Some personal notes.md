@@ -16,3 +16,13 @@
 # modelsim search expressions
 
 - expression_BUILDER_quicksaves.md
+
+# my module versions
+
+- /home/msc23f11/myModules/my_axi_test.sv
+- /home/msc23f11/myModules/myAxiChanCompare.sv
+- /home/msc23f11/myModules/myAssertions.svh
+
+# other files
+
+- /home/msc23f11/perfAnalysis7to16with0to16.csv

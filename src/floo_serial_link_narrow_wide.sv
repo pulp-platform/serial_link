@@ -139,7 +139,6 @@ module floo_serial_link_narrow_wide
       .narrow_rsp_o      ( narrow_rsp_o      ),
       .narrow_req_i      ( narrow_req_i      ),
       .narrow_rsp_i      ( narrow_rsp_i      ),
-      // TODO: add connection for wide channel
       .wide_i            ( wide_i            ),
       .wide_o            ( wide_o            ),
       .axis_out_req_o    ( axis_out_req      ),
@@ -162,7 +161,6 @@ module floo_serial_link_narrow_wide
       .narrow_rsp_o      ( narrow_rsp_o      ),
       .narrow_req_i      ( narrow_req_i      ),
       .narrow_rsp_i      ( narrow_rsp_i      ),
-      // TODO: add connection for wide channel
       .wide_i            ( wide_i            ),
       .wide_o            ( wide_o            ),
       .axis_out_req_o    ( axis_out_req      ),

@@ -95,6 +95,7 @@ module floo_axis_noc_bridge_virtual_channels
     .send_valid_i           ( req_i.valid               ),
     .send_valid_o           ( req_valid_synchr_out      ),
     .send_ready_i           ( req_ready_synchr_out      ),
+    .req_cred_to_buffer_msg ( 1'b1                      ),
     .credits_received_i     ( req_rsp_queue_in.credits  ),
     .receive_cred_i         ( req_read_incoming_credits ),
     .buffer_queue_out_val_i ( req_o.valid               ),
@@ -107,6 +108,7 @@ module floo_axis_noc_bridge_virtual_channels
   assign req_read_incoming_credits = (axis_cred_in_req_valid & axis_in_rsp_o.tready);
   assign force_consume_req_credits = axis_out_valid & axis_out_ready & (req_rsp_arbiter_out.credits_hdr == request);
 
+  // TODO: for debugging only. Please remove the always_ff block...
   always_ff @(posedge clk_i) begin
     if (req_read_incoming_credits & allow_debug_msg) begin
       $display("INFO: received credits for req-channel = %1d", req_rsp_queue_in.credits);
@@ -135,6 +137,7 @@ module floo_axis_noc_bridge_virtual_channels
     .send_valid_i           ( rsp_i.valid               ),
     .send_valid_o           ( rsp_valid_synchr_out      ),
     .send_ready_i           ( rsp_ready_synchr_out      ),
+    .req_cred_to_buffer_msg ( 1'b1                      ),
     .credits_received_i     ( req_rsp_queue_in.credits  ),
     .receive_cred_i         ( rsp_read_incoming_credits ),
     .buffer_queue_out_val_i ( rsp_o.valid               ),
@@ -147,6 +150,7 @@ module floo_axis_noc_bridge_virtual_channels
   assign rsp_read_incoming_credits = (axis_cred_in_rsp_valid & axis_in_rsp_o.tready);
   assign force_consume_rsp_credits = axis_out_valid & axis_out_ready & (req_rsp_arbiter_out.credits_hdr == response);
 
+  // TODO: for debugging only. Please remove the always_ff block...
   always_ff @(posedge clk_i) begin
     if (rsp_read_incoming_credits & allow_debug_msg) begin
       $display("INFO: received credits for rsp-channel = %1d", req_rsp_queue_in.credits);
@@ -220,6 +224,7 @@ module floo_axis_noc_bridge_virtual_channels
   assign {req_rsp_queue_in.data_hdr, req_rsp_queue_in.data}                                       = axis_in_req_i.t.data;
   assign {req_rsp_queue_in.data_validity, req_rsp_queue_in.credits_hdr, req_rsp_queue_in.credits} = axis_in_req_i.t.user;
 
+  // TODO: for debugging only. Please remove the always_ff block...
   always_ff @(posedge clk_i) begin
     if (axis_in_req_i.tvalid & axis_in_rsp_o.tready & allow_debug_msg) begin
       $display("INFO: received axis packet (@%8d) = | %1d | %30d | %1d | %1d | %2d |", $time, req_rsp_queue_in.data_hdr, req_rsp_queue_in.data, req_rsp_queue_in.data_validity, req_rsp_queue_in.credits_hdr, req_rsp_queue_in.credits);
