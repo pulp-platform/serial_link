@@ -91,7 +91,7 @@ module serial_link_credit_synchronization #(
   // The hidden counter values are supposed to allow the credits_to_send_o value to be fixed once the output valid signal is
   // driven high, while still keeping track of the incoming credits
   credit_t credits_to_send_hidden_q, credits_to_send_hidden_d;
-  logic force_send_credits_d, force_send_credits_q;
+  logic force_send_credits, force_send_credits_q;
 
   credit_decrem_t credits_available_decrement;
   logic credits_to_send_increment, credits_to_send_hidden_increment;
@@ -119,7 +119,7 @@ module serial_link_credit_synchronization #(
   // select if a credits_only packet should be outputed, or if there is valid data to be sent (or credits & data)
   always_comb begin : packet_source_selection
     send_normal_packet_d = send_normal_packet_q;
-    if (~send_valid_i & force_send_credits_d) begin
+    if (~send_valid_i & force_send_credits) begin
       // When I don't have valid data at the input and I overstepped the ForceSendThreshold, I switch to the credits_only mode
         send_normal_packet_d = 0;
     end else begin
@@ -132,11 +132,11 @@ module serial_link_credit_synchronization #(
   end
 
   always_comb begin : output_valid_control
-    force_send_credits_d = 1'b0;
+    force_send_credits = 1'b0;
     // Send empty packets with credits if there are too many
     // credits to send but no AXI request transaction
     if (credits_to_send_q >= ForceSendThresh) begin
-      force_send_credits_d = 1'b1;
+      force_send_credits = 1'b1;
     end
     // There is a potential deadlock situation, when the final credits on the local side
     // are consumed and all the credits from the other side are currently in-flight.
@@ -226,7 +226,6 @@ module serial_link_credit_synchronization #(
   `FF(credits_to_send_q, credits_to_send_d, 0)
   `FF(credits_to_send_hidden_q, credits_to_send_hidden_d, 0)
   // This is additional logic to prevent datapackages from being stalled in case of a force send.
-  // By removing all the force_send_credits_q related parts, this additional logic could be removed...
   `FF(send_normal_packet_q, send_normal_packet_d, 1)
 
 
