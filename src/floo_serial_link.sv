@@ -42,8 +42,8 @@ module floo_serial_link
   input  logic                                 rst_sl_ni,
   input  logic                                 clk_reg_i,
   input  logic                                 rst_reg_ni,
-  // Testmode is an optional input pin. Tie to zero if not used.
-  input  logic                                 testmode_i = '0,
+  // Tie to zero if not used.
+  input  logic                                 testmode_i,
   input  req_flit_t                            req_i,
   input  rsp_flit_t                            rsp_i,
   output req_flit_t                            req_o,
@@ -54,8 +54,8 @@ module floo_serial_link
   output logic [NumChannels-1:0]               ddr_rcv_clk_o,
   input  logic [NumChannels-1:0][NumLanes-1:0] ddr_i,
   output logic [NumChannels-1:0][NumLanes-1:0] ddr_o,
-  // AXI isolation signals (in/out). Optional input pin: Tie to zero if not used
-  input  logic [1:0]                           isolated_i = '0,
+  // AXI isolation signals (in/out). Tie to zero if not used
+  input  logic [1:0]                           isolated_i,
   output logic [1:0]                           isolate_o,
   // Clock gate register
   output logic                                 clk_ena_o,

@@ -57,6 +57,7 @@ module tb_floo_serial_link_narrow_wide();
   localparam int unsigned WideMaxTxnsPerId      = 32;
 
   // Stop the simulation if this simulation time (ns) is exceeded.
+  // localparam int stopSimAfter = 200000000;
   localparam int stopSimAfter = 75000000;
 
   // ==============
@@ -390,16 +391,16 @@ module tb_floo_serial_link_narrow_wide();
     .UW                   ( NarrowInUserWidth ),
     .TA                   ( 100ps             ),
     .TT                   ( 500ps             ),
-    .MAX_READ_TXNS        ( 2                 ),
-    .MAX_WRITE_TXNS       ( 2                 ),
+    .MAX_READ_TXNS        ( 4                 ),
+    .MAX_WRITE_TXNS       ( 4                 ),
     .AX_MIN_WAIT_CYCLES   ( min_wait_cycles   ),
     .AX_MAX_WAIT_CYCLES   ( max_wait_cycles   ),
     .W_MIN_WAIT_CYCLES    ( min_wait_cycles   ),
     .W_MAX_WAIT_CYCLES    ( max_wait_cycles   ),
     .RESP_MIN_WAIT_CYCLES ( min_wait_cycles   ),
     .RESP_MAX_WAIT_CYCLES ( max_wait_cycles   ),
-    .AXI_MAX_BURST_LEN    ( 0                 ),
-    .TRAFFIC_SHAPING      ( 0                 ),
+    // .AXI_MAX_BURST_LEN    ( 1                 ),
+    .TRAFFIC_SHAPING      ( 1                 ),
     .AXI_EXCLS            ( 1'b1              ),
     .AXI_ATOPS            ( 1'b0              ),
     .AXI_BURST_FIXED      ( 1'b1              ),
@@ -432,16 +433,16 @@ module tb_floo_serial_link_narrow_wide();
     .UW                   ( WideInUserWidth ),
     .TA                   ( 100ps           ),
     .TT                   ( 500ps           ),
-    .MAX_READ_TXNS        ( 2               ),
-    .MAX_WRITE_TXNS       ( 2               ),
+    .MAX_READ_TXNS        ( 32              ),
+    .MAX_WRITE_TXNS       ( 32              ),
     .AX_MIN_WAIT_CYCLES   ( min_wait_cycles ),
     .AX_MAX_WAIT_CYCLES   ( max_wait_cycles ),
     .W_MIN_WAIT_CYCLES    ( min_wait_cycles ),
     .W_MAX_WAIT_CYCLES    ( max_wait_cycles ),
     .RESP_MIN_WAIT_CYCLES ( min_wait_cycles ),
     .RESP_MAX_WAIT_CYCLES ( max_wait_cycles ),
-    .AXI_MAX_BURST_LEN    ( 0               ),
-    .TRAFFIC_SHAPING      ( 0               ),
+    // .AXI_MAX_BURST_LEN    ( 0               ),
+    .TRAFFIC_SHAPING      ( 1               ),
     .AXI_EXCLS            ( 1'b1            ),
     .AXI_ATOPS            ( 1'b0            ),
     .AXI_BURST_FIXED      ( 1'b1            ),
@@ -480,8 +481,11 @@ module tb_floo_serial_link_narrow_wide();
   static wide_axi_rand_slave_t  wide_rand_slave_1  = new ( wide_axi_out_1 );
   static wide_axi_rand_slave_t  wide_rand_slave_2  = new ( wide_axi_out_2 );
 
-  // logic [1:0] mst_done;
   logic [3:0] mst_done;
+  int time_narrow_1;
+  int time_narrow_2;
+  int time_wide_1;
+  int time_wide_2;
 
   // By default perform Testduration Reads & Writes
   int NumWrites_1 = TestDuration;
@@ -517,6 +521,7 @@ module tb_floo_serial_link_narrow_wide();
     automatic time start_cycle, end_cycle;
     automatic int unsigned data_sent = 0;
     automatic int unsigned data_received = 0;
+
     if ($value$plusargs("NUM_WRITES_1=%d", NumWrites_1)) begin
       $info("[DDR1] Number of writes specified as %d", NumWrites_1);
     end
@@ -526,6 +531,8 @@ module tb_floo_serial_link_narrow_wide();
     mst_done[0] = 0;
     narrow_rand_master_1.reset();
     wait_for_reset_1();
+    narrow_rand_master_1.add_traffic_shaping_fixed_size(1, 3, 1);
+
     start_cycle = $realtime;
     fork
       narrow_rand_master_1.run(NumWrites_1, NumReads_1);
@@ -539,17 +546,21 @@ module tb_floo_serial_link_narrow_wide();
       end
     join_any
     end_cycle = $realtime;
-    $info("BW %0d/%0d (sent/rcv) Mbit/s @ %0d/%0d MHz (SoC/PHY)",
+    $display("INFO: narrow1 BW %0d/%0d (sent/rcv) Mbit/s @ %0d/%0d MHz (SoC/PHY)",
       data_sent * 1000 / (end_cycle - start_cycle),
       data_received * 1000 / (end_cycle - start_cycle),
       1000 / TckSys1,
       1000 / TckSys1 / 8);
-    $display("INFO: time = %0d", (end_cycle - start_cycle));
-    $display("INFO: narrow_rand_master_1 finished.");
+    $display("INFO: narrow_rand_master_1 finished (time = %0d ns)", (end_cycle - start_cycle));
+    time_narrow_1 = (end_cycle - start_cycle);
     mst_done[0] = 1;
   end
 
   initial begin
+    automatic time start_cycle_narrow2, end_cycle_narrow2;
+    automatic int unsigned data_sent_narrow2 = 0;
+    automatic int unsigned data_received_narrow2 = 0;
+
     if ($value$plusargs("NUM_WRITES_2=%d", NumWrites_2)) begin
       $info("[DDR2] Number of writes specified as %d", NumWrites_2);
     end
@@ -559,26 +570,95 @@ module tb_floo_serial_link_narrow_wide();
     mst_done[1] = 0;
     narrow_rand_master_2.reset();
     wait_for_reset_2();
-    narrow_rand_master_2.run(NumWrites_2, NumReads_2);
-    $display("INFO: narrow_rand_master_2 finished.");
+    narrow_rand_master_2.add_traffic_shaping_fixed_size(1, 3, 1);
+
+    start_cycle_narrow2 = $realtime;
+    fork
+      narrow_rand_master_2.run(NumWrites_2, NumReads_2);
+      forever begin
+        @(posedge clk_2);
+        if (narrow_axi_in_rsp_2.r_valid & narrow_axi_in_req_2.r_ready) data_received_narrow2 += $bits(narrow_axi_in_rsp_2.r);
+        if (narrow_axi_in_rsp_2.b_valid & narrow_axi_in_req_2.b_ready) data_received_narrow2 += $bits(narrow_axi_in_rsp_2.b);
+        if (narrow_axi_in_req_2.ar_valid & narrow_axi_in_rsp_2.ar_ready) data_sent_narrow2 += $bits(narrow_axi_in_req_2.ar);
+        if (narrow_axi_in_req_2.aw_valid & narrow_axi_in_rsp_2.aw_ready) data_sent_narrow2 += $bits(narrow_axi_in_req_2.aw);
+        if (narrow_axi_in_req_2.w_valid & narrow_axi_in_rsp_2.w_ready) data_sent_narrow2 += $bits(narrow_axi_in_req_2.w);
+      end
+    join_any
+    end_cycle_narrow2 = $realtime;
+    $display("INFO: narrow2 BW %0d/%0d (sent/rcv) Mbit/s @ %0d/%0d MHz (SoC/PHY)",
+      data_sent_narrow2 * 1000 / (end_cycle_narrow2 - start_cycle_narrow2),
+      data_received_narrow2 * 1000 / (end_cycle_narrow2 - start_cycle_narrow2),
+      1000 / TckSys2,
+      1000 / TckSys2 / 8);
+
+    $display("INFO: narrow_rand_master_2 finished (time = %0d ns)", (end_cycle_narrow2 - start_cycle_narrow2));
+    time_narrow_2 = (end_cycle_narrow2 - start_cycle_narrow2);
     mst_done[1] = 1;
   end
 
   initial begin
+    automatic time start_cycle_wide, end_cycle_wide;
+    automatic int unsigned data_sent_wide = 0;
+    automatic int unsigned data_received_wide = 0;
+
     mst_done[2] = 0;
     wide_rand_master_1.reset();
     wait_for_reset_1();
-    wide_rand_master_1.run(NumWrites_1, NumReads_1);
-    $display("INFO: wide_rand_master_1 finished.");
+    wide_rand_master_1.add_traffic_shaping_fixed_size(32, 7, 1);
+
+    start_cycle_wide = $realtime;
+    fork
+      wide_rand_master_1.run(NumWrites_1, NumReads_1);
+      forever begin
+        @(posedge clk_1);
+        if (wide_axi_in_rsp_1.r_valid & wide_axi_in_req_1.r_ready) data_received_wide += $bits(wide_axi_in_rsp_1.r);
+        if (wide_axi_in_rsp_1.b_valid & wide_axi_in_req_1.b_ready) data_received_wide += $bits(wide_axi_in_rsp_1.b);
+        if (wide_axi_in_req_1.ar_valid & wide_axi_in_rsp_1.ar_ready) data_sent_wide += $bits(wide_axi_in_req_1.ar);
+        if (wide_axi_in_req_1.aw_valid & wide_axi_in_rsp_1.aw_ready) data_sent_wide += $bits(wide_axi_in_req_1.aw);
+        if (wide_axi_in_req_1.w_valid & wide_axi_in_rsp_1.w_ready) data_sent_wide += $bits(wide_axi_in_req_1.w);
+      end
+    join_any
+    end_cycle_wide = $realtime;
+    $display("INFO: wide1 BW %0d/%0d (sent/rcv) Mbit/s @ %0d/%0d MHz (SoC/PHY)",
+      data_sent_wide * 1000 / (end_cycle_wide - start_cycle_wide),
+      data_received_wide * 1000 / (end_cycle_wide - start_cycle_wide),
+      1000 / TckSys1,
+      1000 / TckSys1 / 8);
+    $display("INFO: wide_rand_master_1 finished (time = %0d ns)", (end_cycle_wide - start_cycle_wide));
+    time_wide_1 = (end_cycle_wide - start_cycle_wide);
     mst_done[2] = 1;
   end
 
   initial begin
+    automatic time start_cycle_wide2, end_cycle_wide2;
+    automatic int unsigned data_sent_wide2 = 0;
+    automatic int unsigned data_received_wide2 = 0;
+
     mst_done[3] = 0;
     wide_rand_master_2.reset();
     wait_for_reset_2();
-    wide_rand_master_2.run(NumWrites_2, NumReads_2);
-    $display("INFO: wide_rand_master_2 finished.");
+    wide_rand_master_2.add_traffic_shaping_fixed_size(32, 7, 1);
+
+    start_cycle_wide2 = $realtime;
+    fork
+      wide_rand_master_2.run(NumWrites_2, NumReads_2);
+      forever begin
+        @(posedge clk_2);
+        if (wide_axi_in_rsp_2.r_valid & wide_axi_in_req_2.r_ready) data_received_wide2 += $bits(wide_axi_in_rsp_2.r);
+        if (wide_axi_in_rsp_2.b_valid & wide_axi_in_req_2.b_ready) data_received_wide2 += $bits(wide_axi_in_rsp_2.b);
+        if (wide_axi_in_req_2.ar_valid & wide_axi_in_rsp_2.ar_ready) data_sent_wide2 += $bits(wide_axi_in_req_2.ar);
+        if (wide_axi_in_req_2.aw_valid & wide_axi_in_rsp_2.aw_ready) data_sent_wide2 += $bits(wide_axi_in_req_2.aw);
+        if (wide_axi_in_req_2.w_valid & wide_axi_in_rsp_2.w_ready) data_sent_wide2 += $bits(wide_axi_in_req_2.w);
+      end
+    join_any
+    end_cycle_wide2 = $realtime;
+    $display("INFO: wide2 BW %0d/%0d (sent/rcv) Mbit/s @ %0d/%0d MHz (SoC/PHY)",
+      data_sent_wide2 * 1000 / (end_cycle_wide2 - start_cycle_wide2),
+      data_received_wide2 * 1000 / (end_cycle_wide2 - start_cycle_wide2),
+      1000 / TckSys2,
+      1000 / TckSys2 / 8);
+    $display("INFO: wide_rand_master_2 finished (time = %0d ns)", (end_cycle_wide2 - start_cycle_wide2));
+    time_wide_2 = (end_cycle_wide2 - start_cycle_wide2);
     mst_done[3] = 1;
   end
 
@@ -726,6 +806,7 @@ module tb_floo_serial_link_narrow_wide();
       @(posedge clk_1);
     end
     $display("[SYS] Simulation Stopped (%d ns)", $time);
+    $display("INFO: Performance Rating (lower is better): %0d (avg)", (time_narrow_1+time_narrow_2+time_wide_1+time_wide_2)/(TestDuration*4));
     $stop();
   endtask
 
