@@ -4,6 +4,9 @@
 
 // Authors:
 //  - Yannick Baumann <baumanny@ethz.student.ch>
+
+  `include "register_interface/typedef.svh"
+
   import serial_link_reg_pkg::*;
   import floo_narrow_wide_flit_pkg::*;
   import serial_link_single_channel_reg_pkg::*;
