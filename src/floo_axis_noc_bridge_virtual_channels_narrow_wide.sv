@@ -139,7 +139,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .data_t                 ( narrow_flit_data_t         ),
     .NumCredits             ( NumCred_NocBridge          ),
     .ForceSendThresh        ( ForceSendThresh            ),
-    .CredOnlyPktMode        ( 1'b1                       )
+    .CredOnlyConsCred       ( 0                          )
   ) i_credit_counter_req (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -182,7 +182,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .data_t                 ( narrow_flit_data_t         ),
     .NumCredits             ( NumCred_NocBridge          ),
     .ForceSendThresh        ( ForceSendThresh            ),
-    .CredOnlyPktMode        ( 1'b1                       )
+    .CredOnlyConsCred       ( 0                          )
   ) i_credit_counter_rsp (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -230,7 +230,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .data_t                 ( wide_flit_data_t           ),
     .NumCredits             ( NumCred_NocBridge          ),
     .ForceSendThresh        ( ForceSendThresh            ),
-    .CredOnlyPktMode        ( 1'b1                       )
+    .CredOnlyConsCred       ( 0                          )
   ) i_credit_counter_wide (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -394,7 +394,9 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   // TODO: I don't think that I still need all of these handshakes to happen in order to assign the ready to one. The credit_counters
   // ought to ensure that a channel is not forwarded if the queue is expected to be full. => verify & possibly remove the above lines...
   // assign axis_in_rsp_o.tready = axis_in_req_ready || axis_in_rsp_ready || axis_in_wide_ready || axis_in_is_cred_only;
-  assign axis_in_rsp_o.tready = axis_data_in_req_ready || axis_data_in_rsp_ready || axis_data_in_wide_ready || axis_in_is_cred_only;
+  assign axis_in_rsp_o.tready = '1;
+  // TODO: Even the version below might not be required...
+  // assign axis_in_rsp_o.tready = axis_data_in_req_ready || axis_data_in_rsp_ready || axis_data_in_wide_ready || axis_in_is_cred_only;
 
 
   //-----------------------------------//

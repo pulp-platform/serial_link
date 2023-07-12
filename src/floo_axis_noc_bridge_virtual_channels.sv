@@ -84,7 +84,7 @@ module floo_axis_noc_bridge_virtual_channels
     .data_t                 ( flit_data_t               ),
     .NumCredits             ( NumCred_NocBridge         ),
     .ForceSendThresh        ( ForceSendThresh           ),
-    .CredOnlyPktMode        ( 1'b1                      )
+    .CredOnlyConsCred       ( 0                         )
   ) i_synchronization_req (
     .clk_i                  ( clk_i                     ),
     .rst_ni                 ( rst_ni                    ),
@@ -126,7 +126,7 @@ module floo_axis_noc_bridge_virtual_channels
     .data_t                 ( flit_data_t               ),
     .NumCredits             ( NumCred_NocBridge         ),
     .ForceSendThresh        ( ForceSendThresh           ),
-    .CredOnlyPktMode        ( 1'b1                      )
+    .CredOnlyConsCred       ( 0                         )
   ) i_synchronization_rsp (
     .clk_i                  ( clk_i                     ),
     .rst_ni                 ( rst_ni                    ),
