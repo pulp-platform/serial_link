@@ -93,7 +93,7 @@ import serial_link_pkg::*;
   // (Adjust in case data_hdr_info_t is adjusted. Should contain size of data_hdr_info_t without credit_t)
   localparam int MaxSplitsWithoutCntr  = (($bits(credit_t) + 1 + $bits(axis_packet_t)) + BandWidth - 1) / BandWidth;
   localparam int SplitCntrRequiredBits = $clog2(MaxSplitsWithoutCntr + 1);
-  typedef logic [SplitCntrRequiredBits-1:0] split_cntr_t;
+  typedef  logic [SplitCntrRequiredBits-1:0] split_cntr_t;
 
   typedef struct packed {
     split_cntr_t req_num_splits;
@@ -104,7 +104,8 @@ import serial_link_pkg::*;
   // The width used to transfer all the data contained in one axis-packet (so far data, user & strb bits are supported)
   localparam int MaxNumOfBitsToBeTransfered = $bits(axis_packet_t) + $bits(data_hdr_info_t);
   localparam int MaxPossibleTransferSplits  = (MaxNumOfBitsToBeTransfered + BandWidth - 1) / BandWidth;
-  localparam int RecvFifoDepth = NumCredits;
+  // localparam int RecvFifoDepth = NumCredits;
+  localparam int RecvFifoDepth = NumCredits * MaxPossibleTransferSplits;
 
   data_hdr_info_t received_hdr, send_hdr, pre_received_hdr;
 
@@ -134,13 +135,13 @@ import serial_link_pkg::*;
   phy_data_t raw_mode_fifo_data_in, raw_mode_fifo_data_out;
 
   logic [MaxPossibleTransferSplits-1:0] splitSegmentsToBeSent;
-  logic [$clog2(MaxNumOfBitsToBeTransfered+1)-1:0] remainingBitsToBeSent;
+  logic [$clog2(MaxNumOfBitsToBeTransfered+1)-1:0] remainingBitsToBeSent, remainingBitsForBitmask;
 
   logic [$clog2(NumStrbBitsIncoming+1)-1:0] numLeadZero;
   split_cntr_t trailing_zero_counter;
   logic all_zeros;
-  logic [NumStrbBitsIncoming-1:0] strb_after_synchronization;
 
+  split_cntr_t requiredSplits;
 
   /////////////////////////////////////////////////
   //  Find the amount of data to be transmitted  //
@@ -153,22 +154,22 @@ import serial_link_pkg::*;
         .WIDTH ( NumStrbBitsIncoming ),
         .MODE  ( 1'b1                )
       ) i_leading_zero_counter (
-        .in_i    ( strb_after_synchronization ),
-        .cnt_o   ( numLeadZero                ),
-        .empty_o (                            )
+        .in_i    ( axis_in_req_i.t.strb ),
+        .cnt_o   ( numLeadZero          ),
+        .empty_o (                      )
       );
 
       // // TODO: below always_ff is for debugging only. Please remove after debugging!
       // always_ff @(posedge clk_i) begin
       //   if (data_out_valid_o == '1 & link_state_q == LinkSendIdle) begin
-      //     $display("INFO: zeroStrobe(send_hdr.is_credits_only=%1b): %2d/%2d (%b)", send_hdr.is_credits_only, numLeadZero, $bits(strb_after_synchronization), strb_after_synchronization);
+      //     $display("INFO: zeroStrobe(send_hdr.is_credits_only=%1b): %2d/%2d (%b)", send_hdr.is_credits_only, numLeadZero, $bits(axis_in_req_i.t.strb), axis_in_req_i.t.strb);
       //     $display("INFO: remainingBitsToBeSent=%4d => splits: %2d", remainingBitsToBeSent, send_hdr.req_num_splits);
       //   end
       // end
 
       // alternative implementation to the cealing division.
       for (genvar i = 0; i < MaxPossibleTransferSplits; i++) begin
-        assign splitSegmentsToBeSent[i] = remainingBitsToBeSent <= (i*BandWidth);
+        assign splitSegmentsToBeSent[i] = remainingBitsForBitmask <= (i*BandWidth);
       end
       lzc #(
         .WIDTH ( MaxPossibleTransferSplits ),
@@ -180,25 +181,27 @@ import serial_link_pkg::*;
       );
 
       // lzc module does not output the correct amount of trailing zeroes when the entire input consists of zeroes only.
-      split_cntr_t requiredSplits;
       assign requiredSplits = ((all_zeros) ? MaxPossibleTransferSplits : trailing_zero_counter);
       // moreover, a credit_only packet will require only 1 split (resulting number needs to be adjusted).
       assign send_hdr.req_num_splits =  (send_hdr.is_credits_only) ? 'd1 : requiredSplits;
       if (TransferStrobe) begin
+        assign remainingBitsForBitmask = (MaxNumOfBitsToBeTransfered - ({numLeadZero,3'b0} + numLeadZero));
         // Assigning the remainingBitsToBeSent to 1 in case of credits_only is not the correct number, but works nonetheless.
         // It is only important to have a low number, such that only one sending split will require. (TODO: do this or the data_out
         // limit comparison with the multiplication? Compare to TODO: alternativeApproachWithMultiplication)
-        assign remainingBitsToBeSent = (send_hdr.is_credits_only) ? 'd1 : (MaxNumOfBitsToBeTransfered - ({numLeadZero,3'b0} + numLeadZero));
+        assign remainingBitsToBeSent   = (send_hdr.is_credits_only) ? 'd1 : remainingBitsForBitmask;
       end else begin
+        assign remainingBitsForBitmask = (MaxNumOfBitsToBeTransfered - {numLeadZero,3'b0});
         // Assigning the remainingBitsToBeSent to 1 in case of credits_only is not the correct number, but works nonetheless.
         // It is only important to have a low number, such that only one sending split will require. (TODO: do this or the data_out
         // limit comparison with the multiplication? Compare to TODO: alternativeApproachWithMultiplication)
-        assign remainingBitsToBeSent = (send_hdr.is_credits_only) ? 'd1 : (MaxNumOfBitsToBeTransfered - {numLeadZero,3'b0});
+        assign remainingBitsToBeSent   = (send_hdr.is_credits_only) ? 'd1 : remainingBitsForBitmask;
       end
 
     end else begin
       assign send_hdr.req_num_splits = MaxPossibleTransferSplits;
-      assign remainingBitsToBeSent = MaxNumOfBitsToBeTransfered;
+      assign remainingBitsForBitmask = MaxNumOfBitsToBeTransfered;
+      assign remainingBitsToBeSent   = remainingBitsForBitmask;
     end
   endgenerate
 
@@ -358,52 +361,63 @@ import serial_link_pkg::*;
 generate
     if (TransferStrobe | AllowVarAxisLen) begin
       serial_link_credit_synchronization #(
-        .credit_t         ( credit_t                                   ),
-        .data_width       ( $bits(axis_packet_t) + NumStrbBitsIncoming ),
-        .MaxCredPerPktOut ( MaxPossibleTransferSplits                  ),
-        .NumCredits       ( NumCredits                                 )
+        .credit_t         ( credit_t                  ),
+        .data_t           ( axis_packet_t             ),
+        // .MaxCredPerPktOut ( MaxPossibleTransferSplits ),
+        .NumCredits       ( NumCredits                )
       ) i_synchronization_flow_control (
-        .clk_i                  ( clk_i                                                  ),
-        .rst_ni                 ( rst_ni                                                 ),
-        .data_to_send_i         ( {axis_in_req_i.t.strb, axis_packet_in_synch_in}        ),
-        .data_to_send_o         ( {strb_after_synchronization, axis_packet_in_synch_out} ),
-        .credits_to_send_o      ( send_hdr.amount_of_credits                             ),
-        .send_ready_o           ( axis_in_rsp_o.tready                                   ),
-        .send_valid_i           ( axis_in_req_i.tvalid                                   ),
-        .send_valid_o           ( axis_in_req_tvalid_afterFlowControl                    ),
-        .send_ready_i           ( axis_in_rsp_tready_afterFlowControl                    ),
-        .req_cred_to_buffer_msg ( send_hdr.req_num_splits                                ),
-        .credits_received_i     ( credits_incoming                                       ),
-        .receive_cred_i         ( consume_incoming_credits                               ),
-        .buffer_queue_out_val_i ( flow_control_fifo_valid_out                            ),
-        .buffer_queue_out_rdy_i ( flow_control_fifo_ready_out                            ),
-        .credits_only_packet_o  ( send_hdr.is_credits_only                               ),
-        .allow_cred_consume_i   ( 1'b1                                                   ),
-        .consume_cred_to_send_i ( 1'b0                                                   )
+        .clk_i                  ( clk_i                                 ),
+        .rst_ni                 ( rst_ni                                ),
+        .data_to_send_i         ( axis_packet_in_synch_in               ),
+        .data_to_send_o         ( axis_packet_in_synch_out              ),
+        .credits_to_send_o      ( send_hdr.amount_of_credits            ),
+        .send_ready_o           ( axis_in_rsp_o.tready                  ),
+        .send_valid_i           ( axis_in_req_i.tvalid                  ),
+        .send_valid_o           ( axis_in_req_tvalid_afterFlowControl   ),
+        .send_ready_i           ( axis_in_rsp_tready_afterFlowControl   ),
+        .req_cred_to_buffer_msg ( 'd1                                   ),
+        // TODO: to re-enable the uncommented feature:
+        // 1) switch the 3 disabled ports below
+        // 2) Enable the MaxCredPerPktOut line above
+        // 3) Toggle the definition of: localparam int RecvFifoDepth = ...
+        // .req_cred_to_buffer_msg ( requiredSplits                        ),
+        .credits_received_i     ( credits_incoming                      ),
+        .receive_cred_i         ( consume_incoming_credits              ),
+        .buffer_queue_out_val_i ( axis_out_req_unfiltered.tvalid        ),
+        // .buffer_queue_out_val_i ( flow_control_fifo_valid_out           ),
+        .buffer_queue_out_rdy_i ( axis_out_rsp_unfiltered.tready        ),
+        // .buffer_queue_out_rdy_i ( flow_control_fifo_ready_out           ),
+        .credits_only_packet_o  ( send_hdr.is_credits_only              ),
+        .allow_cred_consume_i   ( 1'b1                                  ),
+        .consume_cred_to_send_i ( 1'b0                                  )
       );
     end else begin
       serial_link_credit_synchronization #(
-        .credit_t   ( credit_t      ),
-        .data_t     ( axis_packet_t ),
-        .NumCredits ( NumCredits    )
+        .credit_t         ( credit_t                  ),
+        .data_t           ( axis_packet_t             ),
+        // .MaxCredPerPktOut ( MaxPossibleTransferSplits ),
+        .NumCredits       ( NumCredits                )
       ) i_synchronization_flow_control (
-        .clk_i                  ( clk_i                               ),
-        .rst_ni                 ( rst_ni                              ),
-        .data_to_send_i         ( axis_packet_in_synch_in             ),
-        .data_to_send_o         ( axis_packet_in_synch_out            ),
-        .credits_to_send_o      ( send_hdr.amount_of_credits          ),
-        .send_ready_o           ( axis_in_rsp_o.tready                ),
-        .send_valid_i           ( axis_in_req_i.tvalid                ),
-        .send_valid_o           ( axis_in_req_tvalid_afterFlowControl ),
-        .send_ready_i           ( axis_in_rsp_tready_afterFlowControl ),
-        .req_cred_to_buffer_msg ( MaxPossibleTransferSplits           ),
-        .credits_received_i     ( credits_incoming                    ),
-        .receive_cred_i         ( consume_incoming_credits            ),
-        .buffer_queue_out_val_i ( flow_control_fifo_valid_out         ),
-        .buffer_queue_out_rdy_i ( flow_control_fifo_ready_out         ),
-        .credits_only_packet_o  ( send_hdr.is_credits_only            ),
-        .allow_cred_consume_i   ( 1'b1                                ),
-        .consume_cred_to_send_i ( 1'b0                                )
+        .clk_i                  ( clk_i                                  ),
+        .rst_ni                 ( rst_ni                                 ),
+        .data_to_send_i         ( axis_packet_in_synch_in                ),
+        .data_to_send_o         ( axis_packet_in_synch_out               ),
+        .credits_to_send_o      ( send_hdr.amount_of_credits             ),
+        .send_ready_o           ( axis_in_rsp_o.tready                   ),
+        .send_valid_i           ( axis_in_req_i.tvalid                   ),
+        .send_valid_o           ( axis_in_req_tvalid_afterFlowControl    ),
+        .send_ready_i           ( axis_in_rsp_tready_afterFlowControl    ),
+        .req_cred_to_buffer_msg ( 'd1                                    ),
+        // .req_cred_to_buffer_msg ( MaxPossibleTransferSplits              ),
+        .credits_received_i     ( credits_incoming                       ),
+        .receive_cred_i         ( consume_incoming_credits               ),
+        .buffer_queue_out_val_i ( axis_out_req_unfiltered.tvalid         ),
+        // .buffer_queue_out_val_i ( flow_control_fifo_valid_out            ),
+        .buffer_queue_out_rdy_i ( axis_out_rsp_unfiltered.tready         ),
+        // .buffer_queue_out_rdy_i ( flow_control_fifo_ready_out            ),
+        .credits_only_packet_o  ( send_hdr.is_credits_only               ),
+        .allow_cred_consume_i   ( 1'b1                                   ),
+        .consume_cred_to_send_i ( 1'b0                                   )
       );
     end
   endgenerate
@@ -422,10 +436,10 @@ generate
     if (TransferStrobe) begin
       for (genvar i = 0; i < NumStrbBitsToSend; i++) begin
         if (8*i+7 < $bits(payload_t)) begin
-          assign axis_packet_in_synch_in.strb_data_bits[9*i+8:9*i] = {axis_in_req_i.t.data[8*i+7:8*i], strb_after_synchronization[i]};
+          assign axis_packet_in_synch_in.strb_data_bits[9*i+8:9*i] = {axis_in_req_i.t.data[8*i+7:8*i], axis_in_req_i.t.strb[i]};
         end else begin
           // prevent out of bounds warning:
-          assign axis_packet_in_synch_in.strb_data_bits[i+$bits(payload_t):9*i] = {axis_in_req_i.t.data[$bits(payload_t)-1:8*i], strb_after_synchronization[i]};
+          assign axis_packet_in_synch_in.strb_data_bits[i+$bits(payload_t):9*i] = {axis_in_req_i.t.data[$bits(payload_t)-1:8*i], axis_in_req_i.t.strb[i]};
         end
       end
     end else begin
