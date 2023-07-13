@@ -11,6 +11,11 @@ package noc_bridge_narrow_wide_pkg;
   // virtualization will be used instead.
   localparam int NumCred_NocBridge = 8;
 
+  // new parameters to allow for variable number of credits for the individual channels in the virtual channel noc_bridge verison
+  localparam int NumCred_NocBridge_narrow_req = NumCred_NocBridge;
+  localparam int NumCred_NocBridge_narrow_rsp = NumCred_NocBridge;
+  localparam int NumCred_NocBridge_wide_chan  = NumCred_NocBridge;
+
   ///////////////////////////////////////////
   // DEPENDANT PARAMETERS - DO NOT CHANGE  //
   ///////////////////////////////////////////

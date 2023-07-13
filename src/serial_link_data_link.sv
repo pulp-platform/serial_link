@@ -547,7 +547,11 @@ generate
   ////////////////////
 
   `ASSERT_INIT(RawModeFifoDim, RecvFifoDepth >= RawModeFifoDepth)
-  // Bandwidth must be large enough to allow the meta packet header to be sent in one go.
+  // Bandwidth must be large enough to allow the meta packet-header to be sent in one go.
   `ASSERT_INIT(BandWidthTooSmall, BandWidth >= $bits(data_hdr_info_t))
+  // It is assumed that no valid data can be inputed with a zero strobe (when AllowVarAxisLen is enabled).
+  // Should this feature be desired, the port empty_o of the instance i_leading_zero_counter should be
+  // utilized to declare what ought to happen in this case.
+  `ASSERT(ZeroStrobe, !(AllowVarAxisLen & axis_in_req_i.t.strb == '0 & axis_in_req_i.tvalid & axis_in_rsp_o.tready))
 
 endmodule

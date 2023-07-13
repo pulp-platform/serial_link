@@ -21,8 +21,8 @@ exec echo "NumCredits, NumCred_NocBridge, PerformanceRating, narrow1 BW (sent/rc
 
 
 for { set link_credits $link_credits_start}  {$link_credits <= $link_credits_stop} {incr link_credits $link_credits_step} {
-	set fd [open src/serial_link_pkg.sv r]
-	set newfd [open src/serial_link_pkg.sv.tmp w]
+	set fd [open src/noc_bridge_narrow_wide_pkg.sv r]
+	set newfd [open src/noc_bridge_narrow_wide_pkg.sv.tmp w]
 	while {[gets $fd line] >= 0} {
 		if {[string first "localparam int NumCredits = " $line] != -1} {
 	    	puts $newfd "  localparam int NumCredits = $link_credits;"
@@ -32,7 +32,7 @@ for { set link_credits $link_credits_start}  {$link_credits <= $link_credits_sto
 	}
 	close $fd
 	close $newfd
-	file rename -force "src/serial_link_pkg.sv.tmp" "src/serial_link_pkg.sv"
+	file rename -force "src/noc_bridge_narrow_wide_pkg.sv.tmp" "src/noc_bridge_narrow_wide_pkg.sv"
 
 	if {$noc_credits_include_zero == 1} {
 		set fd [open src/noc_bridge_narrow_wide_pkg.sv r]
