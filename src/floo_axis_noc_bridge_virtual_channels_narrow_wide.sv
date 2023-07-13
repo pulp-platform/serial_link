@@ -15,7 +15,9 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   parameter  type axis_req_t        = logic,
   parameter  type axis_rsp_t        = logic,
   // TODO: finde suitable ForceSendThresh margin
-  parameter  int  ForceSendThresh   = noc_bridge_pkg::NumCred_NocBridge-4
+  parameter  int  ForceSendThresh_narrow_req = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_narrow_req-4,
+  parameter  int  ForceSendThresh_narrow_rsp = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_narrow_rsp-4,
+  parameter  int  ForceSendThresh_wide_chan  = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_wide_chan-4
 ) (
   // global signals
   input  logic      clk_i,
@@ -135,11 +137,11 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
 
   // credit counter req-channel
   serial_link_credit_synchronization #(
-    .credit_t               ( bridge_credit_t            ),
-    .data_t                 ( narrow_flit_data_t         ),
-    .NumCredits             ( NumCred_NocBridge          ),
-    .ForceSendThresh        ( ForceSendThresh            ),
-    .CredOnlyConsCred       ( 0                          )
+    .credit_t               ( bridge_credit_t              ),
+    .data_t                 ( narrow_flit_data_t           ),
+    .NumCredits             ( NumCred_NocBridge_narrow_req ),
+    .ForceSendThresh        ( ForceSendThresh_narrow_req   ),
+    .CredOnlyConsCred       ( 0                            )
   ) i_credit_counter_req (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -178,11 +180,11 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
 
   // credit counter rsp-channel
   serial_link_credit_synchronization #(
-    .credit_t               ( bridge_credit_t            ),
-    .data_t                 ( narrow_flit_data_t         ),
-    .NumCredits             ( NumCred_NocBridge          ),
-    .ForceSendThresh        ( ForceSendThresh            ),
-    .CredOnlyConsCred       ( 0                          )
+    .credit_t               ( bridge_credit_t              ),
+    .data_t                 ( narrow_flit_data_t           ),
+    .NumCredits             ( NumCred_NocBridge_narrow_rsp ),
+    .ForceSendThresh        ( ForceSendThresh_narrow_rsp   ),
+    .CredOnlyConsCred       ( 0                            )
   ) i_credit_counter_rsp (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -226,11 +228,11 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
 
   // credit counter wide-channel
   serial_link_credit_synchronization #(
-    .credit_t               ( bridge_credit_t            ),
-    .data_t                 ( wide_flit_data_t           ),
-    .NumCredits             ( NumCred_NocBridge          ),
-    .ForceSendThresh        ( ForceSendThresh            ),
-    .CredOnlyConsCred       ( 0                          )
+    .credit_t               ( bridge_credit_t             ),
+    .data_t                 ( wide_flit_data_t            ),
+    .NumCredits             ( NumCred_NocBridge_wide_chan ),
+    .ForceSendThresh        ( ForceSendThresh_wide_chan   ),
+    .CredOnlyConsCred       ( 0                           )
   ) i_credit_counter_wide (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -405,8 +407,8 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
 
   // Input queue for the req channel.
   stream_fifo #(
-    .T          ( narrow_flit_req_data_t ),
-    .DEPTH      ( NumCred_NocBridge      )
+    .T          ( narrow_flit_req_data_t       ),
+    .DEPTH      ( NumCred_NocBridge_narrow_req )
   ) i_axis_in_req_reg (
     .clk_i      ( clk_i                  ),
     .rst_ni     ( rst_ni                 ),
@@ -425,8 +427,8 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
 
   // Input queue for the rsp channel.
   stream_fifo #(
-    .T          ( narrow_flit_rsp_data_t ),
-    .DEPTH      ( NumCred_NocBridge      )
+    .T          ( narrow_flit_rsp_data_t       ),
+    .DEPTH      ( NumCred_NocBridge_narrow_rsp )
   ) i_axis_in_rsp_reg (
     .clk_i      ( clk_i                  ),
     .rst_ni     ( rst_ni                 ),
@@ -445,8 +447,8 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
 
   // Input queue for the wide channel.
   stream_fifo #(
-    .T          ( wide_flit_data_t          ),
-    .DEPTH      ( NumCred_NocBridge         )
+    .T          ( wide_flit_data_t            ),
+    .DEPTH      ( NumCred_NocBridge_wide_chan )
   ) i_axis_in_wide_reg (
     .clk_i      ( clk_i                     ),
     .rst_ni     ( rst_ni                    ),
