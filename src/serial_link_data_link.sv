@@ -143,12 +143,13 @@ import serial_link_pkg::*;
 
   split_cntr_t requiredSplits;
 
+
   /////////////////////////////////////////////////
   //  Find the amount of data to be transmitted  //
   /////////////////////////////////////////////////
 
   generate
-    if (AllowVarAxisLen) begin
+    if (AllowVarAxisLen) begin : splitDetermination
 
       lzc #(
         .WIDTH ( NumStrbBitsIncoming ),
@@ -171,12 +172,18 @@ import serial_link_pkg::*;
       for (genvar i = 0; i < MaxPossibleTransferSplits; i++) begin
         assign splitSegmentsToBeSent[i] = remainingBitsForBitmask <= (i*BandWidth);
       end
+
+      // For synthesis: make the port and connection width match...
+      localparam int cnt_o_port_width = cf_math_pkg::idx_width(MaxPossibleTransferSplits);
+      logic [cnt_o_port_width-1:0] numTrailingZeros;
+      assign trailing_zero_counter = numTrailingZeros;
+
       lzc #(
         .WIDTH ( MaxPossibleTransferSplits ),
         .MODE  ( 1'b0                      )
       ) i_trailing_zero_counter (
         .in_i    ( splitSegmentsToBeSent ),
-        .cnt_o   ( trailing_zero_counter ),
+        .cnt_o   ( numTrailingZeros      ),
         .empty_o ( all_zeros             )
       );
 
@@ -375,7 +382,7 @@ generate
         .send_valid_i           ( axis_in_req_i.tvalid                  ),
         .send_valid_o           ( axis_in_req_tvalid_afterFlowControl   ),
         .send_ready_i           ( axis_in_rsp_tready_afterFlowControl   ),
-        .req_cred_to_buffer_msg ( 'd1                                   ),
+        .req_cred_to_buffer_msg ( 1'd1                                  ),
         // TODO: to re-enable the uncommented feature:
         // 1) switch the 3 disabled ports below
         // 2) Enable the MaxCredPerPktOut line above
@@ -407,7 +414,7 @@ generate
         .send_valid_i           ( axis_in_req_i.tvalid                   ),
         .send_valid_o           ( axis_in_req_tvalid_afterFlowControl    ),
         .send_ready_i           ( axis_in_rsp_tready_afterFlowControl    ),
-        .req_cred_to_buffer_msg ( 'd1                                    ),
+        .req_cred_to_buffer_msg ( 1'd1                                   ),
         // .req_cred_to_buffer_msg ( MaxPossibleTransferSplits              ),
         .credits_received_i     ( credits_incoming                       ),
         .receive_cred_i         ( consume_incoming_credits               ),
