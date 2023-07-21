@@ -215,18 +215,21 @@ import serial_link_pkg::*;
   // TODO: remove the initial begin block below. Only for debugging purposes...
   initial begin
     #3;
-    $display("INFO: Parameter and sizes | Number of required splits: %0d (Bandwidth: %0d & Transfer_size: %0d => strb_data_bits: %0d & user_bits: %0d & req_num_splits: %0d & amount_of_credits: %0d & is_credits_only: 1 => strb %0d)",MaxPossibleTransferSplits, BandWidth, MaxNumOfBitsToBeTransfered, ($bits(payload_t)+NumStrbBitsToSend), NumUserBits, SplitCntrRequiredBits, $bits(credit_t), NumStrbBitsToSend);
-    $display("INFO: Packet-size definit | Strobe to be sent: %76b", axis_in_req_i.t.strb);
-    $display("INFO: Analytics and stats | splitSegmentsToBeSent: %b", splitSegmentsToBeSent);
-    $display("INFO: Analytics and stats | trailing_zero_counter: %0d", trailing_zero_counter);
-    $display("INFO: Analytics and stats | all_zeros: %1b", all_zeros);
-    $display("INFO: Analytics and stats | payload_t: %0d", $bits(payload_t));
-    $display("INFO: Actually to be sent | Transfer_size: %0d", remainingBitsToBeSent);
-    $display("INFO: Actually to be sent | Number of required splits: %0d", (remainingBitsToBeSent+BandWidth-1) / BandWidth);
-    $display("INFO: Actually to be sent | send_hdr.req_num_splits: %0d", send_hdr.req_num_splits);
-    $display("INFO: ------------------------------------------------");
-    // $error("Simulation not actually started. Prevented by debug block...");
-    // $stop;
+    // Only the serial_link_0 should print out (avoid dublicate print outs)
+    if ($sformatf("%m") == "tb_floo_serial_link_narrow_wide.i_serial_link_0.i_serial_link_data_link") begin
+      $display("INFO: Parameter and sizes | Number of required splits: %0d (Bandwidth: %0d & Transfer_size: %0d => strb_data_bits: %0d & user_bits: %0d & req_num_splits: %0d & amount_of_credits: %0d & is_credits_only: 1 => strb %0d)",MaxPossibleTransferSplits, BandWidth, MaxNumOfBitsToBeTransfered, ($bits(payload_t)+NumStrbBitsToSend), NumUserBits, SplitCntrRequiredBits, $bits(credit_t), NumStrbBitsToSend);
+      $display("INFO: Packet-size definit | Strobe to be sent: %76b", axis_in_req_i.t.strb);
+      $display("INFO: Analytics and stats | splitSegmentsToBeSent: %b", splitSegmentsToBeSent);
+      $display("INFO: Analytics and stats | trailing_zero_counter: %0d", trailing_zero_counter);
+      $display("INFO: Analytics and stats | all_zeros: %1b", all_zeros);
+      $display("INFO: Analytics and stats | payload_t: %0d", $bits(payload_t));
+      $display("INFO: Actually to be sent | Transfer_size: %0d", remainingBitsToBeSent);
+      $display("INFO: Actually to be sent | Number of required splits: %0d", (remainingBitsToBeSent+BandWidth-1) / BandWidth);
+      $display("INFO: Actually to be sent | send_hdr.req_num_splits: %0d", send_hdr.req_num_splits);
+      $display("INFO: ------------------------------------------------");
+      // $error("Simulation not actually started. Prevented by debug block...");
+      // $stop;
+    end
   end
 
 
@@ -242,7 +245,10 @@ import serial_link_pkg::*;
 
   // TODO: remove the initial begin block below. Only for debugging purposes...
   initial begin
-    $display("INFO: The stream_fifo of the data_link has a depth of: %0d",RecvFifoDepth);
+    // Only the serial_link_0 should print out (avoid dublicate print outs)
+    if ($sformatf("%m") == "tb_floo_serial_link_narrow_wide.i_serial_link_0.i_serial_link_data_link") begin
+      $display("INFO: The stream_fifo of the data_link has a depth of: %0d", RecvFifoDepth);
+    end
   end
 
   stream_fifo #(
