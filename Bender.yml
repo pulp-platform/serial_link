@@ -53,6 +53,9 @@ sources:
     - src/floo_axis_noc_bridge_virtual_channels.sv
     - src/floo_axis_noc_bridge_virtual_channels_narrow_wide.sv
 
+    # Benchmarking unit
+    - src/serial_link_benchmarking_unit.sv
+
     # Serial Link Wrapper
     - src/axi_serial_link.sv
     - src/floo_serial_link.sv
