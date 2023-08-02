@@ -142,6 +142,10 @@ module tb_floo_serial_link_narrow_wide();
   logic clk_1, clk_2, clk_reg;
   logic rst_1_n, rst_2_n, rst_reg_n;
 
+  // benchmarking wires/variables
+  logic [31:0] serial_link_0_valid_cycles_from_phys, serial_link_0_valid_cycles_to_phys, serial_link_0_number_cycles, data_link_0_num_cred_only_pack_sent, network_0_number_cycles, network_0_valid_cycles_to_phys, network_0_valid_cycles_from_phys, network_0_num_cred_only_pack_sent, network_0_sum_stalled_cyc_cred_cntrs;
+  logic [31:0] serial_link_1_valid_cycles_from_phys, serial_link_1_valid_cycles_to_phys, serial_link_1_number_cycles, data_link_1_num_cred_only_pack_sent, network_1_number_cycles, network_1_valid_cycles_to_phys, network_1_valid_cycles_from_phys, network_1_num_cred_only_pack_sent, network_1_sum_stalled_cyc_cred_cntrs;
+
   // system clock and reset
   clk_rst_gen #(
     .ClkPeriod    ( TckReg          ),
@@ -401,7 +405,7 @@ module tb_floo_serial_link_narrow_wide();
     .RESP_MAX_WAIT_CYCLES ( max_wait_cycles   ),
     // .AXI_MAX_BURST_LEN    ( 1                 ),
     .TRAFFIC_SHAPING      ( 1                 ),
-    .AXI_EXCLS            ( 1'b1              ),
+    .AXI_EXCLS            ( 1'b0              ),
     .AXI_ATOPS            ( 1'b0              ),
     .AXI_BURST_FIXED      ( 1'b1              ),
     .AXI_BURST_INCR       ( 1'b1              ),
@@ -443,7 +447,7 @@ module tb_floo_serial_link_narrow_wide();
     .RESP_MAX_WAIT_CYCLES ( max_wait_cycles ),
     // .AXI_MAX_BURST_LEN    ( 0               ),
     .TRAFFIC_SHAPING      ( 1               ),
-    .AXI_EXCLS            ( 1'b1            ),
+    .AXI_EXCLS            ( 1'b0            ),
     .AXI_ATOPS            ( 1'b0            ),
     .AXI_BURST_FIXED      ( 1'b1            ),
     .AXI_BURST_INCR       ( 1'b1            ),
@@ -799,9 +803,35 @@ module tb_floo_serial_link_narrow_wide();
   `AXI_ASSIGN_REQ_STRUCT(wide_remapped_out_req_1, wide_axi_out_req_1)
   `AXI_ASSIGN_RESP_STRUCT(wide_remapped_out_rsp_1, wide_axi_out_rsp_1)
 
-  // ==============
+  // =======================
+  //    Benchmarking unit
+  // =======================
+
+  serial_link_benchmarking_unit #(
+  ) i_benchmarking (
+    .serial_link_0_valid_cycles_from_phys ( serial_link_0_valid_cycles_from_phys ),
+    .serial_link_0_number_cycles          ( serial_link_0_number_cycles          ),
+    .serial_link_0_valid_cycles_to_phys   ( serial_link_0_valid_cycles_to_phys   ),
+    .serial_link_1_valid_cycles_from_phys ( serial_link_1_valid_cycles_from_phys ),
+    .serial_link_1_number_cycles          ( serial_link_1_number_cycles          ),
+    .serial_link_1_valid_cycles_to_phys   ( serial_link_1_valid_cycles_to_phys   ),
+    .data_link_0_num_cred_only_pack_sent  ( data_link_0_num_cred_only_pack_sent  ),
+    .data_link_1_num_cred_only_pack_sent  ( data_link_1_num_cred_only_pack_sent  ),
+    .network_0_valid_cycles_to_phys       ( network_0_valid_cycles_to_phys       ),
+    .network_0_number_cycles              ( network_0_number_cycles              ),
+    .network_0_num_cred_only_pack_sent    ( network_0_num_cred_only_pack_sent    ),
+    .network_0_valid_cycles_from_phys     ( network_0_valid_cycles_from_phys     ),
+    .network_0_sum_stalled_cyc_cred_cntrs ( network_0_sum_stalled_cyc_cred_cntrs ),
+    .network_1_valid_cycles_to_phys       ( network_1_valid_cycles_to_phys       ),
+    .network_1_number_cycles              ( network_1_number_cycles              ),
+    .network_1_num_cred_only_pack_sent    ( network_1_num_cred_only_pack_sent    ),
+    .network_1_valid_cycles_from_phys     ( network_1_valid_cycles_from_phys     ),
+    .network_1_sum_stalled_cyc_cred_cntrs ( network_1_sum_stalled_cyc_cred_cntrs )
+  );
+
+  // ===========
   //    Tasks
-  // ==============
+  // ===========
 
   task automatic wait_for_config_1();
     while (config_done_1 != 1) begin
@@ -828,12 +858,12 @@ module tb_floo_serial_link_narrow_wide();
       @(posedge clk_1);
     end
     $display("[SYS] Simulation Stopped (%d ns)", $time);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.benchmarking_attempts ||| valid_coverage_to_phys %3.2f%%, valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d", 100*ActiveClockCycles_to_phys_0/(1.0*NumberOfClockCycles_0), 100*ActiveClockCycles_from_phys_0/(1.0*NumberOfClockCycles_0), NumberOfClockCycles_0, ActiveClockCycles_to_phys_0, ActiveClockCycles_from_phys_0);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.num_cred_only ||| cred_only_packets_sent %0d", NumberOfCreditOnly_0);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.noc_bridge_benchmarking ||| %3.2f%% %3.2f%% %0d %0d", 100*activeCyclesBridge_to_phys_0/(1.0*clockCyclesBridge_0), 100*activeCyclesBridge_from_phys_0/(1.0*clockCyclesBridge_0), creditOnlyBridge_0, hold_back_0);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.benchmarking_attempts ||| valid_coverage_to_phys %3.2f%%, valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d", 100*ActiveClockCycles_to_phys_1/(1.0*NumberOfClockCycles_1), 100*ActiveClockCycles_from_phys_1/(1.0*NumberOfClockCycles_1), NumberOfClockCycles_1, ActiveClockCycles_to_phys_1, ActiveClockCycles_from_phys_1);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.num_cred_only ||| cred_only_packets_sent %0d", NumberOfCreditOnly_1);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.noc_bridge_benchmarking ||| %3.2f%% %3.2f%% %0d %0d", 100*activeCyclesBridge_to_phys_1/(1.0*clockCyclesBridge_1), 100*activeCyclesBridge_from_phys_1/(1.0*clockCyclesBridge_1), creditOnlyBridge_1, hold_back_1);
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.benchmarking_attempts ||| valid_coverage_to_phys %3.2f%%, valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d", 100*serial_link_0_valid_cycles_to_phys/(1.0*serial_link_0_number_cycles), 100*serial_link_0_valid_cycles_from_phys/(1.0*serial_link_0_number_cycles), serial_link_0_number_cycles, serial_link_0_valid_cycles_to_phys, serial_link_0_valid_cycles_from_phys);
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.num_cred_only ||| cred_only_packets_sent %0d", data_link_0_num_cred_only_pack_sent);
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.noc_bridge_benchmarking ||| %3.2f%% %3.2f%% %0d %0d", 100*network_0_valid_cycles_to_phys/(1.0*network_0_number_cycles), 100*network_0_valid_cycles_from_phys/(1.0*network_0_number_cycles), network_0_num_cred_only_pack_sent, network_0_sum_stalled_cyc_cred_cntrs);
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.benchmarking_attempts ||| valid_coverage_to_phys %3.2f%%, valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d", 100*serial_link_1_valid_cycles_to_phys/(1.0*serial_link_1_number_cycles), 100*serial_link_1_valid_cycles_from_phys/(1.0*serial_link_1_number_cycles), serial_link_1_number_cycles, serial_link_1_valid_cycles_to_phys, serial_link_1_valid_cycles_from_phys);
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.num_cred_only ||| cred_only_packets_sent %0d", data_link_1_num_cred_only_pack_sent);
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.noc_bridge_benchmarking ||| %3.2f%% %3.2f%% %0d %0d", 100*network_1_valid_cycles_to_phys/(1.0*network_1_number_cycles), 100*network_1_valid_cycles_from_phys/(1.0*network_1_number_cycles), network_1_num_cred_only_pack_sent, network_1_sum_stalled_cyc_cred_cntrs);
     $display("benchmarking: Performance Rating (lower is better): %0d (avg)", (time_narrow_1+time_narrow_2+time_wide_1+time_wide_2)/(TestDuration*4));
     $stop();
   endtask
