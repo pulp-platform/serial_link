@@ -6,6 +6,8 @@
 //  - Yannick Baumann <baumanny@ethz.student.ch>
 
   `include "register_interface/typedef.svh"
+  // required to suppress elaboration errors
+  `define performSynthesis
 
   import serial_link_reg_pkg::*;
   import floo_narrow_wide_flit_pkg::*;

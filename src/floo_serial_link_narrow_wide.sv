@@ -332,15 +332,21 @@ module floo_serial_link_narrow_wide
     );
   end
 
-  insert_latency_to_signal #(
-    .data_width  ( (NumChannels*NumLanes) + NumChannels ),
-    .delay       ( 0 ),
-    .use_default ( 0 ),
-    .default_val ( 0 )
-  ) i_signal_shifter5 (
-    .signal_i ( {ddr_i, ddr_rcv_clk_i}             ),
-    .signal_o ( {ddr_delayed, ddr_rcv_clk_delayed} )
-  );
+  `ifdef performSynthesis
+    assign ddr_delayed = ddr_i;
+    assign ddr_rcv_clk_delayed = ddr_rcv_clk_i;
+  `endif
+  `ifndef performSynthesis
+    insert_latency_to_signal #(
+      .data_width  ( (NumChannels*NumLanes) + NumChannels ),
+      .delay       ( 5  ),
+      .use_default ( 1  ),
+      .default_val ( '1 )
+    ) i_signal_shifter (
+      .signal_i ( {ddr_i, ddr_rcv_clk_i}             ),
+      .signal_o ( {ddr_delayed, ddr_rcv_clk_delayed} )
+    );
+  `endif
 
   /////////////////////////////////
   //   CONFIGURATION REGISTERS   //
