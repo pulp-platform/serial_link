@@ -8,6 +8,10 @@
 // This benchmarking unit is to be used in the tb_floo_serial_link_narrow_wide.sv
 // testbench in combination with the analyzePerformance.tcl script.
 module serial_link_benchmarking_unit #(
+  parameter type narrow_axi_rand_master_t = logic,
+  parameter type narrow_axi_rand_slave_t = logic,
+  parameter type wide_axi_rand_master_t = logic,
+  parameter type wide_axi_rand_slave_t = logic
 ) (
   output logic[31:0] serial_link_0_number_cycles,
   output logic[31:0] serial_link_0_valid_cycles_to_phys,
@@ -34,6 +38,93 @@ module serial_link_benchmarking_unit #(
   // When designs are being synthesized, the variable performSynthesis should be defined.
   // This prevents the elaboration of the benchmarking module and therefore avoids error messages.
   `ifndef performSynthesis
+
+    // Helper objects to read out the different fields of the types
+    narrow_axi_rand_master_t test_object_narrow_axi_rand_master;
+    narrow_axi_rand_slave_t test_object_narrow_axi_rand_slave;
+    wide_axi_rand_master_t test_object_wide_axi_rand_master;
+    wide_axi_rand_slave_t test_object_wide_axi_rand_slave;
+
+    // print out relevant information concerning the configuration and selected parameters for the respective benchmarking run
+    initial begin
+      $display("settings: latency_of_delay_module;%0d_ns bandwidth_physical_channel;%0d_bits_per_offchip_rising_clockedge number_of_channels;%0d \
+number_of_lanes;%0d max_data_transer_size;%0d_bits data_link_stream_fifo_depth;%0d",
+      i_serial_link_0.i_signal_shifter.delay, i_serial_link_0.i_serial_link_data_link.BandWidth, i_serial_link_0.i_serial_link_data_link.NumChannels,
+      i_serial_link_0.i_serial_link_data_link.NumLanes, i_serial_link_0.i_serial_link_data_link.MaxNumOfBitsToBeTransfered,
+      i_serial_link_0.i_serial_link_data_link.RecvFifoDepth);
+
+      $display("rand_device: narrow_axi_rand_master_t.AW$%0d", test_object_narrow_axi_rand_master.AW);
+      $display("rand_device: narrow_axi_rand_master_t.DW$%0d", test_object_narrow_axi_rand_master.DW);
+      $display("rand_device: narrow_axi_rand_master_t.IW$%0d", test_object_narrow_axi_rand_master.IW);
+      $display("rand_device: narrow_axi_rand_master_t.UW$%0d", test_object_narrow_axi_rand_master.UW);
+      $display("rand_device: narrow_axi_rand_master_t.TA$%0d", test_object_narrow_axi_rand_master.TA);
+      $display("rand_device: narrow_axi_rand_master_t.TT$%0d", test_object_narrow_axi_rand_master.TT);
+      $display("rand_device: narrow_axi_rand_master_t.MAX_READ_TXNS$%0d", test_object_narrow_axi_rand_master.MAX_READ_TXNS);
+      $display("rand_device: narrow_axi_rand_master_t.MAX_WRITE_TXNS$%0d", test_object_narrow_axi_rand_master.MAX_WRITE_TXNS);
+      $display("rand_device: narrow_axi_rand_master_t.AX_MIN_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_master.AX_MIN_WAIT_CYCLES);
+      $display("rand_device: narrow_axi_rand_master_t.AX_MAX_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_master.AX_MAX_WAIT_CYCLES);
+      $display("rand_device: narrow_axi_rand_master_t.W_MIN_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_master.W_MIN_WAIT_CYCLES);
+      $display("rand_device: narrow_axi_rand_master_t.W_MAX_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_master.W_MAX_WAIT_CYCLES);
+      $display("rand_device: narrow_axi_rand_master_t.RESP_MIN_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_master.RESP_MIN_WAIT_CYCLES);
+      $display("rand_device: narrow_axi_rand_master_t.RESP_MAX_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_master.RESP_MAX_WAIT_CYCLES);
+      $display("rand_device: narrow_axi_rand_master_t.TRAFFIC_SHAPING$%0d", test_object_narrow_axi_rand_master.TRAFFIC_SHAPING);
+      $display("rand_device: narrow_axi_rand_master_t.AXI_EXCLS$%0d", test_object_narrow_axi_rand_master.AXI_EXCLS);
+      $display("rand_device: narrow_axi_rand_master_t.AXI_ATOPS$%0d", test_object_narrow_axi_rand_master.AXI_ATOPS);
+      $display("rand_device: narrow_axi_rand_master_t.AXI_BURST_FIXED$%0d", test_object_narrow_axi_rand_master.AXI_BURST_FIXED);
+      $display("rand_device: narrow_axi_rand_master_t.AXI_BURST_INCR$%0d", test_object_narrow_axi_rand_master.AXI_BURST_INCR);
+      $display("rand_device: narrow_axi_rand_master_t.AXI_BURST_WRAP$%0d", test_object_narrow_axi_rand_master.AXI_BURST_WRAP);
+
+      $display("rand_device: wide_axi_rand_master_t.AW$%0d", test_object_wide_axi_rand_master.AW);
+      $display("rand_device: wide_axi_rand_master_t.DW$%0d", test_object_wide_axi_rand_master.DW);
+      $display("rand_device: wide_axi_rand_master_t.IW$%0d", test_object_wide_axi_rand_master.IW);
+      $display("rand_device: wide_axi_rand_master_t.UW$%0d", test_object_wide_axi_rand_master.UW);
+      $display("rand_device: wide_axi_rand_master_t.TA$%0d", test_object_wide_axi_rand_master.TA);
+      $display("rand_device: wide_axi_rand_master_t.TT$%0d", test_object_wide_axi_rand_master.TT);
+      $display("rand_device: wide_axi_rand_master_t.MAX_READ_TXNS$%0d", test_object_wide_axi_rand_master.MAX_READ_TXNS);
+      $display("rand_device: wide_axi_rand_master_t.MAX_WRITE_TXNS$%0d", test_object_wide_axi_rand_master.MAX_WRITE_TXNS);
+      $display("rand_device: wide_axi_rand_master_t.AX_MIN_WAIT_CYCLES$%0d", test_object_wide_axi_rand_master.AX_MIN_WAIT_CYCLES);
+      $display("rand_device: wide_axi_rand_master_t.AX_MAX_WAIT_CYCLES$%0d", test_object_wide_axi_rand_master.AX_MAX_WAIT_CYCLES);
+      $display("rand_device: wide_axi_rand_master_t.W_MIN_WAIT_CYCLES$%0d", test_object_wide_axi_rand_master.W_MIN_WAIT_CYCLES);
+      $display("rand_device: wide_axi_rand_master_t.W_MAX_WAIT_CYCLES$%0d", test_object_wide_axi_rand_master.W_MAX_WAIT_CYCLES);
+      $display("rand_device: wide_axi_rand_master_t.RESP_MIN_WAIT_CYCLES$%0d", test_object_wide_axi_rand_master.RESP_MIN_WAIT_CYCLES);
+      $display("rand_device: wide_axi_rand_master_t.RESP_MAX_WAIT_CYCLES$%0d", test_object_wide_axi_rand_master.RESP_MAX_WAIT_CYCLES);
+      $display("rand_device: wide_axi_rand_master_t.TRAFFIC_SHAPING$%0d", test_object_wide_axi_rand_master.TRAFFIC_SHAPING);
+      $display("rand_device: wide_axi_rand_master_t.AXI_EXCLS$%0d", test_object_wide_axi_rand_master.AXI_EXCLS);
+      $display("rand_device: wide_axi_rand_master_t.AXI_ATOPS$%0d", test_object_wide_axi_rand_master.AXI_ATOPS);
+      $display("rand_device: wide_axi_rand_master_t.AXI_BURST_FIXED$%0d", test_object_wide_axi_rand_master.AXI_BURST_FIXED);
+      $display("rand_device: wide_axi_rand_master_t.AXI_BURST_INCR$%0d", test_object_wide_axi_rand_master.AXI_BURST_INCR);
+      $display("rand_device: wide_axi_rand_master_t.AXI_BURST_WRAP$%0d", test_object_wide_axi_rand_master.AXI_BURST_WRAP);
+
+      $display("rand_device: narrow_axi_rand_slave_t.AW$%0d", test_object_narrow_axi_rand_slave.AW);
+      $display("rand_device: narrow_axi_rand_slave_t.DW$%0d", test_object_narrow_axi_rand_slave.DW);
+      $display("rand_device: narrow_axi_rand_slave_t.IW$%0d", test_object_narrow_axi_rand_slave.IW);
+      $display("rand_device: narrow_axi_rand_slave_t.UW$%0d", test_object_narrow_axi_rand_slave.UW);
+      $display("rand_device: narrow_axi_rand_slave_t.TA$%0d", test_object_narrow_axi_rand_slave.TA);
+      $display("rand_device: narrow_axi_rand_slave_t.TT$%0d", test_object_narrow_axi_rand_slave.TT);
+      $display("rand_device: narrow_axi_rand_slave_t.RAND_RESP$%0d", test_object_narrow_axi_rand_slave.RAND_RESP);
+      $display("rand_device: narrow_axi_rand_slave_t.AX_MIN_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_slave.AX_MIN_WAIT_CYCLES);
+      $display("rand_device: narrow_axi_rand_slave_t.AX_MAX_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_slave.AX_MAX_WAIT_CYCLES);
+      $display("rand_device: narrow_axi_rand_slave_t.R_MIN_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_slave.R_MIN_WAIT_CYCLES);
+      $display("rand_device: narrow_axi_rand_slave_t.R_MAX_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_slave.R_MAX_WAIT_CYCLES);
+      $display("rand_device: narrow_axi_rand_slave_t.RESP_MIN_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_slave.RESP_MIN_WAIT_CYCLES);
+      $display("rand_device: narrow_axi_rand_slave_t.RESP_MAX_WAIT_CYCLES$%0d", test_object_narrow_axi_rand_slave.RESP_MAX_WAIT_CYCLES);
+
+      $display("rand_device: wide_axi_rand_slave_t.AW$%0d", test_object_wide_axi_rand_slave.AW);
+      $display("rand_device: wide_axi_rand_slave_t.DW$%0d", test_object_wide_axi_rand_slave.DW);
+      $display("rand_device: wide_axi_rand_slave_t.IW$%0d", test_object_wide_axi_rand_slave.IW);
+      $display("rand_device: wide_axi_rand_slave_t.UW$%0d", test_object_wide_axi_rand_slave.UW);
+      $display("rand_device: wide_axi_rand_slave_t.TA$%0d", test_object_wide_axi_rand_slave.TA);
+      $display("rand_device: wide_axi_rand_slave_t.TT$%0d", test_object_wide_axi_rand_slave.TT);
+      $display("rand_device: wide_axi_rand_slave_t.RAND_RESP$%0d", test_object_wide_axi_rand_slave.RAND_RESP);
+      $display("rand_device: wide_axi_rand_slave_t.AX_MIN_WAIT_CYCLES$%0d", test_object_wide_axi_rand_slave.AX_MIN_WAIT_CYCLES);
+      $display("rand_device: wide_axi_rand_slave_t.AX_MAX_WAIT_CYCLES$%0d", test_object_wide_axi_rand_slave.AX_MAX_WAIT_CYCLES);
+      $display("rand_device: wide_axi_rand_slave_t.R_MIN_WAIT_CYCLES$%0d", test_object_wide_axi_rand_slave.R_MIN_WAIT_CYCLES);
+      $display("rand_device: wide_axi_rand_slave_t.R_MAX_WAIT_CYCLES$%0d", test_object_wide_axi_rand_slave.R_MAX_WAIT_CYCLES);
+      $display("rand_device: wide_axi_rand_slave_t.RESP_MIN_WAIT_CYCLES$%0d", test_object_wide_axi_rand_slave.RESP_MIN_WAIT_CYCLES);
+      $display("rand_device: wide_axi_rand_slave_t.RESP_MAX_WAIT_CYCLES$%0d", test_object_wide_axi_rand_slave.RESP_MAX_WAIT_CYCLES);
+    end
+
+
     //////////////////////////////////
     //  valid_coverage_serial_link  //
     //////////////////////////////////

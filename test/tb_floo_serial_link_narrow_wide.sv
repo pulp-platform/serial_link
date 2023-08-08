@@ -815,6 +815,10 @@ module tb_floo_serial_link_narrow_wide();
   // =======================
 
   serial_link_benchmarking_unit #(
+    .narrow_axi_rand_master_t ( narrow_axi_rand_master_t ),
+    .narrow_axi_rand_slave_t  ( narrow_axi_rand_slave_t  ),
+    .wide_axi_rand_master_t   ( wide_axi_rand_master_t   ),
+    .wide_axi_rand_slave_t    ( wide_axi_rand_slave_t    )
   ) i_benchmarking (
     .serial_link_0_valid_cycles_from_phys ( serial_link_0_valid_cycles_from_phys ),
     .serial_link_0_number_cycles          ( serial_link_0_number_cycles          ),
@@ -867,11 +871,6 @@ module tb_floo_serial_link_narrow_wide();
       @(posedge clk_1);
     end
     $display("[SYS] Simulation Stopped (%d ns)", $time);
-    $display("settings: latency_of_delay_module;%0d_ns bandwidth_physical_channel;%0d_bits_per_offchip_rising_clockedge number_of_channels;%0d \
-number_of_lanes;%0d max_data_transer_size;%0d_bits data_link_stream_fifo_depth;%0d",
-      i_serial_link_0.i_signal_shifter.delay, i_serial_link_0.i_serial_link_data_link.BandWidth, i_serial_link_0.i_serial_link_data_link.NumChannels,
-      i_serial_link_0.i_serial_link_data_link.NumLanes, i_serial_link_0.i_serial_link_data_link.MaxNumOfBitsToBeTransfered,
-      i_serial_link_0.i_serial_link_data_link.RecvFifoDepth);
     $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.benchmarking_attempts ||| \
 valid_coverage_to_phys %3.2f%%, valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d",
       100*serial_link_0_valid_cycles_to_phys/(1.0*serial_link_0_number_cycles),
