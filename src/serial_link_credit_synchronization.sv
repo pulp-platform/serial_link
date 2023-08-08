@@ -5,23 +5,28 @@
 // Its internal credit coutners are used to control the handshaking interfaces. Therefore, it may be
 // used to intercept an existing data line with valid/ready handshaking.
 module serial_link_credit_synchronization #(
-  parameter  type credit_t        = logic,
+  parameter  type  credit_t          = logic,
   // declare eighter the data_t type or alternatively assign the data-width directly. In the latter case the type will
   // not be considered.
-  parameter  type data_t          = logic,
-  parameter  int  data_width      = $bits(data_t),
+  parameter  type  data_t            = logic,
+  parameter  int   data_width        = $bits(data_t),
   // For credit-based control flow
-  parameter  int  NumCredits      = -1,
+  parameter  int   NumCredits        = -1,
   // Force send out credits belonging to the other side
   // after ForceSendThresh is reached
-  parameter  int ForceSendThresh  = NumCredits - 4,
+  parameter  int   ForceSendThresh   = NumCredits - 4,
   // Assign the number of credits that an outgoing credits_only packet will consume (see credits_only_packet_o port).
-  parameter  int CredOnlyConsCred = 1,
+  parameter  int   CredOnlyConsCred  = 1,
   // Alter this parameter, if an outgoing data packet can consume more than 1 credit. This option does not make sense
   // in the normal operation mode, however, is useful in combination with the variable message sizes of the
   // serial_link_data_link. While wider messages might occupy more space in the receiving fifo, narrower packets
   // might only consume one entry of the fifo. Use this parameter in combination with the input pin "req_cred_to_buffer_msg".
-  parameter  int MaxCredPerPktOut = 1,
+  parameter  int   MaxCredPerPktOut  = 1,
+  // To allow a stable data output (not changing data or amount of credits to send, while output valid is asserted)
+  // a shadow counter is utilized to keep track of the credits released in the mean time. However, in case the credits_to_send_o
+  // output port is allowed to change while send_valid_o is HIGH, the below parameter might be set to 1, which will
+  // disable the internal shadow_counter.
+  parameter  logic DontUseShadowCtnr = 0,
 
   // dependant parameters: Do not change!
   localparam type credit_decrem_t = logic[$clog2(MaxCredPerPktOut+1)-1:0]
@@ -100,6 +105,9 @@ module serial_link_credit_synchronization #(
   logic credits_to_send_increment, credits_to_send_hidden_increment;
   credit_t credits_available_increment, credits_to_send_offset, credits_to_send_decrement, credits_to_send_hidden_decrement;
 
+  logic allow_to_send_credit_only_packets, cannot_send_data_packet;
+  logic consume_last_credits_but_dont_return_any, enough_credits_for_cred_only_pack_to_send;
+
   assign send_ready_o          = send_ready_i & send_normal_packet_q & send_valid_o;
   assign credits_to_send_o     = credits_to_send_q;
   assign credits_only_packet_o = ~send_normal_packet_q;
@@ -119,18 +127,30 @@ module serial_link_credit_synchronization #(
     end
   end
 
-  // TODO: improve readability of the below code block:
   // feasibility of packet types to be sent
   always_comb begin : can_only_send_credit_only
+    // old code version:
+    // cannot_send_data_but_credits_only = '0;
+    // if ((credits_available_q > req_cred_to_buffer_msg) || ( credits_available_q == req_cred_to_buffer_msg && credits_to_send_q > 0 && allow_cred_consume_i)) begin
+    //   // can send data
+    // end else begin
+    //   // cannot send data
+    //   if ((credits_available_q > CredOnlyConsCred) || ( credits_available_q == CredOnlyConsCred && credits_to_send_q > 0 && allow_cred_consume_i)) begin
+    //     // can send credits_only
+    //     cannot_send_data_but_credits_only = 1;
+    //   end
+    // end
+
+    // new code version (equivalent to the old version, just some reformatting):
     cannot_send_data_but_credits_only = '0;
-    if ((credits_available_q > req_cred_to_buffer_msg) || ( credits_available_q == req_cred_to_buffer_msg && credits_to_send_q > 0 && allow_cred_consume_i)) begin
-      // can send data
-    end else begin
-      // cannot send data
-      if ((credits_available_q > CredOnlyConsCred) || ( credits_available_q == CredOnlyConsCred && credits_to_send_q > 0 && allow_cred_consume_i)) begin
-        // can send credits_only
-        cannot_send_data_but_credits_only = 1;
-      end
+
+    allow_to_send_credit_only_packets = (credits_available_q > CredOnlyConsCred) || ( credits_available_q == CredOnlyConsCred && credits_to_send_q > 0 && allow_cred_consume_i);
+    cannot_send_data_packet = credits_available_q < req_cred_to_buffer_msg;
+    consume_last_credits_but_dont_return_any = (credits_available_q == req_cred_to_buffer_msg) && !(credits_to_send_q > 0 && allow_cred_consume_i);
+    enough_credits_for_cred_only_pack_to_send = (credits_available_q > CredOnlyConsCred);
+    if ((cannot_send_data_packet && allow_to_send_credit_only_packets) || (consume_last_credits_but_dont_return_any && enough_credits_for_cred_only_pack_to_send)) begin
+      // cannot send data BUT can send credits_only packet
+      cannot_send_data_but_credits_only = 1;
     end
   end
 
@@ -205,20 +225,30 @@ module serial_link_credit_synchronization #(
     credits_to_send_decrement = '0;
     credits_to_send_offset    = '0;
 
-    // There is a valid output handshake or credits are force consumed, allowing the shadow (hidden) counter to be transfered
-    if ((send_valid_o & send_ready_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
-      // The hidden credits are transfered to the visible counter
-      credits_to_send_offset = credits_to_send_hidden_q;
-    end
-    // Credits are only released if they are allowed to be consumed & I have a valid packet or force consume credits.
-    if ((send_valid_o & send_ready_i & allow_cred_consume_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
-      // The counter is decremented by the amount of credits being released
-      credits_to_send_decrement = credits_to_send_q;
-    end
-    // potential increments are only ignored if (send_valid_o & ~send_ready_i) as in this case the hidden counter
-    // is incremented instead.
-    if (~send_valid_o | (send_valid_o & send_ready_i)) begin
+    // different logic depending on whether or not the shadow counter is being used
+    if (DontUseShadowCtnr) begin
+      // Credits are only released if they are allowed to be consumed & I have a valid packet OR force consume credits.
+      if ((send_valid_o & send_ready_i & allow_cred_consume_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+        // The counter is decremented by the amount of credits being released
+        credits_to_send_decrement = credits_to_send_q;
+      end
       credits_to_send_increment = (buffer_queue_out_val_i & buffer_queue_out_rdy_i);
+    end else begin
+      // There is a valid output handshake or credits are force consumed, allowing the shadow (hidden) counter to be transfered
+      if ((send_valid_o & send_ready_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+        // The hidden credits are transfered to the visible counter
+        credits_to_send_offset = credits_to_send_hidden_q;
+      end
+      // Credits are only released if they are allowed to be consumed & I have a valid packet OR force consume credits.
+      if ((send_valid_o & send_ready_i & allow_cred_consume_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+        // The counter is decremented by the amount of credits being released
+        credits_to_send_decrement = credits_to_send_q;
+      end
+      // potential increments are only ignored if (send_valid_o & ~send_ready_i) as in this case the hidden counter
+      // is incremented instead.
+      if ((~send_valid_o | (send_valid_o & send_ready_i))) begin
+        credits_to_send_increment = (buffer_queue_out_val_i & buffer_queue_out_rdy_i);
+      end
     end
   end
 
@@ -229,18 +259,21 @@ module serial_link_credit_synchronization #(
     credits_to_send_hidden_increment = '0;
     credits_to_send_hidden_decrement = '0;
 
-    // I don't have a handshake yet, but valid is set to high. Therefore, the hidden counter is being increased instead
-    // such as not to change the credits_to_send_o while valid data is being available.
-    if (send_valid_o & ~send_ready_i) begin
-      // increment if the buffer queue releases an element.
-      credits_to_send_hidden_increment = (buffer_queue_out_val_i & buffer_queue_out_rdy_i);
-    end
+    // shadow counter can be disabled via DontUseShadowCtnr parameter
+    if (~DontUseShadowCtnr) begin
+      // I don't have a handshake yet, but valid is set to high. Therefore, the hidden counter is being increased instead
+      // such as not to change the credits_to_send_o while valid data is being available.
+      if (send_valid_o & ~send_ready_i) begin
+        // increment if the buffer queue releases an element.
+        credits_to_send_hidden_increment = (buffer_queue_out_val_i & buffer_queue_out_rdy_i);
+      end
 
-    if ((send_valid_o & send_ready_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
-      // In the case of a valid data-out handshake, the hidden counter
-      // value will be assigned to the visible counter after releasing the packet. Therefore, these assigned credits
-      // can be removed from the hidden counter.
-      credits_to_send_hidden_decrement = credits_to_send_hidden_q;
+      if ((send_valid_o & send_ready_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+        // In the case of a valid data-out handshake, the hidden counter
+        // value will be assigned to the visible counter after releasing the packet. Therefore, these assigned credits
+        // can be removed from the hidden counter.
+        credits_to_send_hidden_decrement = credits_to_send_hidden_q;
+      end
     end
   end
 
