@@ -142,88 +142,89 @@ module serial_link_benchmarking_unit #(
   //  valid_coverage_network  //
   //////////////////////////////
 
-  // ===========================
-  //    variable declarations
-  // ===========================
-  int cntr_var_network_0_number_cycles = 0;
-  int cntr_var_network_0_valid_cycles_to_phys = 0;
-  int cntr_var_network_0_valid_cycles_from_phys = 0;
-  int cntr_var_network_0_num_cred_only_pack_sent = 0;
-  int cntr_var_network_0_sum_stalled_cyc_cred_cntrs = 0;
+  if (i_serial_link_0.BridgeVirtualChannels) begin
+    // ===========================
+    //    variable declarations
+    // ===========================
+    int cntr_var_network_0_number_cycles = 0;
+    int cntr_var_network_0_valid_cycles_to_phys = 0;
+    int cntr_var_network_0_valid_cycles_from_phys = 0;
+    int cntr_var_network_0_num_cred_only_pack_sent = 0;
+    int cntr_var_network_0_sum_stalled_cyc_cred_cntrs = 0;
 
-  int cntr_var_network_1_number_cycles = 0;
-  int cntr_var_network_1_valid_cycles_to_phys = 0;
-  int cntr_var_network_1_valid_cycles_from_phys = 0;
-  int cntr_var_network_1_num_cred_only_pack_sent = 0;
-  int cntr_var_network_1_sum_stalled_cyc_cred_cntrs = 0;
+    int cntr_var_network_1_number_cycles = 0;
+    int cntr_var_network_1_valid_cycles_to_phys = 0;
+    int cntr_var_network_1_valid_cycles_from_phys = 0;
+    int cntr_var_network_1_num_cred_only_pack_sent = 0;
+    int cntr_var_network_1_sum_stalled_cyc_cred_cntrs = 0;
 
-  // ========================
-  //    benchmarking logic
-  // ========================
-  always_ff @(posedge i_serial_link_0.bridge.i_serial_link_network.clk_i or negedge i_serial_link_0.bridge.i_serial_link_network.rst_ni) begin : valid_coverage_network_0
-    if (!i_serial_link_0.bridge.i_serial_link_network.rst_ni) begin
-      cntr_var_network_0_number_cycles = 0;
-      cntr_var_network_0_valid_cycles_to_phys = 0;
-      cntr_var_network_0_valid_cycles_from_phys = 0;
-      cntr_var_network_0_num_cred_only_pack_sent = 0;
-      cntr_var_network_0_sum_stalled_cyc_cred_cntrs = 0;
-    end else begin
-      cntr_var_network_0_number_cycles++;
-      if (i_serial_link_0.bridge.i_serial_link_network.narrow_req_i.valid || i_serial_link_0.bridge.i_serial_link_network.narrow_rsp_i.valid || i_serial_link_0.bridge.i_serial_link_network.wide_i.valid) begin
-        cntr_var_network_0_valid_cycles_to_phys++;
-      end
-      if (i_serial_link_0.bridge.i_serial_link_network.axis_in_req_i.tvalid) begin
-        cntr_var_network_0_valid_cycles_from_phys++;
-      end
-      if (i_serial_link_0.bridge.i_serial_link_network.axis_out_rsp_i.tready && i_serial_link_0.bridge.i_serial_link_network.axis_out_req_o.tvalid && i_serial_link_0.bridge.i_serial_link_network.narrow_wide_axis_out.data_validity == 0) begin
-        cntr_var_network_0_num_cred_only_pack_sent++;
-      end
-      if ((i_serial_link_0.bridge.i_serial_link_network.wide_i.valid && !i_serial_link_0.bridge.i_serial_link_network.wide_valid_synchr_out) || (i_serial_link_0.bridge.i_serial_link_network.narrow_rsp_i.valid && !i_serial_link_0.bridge.i_serial_link_network.rsp_valid_synchr_out) || (i_serial_link_0.bridge.i_serial_link_network.narrow_req_i.valid && !i_serial_link_0.bridge.i_serial_link_network.req_valid_synchr_out)) begin
-        cntr_var_network_0_sum_stalled_cyc_cred_cntrs++;
+    // ========================
+    //    benchmarking logic
+    // ========================
+    always_ff @(posedge i_serial_link_0.bridge.i_serial_link_network.clk_i or negedge i_serial_link_0.bridge.i_serial_link_network.rst_ni) begin : valid_coverage_network_0
+      if (!i_serial_link_0.bridge.i_serial_link_network.rst_ni) begin
+        cntr_var_network_0_number_cycles = 0;
+        cntr_var_network_0_valid_cycles_to_phys = 0;
+        cntr_var_network_0_valid_cycles_from_phys = 0;
+        cntr_var_network_0_num_cred_only_pack_sent = 0;
+        cntr_var_network_0_sum_stalled_cyc_cred_cntrs = 0;
+      end else begin
+        cntr_var_network_0_number_cycles++;
+        if (i_serial_link_0.bridge.i_serial_link_network.narrow_req_i.valid || i_serial_link_0.bridge.i_serial_link_network.narrow_rsp_i.valid || i_serial_link_0.bridge.i_serial_link_network.wide_i.valid) begin
+          cntr_var_network_0_valid_cycles_to_phys++;
+        end
+        if (i_serial_link_0.bridge.i_serial_link_network.axis_in_req_i.tvalid) begin
+          cntr_var_network_0_valid_cycles_from_phys++;
+        end
+        if (i_serial_link_0.bridge.i_serial_link_network.axis_out_rsp_i.tready && i_serial_link_0.bridge.i_serial_link_network.axis_out_req_o.tvalid && i_serial_link_0.bridge.i_serial_link_network.narrow_wide_axis_out.data_validity == 0) begin
+          cntr_var_network_0_num_cred_only_pack_sent++;
+        end
+        if ((i_serial_link_0.bridge.i_serial_link_network.wide_i.valid && !i_serial_link_0.bridge.i_serial_link_network.wide_valid_synchr_out) || (i_serial_link_0.bridge.i_serial_link_network.narrow_rsp_i.valid && !i_serial_link_0.bridge.i_serial_link_network.rsp_valid_synchr_out) || (i_serial_link_0.bridge.i_serial_link_network.narrow_req_i.valid && !i_serial_link_0.bridge.i_serial_link_network.req_valid_synchr_out)) begin
+          cntr_var_network_0_sum_stalled_cyc_cred_cntrs++;
+        end
       end
     end
-  end
 
-  always_ff @(posedge i_serial_link_1.bridge.i_serial_link_network.clk_i or negedge i_serial_link_1.bridge.i_serial_link_network.rst_ni) begin : valid_coverage_network_1
-    if (!i_serial_link_1.bridge.i_serial_link_network.rst_ni) begin
-      cntr_var_network_1_number_cycles = 0;
-      cntr_var_network_1_valid_cycles_to_phys = 0;
-      cntr_var_network_1_valid_cycles_from_phys = 0;
-      cntr_var_network_1_num_cred_only_pack_sent = 0;
-      cntr_var_network_1_sum_stalled_cyc_cred_cntrs = 0;
-    end else begin
-      cntr_var_network_1_number_cycles++;
-      if (i_serial_link_1.bridge.i_serial_link_network.narrow_req_i.valid || i_serial_link_1.bridge.i_serial_link_network.narrow_rsp_i.valid || i_serial_link_1.bridge.i_serial_link_network.wide_i.valid) begin
-        cntr_var_network_1_valid_cycles_to_phys++;
-      end
-      if (i_serial_link_1.bridge.i_serial_link_network.axis_in_req_i.tvalid) begin
-        cntr_var_network_1_valid_cycles_from_phys++;
-      end
-      if (i_serial_link_1.bridge.i_serial_link_network.axis_out_rsp_i.tready && i_serial_link_1.bridge.i_serial_link_network.axis_out_req_o.tvalid && i_serial_link_1.bridge.i_serial_link_network.narrow_wide_axis_out.data_validity == 0) begin
-        cntr_var_network_1_num_cred_only_pack_sent++;
-      end
-      if ((i_serial_link_1.bridge.i_serial_link_network.wide_i.valid && !i_serial_link_1.bridge.i_serial_link_network.wide_valid_synchr_out) || (i_serial_link_1.bridge.i_serial_link_network.narrow_rsp_i.valid && !i_serial_link_1.bridge.i_serial_link_network.rsp_valid_synchr_out) || (i_serial_link_1.bridge.i_serial_link_network.narrow_req_i.valid && !i_serial_link_1.bridge.i_serial_link_network.req_valid_synchr_out)) begin
-        cntr_var_network_1_sum_stalled_cyc_cred_cntrs++;
+    always_ff @(posedge i_serial_link_1.bridge.i_serial_link_network.clk_i or negedge i_serial_link_1.bridge.i_serial_link_network.rst_ni) begin : valid_coverage_network_1
+      if (!i_serial_link_1.bridge.i_serial_link_network.rst_ni) begin
+        cntr_var_network_1_number_cycles = 0;
+        cntr_var_network_1_valid_cycles_to_phys = 0;
+        cntr_var_network_1_valid_cycles_from_phys = 0;
+        cntr_var_network_1_num_cred_only_pack_sent = 0;
+        cntr_var_network_1_sum_stalled_cyc_cred_cntrs = 0;
+      end else begin
+        cntr_var_network_1_number_cycles++;
+        if (i_serial_link_1.bridge.i_serial_link_network.narrow_req_i.valid || i_serial_link_1.bridge.i_serial_link_network.narrow_rsp_i.valid || i_serial_link_1.bridge.i_serial_link_network.wide_i.valid) begin
+          cntr_var_network_1_valid_cycles_to_phys++;
+        end
+        if (i_serial_link_1.bridge.i_serial_link_network.axis_in_req_i.tvalid) begin
+          cntr_var_network_1_valid_cycles_from_phys++;
+        end
+        if (i_serial_link_1.bridge.i_serial_link_network.axis_out_rsp_i.tready && i_serial_link_1.bridge.i_serial_link_network.axis_out_req_o.tvalid && i_serial_link_1.bridge.i_serial_link_network.narrow_wide_axis_out.data_validity == 0) begin
+          cntr_var_network_1_num_cred_only_pack_sent++;
+        end
+        if ((i_serial_link_1.bridge.i_serial_link_network.wide_i.valid && !i_serial_link_1.bridge.i_serial_link_network.wide_valid_synchr_out) || (i_serial_link_1.bridge.i_serial_link_network.narrow_rsp_i.valid && !i_serial_link_1.bridge.i_serial_link_network.rsp_valid_synchr_out) || (i_serial_link_1.bridge.i_serial_link_network.narrow_req_i.valid && !i_serial_link_1.bridge.i_serial_link_network.req_valid_synchr_out)) begin
+          cntr_var_network_1_sum_stalled_cyc_cred_cntrs++;
+        end
       end
     end
+
+    // ======================
+    //    port assignments
+    // ======================
+    always_comb begin : network_port_assignments
+      network_0_number_cycles              = cntr_var_network_0_number_cycles;
+      network_0_valid_cycles_to_phys       = cntr_var_network_0_valid_cycles_to_phys;
+      network_0_valid_cycles_from_phys     = cntr_var_network_0_valid_cycles_from_phys;
+      network_0_num_cred_only_pack_sent    = cntr_var_network_0_num_cred_only_pack_sent;
+      network_0_sum_stalled_cyc_cred_cntrs = cntr_var_network_0_sum_stalled_cyc_cred_cntrs;
+
+      network_1_number_cycles              = cntr_var_network_1_number_cycles;
+      network_1_valid_cycles_to_phys       = cntr_var_network_1_valid_cycles_to_phys;
+      network_1_valid_cycles_from_phys     = cntr_var_network_1_valid_cycles_from_phys;
+      network_1_num_cred_only_pack_sent    = cntr_var_network_1_num_cred_only_pack_sent;
+      network_1_sum_stalled_cyc_cred_cntrs = cntr_var_network_1_sum_stalled_cyc_cred_cntrs;
+    end
   end
-
-  // ======================
-  //    port assignments
-  // ======================
-  always_comb begin : network_port_assignments
-    network_0_number_cycles              = cntr_var_network_0_number_cycles;
-    network_0_valid_cycles_to_phys       = cntr_var_network_0_valid_cycles_to_phys;
-    network_0_valid_cycles_from_phys     = cntr_var_network_0_valid_cycles_from_phys;
-    network_0_num_cred_only_pack_sent    = cntr_var_network_0_num_cred_only_pack_sent;
-    network_0_sum_stalled_cyc_cred_cntrs = cntr_var_network_0_sum_stalled_cyc_cred_cntrs;
-
-    network_1_number_cycles              = cntr_var_network_1_number_cycles;
-    network_1_valid_cycles_to_phys       = cntr_var_network_1_valid_cycles_to_phys;
-    network_1_valid_cycles_from_phys     = cntr_var_network_1_valid_cycles_from_phys;
-    network_1_num_cred_only_pack_sent    = cntr_var_network_1_num_cred_only_pack_sent;
-    network_1_sum_stalled_cyc_cred_cntrs = cntr_var_network_1_sum_stalled_cyc_cred_cntrs;
-  end
-
 
 endmodule

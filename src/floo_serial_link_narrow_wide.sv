@@ -66,6 +66,9 @@ module floo_serial_link_narrow_wide
   output logic                                 reset_no
 );
 
+  logic [NumChannels-1:0]               ddr_rcv_clk_delayed;
+  logic [NumChannels-1:0][NumLanes-1:0] ddr_delayed;
+
   import serial_link_pkg::*;
   import noc_bridge_narrow_wide_pkg::*;
 
@@ -316,7 +319,7 @@ module floo_serial_link_narrow_wide
       .clk_div_i         ( reg2hw.tx_phy_ctrl1[i].q                 ),
       .clk_shift_start_i ( reg2hw.tx_phy_ctrl2[i].clk_shift_start.q ),
       .clk_shift_end_i   ( reg2hw.tx_phy_ctrl2[i].clk_shift_end.q   ),
-      .ddr_rcv_clk_i     ( ddr_rcv_clk_i[i]                         ),
+      .ddr_rcv_clk_i     ( ddr_rcv_clk_delayed[i]                   ),
       .ddr_rcv_clk_o     ( ddr_rcv_clk_o[i]                         ),
       .data_out_i        ( alloc2phy_data_out[i]                    ),
       .data_out_valid_i  ( alloc2phy_data_out_valid[i]              ),
@@ -324,10 +327,20 @@ module floo_serial_link_narrow_wide
       .data_in_o         ( phy2alloc_data_in[i]                     ),
       .data_in_valid_o   ( phy2alloc_data_in_valid[i]               ),
       .data_in_ready_i   ( alloc2phy_data_in_ready[i]               ),
-      .ddr_i             ( ddr_i[i]                                 ),
+      .ddr_i             ( ddr_delayed[i]                           ),
       .ddr_o             ( ddr_o[i]                                 )
     );
   end
+
+  insert_latency_to_signal #(
+    .data_width  ( (NumChannels*NumLanes) + NumChannels ),
+    .delay       ( 0 ),
+    .use_default ( 0 ),
+    .default_val ( 0 )
+  ) i_signal_shifter5 (
+    .signal_i ( {ddr_i, ddr_rcv_clk_i}             ),
+    .signal_o ( {ddr_delayed, ddr_rcv_clk_delayed} )
+  );
 
   /////////////////////////////////
   //   CONFIGURATION REGISTERS   //

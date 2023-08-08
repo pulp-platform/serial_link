@@ -141,7 +141,8 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .data_t                 ( narrow_flit_data_t           ),
     .NumCredits             ( NumCred_NocBridge_narrow_req ),
     .ForceSendThresh        ( ForceSendThresh_narrow_req   ),
-    .CredOnlyConsCred       ( 0                            )
+    .CredOnlyConsCred       ( 0                            ),
+    .DontUseShadowCtnr      ( 1                            )
   ) i_credit_counter_req (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -184,7 +185,8 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .data_t                 ( narrow_flit_data_t           ),
     .NumCredits             ( NumCred_NocBridge_narrow_rsp ),
     .ForceSendThresh        ( ForceSendThresh_narrow_rsp   ),
-    .CredOnlyConsCred       ( 0                            )
+    .CredOnlyConsCred       ( 0                            ),
+    .DontUseShadowCtnr      ( 1                            )
   ) i_credit_counter_rsp (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -232,7 +234,8 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .data_t                 ( wide_flit_data_t            ),
     .NumCredits             ( NumCred_NocBridge_wide_chan ),
     .ForceSendThresh        ( ForceSendThresh_wide_chan   ),
-    .CredOnlyConsCred       ( 0                           )
+    .CredOnlyConsCred       ( 0                           ),
+    .DontUseShadowCtnr      ( 1                           )
   ) i_credit_counter_wide (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
