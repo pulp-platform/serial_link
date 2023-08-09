@@ -153,6 +153,11 @@ module tb_floo_serial_link_narrow_wide();
   logic [31:0] network_1_valid_cycles_to_phys, network_1_valid_cycles_from_phys, network_1_num_cred_only_pack_sent;
   logic [31:0] network_1_sum_stalled_cyc_cred_cntrs;
 
+  logic [31:0] lat_0, lat_1, lat_2, lat_3, lat_4, lat_5, lat_6, lat_7, lat_8, lat_9;
+  logic [31:0] lat_10, lat_11, lat_12, lat_13, lat_14, lat_15, lat_16, lat_17, lat_18, lat_19;
+  logic [31:0] lat_20, lat_21, lat_22, lat_23, lat_24, lat_25, lat_26, lat_27, lat_28, lat_29;
+  logic [31:0] lat_30, lat_31, lat_32, lat_33, lat_34, lat_35, lat_36, lat_37, lat_38, lat_39;
+
   // system clock and reset
   clk_rst_gen #(
     .ClkPeriod    ( TckReg          ),
@@ -499,11 +504,15 @@ module tb_floo_serial_link_narrow_wide();
   int time_wide_1;
   int time_wide_2;
 
-  // By default perform Testduration Reads & Writes
-  int NumWrites_1 = TestDuration;
-  int NumReads_1 = TestDuration;
-  int NumWrites_2 = TestDuration;
-  int NumReads_2 = TestDuration;
+  // By default perform Testduration Reads & Writes (to disable a master, assign its read and write count to zero)
+  int NumWrites_narrow_1 = TestDuration;
+  int NumReads_narrow_1  = TestDuration;
+  int NumWrites_narrow_2 = 0;
+  int NumReads_narrow_2  = 0;
+  int NumWrites_wide_1   = 0;
+  int NumReads_wide_1    = 0;
+  int NumWrites_wide_2   = TestDuration;
+  int NumReads_wide_2    = TestDuration;
 
   initial begin
     narrow_rand_slave_1.reset();
@@ -538,6 +547,7 @@ module tb_floo_serial_link_narrow_wide();
     end else begin
       $display("INFO: The two sides of the off-chip link do not share the same frequency.");
     end
+    $display("max_possible_bandwidth_physical_link !%0d Mbit/s, %0d Mbit/s",(1000*i_serial_link_0.i_serial_link_data_link.BandWidth)/(TckSys1*8),(1000*i_serial_link_1.i_serial_link_data_link.BandWidth)/(TckSys2*8));
     reg_master_1.reset_master();
     reg_master_2.reset_master();
     fork
@@ -567,11 +577,11 @@ module tb_floo_serial_link_narrow_wide();
     automatic int unsigned data_sent = 0;
     automatic int unsigned data_received = 0;
 
-    if ($value$plusargs("NUM_WRITES_1=%d", NumWrites_1)) begin
-      $info("[DDR1] Number of writes specified as %d", NumWrites_1);
+    if ($value$plusargs("NUM_WRITES_1=%d", NumWrites_narrow_1)) begin
+      $info("[DDR1] Number of writes specified as %d", NumWrites_narrow_1);
     end
-    if ($value$plusargs("NUM_READS_1=%d", NumReads_1)) begin
-      $info("[DDR1] Number of reads specified as %d", NumReads_1);
+    if ($value$plusargs("NUM_READS_1=%d", NumReads_narrow_1)) begin
+      $info("[DDR1] Number of reads specified as %d", NumReads_narrow_1);
     end
     mst_done[0] = 0;
     narrow_rand_master_1.reset();
@@ -581,7 +591,7 @@ module tb_floo_serial_link_narrow_wide();
     wait_for_config_1();
     start_cycle = $realtime;
     fork
-      narrow_rand_master_1.run(NumWrites_1, NumReads_1);
+      narrow_rand_master_1.run(NumWrites_narrow_1, NumReads_narrow_1);
       forever begin
         @(posedge clk_1);
         if (narrow_axi_in_rsp_1.r_valid & narrow_axi_in_req_1.r_ready) data_received += $bits(narrow_axi_in_rsp_1.r);
@@ -607,11 +617,11 @@ module tb_floo_serial_link_narrow_wide();
     automatic int unsigned data_sent_narrow2 = 0;
     automatic int unsigned data_received_narrow2 = 0;
 
-    if ($value$plusargs("NUM_WRITES_2=%d", NumWrites_2)) begin
-      $info("[DDR2] Number of writes specified as %d", NumWrites_2);
+    if ($value$plusargs("NUM_WRITES_2=%d", NumWrites_narrow_2)) begin
+      $info("[DDR2] Number of writes specified as %d", NumWrites_narrow_2);
     end
-    if ($value$plusargs("NUM_READS_2=%d", NumReads_2)) begin
-      $info("[DDR2] Number of reads specified as %d", NumReads_2);
+    if ($value$plusargs("NUM_READS_2=%d", NumReads_narrow_2)) begin
+      $info("[DDR2] Number of reads specified as %d", NumReads_narrow_2);
     end
     mst_done[1] = 0;
     narrow_rand_master_2.reset();
@@ -621,7 +631,7 @@ module tb_floo_serial_link_narrow_wide();
     wait_for_config_2();
     start_cycle_narrow2 = $realtime;
     fork
-      narrow_rand_master_2.run(NumWrites_2, NumReads_2);
+      narrow_rand_master_2.run(NumWrites_narrow_2, NumReads_narrow_2);
       forever begin
         @(posedge clk_2);
         if (narrow_axi_in_rsp_2.r_valid & narrow_axi_in_req_2.r_ready) data_received_narrow2 += $bits(narrow_axi_in_rsp_2.r);
@@ -656,7 +666,7 @@ module tb_floo_serial_link_narrow_wide();
     wait_for_config_1();
     start_cycle_wide = $realtime;
     fork
-      wide_rand_master_1.run(NumWrites_1, NumReads_1);
+      wide_rand_master_1.run(NumWrites_wide_1, NumReads_wide_1);
       forever begin
         @(posedge clk_1);
         if (wide_axi_in_rsp_1.r_valid & wide_axi_in_req_1.r_ready) data_received_wide += $bits(wide_axi_in_rsp_1.r);
@@ -690,7 +700,7 @@ module tb_floo_serial_link_narrow_wide();
     wait_for_config_2();
     start_cycle_wide2 = $realtime;
     fork
-      wide_rand_master_2.run(NumWrites_2, NumReads_2);
+      wide_rand_master_2.run(NumWrites_wide_2, NumReads_wide_2);
       forever begin
         @(posedge clk_2);
         if (wide_axi_in_rsp_2.r_valid & wide_axi_in_req_2.r_ready) data_received_wide2 += $bits(wide_axi_in_rsp_2.r);
@@ -820,26 +830,67 @@ module tb_floo_serial_link_narrow_wide();
     .wide_axi_rand_master_t   ( wide_axi_rand_master_t   ),
     .wide_axi_rand_slave_t    ( wide_axi_rand_slave_t    )
   ) i_benchmarking (
-    .serial_link_0_valid_cycles_from_phys ( serial_link_0_valid_cycles_from_phys ),
-    .serial_link_0_number_cycles          ( serial_link_0_number_cycles          ),
-    .serial_link_0_valid_cycles_to_phys   ( serial_link_0_valid_cycles_to_phys   ),
-    .serial_link_1_valid_cycles_from_phys ( serial_link_1_valid_cycles_from_phys ),
-    .serial_link_1_number_cycles          ( serial_link_1_number_cycles          ),
-    .serial_link_1_valid_cycles_to_phys   ( serial_link_1_valid_cycles_to_phys   ),
-    .data_link_0_num_cred_only_pack_sent  ( data_link_0_num_cred_only_pack_sent  ),
-    .data_link_0_sum_stalled_cyc_cred_cntrs(data_link_0_sum_stalled_cyc_cred_cntrs),
-    .data_link_1_num_cred_only_pack_sent  ( data_link_1_num_cred_only_pack_sent  ),
-    .data_link_1_sum_stalled_cyc_cred_cntrs(data_link_1_sum_stalled_cyc_cred_cntrs),
-    .network_0_valid_cycles_to_phys       ( network_0_valid_cycles_to_phys       ),
-    .network_0_number_cycles              ( network_0_number_cycles              ),
-    .network_0_num_cred_only_pack_sent    ( network_0_num_cred_only_pack_sent    ),
-    .network_0_valid_cycles_from_phys     ( network_0_valid_cycles_from_phys     ),
-    .network_0_sum_stalled_cyc_cred_cntrs ( network_0_sum_stalled_cyc_cred_cntrs ),
-    .network_1_valid_cycles_to_phys       ( network_1_valid_cycles_to_phys       ),
-    .network_1_number_cycles              ( network_1_number_cycles              ),
-    .network_1_num_cred_only_pack_sent    ( network_1_num_cred_only_pack_sent    ),
-    .network_1_valid_cycles_from_phys     ( network_1_valid_cycles_from_phys     ),
-    .network_1_sum_stalled_cyc_cred_cntrs ( network_1_sum_stalled_cyc_cred_cntrs )
+    .serial_link_0_valid_cycles_from_phys   ( serial_link_0_valid_cycles_from_phys   ),
+    .serial_link_0_number_cycles            ( serial_link_0_number_cycles            ),
+    .serial_link_0_valid_cycles_to_phys     ( serial_link_0_valid_cycles_to_phys     ),
+    .serial_link_1_valid_cycles_from_phys   ( serial_link_1_valid_cycles_from_phys   ),
+    .serial_link_1_number_cycles            ( serial_link_1_number_cycles            ),
+    .serial_link_1_valid_cycles_to_phys     ( serial_link_1_valid_cycles_to_phys     ),
+    .data_link_0_num_cred_only_pack_sent    ( data_link_0_num_cred_only_pack_sent    ),
+    .data_link_0_sum_stalled_cyc_cred_cntrs ( data_link_0_sum_stalled_cyc_cred_cntrs ),
+    .data_link_1_num_cred_only_pack_sent    ( data_link_1_num_cred_only_pack_sent    ),
+    .data_link_1_sum_stalled_cyc_cred_cntrs ( data_link_1_sum_stalled_cyc_cred_cntrs ),
+    .network_0_valid_cycles_to_phys         ( network_0_valid_cycles_to_phys         ),
+    .network_0_number_cycles                ( network_0_number_cycles                ),
+    .network_0_num_cred_only_pack_sent      ( network_0_num_cred_only_pack_sent      ),
+    .network_0_valid_cycles_from_phys       ( network_0_valid_cycles_from_phys       ),
+    .network_0_sum_stalled_cyc_cred_cntrs   ( network_0_sum_stalled_cyc_cred_cntrs   ),
+    .network_1_valid_cycles_to_phys         ( network_1_valid_cycles_to_phys         ),
+    .network_1_number_cycles                ( network_1_number_cycles                ),
+    .network_1_num_cred_only_pack_sent      ( network_1_num_cred_only_pack_sent      ),
+    .network_1_valid_cycles_from_phys       ( network_1_valid_cycles_from_phys       ),
+    .network_1_sum_stalled_cyc_cred_cntrs   ( network_1_sum_stalled_cyc_cred_cntrs   ),
+
+    .lat_0  ( lat_0  ),
+    .lat_1  ( lat_1  ),
+    .lat_2  ( lat_2  ),
+    .lat_3  ( lat_3  ),
+    .lat_4  ( lat_4  ),
+    .lat_5  ( lat_5  ),
+    .lat_6  ( lat_6  ),
+    .lat_7  ( lat_7  ),
+    .lat_8  ( lat_8  ),
+    .lat_9  ( lat_9  ),
+    .lat_10 ( lat_10 ),
+    .lat_11 ( lat_11 ),
+    .lat_12 ( lat_12 ),
+    .lat_13 ( lat_13 ),
+    .lat_14 ( lat_14 ),
+    .lat_15 ( lat_15 ),
+    .lat_16 ( lat_16 ),
+    .lat_17 ( lat_17 ),
+    .lat_18 ( lat_18 ),
+    .lat_19 ( lat_19 ),
+    .lat_20 ( lat_20 ),
+    .lat_21 ( lat_21 ),
+    .lat_22 ( lat_22 ),
+    .lat_23 ( lat_23 ),
+    .lat_24 ( lat_24 ),
+    .lat_25 ( lat_25 ),
+    .lat_26 ( lat_26 ),
+    .lat_27 ( lat_27 ),
+    .lat_28 ( lat_28 ),
+    .lat_29 ( lat_29 ),
+    .lat_30 ( lat_30 ),
+    .lat_31 ( lat_31 ),
+    .lat_32 ( lat_32 ),
+    .lat_33 ( lat_33 ),
+    .lat_34 ( lat_34 ),
+    .lat_35 ( lat_35 ),
+    .lat_36 ( lat_36 ),
+    .lat_37 ( lat_37 ),
+    .lat_38 ( lat_38 ),
+    .lat_39 ( lat_39 )
   );
 
   // ===========
@@ -871,6 +922,13 @@ module tb_floo_serial_link_narrow_wide();
       @(posedge clk_1);
     end
     $display("[SYS] Simulation Stopped (%d ns)", $time);
+    // benchmarking simulation results printout
+    $display("latency_array: %0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d",
+      lat_0, lat_1, lat_2, lat_3, lat_4, lat_5, lat_6, lat_7, lat_8, lat_9,
+      lat_10, lat_11, lat_12, lat_13, lat_14, lat_15, lat_16, lat_17, lat_18, lat_19,
+      lat_20, lat_21, lat_22, lat_23, lat_24, lat_25, lat_26, lat_27, lat_28, lat_29,
+      lat_30, lat_31, lat_32, lat_33, lat_34, lat_35, lat_36, lat_37, lat_38, lat_39);
+    $display("numberOfTransactions: %0d %0d %0d %0d %0d %0d %0d %0d",NumWrites_narrow_1,NumReads_narrow_1,NumWrites_narrow_2,NumReads_narrow_2,NumWrites_wide_1,NumReads_wide_1,NumWrites_wide_2,NumReads_wide_2);
     $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.benchmarking_attempts ||| \
 valid_coverage_to_phys %3.2f%%, valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d",
       100*serial_link_0_valid_cycles_to_phys/(1.0*serial_link_0_number_cycles),
