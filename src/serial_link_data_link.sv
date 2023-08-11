@@ -207,6 +207,7 @@ import serial_link_pkg::*;
     assign send_hdr.req_num_splits = MaxPossibleTransferSplits;
     assign remainingBitsForBitmask = MaxNumOfBitsToBeTransfered;
     assign remainingBitsToBeSent   = remainingBitsForBitmask;
+    assign requiredSplits          = MaxPossibleTransferSplits;
   end
 
   // TODO: remove the initial begin block below. Only for debugging purposes...

@@ -14,7 +14,7 @@ package serial_link_pkg;
 
   // Number of outstanding transactions for flow control
   // FIFO depths depend on it -> expensive to increase!
-  localparam int NumCredits = 8;
+  localparam int NumCredits = 16;
 
   // Number of words in the pattern sequence that can be sent out at once
   // Must be smaller than RecvFifoDepth
