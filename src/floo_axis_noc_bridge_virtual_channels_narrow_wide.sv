@@ -14,7 +14,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   parameter  type wide_flit_t       = logic,
   parameter  type axis_req_t        = logic,
   parameter  type axis_rsp_t        = logic,
-  // TODO: finde suitable ForceSendThresh margin
+  // TODO: finde suitable ForceSendThresh margin (do not change line number or ordering!)
   parameter  int  ForceSendThresh_narrow_req = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_narrow_req-4,
   parameter  int  ForceSendThresh_narrow_rsp = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_narrow_rsp-4,
   parameter  int  ForceSendThresh_wide_chan  = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_wide_chan-4
