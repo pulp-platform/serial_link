@@ -32,7 +32,7 @@ proc print_field_explanation {} {
 proc print_csv_header {performedSteps numTransactionsAvailable} {
 	if {$performedSteps == 0} {
 		# Fetch the configuration of the random_axi_devices (masters/slaves)
-		exec echo -n "results generated per analyzePerformance script (version 1.1) on [exec date]. The latest commit was: " >> perfAnalysis.csv
+		exec echo -n "results generated per analyzePerformance script (version 1.2) on [exec date]. The latest commit was: " >> perfAnalysis.csv
 		exec cat .git/COMMIT_EDITMSG >> perfAnalysis.csv
 		exec echo "---------- random masters/slaves configuration ----------" >> perfAnalysis.csv
 		exec echo -n "narrow_axi_rand_master_t,,AW," >> perfAnalysis.csv
@@ -215,7 +215,14 @@ proc print_csv_header {performedSteps numTransactionsAvailable} {
 		exec cat perfAnalysis.tmp | grep "settings: " | cut -d " " -f 7 | cut -d ";" -f 1 | head -c-1 >> perfAnalysis.csv
 		exec echo -n ", " >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "settings: " | cut -d " " -f 8 | cut -d ";" -f 1 | head -c-1 >> perfAnalysis.csv
-		exec echo ", narrow_ax_len, narrow_ax_size, wide_ax_len, wide_ax_size, max_BW_physical_from_side_1, max_BW_physical_from_side_2" >> perfAnalysis.csv
+		exec echo -n ", narrow_ax_len, narrow_ax_size, wide_ax_len, wide_ax_size, max_BW_physical_from_side_1, max_BW_physical_from_side_2, " >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 2 | cut -d ";" -f 1 | head -c-1 >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 3 | cut -d ";" -f 1 | head -c-1 >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 4 | cut -d ";" -f 1 | head -c-1 >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 5 | cut -d ";" -f 1 >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "settings: " | cut -d " " -f 3 | cut -d ";" -f 2 | head -c-1 >> perfAnalysis.csv
 		exec echo -n ", , " >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "settings: " | cut -d " " -f 4 | cut -d ";" -f 2 | head -c-1 >> perfAnalysis.csv
@@ -237,9 +244,15 @@ proc print_csv_header {performedSteps numTransactionsAvailable} {
 		exec cat test/tb_floo_serial_link_narrow_wide.sv | grep wide_rand_master_1.add_traffic_shaping_fixed_size | cut -d "," -f2 | cut -d " " -f2 | head -c-1 >> perfAnalysis.csv
 		exec echo -n ", " >> perfAnalysis.csv
 		# exec echo -n "TODO_max_possible_bridge_bw_narrow" >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "max_possible_bandwidth_physical_link !" | cut -d "!" -f 2 >> perfAnalysis.csv
-		# exec echo -n ", " >> perfAnalysis.csv
-		# exec echo "TODO_max_possible_bridge_bw_wide" >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "max_possible_bandwidth_physical_link !" | cut -d "!" -f 2 | head -c-1 >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 2 | cut -d ";" -f 2 | head -c-1 >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 3 | cut -d ";" -f 2 | cut -d ":" -f 3 | head -c-1 >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 4 | cut -d ";" -f 2 | cut -d ":" -f 3 | head -c-1 >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 5 | cut -d ";" -f 2 | cut -d ":" -f 3 >> perfAnalysis.csv
 		print_field_explanation
 		exec echo "---------- start of the simulation ----------,,,,,,,,,,,,,,,,,,,,,,,average latency (rand_master runtime per packet),,,,min and max latency numbers for the narrow channel from side 1 to 2,,,,,,,,,,min and max latency numbers for the narrow channel from side 2 to 1,,,,,,,,,,min and max latency numbers for the wide channel from side 1 to 2,,,,,,,,,,min and max latency numbers for the wide channel from side 2 to 1" >> perfAnalysis.csv
 		exec echo "NumCredits, NumCred_NocBridge, avg_time_per_read/write (lower is better), narrow1 BW (sent/rcv) Mbit/s, narrow2 BW (sent/rcv) Mbit/s, wide1 BW (sent/rcv) Mbit/s, wide2 BW (sent/rcv) Mbit/s, data_link_0: valid_coverage_to_phys, data_link_0: valid_coverage_from_phys, data_link_0: num_cred_only, data_link_0: valid_in_but_not_valid_out, data_link_1: valid_coverage_to_phys, data_link_1: valid_coverage_from_phys, data_link_1: num_cred_only, data_link_1: valid_in_but_not_valid_out, noc_bridge_0: valid_coverage_to_phys, noc_bridge_0: valid_coverage_from_phys, noc_bridge_0: num_cred_only, noc_bridge_0: valid_in_but_not_valid_out, noc_bridge_1: valid_coverage_to_phys, noc_bridge_1: valid_coverage_from_phys, noc_bridge_1: num_cred_only, noc_bridge_1: valid_in_but_not_valid_out,narrow_1 \[ns\],narrow_2 \[ns\],wide_1 \[ns\],wide_2 \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\]" >> perfAnalysis.csv
