@@ -14,6 +14,7 @@ set link_credits_step 4
 
 proc print_field_explanation {} {
 	exec echo "---------- few explanations on the obtained data ----------" >> perfAnalysis.csv
+	exec echo "Important:,The TA & TT test and sample times reported for the different rand_master/slave types are rounded to nano seconds. For this reason 500ps wil get reported as 1ns and 100ps will end up being 0ns." >> perfAnalysis.csv
 	exec echo "-> The random master/slave configurations (with all relevant parameters),,,are provided in the above section *random master/slaves configuration*. The requested number of transactions are listed for the individual masters in their respective type section." >> perfAnalysis.csv
 	exec echo "-> The latency_of_delay_module,,parameter reports the selected delay which will be introduced in the physical layer. The module delays the incoming signal to the serial_link_physical module in the floo_serial_link_narrow_wide instance." >> perfAnalysis.csv
 	exec echo "-> bandwidth_physical_channel,,describes the amount of bits which can be transfered over the physical link in one off-chip clock cycle. The off-chip physical channel uses DDR. For this reason the number is twice the size of the actual width of the physical link." >> perfAnalysis.csv
@@ -28,10 +29,11 @@ proc print_field_explanation {} {
 	exec echo "" >> perfAnalysis.csv
 }
 
-proc print_csv_header {performedSteps} {
+proc print_csv_header {performedSteps numTransactionsAvailable} {
 	if {$performedSteps == 0} {
 		# Fetch the configuration of the random_axi_devices (masters/slaves)
-		exec echo "results generated per analyzePerformance script (version 1.0) on [exec date]" >> perfAnalysis.csv
+		exec echo -n "results generated per analyzePerformance script (version 1.1) on [exec date]. The latest commit was: " >> perfAnalysis.csv
+		exec cat .git/COMMIT_EDITMSG >> perfAnalysis.csv
 		exec echo "---------- random masters/slaves configuration ----------" >> perfAnalysis.csv
 		exec echo -n "narrow_axi_rand_master_t,,AW," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: narrow_axi_rand_master_t.AW" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
@@ -54,13 +56,14 @@ proc print_csv_header {performedSteps} {
 		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_master_t.UW" | cut -d "$" -f 2 >> perfAnalysis.csv
         exec echo -n ",,TA," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: narrow_axi_rand_master_t.TA" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
-        exec echo -n ",,TA," >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_master_t.TA" | cut -d "$" -f 2 >> perfAnalysis.csv
+        exec echo -n " ns (rounded),,TA," >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_master_t.TA" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
+        exec echo " ns (rounded)" >> perfAnalysis.csv
         exec echo -n ",,TT," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: narrow_axi_rand_master_t.TT" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
-        exec echo -n ",,TT," >> perfAnalysis.csv
+        exec echo -n " ns (rounded),,TT," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_master_t.TT" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
-        exec echo -n ",,AW," >> perfAnalysis.csv
+        exec echo -n " ns (rounded),,AW," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: narrow_axi_rand_slave_t.AW" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
         exec echo -n ",,AW," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_slave_t.AW" | cut -d "$" -f 2 >> perfAnalysis.csv
@@ -94,16 +97,18 @@ proc print_csv_header {performedSteps} {
 		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_master_t.AX_MAX_WAIT_CYCLES" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
         exec echo -n ",,TA," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: narrow_axi_rand_slave_t.TA" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
-        exec echo -n ",,TA," >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_slave_t.TA" | cut -d "$" -f 2 >> perfAnalysis.csv
+        exec echo -n " ns (rounded),,TA," >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_slave_t.TA" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
+        exec echo " ns (rounded)" >> perfAnalysis.csv
         exec echo -n ",,W_MIN_WAIT_CYCLES," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: narrow_axi_rand_master_t.W_MIN_WAIT_CYCLES" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
         exec echo -n ",,W_MIN_WAIT_CYCLES," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_master_t.W_MIN_WAIT_CYCLES" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
         exec echo -n ",,TT," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: narrow_axi_rand_slave_t.TT" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
-        exec echo -n ",,TT," >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_slave_t.TT" | cut -d "$" -f 2 >> perfAnalysis.csv
+        exec echo -n " ns (rounded),,TT," >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_slave_t.TT" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
+        exec echo " ns (rounded)" >> perfAnalysis.csv
         exec echo -n ",,W_MAX_WAIT_CYCLES," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: narrow_axi_rand_master_t.W_MAX_WAIT_CYCLES" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
         exec echo -n ",,W_MAX_WAIT_CYCLES," >> perfAnalysis.csv
@@ -170,22 +175,33 @@ proc print_csv_header {performedSteps} {
         exec echo -n ",,AXI_BURST_WRAP," >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "rand_device: wide_axi_rand_master_t.AXI_BURST_WRAP" | cut -d "$" -f 2 | head -c-1 >> perfAnalysis.csv
         exec echo ",,,,,," >> perfAnalysis.csv
-        exec echo -n ",,Number_Of_Writes (narrow_1)," >> perfAnalysis.csv
-        exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 3 | head -c-1 >> perfAnalysis.csv
-        exec echo -n ",,Number_Of_Writes (wide_1)," >> perfAnalysis.csv
-        exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 7 >> perfAnalysis.csv
-		exec echo -n ",,Number_Of_Reads (narrow_1)," >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 4 | head -c-1 >> perfAnalysis.csv
-		exec echo -n ",,Number_Of_Reads (wide_1)," >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 8 >> perfAnalysis.csv
-		exec echo -n ",,Number_Of_Writes (narrow_2)," >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 5 | head -c-1 >> perfAnalysis.csv
-		exec echo -n ",,Number_Of_Writes (wide_2)," >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 9 >> perfAnalysis.csv
-		exec echo -n ",,Number_Of_Reads (narrow_2)," >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 6 | head -c-1 >> perfAnalysis.csv
-		exec echo -n ",,Number_Of_Reads (wide_2)," >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 10 >> perfAnalysis.csv
+        if { $numTransactionsAvailable } {
+	        exec echo -n ",,Number_Of_Writes (narrow_1)," >> perfAnalysis.csv
+	        exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 3 | head -c-1 >> perfAnalysis.csv
+	        exec echo -n ",,Number_Of_Writes (wide_1)," >> perfAnalysis.csv
+	        exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 7 >> perfAnalysis.csv
+			exec echo -n ",,Number_Of_Reads (narrow_1)," >> perfAnalysis.csv
+			exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 4 | head -c-1 >> perfAnalysis.csv
+			exec echo -n ",,Number_Of_Reads (wide_1)," >> perfAnalysis.csv
+			exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 8 >> perfAnalysis.csv
+			exec echo -n ",,Number_Of_Writes (narrow_2)," >> perfAnalysis.csv
+			exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 5 | head -c-1 >> perfAnalysis.csv
+			exec echo -n ",,Number_Of_Writes (wide_2)," >> perfAnalysis.csv
+			exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 9 >> perfAnalysis.csv
+			exec echo -n ",,Number_Of_Reads (narrow_2)," >> perfAnalysis.csv
+			exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 6 | head -c-1 >> perfAnalysis.csv
+			exec echo -n ",,Number_Of_Reads (wide_2)," >> perfAnalysis.csv
+			exec cat perfAnalysis.tmp | grep "numberOfTransactions:" | cut -d " " -f 10 >> perfAnalysis.csv
+        } else {
+	        exec echo -n ",,Number_Of_Writes (narrow_1),N/A" >> perfAnalysis.csv
+	        exec echo ",,Number_Of_Writes (wide_1),N/A" >> perfAnalysis.csv
+			exec echo -n ",,Number_Of_Reads (narrow_1),N/A" >> perfAnalysis.csv
+			exec echo ",,Number_Of_Reads (wide_1),N/A" >> perfAnalysis.csv
+			exec echo -n ",,Number_Of_Writes (narrow_2),N/A" >> perfAnalysis.csv
+			exec echo ",,Number_Of_Writes (wide_2),N/A" >> perfAnalysis.csv
+			exec echo -n ",,Number_Of_Reads (narrow_2),N/A" >> perfAnalysis.csv
+			exec echo ",,Number_Of_Reads (wide_2),N/A" >> perfAnalysis.csv
+        }
 
 		exec echo "---------- general information about this benchmarking run ----------" >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "settings: " | cut -d " " -f 3 | cut -d ";" -f 1 | head -c-1 >> perfAnalysis.csv
@@ -361,15 +377,19 @@ for { set link_credits $link_credits_start}  {$link_credits <= $link_credits_sto
 		close $newfd
 		file rename -force "src/noc_bridge_narrow_wide_pkg.sv.tmp" "src/noc_bridge_narrow_wide_pkg.sv"
 		exec make sim_c > perfAnalysis.tmp
-		print_csv_header $performedSteps
-		exec echo -n "$link_credits, 0, " >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "Status: " > perfAnalysis.tmp2
 		set hasFailedFile [open perfAnalysis.tmp2]
 		set fileContent [read $hasFailedFile]
 		set progressStatus "ok"
 		if {$fileContent == "\[1;37;41mStatus: There are errors!\[0m\n"} {
-			set progressStatus "fail"
-			exec echo "sim failed" >> perfAnalysis.csv
+			print_csv_header $performedSteps 0
+		} else {
+			print_csv_header $performedSteps 1
+		}
+		exec echo -n "$link_credits, 0," >> perfAnalysis.csv
+		if {$fileContent == "\[1;37;41mStatus: There are errors!\[0m\n"} {
+			set progressStatus "failed"
+			exec echo "the simulation failed for these parameters,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A" >> perfAnalysis.csv
 		} else {
 			results_collector
 		}
@@ -391,15 +411,19 @@ for { set link_credits $link_credits_start}  {$link_credits <= $link_credits_sto
 		close $newfd
 		file rename -force "src/noc_bridge_narrow_wide_pkg.sv.tmp" "src/noc_bridge_narrow_wide_pkg.sv"
 		exec make sim_c > perfAnalysis.tmp
-		print_csv_header $performedSteps
-		exec echo -n "$link_credits, $noc_credits, " >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "Status: " > perfAnalysis.tmp2
 		set hasFailedFile [open perfAnalysis.tmp2]
 		set fileContent [read $hasFailedFile]
 		set progressStatus "ok"
 		if {$fileContent == "\[1;37;41mStatus: There are errors!\[0m\n"} {
-			set progressStatus "fail"
-			exec echo "sim failed" >> perfAnalysis.csv
+			print_csv_header $performedSteps 0
+		} else {
+			print_csv_header $performedSteps 1
+		}
+		exec echo -n "$link_credits, $noc_credits," >> perfAnalysis.csv
+		if {$fileContent == "\[1;37;41mStatus: There are errors!\[0m\n"} {
+			set progressStatus "failed"
+			exec echo "the simulation failed for these parameters,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A" >> perfAnalysis.csv
 		} else {
 			results_collector
 		}

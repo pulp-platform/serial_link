@@ -53,9 +53,6 @@ sources:
     - src/floo_axis_noc_bridge_virtual_channels.sv
     - src/floo_axis_noc_bridge_virtual_channels_narrow_wide.sv
 
-    # Benchmarking unit & latency module
-    - src/serial_link_benchmarking_unit.sv
-    - src/insert_latency_to_signal.sv
 
     # Serial Link Wrapper
     - src/axi_serial_link.sv
@@ -72,6 +69,9 @@ sources:
 
     - target: simulation
       files:
+      # Benchmarking unit & latency module
+      - src/serial_link_benchmarking_unit.sv
+      - src/insert_latency_to_signal.sv
       - test/tb_axi_serial_link.sv
       - test/tb_floo_serial_link.sv
       - test/tb_floo_serial_link_narrow_wide.sv
