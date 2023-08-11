@@ -455,11 +455,39 @@ module serial_link_benchmarking_unit #(
 
   // print out relevant information concerning the configuration and selected parameters for the respective benchmarking run
   initial begin
+    string narrow_req;
+    string narrow_rsp;
+    string wide;
+    int fd;
+    fd = $fopen ("./src/floo_axis_noc_bridge_virtual_channels_narrow_wide.sv", "r");
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_rsp, fd);
+    $fgets(wide, fd);
     $display("settings: latency_of_delay_module;%0d_ns bandwidth_physical_channel;%0d_bits_per_offchip_rising_clockedge number_of_channels;%0d \
-number_of_lanes;%0d max_data_transfer_size;%0d_bits data_link_stream_fifo_depth;%0d",
+number_of_lanes;%0d max_data_transfer_size;%0d_bits data_link_stream_fifo_depth;%0d !MaxSendThresh_data_link;NumCred-%0d!\
+MaxSendThresh_bridge_narrow_req;%0d!MaxSendThresh_bridge_narrow_rsp;%0d!MaxSendThresh_bridge_wide;%s",
     i_serial_link_0.i_signal_shifter.delay, i_serial_link_0.i_serial_link_data_link.BandWidth, i_serial_link_0.i_serial_link_data_link.NumChannels,
     i_serial_link_0.i_serial_link_data_link.NumLanes, i_serial_link_0.i_serial_link_data_link.MaxNumOfBitsToBeTransfered,
-    i_serial_link_0.i_serial_link_data_link.RecvFifoDepth);
+    i_serial_link_0.i_serial_link_data_link.RecvFifoDepth,
+    (i_serial_link_0.i_serial_link_data_link.NumCredits - i_serial_link_0.i_serial_link_data_link.ForceSendThresh),
+    narrow_req.substr(0,narrow_req.len()-3), narrow_rsp.substr(0,narrow_rsp.len()-3), wide.substr(0,wide.len()-2));
 
     $display("rand_device: narrow_axi_rand_master_t.AW$%0d", test_object_narrow_axi_rand_master.AW);
     $display("rand_device: narrow_axi_rand_master_t.DW$%0d", test_object_narrow_axi_rand_master.DW);
