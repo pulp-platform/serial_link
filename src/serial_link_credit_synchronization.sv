@@ -316,7 +316,8 @@ module serial_link_credit_synchronization #(
   // those credits. This can happen when a message is transmitted in multiple splits...)
   // Therefore, it is important to ensure these "virtual credits" can be held in the available credit
   // counter type as well.
-  // `ASSERT_INIT(MaxCredCntrCapExceeded, (2**$bits(credit_t)-1) >= (MaxCredPerPktOut - 1 + NumCredits))
+  // TODO: assertion got triggered by CI-tests. Find a solution to it...
+  `ASSERT_INIT(MaxCredCntrCapExceeded, (2**$bits(credit_t)-1) >= (MaxCredPerPktOut - 1 + NumCredits))
   `ASSERT(MaxCredits, credits_available_q <= (NumCredits + MaxCredPerPktOut - 1))
   `ASSERT(MaxSendCredits, (credits_to_send_q + credits_to_send_hidden_q) <= NumCredits)
   `ASSERT(CredConsParamTooLarge, CredOnlyConsCred < 2**$bits(credit_decrem_t))
