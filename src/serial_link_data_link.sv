@@ -104,8 +104,7 @@ import serial_link_pkg::*;
   // The width used to transfer all the data contained in one axis-packet (so far data, user & strb bits are supported)
   localparam int MaxNumOfBitsToBeTransfered = $bits(axis_packet_t) + $bits(data_hdr_info_t);
   localparam int MaxPossibleTransferSplits  = (MaxNumOfBitsToBeTransfered + BandWidth - 1) / BandWidth;
-  // localparam int RecvFifoDepth = NumCredits;
-  localparam int RecvFifoDepth = NumCredits * MaxPossibleTransferSplits;
+  localparam int RecvFifoDepth = NumCredits;
 
   data_hdr_info_t received_hdr, send_hdr, pre_received_hdr;
 
@@ -337,7 +336,7 @@ import serial_link_pkg::*;
 
       // Once all Recv Stream Registers are filled -> generate AXI stream request
       if (recv_reg_out_valid[0]) begin
-        // It is important to have this line at the beginning. Due to the sequential evaluation, the code might not work otherwise.
+        // It is important to have this line at the beginning, since the sequential evaluation of the code might not work otherwise.
         axis_out_req_unfiltered.tvalid = recv_reg_out_valid[received_hdr.req_num_splits-1];
       end
       recv_reg_out_ready = {MaxPossibleTransferSplits{axis_out_rsp_unfiltered.tready & axis_out_req_unfiltered.tvalid}};
@@ -368,67 +367,30 @@ import serial_link_pkg::*;
   //   FLOW-CONTROL-INSERTION   //
   ////////////////////////////////
 
-  if (TransferStrobe | AllowVarAxisLen) begin
-    serial_link_credit_synchronization #(
-      .credit_t         ( credit_t                  ),
-      .data_t           ( axis_packet_t             ),
-      // .MaxCredPerPktOut ( MaxPossibleTransferSplits ),
-      .NumCredits       ( NumCredits                )
-    ) i_synchronization_flow_control (
-      .clk_i                  ( clk_i                                 ),
-      .rst_ni                 ( rst_ni                                ),
-      .data_to_send_i         ( axis_packet_in_synch_in               ),
-      .data_to_send_o         ( axis_packet_in_synch_out              ),
-      .credits_to_send_o      ( send_hdr.amount_of_credits            ),
-      .send_ready_o           ( axis_in_rsp_o.tready                  ),
-      .send_valid_i           ( axis_in_req_i.tvalid                  ),
-      .send_valid_o           ( axis_in_req_tvalid_afterFlowControl   ),
-      .send_ready_i           ( axis_in_rsp_tready_afterFlowControl   ),
-      .req_cred_to_buffer_msg ( 1'd1                                  ),
-      // TODO: to re-enable the uncommented feature:
-      // 1) switch the 3 disabled ports below
-      // 2) Enable the MaxCredPerPktOut line above
-      // 3) Toggle the definition of: localparam int RecvFifoDepth = ...
-      // .req_cred_to_buffer_msg ( requiredSplits                        ),
-      .credits_received_i     ( credits_incoming                      ),
-      .receive_cred_i         ( consume_incoming_credits              ),
-      .buffer_queue_out_val_i ( axis_out_req_unfiltered.tvalid        ),
-      // .buffer_queue_out_val_i ( flow_control_fifo_valid_out           ),
-      .buffer_queue_out_rdy_i ( axis_out_rsp_unfiltered.tready        ),
-      // .buffer_queue_out_rdy_i ( flow_control_fifo_ready_out           ),
-      .credits_only_packet_o  ( send_hdr.is_credits_only              ),
-      .allow_cred_consume_i   ( 1'b1                                  ),
-      .consume_cred_to_send_i ( 1'b0                                  )
-    );
-  end else begin
-    serial_link_credit_synchronization #(
-      .credit_t         ( credit_t                  ),
-      .data_t           ( axis_packet_t             ),
-      // .MaxCredPerPktOut ( MaxPossibleTransferSplits ),
-      .NumCredits       ( NumCredits                )
-    ) i_synchronization_flow_control (
-      .clk_i                  ( clk_i                                  ),
-      .rst_ni                 ( rst_ni                                 ),
-      .data_to_send_i         ( axis_packet_in_synch_in                ),
-      .data_to_send_o         ( axis_packet_in_synch_out               ),
-      .credits_to_send_o      ( send_hdr.amount_of_credits             ),
-      .send_ready_o           ( axis_in_rsp_o.tready                   ),
-      .send_valid_i           ( axis_in_req_i.tvalid                   ),
-      .send_valid_o           ( axis_in_req_tvalid_afterFlowControl    ),
-      .send_ready_i           ( axis_in_rsp_tready_afterFlowControl    ),
-      .req_cred_to_buffer_msg ( 1'd1                                   ),
-      // .req_cred_to_buffer_msg ( MaxPossibleTransferSplits              ),
-      .credits_received_i     ( credits_incoming                       ),
-      .receive_cred_i         ( consume_incoming_credits               ),
-      .buffer_queue_out_val_i ( axis_out_req_unfiltered.tvalid         ),
-      // .buffer_queue_out_val_i ( flow_control_fifo_valid_out            ),
-      .buffer_queue_out_rdy_i ( axis_out_rsp_unfiltered.tready         ),
-      // .buffer_queue_out_rdy_i ( flow_control_fifo_ready_out            ),
-      .credits_only_packet_o  ( send_hdr.is_credits_only               ),
-      .allow_cred_consume_i   ( 1'b1                                   ),
-      .consume_cred_to_send_i ( 1'b0                                   )
-    );
-  end
+  serial_link_credit_synchronization #(
+    .credit_t          ( credit_t                  ),
+    .data_t            ( axis_packet_t             ),
+    .MaxCredPerPktOut  ( MaxPossibleTransferSplits ),
+    .NumCredits        ( NumCredits                )
+  ) i_synchronization_flow_control (
+    .clk_i                  ( clk_i                                 ),
+    .rst_ni                 ( rst_ni                                ),
+    .data_to_send_i         ( axis_packet_in_synch_in               ),
+    .data_to_send_o         ( axis_packet_in_synch_out              ),
+    .credits_to_send_o      ( send_hdr.amount_of_credits            ),
+    .send_ready_o           ( axis_in_rsp_o.tready                  ),
+    .send_valid_i           ( axis_in_req_i.tvalid                  ),
+    .send_valid_o           ( axis_in_req_tvalid_afterFlowControl   ),
+    .send_ready_i           ( axis_in_rsp_tready_afterFlowControl   ),
+    .req_cred_to_buffer_msg ( requiredSplits                        ),
+    .credits_received_i     ( credits_incoming                      ),
+    .receive_cred_i         ( consume_incoming_credits              ),
+    .buffer_queue_out_val_i ( flow_control_fifo_valid_out           ),
+    .buffer_queue_out_rdy_i ( flow_control_fifo_ready_out           ),
+    .credits_only_packet_o  ( send_hdr.is_credits_only              ),
+    .allow_cred_consume_i   ( 1'b1                                  ),
+    .consume_cred_to_send_i ( 1'b0                                  )
+  );
 
   assign credits_incoming = received_hdr.amount_of_credits;
   assign consume_incoming_credits = axis_out_req_unfiltered.tvalid & axis_out_rsp_unfiltered.tready;

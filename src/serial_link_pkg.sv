@@ -40,7 +40,7 @@ package serial_link_pkg;
     TagR          = 4
   } tag_e;
 
-  typedef logic [$clog2(NumCredits):0] credit_t;
+  typedef logic [$clog2(NumCredits+1)-1:0] credit_t;
 
   // PHY FSM
   typedef enum logic [2:0] {

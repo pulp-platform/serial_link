@@ -433,12 +433,12 @@ module tb_floo_serial_link_narrow_wide();
     .TA                   ( 100ps              ),
     .TT                   ( 500ps              ),
     .RAND_RESP            ( 0                  ),
-    .AX_MIN_WAIT_CYCLES   ( min_wait_cycles    ),
-    .AX_MAX_WAIT_CYCLES   ( max_wait_cycles    ),
-    .R_MIN_WAIT_CYCLES    ( min_wait_cycles    ),
-    .R_MAX_WAIT_CYCLES    ( max_wait_cycles    ),
-    .RESP_MIN_WAIT_CYCLES ( min_wait_cycles    ),
-    .RESP_MAX_WAIT_CYCLES ( max_wait_cycles    )
+    .AX_MIN_WAIT_CYCLES   ( 40                 ),
+    .AX_MAX_WAIT_CYCLES   ( 40                 ),
+    .R_MIN_WAIT_CYCLES    ( 40                 ),
+    .R_MAX_WAIT_CYCLES    ( 40                 ),
+    .RESP_MIN_WAIT_CYCLES ( 40                 ),
+    .RESP_MAX_WAIT_CYCLES ( 40                 )
   ) narrow_axi_rand_slave_t;
 
   // wide master type
@@ -475,12 +475,12 @@ module tb_floo_serial_link_narrow_wide();
     .TA                   ( 100ps            ),
     .TT                   ( 500ps            ),
     .RAND_RESP            ( 0                ),
-    .AX_MIN_WAIT_CYCLES   ( min_wait_cycles  ),
-    .AX_MAX_WAIT_CYCLES   ( max_wait_cycles  ),
-    .R_MIN_WAIT_CYCLES    ( min_wait_cycles  ),
-    .R_MAX_WAIT_CYCLES    ( max_wait_cycles  ),
-    .RESP_MIN_WAIT_CYCLES ( min_wait_cycles  ),
-    .RESP_MAX_WAIT_CYCLES ( max_wait_cycles  )
+    .AX_MIN_WAIT_CYCLES   ( 40               ),
+    .AX_MAX_WAIT_CYCLES   ( 40               ),
+    .R_MIN_WAIT_CYCLES    ( 40               ),
+    .R_MAX_WAIT_CYCLES    ( 40               ),
+    .RESP_MIN_WAIT_CYCLES ( 40               ),
+    .RESP_MAX_WAIT_CYCLES ( 40               )
   ) wide_axi_rand_slave_t;
 
   // narrow channels
@@ -507,10 +507,10 @@ module tb_floo_serial_link_narrow_wide();
   // By default perform Testduration Reads & Writes (to disable a master, assign its read and write count to zero)
   int NumWrites_narrow_1 = TestDuration;
   int NumReads_narrow_1  = TestDuration;
-  int NumWrites_narrow_2 = 0;
-  int NumReads_narrow_2  = 0;
-  int NumWrites_wide_1   = 0;
-  int NumReads_wide_1    = 0;
+  int NumWrites_narrow_2 = TestDuration;
+  int NumReads_narrow_2  = TestDuration;
+  int NumWrites_wide_1   = TestDuration;
+  int NumReads_wide_1    = TestDuration;
   int NumWrites_wide_2   = TestDuration;
   int NumReads_wide_2    = TestDuration;
 
