@@ -396,12 +396,8 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   assign axis_in_rsp_ready    = (axis_data_in_rsp_ready  & axis_data_in_rsp_valid);
   assign axis_in_wide_ready   = (axis_data_in_wide_ready & axis_data_in_wide_valid);
   assign axis_in_is_cred_only = (axis_in_req_i.tvalid    & ~narr_wide_queue_in.data_validity);
-  // TODO: I don't think that I still need all of these handshakes to happen in order to assign the ready to one. The credit_counters
-  // ought to ensure that a channel is not forwarded if the queue is expected to be full. => verify & possibly remove the above lines...
-  // assign axis_in_rsp_o.tready = axis_in_req_ready || axis_in_rsp_ready || axis_in_wide_ready || axis_in_is_cred_only;
-  assign axis_in_rsp_o.tready = '1;
-  // TODO: Even the version below might not be required...
-  // assign axis_in_rsp_o.tready = axis_data_in_req_ready || axis_data_in_rsp_ready || axis_data_in_wide_ready || axis_in_is_cred_only;
+
+  assign axis_in_rsp_o.tready = axis_in_req_ready || axis_in_rsp_ready || axis_in_wide_ready || axis_in_is_cred_only;
 
 
   //-----------------------------------//
@@ -473,6 +469,11 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
 
   if (~ignore_assert) begin
     `ASSERT(AxisStable, axis_out_req_o.tvalid & !axis_out_rsp_i.tready |=> $stable(axis_out_req_o.t))
+    // I need to always be able to receive any incoming axis messages, since the virtual-channel
+    // credit counters ought to only send messages of a channel being ready to receive.
+    `ASSERT(ChannelNotPermitted, axis_in_req_i.tvalid |-> axis_in_rsp_o.tready)
+    // wide channel must be wider than the narrow channel
+    `ASSERT(WideSmallerThanNarrow, $bits(axis_packet_t) >= $bits(narrow_axis_packet_t))
   end
 
 endmodule

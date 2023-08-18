@@ -33,34 +33,34 @@ module floo_serial_link_narrow_wide_synth_wrapper
   //    i.e. network, data-link and physical layer all run on this clock and can be clock gated if needed. If no clock gating, reset synchronization
   //    is desired, you can tie clk_sl_i -> clk_i resp. rst_sl_ni -> rst_ni
   // 3) clk_reg_i & rst_reg_ni: peripheral clock and reset. Only connected to RegBus CDC. If NoRegCdc is set, this clock must be the same as 1)
-  input  logic                                 clk_i,
-  input  logic                                 rst_ni,
-  input  logic                                 clk_sl_i,
-  input  logic                                 rst_sl_ni,
-  input  logic                                 clk_reg_i,
-  input  logic                                 rst_reg_ni,
+  input  logic                                                                   clk_i,
+  input  logic                                                                   rst_ni,
+  input  logic                                                                   clk_sl_i,
+  input  logic                                                                   rst_sl_ni,
+  input  logic                                                                   clk_reg_i,
+  input  logic                                                                   rst_reg_ni,
   // Tie to zero if not used.
-  input  logic                                 testmode_i,
+  input  logic                                                                   testmode_i,
   // TODO: rename intput channel to narrow_sth
-  input  narrow_req_flit_t                     narrow_req_i,
-  input  narrow_rsp_flit_t                     narrow_rsp_i,
-  output narrow_req_flit_t                     narrow_req_o,
-  output narrow_rsp_flit_t                     narrow_rsp_o,
-  input  wide_flit_t                           wide_i,
-  output wide_flit_t                           wide_o,
-  input  cfg_req_t                             cfg_req_i,
-  output cfg_rsp_t                             cfg_rsp_o,
-  input  logic [serial_link_pkg::NumChannels-1:0]               ddr_rcv_clk_i,
-  output logic [serial_link_pkg::NumChannels-1:0]               ddr_rcv_clk_o,
+  input  narrow_req_flit_t                                                       narrow_req_i,
+  input  narrow_rsp_flit_t                                                       narrow_rsp_i,
+  output narrow_req_flit_t                                                       narrow_req_o,
+  output narrow_rsp_flit_t                                                       narrow_rsp_o,
+  input  wide_flit_t                                                             wide_i,
+  output wide_flit_t                                                             wide_o,
+  input  cfg_req_t                                                               cfg_req_i,
+  output cfg_rsp_t                                                               cfg_rsp_o,
+  input  logic [serial_link_pkg::NumChannels-1:0]                                ddr_rcv_clk_i,
+  output logic [serial_link_pkg::NumChannels-1:0]                                ddr_rcv_clk_o,
   input  logic [serial_link_pkg::NumChannels-1:0][serial_link_pkg::NumLanes-1:0] ddr_i,
   output logic [serial_link_pkg::NumChannels-1:0][serial_link_pkg::NumLanes-1:0] ddr_o,
   // AXI isolation signals (in/out). Tie to zero if not used
-  input  logic [1:0]                           isolated_i,
-  output logic [1:0]                           isolate_o,
+  input  logic [1:0]                                                             isolated_i,
+  output logic [1:0]                                                             isolate_o,
   // Clock gate register
-  output logic                                 clk_ena_o,
+  output logic                                                                   clk_ena_o,
   // synch-reset register
-  output logic                                 reset_no
+  output logic                                                                   reset_no
 );
 
 

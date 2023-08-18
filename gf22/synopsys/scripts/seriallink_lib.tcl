@@ -42,9 +42,6 @@ proc analyze_bender {} {
   global search_path
   set SAVE_ROOT $ROOT
   exec mkdir -p tmp
-  # # TODO: or is it this line?
-  # exec $ROOT/bender script synopsys
-  # exec $SYNDIR/../bender script synopsys
   exec bender script synopsys \
     -t rtl \
     -t gf22 > tmp/analyze.tcl 2> /dev/stdin
