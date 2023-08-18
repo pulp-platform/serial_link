@@ -8,9 +8,11 @@
 # Elaborate the design => make sure to match the name of the library script!!!
 source [file dirname [info script]]/seriallink_lib.tcl
 
-set TCK        1000
-set TIMESTAMP [exec date | tr " " "_"]
+set T_CLK [exec cat [file dirname [info script]]/constraints/serial_link.sdc | grep "set T_CLK" | cut -d " " -f3]
 
+# Assign clock which is declared in the constraints-file (serial_link.sdc)
+set TCK       [exec echo [expr $T_CLK] | cut -d "." -f1]
+set TIMESTAMP [exec date | tr " " "_" | cut -d "_" -f1]_[exec date | tr " " "_" | cut -d "_" -f3]_[exec date | tr " " "_" | cut -d "_" -f2]_[exec date | tr " " "_" | cut -d "_" -f4]
 
 
 # set the name of the design => please give your design a reasonable name
@@ -33,11 +35,6 @@ dz_set_pvt [list \
     GF22FDX_SC8T_104CPP_BASE_CSC20L_SSG_0P72V_0P00V_0P00V_0P00V_125C  \
     GF22FDX_SC8T_104CPP_BASE_CSC24L_SSG_0P72V_0P00V_0P00V_0P00V_125C  \
     GF22FDX_SC8T_104CPP_BASE_CSC28L_SSG_0P72V_0P00V_0P00V_0P00V_125C  ]
-
-# # Add all memories => TODO: is this part required?
-# foreach db $MEMCUTS {
-#     lappend link_library ${db}_104cpp_TT_0P800V_0P000V_0P000V_025C.db
-# }
 
 # Remove any existing designs
 remove_design -designs
@@ -64,6 +61,3 @@ redirect -tee -file $REPDIR/elab_elaborate.log {
 
 # Write elaborated code
 write_file -format ddc -hierarchy -output $SYNDIR/DDC/${OUTNAME}.ddc
-
-# Ciao!
-# exit

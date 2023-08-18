@@ -117,6 +117,7 @@ module serial_link_credit_synchronization #(
 
   logic allow_to_send_credit_only_packets, cannot_send_data_packet;
   logic consume_last_credits_but_dont_return_any, enough_credits_for_cred_only_pack_to_send;
+  logic return_credits;
 
   assign send_ready_o          = send_ready_i & send_normal_packet_q & send_valid_o;
   assign credits_to_send_o     = credits_to_send_q;
@@ -138,27 +139,13 @@ module serial_link_credit_synchronization #(
 
   // feasibility of packet types to be sent
   always_comb begin : can_only_send_credit_only
-    // old code version:
-    // cannot_send_data_but_credits_only = '0;
-    // if ((credits_available_q > req_cred_to_buffer_msg) || ( credits_available_q == req_cred_to_buffer_msg && credits_to_send_q > 0 && allow_cred_consume_i)) begin
-    //   // can send data
-    // end else begin
-    //   // cannot send data
-    //   if ((credits_available_q > CredOnlyConsCred) || ( credits_available_q == CredOnlyConsCred && credits_to_send_q > 0 && allow_cred_consume_i)) begin
-    //     // can send credits_only
-    //     cannot_send_data_but_credits_only = 1;
-    //   end
-    // end
-
-    // new code version (equivalent to the old version, just some reformatting):
     cannot_send_data_but_credits_only = '0;
-
-    allow_to_send_credit_only_packets = (credits_available_q > CredOnlyConsCred) || ( credits_available_q == CredOnlyConsCred && credits_to_send_q > 0 && allow_cred_consume_i);
-    cannot_send_data_packet = credits_available_q < req_cred_to_buffer_msg;
-    consume_last_credits_but_dont_return_any = (credits_available_q == req_cred_to_buffer_msg) && !(credits_to_send_q > 0 && allow_cred_consume_i);
-    enough_credits_for_cred_only_pack_to_send = (credits_available_q > CredOnlyConsCred);
-    if ((cannot_send_data_packet && allow_to_send_credit_only_packets) || (consume_last_credits_but_dont_return_any && enough_credits_for_cred_only_pack_to_send)) begin
-      // cannot send data BUT can send credits_only packet
+    return_credits = (credits_to_send_q > 0 && allow_cred_consume_i);
+    if (!((credits_available_q > req_cred_to_buffer_msg) ||
+      (credits_available_q == req_cred_to_buffer_msg && return_credits)) &&
+      ((credits_available_q > CredOnlyConsCred) ||
+      (credits_available_q == CredOnlyConsCred && return_credits))) begin
+      // cannot send data but can send credits_only
       cannot_send_data_but_credits_only = 1;
     end
   end
