@@ -208,8 +208,7 @@ module floo_serial_link_narrow_wide
     .NumLanes         ( NumLanes    ),
     .credit_t         ( credit_t    ),
     .NumCredits       ( NumCredits  ),
-    .AllowVarAxisLen  ( 1'b1        ),
-    .TransferStrobe   ( 1'b0        )
+    .AllowVarAxisLen  ( 1'b1        )
   ) i_serial_link_data_link (
     .clk_i                                   ( clk_sl_i                                        ),
     .rst_ni                                  ( rst_sl_ni                                       ),

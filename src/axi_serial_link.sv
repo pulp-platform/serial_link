@@ -180,9 +180,7 @@ import serial_link_pkg::*;
     .NumChannels      ( NumChannels       ),
     .NumLanes         ( NumLanes          ),
     .credit_t         ( credit_t          ),
-    .NumCredits       ( NumCredits        )/*,
-    // TODO: change parameter value back to 1'b0 (line may also be removed instead)
-    .AllowVarAxisLen  ( 1'b1              )*/
+    .NumCredits       ( NumCredits        )
   ) i_serial_link_data_link (
     .clk_i                                   ( clk_sl_i                                         ),
     .rst_ni                                  ( rst_sl_ni                                        ),
