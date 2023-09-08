@@ -26,7 +26,6 @@
 module dequeue_shift_register
 import serial_link_pkg::*;
 #(
-  parameter  int  num_blocks   = 8,     // TODO: description
   parameter  type data_i_t     = logic, // TODO: description
   // TODO: Important parameter to set the header_o output to contain the header bit info which leads to a shift in the input data-stream.
   parameter  type header_t     = logic,
@@ -34,12 +33,13 @@ import serial_link_pkg::*;
   // TODO: remove the bits with a multiple of the header size as index from the stream
   parameter  bit  use_shifted_block_bit = use_header,
 
-  localparam type data_o_t   = logic[$bits(data_i_t)-num_blocks-1:0], // TODO: description
+  parameter  type data_block_t = logic,
+  localparam int  block_size   = $bits(data_block_t),
+  localparam int  num_blocks   = ($bits(data_i_t) + block_size - 1) / block_size,
 
-  localparam int  input_size   = $bits(data_i_t),
-  localparam int  block_size   = (input_size + num_blocks - 1) / num_blocks,
+  localparam type data_o_t     = logic[$bits(data_i_t)-num_blocks-1:0], // TODO: description
 
-  localparam int  num_hdr_bits = $bits(header_t),
+  localparam int  num_hdr_bits = (use_shifted_block_bit) ? $bits(header_t) : 0,
   localparam type block_in_t   = logic [block_size-1:0],
   localparam type block_out_t  = logic [block_size-2:0],
   localparam type block_cntr_t = logic [$clog2(num_blocks)-1:0],
@@ -74,12 +74,18 @@ import serial_link_pkg::*;
     block_out_t  [num_blocks-1:0] data_out_blocks;
     block_cntr_t block_idx_q, block_idx_d;
     data_o_t     data_out_flattened;
+    logic        block_start_bit;
 
+  // initial begin
+  //   $display("INFO: dequeue_register: input_size  = %0d",$bits(data_i_t));
+  //   $display("INFO: dequeue_register: block_in_t  %0d",$bits(block_in_t));
+  // end
 
     assign cont_data_o     = contains_valid_data;
     assign ready_o         = all_data_consumed | ~contains_valid_data;
     assign load_new_data   = valid_i & ready_o;
-    assign valid_shift_pos = data_out[0][num_hdr_bits] & contains_valid_data;
+    assign block_start_bit = data_out[0][num_hdr_bits];
+    assign valid_shift_pos = block_start_bit & contains_valid_data;
     assign valid_o         = contains_valid_data & valid_shift_pos;
     assign shift_en_o      = ~load_new_data & (ready_i | ~valid_shift_pos) & shift_en_i & contains_valid_data;
     assign first_hs_o      = valid_o & ready_i & first_outstanding_q;

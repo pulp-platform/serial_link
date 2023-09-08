@@ -147,7 +147,6 @@ set_ideal_network [remove_from_collection [get_ports {rst* reset_no* *clk*}] [ge
 
 set_clock_groups \
     -asynchronous \
-    -allow_paths \
     -group [get_clocks {clk clk_ddr_*out* clk_slow*}] \
     -group [get_clocks *in*] \
     -group [get_clocks clk_reg]
