@@ -9,8 +9,8 @@
 # System clock (1 GHz)
 set T_CLK 1000
 
-# Peripheral Clock (250 MHz)
-set T_REG 2000
+# Peripheral Clock (300 MHz)
+set T_REG 3333
 
 # Incoming forwarded clock
 set FWD_CLK_DIV 8
@@ -96,7 +96,7 @@ set_false_path -hold  -fall_from [get_clocks clk_slow] -rise_to [get_clocks clk_
 #  I/O DELAYS  #
 ################
 
-set IO_delay              [expr $T_CLK / 3]
+set IO_delay              [expr $T_CLK / 2]
 
 set_input_delay -max -clock [get_clocks vir_clk_ddr_in] [expr $MARGIN] [get_ports ddr_i]
 set_input_delay -add_delay -min -clock [get_clocks vir_clk_ddr_in] [expr -$MARGIN] [get_ports ddr_i]

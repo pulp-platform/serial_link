@@ -76,7 +76,6 @@ sources:
       - test/tb_floo_serial_link.sv
       - test/tb_floo_serial_link_narrow_wide.sv
       - test/tb_floo_noc_bridge.sv
-      - test/tb_floo_noc_bridge_narrow_wide.sv
       - test/tb_ch_calib_serial_link.sv
       - test/tb_stream_chopper.sv
       - test/tb_stream_chopper_dechopper.sv

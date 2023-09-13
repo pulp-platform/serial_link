@@ -128,13 +128,13 @@ module floo_serial_link_narrow_wide
 
   if (BridgeVirtualChannels) begin : bridge
     floo_axis_noc_bridge_virtual_channels_narrow_wide #(
-      .ignore_assert     ( 1'b0              ),
-      // .allow_debug_msg   ( 1'b1              ),
-      .narrow_req_flit_t ( narrow_req_flit_t ),
-      .narrow_rsp_flit_t ( narrow_rsp_flit_t ),
-      .wide_flit_t       ( wide_flit_t       ),
-      .axis_req_t        ( axis_req_t        ),
-      .axis_rsp_t        ( axis_rsp_t        )
+      .ignore_assert        ( 1'b0              ),
+      .narrow_req_flit_t    ( narrow_req_flit_t ),
+      .narrow_rsp_flit_t    ( narrow_rsp_flit_t ),
+      .wide_flit_t          ( wide_flit_t       ),
+      .axis_req_t           ( axis_req_t        ),
+      .axis_rsp_t           ( axis_rsp_t        ),
+      .preventIoTimingPaths (1'b1               )
     ) i_serial_link_network (
       .clk_i             ( clk_sl_i          ),
       .rst_ni            ( rst_sl_ni         ),

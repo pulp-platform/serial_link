@@ -433,12 +433,12 @@ module tb_floo_serial_link_narrow_wide();
     .TA                   ( 100ps              ),
     .TT                   ( 500ps              ),
     .RAND_RESP            ( 0                  ),
-    .AX_MIN_WAIT_CYCLES   ( 40                 ),
-    .AX_MAX_WAIT_CYCLES   ( 40                 ),
-    .R_MIN_WAIT_CYCLES    ( 40                 ),
-    .R_MAX_WAIT_CYCLES    ( 40                 ),
-    .RESP_MIN_WAIT_CYCLES ( 40                 ),
-    .RESP_MAX_WAIT_CYCLES ( 40                 )
+    .AX_MIN_WAIT_CYCLES   ( 0                  ),
+    .AX_MAX_WAIT_CYCLES   ( 0                  ),
+    .R_MIN_WAIT_CYCLES    ( 0                  ),
+    .R_MAX_WAIT_CYCLES    ( 0                  ),
+    .RESP_MIN_WAIT_CYCLES ( 0                  ),
+    .RESP_MAX_WAIT_CYCLES ( 0                  )
   ) narrow_axi_rand_slave_t;
 
   // wide master type
@@ -475,12 +475,12 @@ module tb_floo_serial_link_narrow_wide();
     .TA                   ( 100ps            ),
     .TT                   ( 500ps            ),
     .RAND_RESP            ( 0                ),
-    .AX_MIN_WAIT_CYCLES   ( 40               ),
-    .AX_MAX_WAIT_CYCLES   ( 40               ),
-    .R_MIN_WAIT_CYCLES    ( 40               ),
-    .R_MAX_WAIT_CYCLES    ( 40               ),
-    .RESP_MIN_WAIT_CYCLES ( 40               ),
-    .RESP_MAX_WAIT_CYCLES ( 40               )
+    .AX_MIN_WAIT_CYCLES   ( 0                ),
+    .AX_MAX_WAIT_CYCLES   ( 0                ),
+    .R_MIN_WAIT_CYCLES    ( 0                ),
+    .R_MAX_WAIT_CYCLES    ( 0                ),
+    .RESP_MIN_WAIT_CYCLES ( 0                ),
+    .RESP_MAX_WAIT_CYCLES ( 0                )
   ) wide_axi_rand_slave_t;
 
   // narrow channels
@@ -594,11 +594,10 @@ module tb_floo_serial_link_narrow_wide();
       narrow_rand_master_1.run(NumWrites_narrow_1, NumReads_narrow_1);
       forever begin
         @(posedge clk_1);
-        if (narrow_axi_in_rsp_1.r_valid & narrow_axi_in_req_1.r_ready) data_received += $bits(narrow_axi_in_rsp_1.r);
-        if (narrow_axi_in_rsp_1.b_valid & narrow_axi_in_req_1.b_ready) data_received += $bits(narrow_axi_in_rsp_1.b);
-        if (narrow_axi_in_req_1.ar_valid & narrow_axi_in_rsp_1.ar_ready) data_sent += $bits(narrow_axi_in_req_1.ar);
-        if (narrow_axi_in_req_1.aw_valid & narrow_axi_in_rsp_1.aw_ready) data_sent += $bits(narrow_axi_in_req_1.aw);
-        if (narrow_axi_in_req_1.w_valid & narrow_axi_in_rsp_1.w_ready) data_sent += $bits(narrow_axi_in_req_1.w);
+        if (narrow_flit_req_out_1.valid & narrow_flit_req_in_1.ready) data_sent     += $bits(narrow_flit_req_out_1.data);
+        if (narrow_flit_rsp_out_1.valid & narrow_flit_rsp_in_1.ready) data_sent     += $bits(narrow_flit_rsp_out_1.data);
+        if (narrow_flit_req_in_1.valid & narrow_flit_req_out_1.ready) data_received += $bits(narrow_flit_req_in_1.data);
+        if (narrow_flit_rsp_in_1.valid & narrow_flit_rsp_out_1.ready) data_received += $bits(narrow_flit_rsp_in_1.data);
       end
     join_any
     end_cycle = $realtime;
@@ -634,11 +633,10 @@ module tb_floo_serial_link_narrow_wide();
       narrow_rand_master_2.run(NumWrites_narrow_2, NumReads_narrow_2);
       forever begin
         @(posedge clk_2);
-        if (narrow_axi_in_rsp_2.r_valid & narrow_axi_in_req_2.r_ready) data_received_narrow2 += $bits(narrow_axi_in_rsp_2.r);
-        if (narrow_axi_in_rsp_2.b_valid & narrow_axi_in_req_2.b_ready) data_received_narrow2 += $bits(narrow_axi_in_rsp_2.b);
-        if (narrow_axi_in_req_2.ar_valid & narrow_axi_in_rsp_2.ar_ready) data_sent_narrow2 += $bits(narrow_axi_in_req_2.ar);
-        if (narrow_axi_in_req_2.aw_valid & narrow_axi_in_rsp_2.aw_ready) data_sent_narrow2 += $bits(narrow_axi_in_req_2.aw);
-        if (narrow_axi_in_req_2.w_valid & narrow_axi_in_rsp_2.w_ready) data_sent_narrow2 += $bits(narrow_axi_in_req_2.w);
+        if (narrow_flit_req_out_2.valid & narrow_flit_req_in_2.ready) data_sent_narrow2     += $bits(narrow_flit_req_out_2.data);
+        if (narrow_flit_rsp_out_2.valid & narrow_flit_rsp_in_2.ready) data_sent_narrow2     += $bits(narrow_flit_rsp_out_2.data);
+        if (narrow_flit_req_in_2.valid & narrow_flit_req_out_2.ready) data_received_narrow2 += $bits(narrow_flit_req_in_2.data);
+        if (narrow_flit_rsp_in_2.valid & narrow_flit_rsp_out_2.ready) data_received_narrow2 += $bits(narrow_flit_rsp_in_2.data);
       end
     join_any
     end_cycle_narrow2 = $realtime;
@@ -669,11 +667,8 @@ module tb_floo_serial_link_narrow_wide();
       wide_rand_master_1.run(NumWrites_wide_1, NumReads_wide_1);
       forever begin
         @(posedge clk_1);
-        if (wide_axi_in_rsp_1.r_valid & wide_axi_in_req_1.r_ready) data_received_wide += $bits(wide_axi_in_rsp_1.r);
-        if (wide_axi_in_rsp_1.b_valid & wide_axi_in_req_1.b_ready) data_received_wide += $bits(wide_axi_in_rsp_1.b);
-        if (wide_axi_in_req_1.ar_valid & wide_axi_in_rsp_1.ar_ready) data_sent_wide += $bits(wide_axi_in_req_1.ar);
-        if (wide_axi_in_req_1.aw_valid & wide_axi_in_rsp_1.aw_ready) data_sent_wide += $bits(wide_axi_in_req_1.aw);
-        if (wide_axi_in_req_1.w_valid & wide_axi_in_rsp_1.w_ready) data_sent_wide += $bits(wide_axi_in_req_1.w);
+        if (wide_flit_out_1.valid & wide_flit_in_1.ready) data_sent_wide     += $bits(wide_flit_out_1.data);
+        if (wide_flit_in_1.valid & wide_flit_out_1.ready) data_received_wide += $bits(wide_flit_in_1.data);
       end
     join_any
     end_cycle_wide = $realtime;
@@ -703,11 +698,8 @@ module tb_floo_serial_link_narrow_wide();
       wide_rand_master_2.run(NumWrites_wide_2, NumReads_wide_2);
       forever begin
         @(posedge clk_2);
-        if (wide_axi_in_rsp_2.r_valid & wide_axi_in_req_2.r_ready) data_received_wide2 += $bits(wide_axi_in_rsp_2.r);
-        if (wide_axi_in_rsp_2.b_valid & wide_axi_in_req_2.b_ready) data_received_wide2 += $bits(wide_axi_in_rsp_2.b);
-        if (wide_axi_in_req_2.ar_valid & wide_axi_in_rsp_2.ar_ready) data_sent_wide2 += $bits(wide_axi_in_req_2.ar);
-        if (wide_axi_in_req_2.aw_valid & wide_axi_in_rsp_2.aw_ready) data_sent_wide2 += $bits(wide_axi_in_req_2.aw);
-        if (wide_axi_in_req_2.w_valid & wide_axi_in_rsp_2.w_ready) data_sent_wide2 += $bits(wide_axi_in_req_2.w);
+        if (wide_flit_out_2.valid & wide_flit_in_2.ready) data_sent_wide2     += $bits(wide_flit_out_2.data);
+        if (wide_flit_in_2.valid & wide_flit_out_2.ready) data_received_wide2 += $bits(wide_flit_in_2.data);
       end
     join_any
     end_cycle_wide2 = $realtime;

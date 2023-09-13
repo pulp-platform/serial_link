@@ -174,30 +174,23 @@ import serial_link_pkg::*;
   assign axis_in_data_i.data_bits = axis_in_req_i.t.data;
 
   enqueue_register #(
-    .AllowVarAxisLen           ( AllowVarAxisLen               ),
-    .ClkDiv                    ( ClockDiv                      ),
-    .data_block_t              ( data_block_t                  ),
-    .strb_t                    ( axis_strb_bits_t              ),
-    .data_in_t                 ( axis_packet_t                 ),
-    .split_cntr_t              ( split_cntr_t                  ),
-    .MaxPossibleTransferSplits ( MaxPossibleTransferSplits     ),
-    .NumExternalBitsAdded      ( $bits(send_hdr) + NumUserBits ),
+    .AllowVarAxisLen           ( AllowVarAxisLen                        ),
+    .ClkDiv                    ( ClockDiv                               ),
+    .data_block_t              ( data_block_t                           ),
+    .strb_t                    ( axis_strb_bits_t                       ),
+    .data_in_t                 ( axis_packet_t                          ),
+    .split_cntr_t              ( split_cntr_t                           ),
+    .MaxPossibleTransferSplits ( MaxPossibleTransferSplits              ),
+    .NumExternalBitsAdded      ( $bits(send_hdr) + NumUserBits          ),
     .NarrowStrbCount           ( noc_bridge_narrow_wide_pkg::NarrowSize )
   ) i_data_collector (
     .clk_i        ( clk_i                   ),
     .rst_ni       ( rst_ni                  ),
-    // TODO: re-enable this port...
-    .clr_i        ( '0                      ),
 
     .valid_i      ( axis_in_req_i.tvalid    ),
     .ready_o      ( axis_in_rsp_o.tready    ),
     .data_i       ( axis_in_data_i          ),
     .strb_i       ( axis_in_req_i.t.strb    ),
-    // .strb_i       ( 76'b0000000000000000000000000000000000000000000000000000000000000000000000000001    ),  // 1  -> 1
-    // .strb_i       ( 76'b0000000000000000000000000000000000000000000000000000000000001111111111111111    ),  // 16 -> 1
-    // .strb_i       ( 76'b0000000000000000000000000000000000000000111111111111111111111111111111111111    ),  // 36 -> 1
-    // .strb_i       ( 76'b0000000000000000000000000000000000000001111111111111111111111111111111111111    ),  // 37 -> 2
-    // .strb_i       ( 76'b1111111111111111111111111111111111111111111111111111111111111111111111111111    ),  // 76 -> 2
 
     .valid_o      ( valid_synch_in          ),
     .ready_i      ( ready_synch_in          ),
@@ -230,58 +223,30 @@ import serial_link_pkg::*;
   //   FLOW-CONTROL-INSERTION   //
   ////////////////////////////////
 
-  // if (AllowVarAxisLen) begin : cred_cons_methode
-    serial_link_credit_synchronization #(
-      .credit_t          ( credit_t                  ),
-      .data_t            ( aligned_axis_t             ),
-      .MaxCredPerPktOut  ( MaxPossibleTransferSplits ),
-      .NumCredits        ( NumCredits                )
-    ) i_synchronization_flow_control (
-      .clk_i                  ( clk_i                               ),
-      .rst_ni                 ( rst_ni                              ),
-      .data_to_send_i         ( axis_packet_in_synch_in             ),
-      .data_to_send_o         ( axis_packet_in_synch_out            ),
-      .credits_to_send_o      ( send_hdr.amount_of_credits          ),
-      .send_ready_o           ( ready_synch_in                  ),
-      .send_valid_i           ( valid_synch_in                ),
-      .send_valid_o           ( axis_in_req_tvalid_afterFlowControl ),
-      .send_ready_i           ( axis_in_rsp_tready_afterFlowControl ),
-      .req_cred_to_buffer_msg ( required_splits_reg_out             ),
-      .credits_received_i     ( credits_incoming                    ),
-      .receive_cred_i         ( consume_incoming_credits            ),
-      .buffer_queue_out_val_i ( fifo_valid_out                      ),
-      .buffer_queue_out_rdy_i ( fifo_ready_out                      ),
-      .credits_only_packet_o  ( send_hdr.is_credits_only            ),
-      .allow_cred_consume_i   ( 1'b1                                ),
-      .consume_cred_to_send_i ( 1'b0                                )
-    );
-  // end else begin : cred_cons_methode
-  //   // TODO: probably this version is no longer working due to the new implemenation
-  //   // of the dequeue_shift_register (conflicting with credit only packets)
-  //   serial_link_credit_synchronization #(
-  //     .credit_t          ( credit_t      ),
-  //     .data_t            ( aligned_axis_t ),
-  //     .NumCredits        ( NumCredits    )
-  //   ) i_synchronization_flow_control (
-  //     .clk_i                  ( clk_i                               ),
-  //     .rst_ni                 ( rst_ni                              ),
-  //     .data_to_send_i         ( axis_packet_in_synch_in             ),
-  //     .data_to_send_o         ( axis_packet_in_synch_out            ),
-  //     .credits_to_send_o      ( send_hdr.amount_of_credits          ),
-  //     .send_ready_o           ( ready_synch_in                      ),
-  //     .send_valid_i           ( valid_synch_in                      ),
-  //     .send_valid_o           ( axis_in_req_tvalid_afterFlowControl ),
-  //     .send_ready_i           ( axis_in_rsp_tready_afterFlowControl ),
-  //     .req_cred_to_buffer_msg ( 1'b1                                ),
-  //     .credits_received_i     ( credits_incoming                    ),
-  //     .receive_cred_i         ( consume_incoming_credits            ),
-  //     .buffer_queue_out_val_i ( axis_out_req_unfiltered.tvalid      ),
-  //     .buffer_queue_out_rdy_i ( axis_out_rsp_unfiltered.tready      ),
-  //     .credits_only_packet_o  ( send_hdr.is_credits_only            ),
-  //     .allow_cred_consume_i   ( 1'b1                                ),
-  //     .consume_cred_to_send_i ( 1'b0                                )
-  //   );
-  // end
+  serial_link_credit_synchronization #(
+    .credit_t          ( credit_t                  ),
+    .data_t            ( aligned_axis_t             ),
+    .MaxCredPerPktOut  ( MaxPossibleTransferSplits ),
+    .NumCredits        ( NumCredits                )
+  ) i_synchronization_flow_control (
+    .clk_i                  ( clk_i                               ),
+    .rst_ni                 ( rst_ni                              ),
+    .data_to_send_i         ( axis_packet_in_synch_in             ),
+    .data_to_send_o         ( axis_packet_in_synch_out            ),
+    .credits_to_send_o      ( send_hdr.amount_of_credits          ),
+    .send_ready_o           ( ready_synch_in                  ),
+    .send_valid_i           ( valid_synch_in                ),
+    .send_valid_o           ( axis_in_req_tvalid_afterFlowControl ),
+    .send_ready_i           ( axis_in_rsp_tready_afterFlowControl ),
+    .req_cred_to_buffer_msg ( required_splits_reg_out             ),
+    .credits_received_i     ( credits_incoming                    ),
+    .receive_cred_i         ( consume_incoming_credits            ),
+    .buffer_queue_out_val_i ( fifo_valid_out                      ),
+    .buffer_queue_out_rdy_i ( fifo_ready_out                      ),
+    .credits_only_packet_o  ( send_hdr.is_credits_only            ),
+    .allow_cred_consume_i   ( 1'b1                                ),
+    .consume_cred_to_send_i ( 1'b0                                )
+  );
 
 
   //////////////////
@@ -440,22 +405,6 @@ import serial_link_pkg::*;
   );
 
   for (genvar i = 0; i < MaxPossibleTransferSplits; i++) begin : gen_recv_reg
-    // TODO: remove old version
-    // stream_register #(
-    //   .T ( phy_data_chan_t )
-    // ) i_recv_reg (
-    //   .clk_i      ( clk_i                      ),
-    //   .rst_ni     ( rst_ni                     ),
-    //   .clr_i      ( 1'b0                       ),
-    //   .testmode_i ( 1'b0                       ),
-    //   .valid_i    ( recv_reg_in_valid[i]       ),
-    //   .ready_o    ( recv_reg_in_ready[i]       ),
-    //   .data_i     ( flow_control_fifo_data_out ),
-    //   .valid_o    ( recv_reg_out_valid[i]      ),
-    //   .ready_i    ( recv_reg_out_ready[i]      ),
-    //   .data_o     ( recv_reg_data[i]           )
-    // );
-
     assign last_blocks[i] = (i<MaxPossibleTransferSplits-1) ? recv_reg_data[i+1] : '0;
     localparam bit use_hdr = (i==0) ? 1 : 0;
     assign shift_enable[i] = (i==0) ? 1 : shifts_allowed[i-1];
@@ -469,7 +418,6 @@ import serial_link_pkg::*;
     ) i_recv_reg (
       .clk_i       ( clk_i                      ),
       .rst_ni      ( rst_ni                     ),
-      .clr_i       ( 1'b0                       ),
       .shift_en_i  ( shift_enable[i]            ),
       .new_packet  ( last_blocks[i]             ),
       .valid_i     ( recv_reg_in_valid[i]       ),

@@ -475,9 +475,6 @@ module serial_link_benchmarking_unit #(
     $fgets(narrow_req, fd);
     $fgets(narrow_req, fd);
     $fgets(narrow_req, fd);
-    $fgets(narrow_req, fd);
-    $fgets(narrow_req, fd);
-    $fgets(narrow_req, fd);
     $fgets(narrow_rsp, fd);
     $fgets(wide, fd);
     $display("settings: latency_of_delay_module;%0d_ns bandwidth_physical_channel;%0d_bits_per_offchip_rising_clockedge number_of_channels;%0d \

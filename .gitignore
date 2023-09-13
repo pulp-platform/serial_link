@@ -31,3 +31,4 @@ src/serial_link_data_link_fixed_div_and_mult.sv
 benchmarking/*
 set_credits.tcl
 *BACKUP*
+report/*

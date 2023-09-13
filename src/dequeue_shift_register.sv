@@ -1,4 +1,4 @@
-// Copyright 2022 ETH Zurich and University of Bologna.
+// Copyright 2023 ETH Zurich and University of Bologna.
 // Solderpad Hardware License, Version 0.51, see LICENSE for details.
 // SPDX-License-Identifier: SHL-0.51
 
@@ -26,18 +26,19 @@
 module dequeue_shift_register
 import serial_link_pkg::*;
 #(
-  parameter  type data_i_t     = logic, // TODO: description
-  // TODO: Important parameter to set the header_o output to contain the header bit info which leads to a shift in the input data-stream.
+  parameter  type data_i_t     = logic, // contains block control bits
+  // Leads to an offset in the block control bit. The header_o outputs the data header.
   parameter  type header_t     = logic,
+  // If set to one, the last header-size bits of data_o are replaced with the transfer header.
   parameter  bit  use_header   = 0,
-  // TODO: remove the bits with a multiple of the header size as index from the stream
+  // Remove the header-bits from the output-stream
   parameter  bit  use_shifted_block_bit = use_header,
 
   parameter  type data_block_t = logic,
   localparam int  block_size   = $bits(data_block_t),
   localparam int  num_blocks   = ($bits(data_i_t) + block_size - 1) / block_size,
 
-  localparam type data_o_t     = logic[$bits(data_i_t)-num_blocks-1:0], // TODO: description
+  localparam type data_o_t     = logic[$bits(data_i_t)-num_blocks-1:0], // no control bits anymore.
 
   localparam int  num_hdr_bits = (use_shifted_block_bit) ? $bits(header_t) : 0,
   localparam type block_in_t   = logic [block_size-1:0],
@@ -47,9 +48,8 @@ import serial_link_pkg::*;
 ) (
     input  logic      clk_i,      // Clock
     input  logic      rst_ni,     // Asynchronous active-low reset
-    input  logic      clr_i,      // Synchronous clear
     input  logic      shift_en_i, // enable or disable the operation
-    input  block_in_t new_packet, // TODO: description
+    input  block_in_t new_packet, // new input value to be shifted into the front position
     // Input port
     input  logic      valid_i,
     output logic      ready_o,
@@ -59,8 +59,9 @@ import serial_link_pkg::*;
     input  logic      ready_i,
     output data_o_t   data_o,
 
-    // TODO: this port is HIGH whenever new data is loaded, until the data is being consumed again. Opposed to valid_o, it does not represent
-    // whether or not the data_o outputs a valid data output stream.
+    // This port is HIGH whenever new data is loaded, until the data is being
+    // consumed again. Opposed to valid_o, it does not represent whether or not
+    // the data_o outputs a valid data output stream.
     output logic      cont_data_o,
     // HIGH if the first output handshake of the current data-element occurs.
     output logic      shift_en_o,
@@ -76,11 +77,6 @@ import serial_link_pkg::*;
     data_o_t     data_out_flattened;
     logic        block_start_bit;
 
-  // initial begin
-  //   $display("INFO: dequeue_register: input_size  = %0d",$bits(data_i_t));
-  //   $display("INFO: dequeue_register: block_in_t  %0d",$bits(block_in_t));
-  // end
-
     assign cont_data_o     = contains_valid_data;
     assign ready_o         = all_data_consumed | ~contains_valid_data;
     assign load_new_data   = valid_i & ready_o;
@@ -91,7 +87,7 @@ import serial_link_pkg::*;
     assign first_hs_o      = valid_o & ready_i & first_outstanding_q;
 
 
-    always_comb begin : TODO_give_lable
+    always_comb begin : find_first_transaction
       first_outstanding_d = first_outstanding_q;
       if (valid_o & ready_i) begin
         first_outstanding_d = 0;
@@ -109,7 +105,7 @@ import serial_link_pkg::*;
       end
     end
 
-    always_comb begin
+    always_comb begin : data_consumption_checker
       block_idx_d = block_idx_q;
       all_data_consumed = 0;
       if (shift_en_o) begin
@@ -129,7 +125,7 @@ import serial_link_pkg::*;
 
     assign data_in_blocks = data_i;
 
-    for (genvar i = 0; i < num_blocks; i++) begin
+    for (genvar i = 0; i < num_blocks; i++) begin : load_or_shift_data
       // assign inputs of the FFs
       always_comb begin
         data_in[i] = data_out[i];
@@ -154,16 +150,17 @@ import serial_link_pkg::*;
         assign data_out_blocks[i] = {data_out[i][block_size-1:bit_removal_index+1], data_out[i][bit_removal_index-1:0]};
       end
 
-      `FFLARNC(data_out[i], data_in[i], 1'b1, clr_i, '0, clk_i, rst_ni)
+      `FF(data_out[i], data_in[i], '0)
     end
+
     assign data_out_flattened = data_out_blocks;
 
-    `FFLARNC(contains_valid_data, valid_i, ready_o, clr_i, 1'b0, clk_i, rst_ni)
+    `FFL(contains_valid_data, valid_i, ready_o, 1'b0, clk_i, rst_ni)
     `FF(block_idx_q, block_idx_d, '0)
     `FF(first_outstanding_q, first_outstanding_d, 1)
 
     if (use_header) begin
-      `FFLARNC(header_o, data_i, load_new_data, clr_i, 1'b0, clk_i, rst_ni)
+      `FFL(header_o, data_i, load_new_data, 1'b0, clk_i, rst_ni)
     end else begin
       assign header_o = '0;
     end
@@ -172,8 +169,6 @@ import serial_link_pkg::*;
   //   ASSERTIONS   //
   ////////////////////
 
-  // sample assertions
-  // `ASSERT_INIT(RawModeFifoDim, RecvFifoDepth >= RawModeFifoDepth)
   `ASSERT(HdrTooBig, num_hdr_bits<block_size)
 
 endmodule
