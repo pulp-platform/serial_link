@@ -29,6 +29,8 @@ module serial_link_credit_synchronization #(
   // However, in case the credits_to_send_o output port is allowed to change while send_valid_o is HIGH,
   // the below parameter might be set to 1, which will disable the internal shadow_counter.
   parameter  logic DontUseShadowCtnr = 0,
+  // TODO: description
+  parameter  logic IsolateIO         = 0,
 
   // dependant parameters: Do not change!
   localparam type credit_decrem_t = logic[$clog2(MaxCredPerPktOut+1)-1:0]
@@ -119,9 +121,38 @@ module serial_link_credit_synchronization #(
   logic consume_last_credits_but_dont_return_any, enough_credits_for_cred_only_pack_to_send;
   logic return_credits;
 
-  assign send_ready_o          = send_ready_i & send_normal_packet_q & send_valid_o;
+  logic send_ready_out, send_valid_in;
+  logic [data_width-1:0] data_to_send_in;
+
+  assign send_ready_out        = send_ready_i & send_normal_packet_q & send_valid_o;
   assign credits_to_send_o     = credits_to_send_q;
   assign credits_only_packet_o = ~send_normal_packet_q;
+
+
+  ////////////////////////////////////
+  //  IO delay path cut (optional)  //
+  ////////////////////////////////////
+
+  if (IsolateIO) begin : IO_isolation
+    stream_register #(
+      .T          ( logic [data_width-1:0] )
+    ) i_IO_isolate (
+      .clk_i      ( clk_i           ),
+      .rst_ni     ( rst_ni          ),
+      .clr_i      ( 1'b0            ),
+      .testmode_i ( 1'b0            ),
+      .valid_i    ( send_valid_i    ),
+      .ready_o    ( send_ready_o    ),
+      .data_i     ( data_to_send_i  ),
+      .valid_o    ( send_valid_in   ),
+      .ready_i    ( send_ready_out  ),
+      .data_o     ( data_to_send_in )
+    );
+  end else begin
+    assign send_valid_in   = send_valid_i;
+    assign send_ready_o    = send_ready_out;
+    assign data_to_send_in = data_to_send_i;
+  end
 
 
   //////////////////////////
@@ -133,7 +164,7 @@ module serial_link_credit_synchronization #(
     if (credits_only_packet_o) begin
       data_to_send_o = '0;
     end else begin
-      data_to_send_o = data_to_send_i;
+      data_to_send_o = data_to_send_in;
     end
   end
 
@@ -153,7 +184,7 @@ module serial_link_credit_synchronization #(
   // select if input-data can be forwarded, or if a credits_only packet sould be sent instead.
   always_comb begin : packet_source_selection
     send_normal_packet_d = send_normal_packet_q;
-    if ((~send_valid_i | cannot_send_data_but_credits_only) & force_send_credits) begin
+    if ((~send_valid_in | cannot_send_data_but_credits_only) & force_send_credits) begin
       // When I don't have valid data at the input and I overstepped the ForceSendThreshold, I switch
       // to the credits_only mode.
       // EXCEPTION: When there is valid data at the input and I have force_send_credits=1, but I cannot
@@ -185,7 +216,7 @@ module serial_link_credit_synchronization #(
     // deadlock situation from above
     send_valid_o = '0;
     if ((credits_available_q > req_credits_for_output_msg) || (credits_available_q == req_credits_for_output_msg && credits_to_send_q > 0 && allow_cred_consume_i)) begin
-      send_valid_o = (send_valid_i | credits_only_packet_o);
+      send_valid_o = (send_valid_in | credits_only_packet_o);
     end
   end
 

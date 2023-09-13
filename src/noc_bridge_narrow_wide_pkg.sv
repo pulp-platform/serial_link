@@ -35,7 +35,7 @@ package noc_bridge_narrow_wide_pkg;
   typedef logic [NarrowRspFlitSize-3:0] narrow_flit_rsp_data_t;
 
 
-  localparam int WideFlitSize  = $bits(wide_flit_t);
+  localparam int WideFlitSize     = $bits(wide_flit_t);
   localparam int WideFlitDataSize = WideFlitSize-2;
 
   typedef logic [WideFlitDataSize-1:0] wide_flit_data_t;
@@ -51,13 +51,13 @@ package noc_bridge_narrow_wide_pkg;
     wideChan   = 'd1
   } selected_channel_type_e;
 
-  localparam int strobeSize   = (($bits(wide_flit_data_t)+$bits(channel_hdr_e)+7)/8);
-  localparam int narrowStrobe = (($bits(narrow_flit_data_t)+$bits(channel_hdr_e)+7)/8);
+  localparam int WideSize   = (($bits(wide_flit_data_t)+$bits(channel_hdr_e)+7)/8);
+  localparam int NarrowSize = (($bits(narrow_flit_data_t)+$bits(channel_hdr_e)+7)/8);
 
-  typedef logic [strobeSize-1:0] strb_noc_t;
+  typedef logic [WideSize-1:0] strb_noc_t;
 
-  localparam strb_noc_t NarrowStrobe = {narrowStrobe{1'b1}};
-  localparam strb_noc_t WideStrobe   = {strobeSize{1'b1}};
+  localparam strb_noc_t NarrowStrobe = {NarrowSize{1'b1}};
+  localparam strb_noc_t WideStrobe   = {WideSize{1'b1}};
 
   localparam int WideChannelHdr = $bits(channel_hdr_e);
 

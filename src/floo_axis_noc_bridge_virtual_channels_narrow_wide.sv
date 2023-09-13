@@ -5,16 +5,16 @@
 module floo_axis_noc_bridge_virtual_channels_narrow_wide
 #(
   // If the parameter is set to 1, all the assertion checks within this module will be ignored.
-  parameter  bit  ignore_assert     = 1'b0,
-  // If the parameter is set to 1, a set of debug messages will be printed upon arival of data from the axis channel.
-  // This feature is temporary and is supposed to ease the developement. It will be removed at a later stage...
-  parameter  bit  allow_debug_msg   = 1'b0,
-  parameter  type narrow_rsp_flit_t = logic,
-  parameter  type narrow_req_flit_t = logic,
-  parameter  type wide_flit_t       = logic,
-  parameter  type axis_req_t        = logic,
-  parameter  type axis_rsp_t        = logic,
-  // TODO: finde suitable ForceSendThresh margin (do not change line number or ordering!)
+  parameter  bit  ignore_assert        = 1'b0,
+  parameter  type narrow_rsp_flit_t    = logic,
+  parameter  type narrow_req_flit_t    = logic,
+  parameter  type wide_flit_t          = logic,
+  parameter  type axis_req_t           = logic,
+  parameter  type axis_rsp_t           = logic,
+  // Enable if timingpaths between the valid and ready signals of incoming messages is not allowed.
+  // Attention: Enabling results in extra area since another register is inserted per channel.
+  parameter  bit  preventIoTimingPaths = 1'b0,
+  // finde suitable ForceSendThresh margin (do not change line number or ordering!)
   parameter  int  ForceSendThresh_narrow_req = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_narrow_req-4,
   parameter  int  ForceSendThresh_narrow_rsp = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_narrow_rsp-4,
   parameter  int  ForceSendThresh_wide_chan  = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_wide_chan-4
@@ -142,7 +142,8 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .NumCredits             ( NumCred_NocBridge_narrow_req ),
     .ForceSendThresh        ( ForceSendThresh_narrow_req   ),
     .CredOnlyConsCred       ( 0                            ),
-    .DontUseShadowCtnr      ( 1                            )
+    .DontUseShadowCtnr      ( 1                            ),
+    .IsolateIO              ( preventIoTimingPaths         )
   ) i_credit_counter_req (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -168,13 +169,6 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   assign req_read_incoming_credits = (axis_cred_in_req_valid & axis_in_rsp_o.tready);
   assign force_consume_req_credits = axis_out_valid & axis_out_ready & (wide_arb_out.credits_hdr == narrow_request);
 
-  // TODO: for debugging only. Please remove the always_ff block...
-  always_ff @(posedge clk_i) begin
-    if (req_read_incoming_credits & allow_debug_msg) begin
-      $display("INFO: received credits for req-channel = %1d", narr_wide_queue_in.credits);
-    end
-  end
-
   assign narrow_arb_req_in.data_hdr      = narrow_request;
   assign narrow_arb_req_in.data          = req_data_synchr_out;
   assign narrow_arb_req_in.data_validity = ~credits_only_packet_req;
@@ -186,7 +180,8 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .NumCredits             ( NumCred_NocBridge_narrow_rsp ),
     .ForceSendThresh        ( ForceSendThresh_narrow_rsp   ),
     .CredOnlyConsCred       ( 0                            ),
-    .DontUseShadowCtnr      ( 1                            )
+    .DontUseShadowCtnr      ( 1                            ),
+    .IsolateIO              ( preventIoTimingPaths         )
   ) i_credit_counter_rsp (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -212,13 +207,6 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   assign rsp_read_incoming_credits = (axis_cred_in_rsp_valid & axis_in_rsp_o.tready);
   assign force_consume_rsp_credits = axis_out_valid & axis_out_ready & (wide_arb_out.credits_hdr == narrow_response);
 
-  // TODO: for debugging only. Please remove the always_ff block...
-  always_ff @(posedge clk_i) begin
-    if (rsp_read_incoming_credits & allow_debug_msg) begin
-      $display("INFO: received credits for rsp-channel = %1d", narr_wide_queue_in.credits);
-    end
-  end
-
   assign narrow_arb_rsp_in.data_hdr      = narrow_response;
   assign narrow_arb_rsp_in.data          = rsp_data_synchr_out;
   assign narrow_arb_rsp_in.data_validity = ~credits_only_packet_rsp;
@@ -235,7 +223,8 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .NumCredits             ( NumCred_NocBridge_wide_chan ),
     .ForceSendThresh        ( ForceSendThresh_wide_chan   ),
     .CredOnlyConsCred       ( 0                           ),
-    .DontUseShadowCtnr      ( 1                           )
+    .DontUseShadowCtnr      ( 1                           ),
+    .IsolateIO              ( preventIoTimingPaths        )
   ) i_credit_counter_wide (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -260,13 +249,6 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   // restore available credits by consuming incoming credits
   assign wide_read_incoming_credits = (axis_cred_in_wide_valid & axis_in_rsp_o.tready);
   assign force_consume_wide_credits = axis_out_valid & axis_out_ready & (wide_arb_out.credits_hdr == wide_channel);
-
-  // TODO: for debugging only. Please remove the always_ff block...
-  always_ff @(posedge clk_i) begin
-    if (wide_read_incoming_credits & allow_debug_msg) begin
-      $display("INFO: received credits for wide-channel = %1d", wide_arb_out.credits);
-    end
-  end
 
   assign wide_arb_wide_in.data_hdr      = wide_channel;
   assign wide_arb_wide_in.data          = wide_data_synchr_out;
@@ -342,21 +324,19 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   `FF(selChanType_q, selChanType_d, narrowChan);
 
   // required for a stable AXIS output
-  stream_fifo #(
-    .T          ( axis_packet_t           ),
-    .DEPTH      ( 2                       )
+  stream_register #(
+    .T          ( axis_packet_t         )
   ) i_axis_out_reg (
-    .clk_i      ( clk_i                   ),
-    .rst_ni     ( rst_ni                  ),
-    .flush_i    ( 1'b0                    ),
-    .testmode_i ( 1'b0                    ),
-    .usage_o    (                         ),
-    .valid_i    ( axis_out_valid          ),
-    .ready_o    ( axis_out_ready          ),
-    .data_i     ( wide_arb_out            ),
-    .valid_o    ( axis_out_req_o.tvalid   ),
-    .ready_i    ( axis_out_rsp_i.tready   ),
-    .data_o     ( narrow_wide_axis_out    )
+    .clk_i      ( clk_i                 ),
+    .rst_ni     ( rst_ni                ),
+    .clr_i      ( 1'b0                  ),
+    .testmode_i ( 1'b0                  ),
+    .valid_i    ( axis_out_valid        ),
+    .ready_o    ( axis_out_ready        ),
+    .data_i     ( wide_arb_out          ),
+    .valid_o    ( axis_out_req_o.tvalid ),
+    .ready_i    ( axis_out_rsp_i.tready ),
+    .data_o     ( narrow_wide_axis_out  )
   );
 
   // assign signals to the axis_out interface
@@ -376,13 +356,6 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   // unpack axis_in
   assign {narr_wide_queue_in.data, narr_wide_queue_in.data_hdr}                                         = axis_in_req_i.t.data;
   assign {narr_wide_queue_in.data_validity, narr_wide_queue_in.credits_hdr, narr_wide_queue_in.credits} = axis_in_req_i.t.user;
-
-  // TODO: for debugging only. Please remove the always_ff block...
-  always_ff @(posedge clk_i) begin
-    if (axis_in_req_i.tvalid & axis_in_rsp_o.tready & allow_debug_msg) begin
-      $display("INFO: received axis packet (@%8d) = | %1d | %30d | %1d | %1d | %2d |", $time, narr_wide_queue_in.data_hdr, narr_wide_queue_in.data, narr_wide_queue_in.data_validity, narr_wide_queue_in.credits_hdr, narr_wide_queue_in.credits);
-    end
-  end
 
   // calculate channel related handshake signals
   assign axis_data_in_req_valid  = (narr_wide_queue_in.data_hdr    == narrow_request)  ? (axis_in_req_i.tvalid & narr_wide_queue_in.data_validity) : 0;

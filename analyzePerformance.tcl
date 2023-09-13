@@ -8,9 +8,9 @@ set noc_credits_start 5
 set noc_credits_stop 20
 set noc_credits_step 5
 
-set link_credits_start 5
-set link_credits_stop 21
-set link_credits_step 4
+set link_credits_start 10
+set link_credits_stop 42
+set link_credits_step 8
 
 proc print_field_explanation {} {
 	exec echo "---------- few explanations on the obtained data ----------" >> perfAnalysis.csv
