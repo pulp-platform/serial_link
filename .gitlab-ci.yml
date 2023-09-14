@@ -3,9 +3,10 @@
 # SPDX-License-Identifier: SHL-0.51
 
 # Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
+# Modified: Yannick Baumann <baumanny@student.ethz.ch>
 
 variables:
-  VSIM: 'questa-2021.3-kgf vsim'
+  VSIM: 'questa-2022.3 vsim'
   VCS: 'vcs-2020.12 vcs'
   VLOGAN: 'vcs-2020.12 vlogan'
 
@@ -62,6 +63,23 @@ build_vcs_single_channel:
     expire_in: 1 week
     paths:
       - bin/serial_link_single_channel.vcs*
+
+run_vsim_floo_noc_bridge:
+  stage: test
+  needs:
+    - build_vsim
+  script:
+    - echo "Running NoC_bridge test with R/W (narrow) [$NUM_NARR_R_1_W_2,$NUM_NARR_R_2_W_1] <-> [$NUM_NARR_R_2_W_1,$NUM_NARR_R_1_W_2] & R/W (wide) [$NUM_WIDE_R_1_W_2,$NUM_WIDE_R_2_W_1] <-> [$NUM_WIDE_R_2_W_1,$NUM_WIDE_R_1_W_2]"
+    - make run TB_DUT=tb_floo_serial_link_narrow_wide WORK=work-vsim RUN_ARGS="+NUM_NARR_WRITES_1=$NUM_NARR_R_2_W_1 +NUM_NARR_READS_1=$NUM_NARR_R_1_W_2 +NUM_NARR_WRITES_2=$NUM_NARR_R_1_W_2 +NUM_NARR_READS_2=$NUM_NARR_R_2_W_1 +NUM_WIDE_WRITES_1=$NUM_WIDE_R_2_W_1 +NUM_WIDE_READS_1=$NUM_WIDE_R_1_W_2 +NUM_WIDE_WRITES_2=$NUM_WIDE_R_1_W_2 +NUM_WIDE_READS_2=$NUM_WIDE_R_2_W_1"
+ variables:
+    TEST_LENGTH: 1000
+  parallel:
+    matrix:
+      - NUM_NARR_R_1_W_2: [0, $TEST_LENGTH]
+        NUM_NARR_R_2_W_1: [0, $TEST_LENGTH]
+        NUM_WIDE_R_1_W_2: [0, $TEST_LENGTH]
+        NUM_WIDE_R_2_W_1: [0, $TEST_LENGTH]
+  timeout: 15 minutes
 
 run_vsim_axi:
   stage: test
