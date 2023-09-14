@@ -166,7 +166,7 @@ module enqueue_register
   logic                  valid_data_into_reg, can_receive_new_data;
   logic                  no_ongoing_shift, no_lat_introduced, enough_time_left;
   logic                  valid_reg_in, ready_reg_in, contains_valid_data;
-  logic                  valid_reg_data, acceptable_size, accept_new_blocks, is_first_element;
+  logic                  valid_reg_data, acceptable_size, accept_next_block, is_first_element;
   logic                  allow_shifts, shift_in_progress, shift_for_no_lat, empty_shift_pos;
 
 
@@ -209,14 +209,14 @@ module enqueue_register
     // I should not have an ongoing (un-terminated) shiftoperation
     no_ongoing_shift  = remaining_shifts_q <= 1;
     // Is a delayless shift insertion possible?
-    no_lat_introduced = ClkDiv - occupied_blocks_q < cycle_delay_q + MinReqBlocks ;
+    no_lat_introduced = ClkDiv - occupied_blocks_q < cycle_delay_q + MinReqBlocks;
     // Am I in a delay phase (output not yet ready) and I have sufficient time to
     // shift the input message into the out_block section )
     enough_time_left  = (required_blocks - MinReqBlocks) < cycle_delay_q;
     // Combination of above signals to evaluate if I am able to receive new blocks
-    accept_new_blocks = no_ongoing_shift & no_lat_introduced & enough_time_left;
-    // If multiple elements could fit & register is emptiede, I may consume a new element
-    is_first_element  = valid_reg_in & ready_reg_in & contains_valid_data;
+    accept_next_block = no_ongoing_shift & no_lat_introduced & enough_time_left;
+    // shift_register it emptied, resulting in the new incoming element to be the first in the reg.
+    is_first_element  = contains_valid_data & allow_new_out_transac & ready_reg_in & contains_valid_data;
 
     // The data block has not yet moved out of the input-intersecting region.
     shift_in_progress = remaining_shifts_q != 0;
@@ -228,7 +228,7 @@ module enqueue_register
     // If the input data is valid and has an acceptable size, it may be consumed,
     // given it does not conflict with existing data and can be fully shifted
     // into position within the given delay_cycle time.
-    valid_reg_data = valid_i & acceptable_size & (accept_new_blocks | is_first_element);
+    valid_reg_data = valid_i & acceptable_size & (accept_next_block | is_first_element);
     // Declares if the register chain is allowed to right-shift the data blocks by another position
     allow_shifts   = (shift_in_progress | shift_for_no_lat) & empty_shift_pos;
   end
