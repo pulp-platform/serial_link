@@ -72,6 +72,7 @@ sources:
       # Benchmarking unit & latency module
       - src/serial_link_benchmarking_unit.sv
       - src/insert_latency_to_signal.sv
+      - src/modified/axi_test_mod.sv
       - test/tb_axi_serial_link.sv
       - test/tb_floo_serial_link.sv
       - test/tb_floo_serial_link_narrow_wide.sv

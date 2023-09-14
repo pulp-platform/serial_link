@@ -400,7 +400,7 @@ module tb_floo_serial_link_narrow_wide();
   `AXI_ASSIGN_TO_RESP(wide_axi_out_rsp_2, wide_axi_out_2)
 
   // narrow master type
-  typedef axi_test::axi_rand_master #(
+  typedef axi_test_mod::axi_rand_master #(
     .AW                   ( NarrowInAddrWidth ),
     .DW                   ( NarrowInDataWidth ),
     .IW                   ( NarrowInIdWidth   ),
@@ -425,7 +425,7 @@ module tb_floo_serial_link_narrow_wide();
   ) narrow_axi_rand_master_t;
 
   // narrow slave type
-  typedef axi_test::axi_rand_slave #(
+  typedef axi_test_mod::axi_rand_slave #(
     .AW                   ( NarrowOutAddrWidth ),
     .DW                   ( NarrowOutDataWidth ),
     .IW                   ( NarrowOutIdWidth   ),
@@ -442,7 +442,7 @@ module tb_floo_serial_link_narrow_wide();
   ) narrow_axi_rand_slave_t;
 
   // wide master type
-  typedef axi_test::axi_rand_master #(
+  typedef axi_test_mod::axi_rand_master #(
     .AW                   ( WideInAddrWidth ),
     .DW                   ( WideInDataWidth ),
     .IW                   ( WideInIdWidth   ),
@@ -467,7 +467,7 @@ module tb_floo_serial_link_narrow_wide();
   ) wide_axi_rand_master_t;
 
   // wide slave type
-  typedef axi_test::axi_rand_slave #(
+  typedef axi_test_mod::axi_rand_slave #(
     .AW                   ( WideOutAddrWidth ),
     .DW                   ( WideOutDataWidth ),
     .IW                   ( WideOutIdWidth   ),
@@ -577,11 +577,11 @@ module tb_floo_serial_link_narrow_wide();
     automatic int unsigned data_sent = 0;
     automatic int unsigned data_received = 0;
 
-    if ($value$plusargs("NUM_WRITES_1=%d", NumWrites_narrow_1)) begin
-      $info("[DDR1] Number of writes specified as %d", NumWrites_narrow_1);
+    if ($value$plusargs("NUM_NARR_WRITES_1=%d", NumWrites_narrow_1)) begin
+      $info("[DDR1] Number of writes (narrow) specified as %d", NumWrites_narrow_1);
     end
-    if ($value$plusargs("NUM_READS_1=%d", NumReads_narrow_1)) begin
-      $info("[DDR1] Number of reads specified as %d", NumReads_narrow_1);
+    if ($value$plusargs("NUM_NARR_READS_1=%d", NumReads_narrow_1)) begin
+      $info("[DDR1] Number of reads (narrow) specified as %d", NumReads_narrow_1);
     end
     mst_done[0] = 0;
     narrow_rand_master_1.reset();
@@ -616,11 +616,11 @@ module tb_floo_serial_link_narrow_wide();
     automatic int unsigned data_sent_narrow2 = 0;
     automatic int unsigned data_received_narrow2 = 0;
 
-    if ($value$plusargs("NUM_WRITES_2=%d", NumWrites_narrow_2)) begin
-      $info("[DDR2] Number of writes specified as %d", NumWrites_narrow_2);
+    if ($value$plusargs("NUM_NARR_WRITES_2=%d", NumWrites_narrow_2)) begin
+      $info("[DDR1] Number of writes (narrow) specified as %d", NumWrites_narrow_2);
     end
-    if ($value$plusargs("NUM_READS_2=%d", NumReads_narrow_2)) begin
-      $info("[DDR2] Number of reads specified as %d", NumReads_narrow_2);
+    if ($value$plusargs("NUM_NARR_READS_2=%d", NumReads_narrow_2)) begin
+      $info("[DDR1] Number of reads (narrow) specified as %d", NumReads_narrow_2);
     end
     mst_done[1] = 0;
     narrow_rand_master_2.reset();
@@ -656,6 +656,12 @@ module tb_floo_serial_link_narrow_wide();
     automatic int unsigned data_sent_wide = 0;
     automatic int unsigned data_received_wide = 0;
 
+    if ($value$plusargs("NUM_WIDE_WRITES_1=%d", NumWrites_wide_1)) begin
+      $info("[DDR1] Number of writes (wide) specified as %d", NumWrites_wide_1);
+    end
+    if ($value$plusargs("NUM_WIDE_READS_1=%d", NumReads_wide_1)) begin
+      $info("[DDR1] Number of reads (wide) specified as %d", NumReads_wide_1);
+    end
     mst_done[2] = 0;
     wide_rand_master_1.reset();
     wait_for_reset_1();
@@ -687,6 +693,12 @@ module tb_floo_serial_link_narrow_wide();
     automatic int unsigned data_sent_wide2 = 0;
     automatic int unsigned data_received_wide2 = 0;
 
+    if ($value$plusargs("NUM_WIDE_WRITES_2=%d", NumWrites_wide_2)) begin
+      $info("[DDR1] Number of writes (wide) specified as %d", NumWrites_wide_2);
+    end
+    if ($value$plusargs("NUM_WIDE_READS_2=%d", NumReads_wide_2)) begin
+      $info("[DDR1] Number of reads (wide) specified as %d", NumReads_wide_2);
+    end
     mst_done[3] = 0;
     wide_rand_master_2.reset();
     wait_for_reset_2();
