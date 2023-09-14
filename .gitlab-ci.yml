@@ -20,9 +20,9 @@ build_vsim:
     - make clean
     - make compile_questa VSIM="${VSIM}" WORK=work-vsim
   artifacts:
-      expire_in: 1 week
-      paths:
-        - work-vsim
+    expire_in: 1 week
+    paths:
+      - work-vsim
 
 build_vsim_single_channel:
   stage: build
@@ -40,9 +40,9 @@ build_vcs_axi:
     - make clean
     - make bin/serial_link_axi.vcs TB_DUT=tb_axi_serial_link VCS="${VCS}" WORK=work-vcs
   artifacts:
-      expire_in: 1 week
-      paths:
-        - bin/serial_link_axi.vcs*
+    expire_in: 1 week
+    paths:
+      - bin/serial_link_axi.vcs*
 
 build_vcs_ch_calib:
   stage: build
@@ -50,9 +50,9 @@ build_vcs_ch_calib:
     - make clean
     - make bin/serial_link_ch_calib.vcs TB_DUT=tb_ch_calib_serial_link VCS="${VCS}" WORK=work-vcs
   artifacts:
-      expire_in: 1 week
-      paths:
-        - bin/serial_link_ch_calib.vcs*
+    expire_in: 1 week
+    paths:
+      - bin/serial_link_ch_calib.vcs*
 
 build_vcs_single_channel:
   stage: build
@@ -71,7 +71,7 @@ run_vsim_floo_noc_bridge:
   script:
     - echo "Running NoC_bridge test with R/W (narrow) [$NUM_NARR_R_1_W_2,$NUM_NARR_R_2_W_1] <-> [$NUM_NARR_R_2_W_1,$NUM_NARR_R_1_W_2] & R/W (wide) [$NUM_WIDE_R_1_W_2,$NUM_WIDE_R_2_W_1] <-> [$NUM_WIDE_R_2_W_1,$NUM_WIDE_R_1_W_2]"
     - make run TB_DUT=tb_floo_serial_link_narrow_wide WORK=work-vsim RUN_ARGS="+NUM_NARR_WRITES_1=$NUM_NARR_R_2_W_1 +NUM_NARR_READS_1=$NUM_NARR_R_1_W_2 +NUM_NARR_WRITES_2=$NUM_NARR_R_1_W_2 +NUM_NARR_READS_2=$NUM_NARR_R_2_W_1 +NUM_WIDE_WRITES_1=$NUM_WIDE_R_2_W_1 +NUM_WIDE_READS_1=$NUM_WIDE_R_1_W_2 +NUM_WIDE_WRITES_2=$NUM_WIDE_R_1_W_2 +NUM_WIDE_READS_2=$NUM_WIDE_R_2_W_1"
- variables:
+  variables:
     TEST_LENGTH: 1000
   parallel:
     matrix:
