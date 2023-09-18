@@ -1,4 +1,4 @@
-// Copyright 2022 ETH Zurich and University of Bologna.
+// Copyright 2023 ETH Zurich and University of Bologna.
 // Solderpad Hardware License, Version 0.51, see LICENSE for details.
 // SPDX-License-Identifier: SHL-0.51
 
@@ -30,15 +30,13 @@ module tb_floo_serial_link_narrow_wide();
   localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;
 
   localparam time         TckSys1         = 50ns;
-  // localparam time         TckSys2         = 50ns;
   localparam time         TckSys2         = 54ns;
   localparam time         TckReg          = 200ns;
   localparam int unsigned RstClkCyclesSys = 1;
 
   // Random-master/slave behaviour (randomized delays)
-  localparam int          min_wait_cycles = 0;
-  localparam int          max_wait_cycles = 0;
-  // localparam int          max_wait_cycles = 100;
+  localparam int          MinWaitCycles   = 0;
+  localparam int          MaxWaitCycles   = 0;
 
   localparam int unsigned RegAddrWidth    = 32;
   localparam int unsigned RegDataWidth    = 32;
@@ -56,9 +54,8 @@ module tb_floo_serial_link_narrow_wide();
   localparam int unsigned WideMaxTxns           = 32;
   localparam int unsigned WideMaxTxnsPerId      = 32;
 
-  // Stop the simulation if this simulation time (ns) is exceeded.
-  // localparam int stopSimAfter = 200000000;
-  localparam int stopSimAfter = 75000000;
+  // Stop the simulation if stop time (in ns) is exceeded.
+  localparam int StopSimAfter = 75000000;
 
   // ==============
   //    DDR Link
@@ -409,13 +406,12 @@ module tb_floo_serial_link_narrow_wide();
     .TT                   ( 500ps             ),
     .MAX_READ_TXNS        ( 4                 ),
     .MAX_WRITE_TXNS       ( 4                 ),
-    .AX_MIN_WAIT_CYCLES   ( min_wait_cycles   ),
-    .AX_MAX_WAIT_CYCLES   ( max_wait_cycles   ),
-    .W_MIN_WAIT_CYCLES    ( min_wait_cycles   ),
-    .W_MAX_WAIT_CYCLES    ( max_wait_cycles   ),
-    .RESP_MIN_WAIT_CYCLES ( min_wait_cycles   ),
-    .RESP_MAX_WAIT_CYCLES ( max_wait_cycles   ),
-    // .AXI_MAX_BURST_LEN    ( 1                 ),
+    .AX_MIN_WAIT_CYCLES   ( MinWaitCycles     ),
+    .AX_MAX_WAIT_CYCLES   ( MaxWaitCycles     ),
+    .W_MIN_WAIT_CYCLES    ( MinWaitCycles     ),
+    .W_MAX_WAIT_CYCLES    ( MaxWaitCycles     ),
+    .RESP_MIN_WAIT_CYCLES ( MinWaitCycles     ),
+    .RESP_MAX_WAIT_CYCLES ( MaxWaitCycles     ),
     .TRAFFIC_SHAPING      ( 1                 ),
     .AXI_EXCLS            ( 1'b0              ),
     .AXI_ATOPS            ( 1'b0              ),
@@ -451,13 +447,12 @@ module tb_floo_serial_link_narrow_wide();
     .TT                   ( 500ps           ),
     .MAX_READ_TXNS        ( 32              ),
     .MAX_WRITE_TXNS       ( 32              ),
-    .AX_MIN_WAIT_CYCLES   ( min_wait_cycles ),
-    .AX_MAX_WAIT_CYCLES   ( max_wait_cycles ),
-    .W_MIN_WAIT_CYCLES    ( min_wait_cycles ),
-    .W_MAX_WAIT_CYCLES    ( max_wait_cycles ),
-    .RESP_MIN_WAIT_CYCLES ( min_wait_cycles ),
-    .RESP_MAX_WAIT_CYCLES ( max_wait_cycles ),
-    // .AXI_MAX_BURST_LEN    ( 0               ),
+    .AX_MIN_WAIT_CYCLES   ( MinWaitCycles   ),
+    .AX_MAX_WAIT_CYCLES   ( MaxWaitCycles   ),
+    .W_MIN_WAIT_CYCLES    ( MinWaitCycles   ),
+    .W_MAX_WAIT_CYCLES    ( MaxWaitCycles   ),
+    .RESP_MIN_WAIT_CYCLES ( MinWaitCycles   ),
+    .RESP_MAX_WAIT_CYCLES ( MaxWaitCycles   ),
     .TRAFFIC_SHAPING      ( 1               ),
     .AXI_EXCLS            ( 1'b0            ),
     .AXI_ATOPS            ( 1'b0            ),
@@ -563,7 +558,7 @@ module tb_floo_serial_link_narrow_wide();
     // The random masters are being started
     while (mst_done != '1) begin
       @(posedge clk_1);
-      if ($time >= stopSimAfter) begin
+      if ($time >= StopSimAfter) begin
         $error("Simulation terminated");
         $display("INFO: Simulation timed out after %1d ns. => You may change the stop time in the tb_floo_serial_link_narrow_wide testbench (localparam).", $time);
         $stop;
@@ -854,7 +849,6 @@ module tb_floo_serial_link_narrow_wide();
     .network_1_num_cred_only_pack_sent      ( network_1_num_cred_only_pack_sent      ),
     .network_1_valid_cycles_from_phys       ( network_1_valid_cycles_from_phys       ),
     .network_1_sum_stalled_cyc_cred_cntrs   ( network_1_sum_stalled_cyc_cred_cntrs   ),
-
     .lat_0  ( lat_0  ),
     .lat_1  ( lat_1  ),
     .lat_2  ( lat_2  ),

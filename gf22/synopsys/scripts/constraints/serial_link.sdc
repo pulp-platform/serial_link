@@ -97,6 +97,8 @@ set_false_path -hold  -fall_from [get_clocks clk_slow] -rise_to [get_clocks clk_
 ################
 
 set IO_delay              [expr $T_CLK / 2]
+set input_delay_margin             35
+set output_delay_margin            35
 
 set_input_delay -max -clock [get_clocks vir_clk_ddr_in] [expr $MARGIN] [get_ports ddr_i]
 set_input_delay -add_delay -min -clock [get_clocks vir_clk_ddr_in] [expr -$MARGIN] [get_ports ddr_i]
@@ -117,9 +119,9 @@ for {set i 0} {$i < $num_channels} {incr i} {
     set_output_delay -add_delay -min -clock_fall -clock [get_clocks clk_ddr_out] [expr $T_FWD_CLK / 4 - $MARGIN] -reference_pin [get_ports ddr_rcv_clk_o[${i}]] $ddr_o_channel_group
 }
 
-set_input_delay -clock [get_clocks clk] [expr $IO_delay] [remove_from_collection [all_inputs] [get_ports {clk* ddr* rst*}]]
+set_input_delay -clock [get_clocks clk] [expr $IO_delay - $input_delay_margin] [remove_from_collection [all_inputs] [get_ports {clk* ddr* rst*}]]
 
-set_output_delay -clock [get_clocks clk] [expr $IO_delay] [remove_from_collection [all_outputs] [get_ports {*clk_o* ddr* reset_no}]]
+set_output_delay -clock [get_clocks clk] [expr $IO_delay - $output_delay_margin] [remove_from_collection [all_outputs] [get_ports {*clk_o* ddr* reset_no}]]
 
 #################
 #  OUTPUT LOAD  #
