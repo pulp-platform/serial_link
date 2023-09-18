@@ -303,6 +303,10 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
         if (wide_valid_synchr_out & !narrow_arb_valid_out) begin
           selChanType_d = wideChan;
         end
+        // TODO: remove the below code section (do not upload on git with this uncommented section still present)
+        // if (wide_valid_synchr_out) begin
+        //   selChanType_d = wideChan;
+        // end
       end
       wideChan : begin
         wide_arb_out.data_hdr      = wide_arb_wide_in.data_hdr;
@@ -316,6 +320,10 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
         if ((!wide_valid_synchr_out | wide_ready_synchr_out) & narrow_arb_valid_out) begin
           selChanType_d = narrowChan;
         end
+        // TODO: remove the below code section (do not upload on git with this uncommented section still present)
+        // if (narrow_arb_valid_out) begin
+        //   selChanType_d = narrowChan;
+        // end
       end
       default : /* default */;
     endcase

@@ -9,7 +9,7 @@ package noc_bridge_narrow_wide_pkg;
 
   // With this parameter you can set the maximal credit count for the NoC bridge. If set to 0, the NoC-bridge without
   // virtualization will be used instead.
-  localparam int NumCred_NocBridge = 8;
+  localparam int NumCred_NocBridge = 20;
 
   // new parameters to allow for variable number of credits for the individual channels in the virtual channel noc_bridge verison
   localparam int NumCred_NocBridge_narrow_req = NumCred_NocBridge;

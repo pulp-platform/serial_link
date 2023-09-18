@@ -197,7 +197,8 @@ module floo_serial_link
     .NumChannels      ( NumChannels       ),
     .NumLanes         ( NumLanes          ),
     .credit_t         ( credit_t          ),
-    .NumCredits       ( NumCredits        )
+    .NumCredits       ( NumCredits        ),
+    .PackMultipleMsg  ( 1'b1              )
   ) i_serial_link_data_link (
     .clk_i                                   ( clk_sl_i                                         ),
     .rst_ni                                  ( rst_sl_ni                                        ),

@@ -30,26 +30,26 @@ import serial_link_pkg::*;
   // Leads to an offset in the block control bit. The header_o outputs the data header.
   parameter  type header_t     = logic,
   // If set to one, the last header-size bits of data_o are replaced with the transfer header.
-  parameter  bit  use_header   = 0,
+  parameter  bit  UseHeader    = 0,
   // Remove the header-bits from the output-stream
-  parameter  bit  use_shifted_block_bit = use_header,
+  parameter  bit  UseShiftedBlockBit = UseHeader,
 
   parameter  type data_block_t = logic,
-  localparam int  block_size   = $bits(data_block_t),
-  localparam int  num_blocks   = ($bits(data_i_t) + block_size - 1) / block_size,
+  localparam int  BlockSize    = $bits(data_block_t),
+  localparam int  NumBlocks    = ($bits(data_i_t) + BlockSize - 1) / BlockSize,
 
-  localparam type data_o_t     = logic[$bits(data_i_t)-num_blocks-1:0], // no control bits anymore.
+  localparam type data_o_t     = logic[$bits(data_i_t)-NumBlocks-1:0], // no control bits anymore.
 
-  localparam int  num_hdr_bits = (use_shifted_block_bit) ? $bits(header_t) : 0,
-  localparam type block_in_t   = logic [block_size-1:0],
-  localparam type block_out_t  = logic [block_size-2:0],
-  localparam type block_cntr_t = logic [$clog2(num_blocks)-1:0],
-  localparam int  bit_removal_index = ( use_shifted_block_bit ) ? $bits(header_t) : 0
+  localparam int  NumHdrBits   = (UseShiftedBlockBit) ? $bits(header_t) : 0,
+  localparam type block_in_t   = logic [BlockSize-1:0],
+  localparam type block_out_t  = logic [BlockSize-2:0],
+  localparam type block_cntr_t = logic [$clog2(NumBlocks)-1:0],
+  localparam int  BitRemovalIndex = (UseShiftedBlockBit) ? $bits(header_t) : 0
 ) (
     input  logic      clk_i,      // Clock
     input  logic      rst_ni,     // Asynchronous active-low reset
     input  logic      shift_en_i, // enable or disable the operation
-    input  block_in_t new_packet, // new input value to be shifted into the front position
+    input  block_in_t new_packet_i, // new input value to be shifted into the front position
     // Input port
     input  logic      valid_i,
     output logic      ready_o,
@@ -65,14 +65,16 @@ import serial_link_pkg::*;
     output logic      cont_data_o,
     // HIGH if the first output handshake of the current data-element occurs.
     output logic      shift_en_o,
+    // Is HIGH if the current output handshake is the first output handshake for the currently
+    // received data-stream.
     output logic      first_hs_o,
     output header_t   header_o
 );
 
     logic        contains_valid_data, load_new_data, all_data_consumed;
     logic        valid_shift_pos, first_outstanding_q, first_outstanding_d;
-    block_in_t   [num_blocks-1:0] data_in_blocks, data_in, data_out;
-    block_out_t  [num_blocks-1:0] data_out_blocks;
+    block_in_t   [NumBlocks-1:0] data_in_blocks, data_in, data_out;
+    block_out_t  [NumBlocks-1:0] data_out_blocks;
     block_cntr_t block_idx_q, block_idx_d;
     data_o_t     data_out_flattened;
     logic        block_start_bit;
@@ -80,7 +82,7 @@ import serial_link_pkg::*;
     assign cont_data_o     = contains_valid_data;
     assign ready_o         = all_data_consumed | ~contains_valid_data;
     assign load_new_data   = valid_i & ready_o;
-    assign block_start_bit = data_out[0][num_hdr_bits];
+    assign block_start_bit = data_out[0][NumHdrBits];
     assign valid_shift_pos = block_start_bit & contains_valid_data;
     assign valid_o         = contains_valid_data & valid_shift_pos;
     assign shift_en_o      = ~load_new_data & (ready_i | ~valid_shift_pos) & shift_en_i & contains_valid_data;
@@ -100,8 +102,8 @@ import serial_link_pkg::*;
     always_comb begin : assemble_data_o
       // remove the interleaved start bits from the data-stream
       data_o = data_out_flattened;
-      if (use_header) begin
-        data_o = {data_out_flattened[$bits(data_o_t)-1:num_hdr_bits], header_o};
+      if (UseHeader) begin
+        data_o = {data_out_flattened[$bits(data_o_t)-1:NumHdrBits], header_o};
       end
     end
 
@@ -114,7 +116,7 @@ import serial_link_pkg::*;
       if (load_new_data) begin
         block_idx_d = '0;
       end
-      if (block_idx_q == (num_blocks - 1)) begin
+      if (block_idx_q == (NumBlocks - 1)) begin
         if (valid_shift_pos) begin
           all_data_consumed = ready_i;
         end else begin
@@ -125,13 +127,13 @@ import serial_link_pkg::*;
 
     assign data_in_blocks = data_i;
 
-    for (genvar i = 0; i < num_blocks; i++) begin : load_or_shift_data
+    for (genvar i = 0; i < NumBlocks; i++) begin : load_or_shift_data
       // assign inputs of the FFs
       always_comb begin
         data_in[i] = data_out[i];
         if (shift_en_o) begin
-          if (i == num_blocks - 1) begin
-            data_in[i] = new_packet;
+          if (i == NumBlocks - 1) begin
+            data_in[i] = new_packet_i;
           end else begin
             data_in[i] = data_out[i+1];
           end
@@ -142,12 +144,12 @@ import serial_link_pkg::*;
         end
       end
 
-      if (bit_removal_index==0) begin
-        assign data_out_blocks[i] = data_out[i][block_size-1:1];
-      end else if (bit_removal_index==block_size) begin
-        assign data_out_blocks[i] = data_out[i][block_size-2:0];
+      if (BitRemovalIndex==0) begin
+        assign data_out_blocks[i] = data_out[i][BlockSize-1:1];
+      end else if (BitRemovalIndex==BlockSize) begin
+        assign data_out_blocks[i] = data_out[i][BlockSize-2:0];
       end else begin
-        assign data_out_blocks[i] = {data_out[i][block_size-1:bit_removal_index+1], data_out[i][bit_removal_index-1:0]};
+        assign data_out_blocks[i] = {data_out[i][BlockSize-1:BitRemovalIndex+1], data_out[i][BitRemovalIndex-1:0]};
       end
 
       `FF(data_out[i], data_in[i], '0)
@@ -159,7 +161,7 @@ import serial_link_pkg::*;
     `FF(block_idx_q, block_idx_d, '0)
     `FF(first_outstanding_q, first_outstanding_d, 1)
 
-    if (use_header) begin
+    if (UseHeader) begin
       `FFL(header_o, data_i, load_new_data, 1'b0, clk_i, rst_ni)
     end else begin
       assign header_o = '0;
@@ -169,6 +171,6 @@ import serial_link_pkg::*;
   //   ASSERTIONS   //
   ////////////////////
 
-  `ASSERT(HdrTooBig, num_hdr_bits<block_size)
+  `ASSERT(HdrTooBig, NumHdrBits<BlockSize)
 
 endmodule

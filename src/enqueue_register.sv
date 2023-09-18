@@ -65,7 +65,7 @@ module find_req_blocks #(
     // One set strobe bit corresponds to 8 bits (1 byte) of data.
     assign required_bits = {num_trailing_ones,3'b0} + NumExternalBitsAdded;
     // When input strobe is fully '1, all blocks are occupied. The condition is needed to ensure the max is not exceeded,
-    // which could happen when the front most date byte is not a full byte (not all bits are required). This would lead
+    // which could happen when the front most data byte is not a full byte (not all bits are required). This would lead
     // to a mismatch in the determined MaxNumSplits opposed to the optained number by comparing the block count.
     assign required_blocks_o = (all_ones) ? TotalNumBlocks : (required_bits + BlockSize - 2) / (BlockSize-1);
   end else begin
