@@ -24,17 +24,17 @@ import serial_link_pkg::*;
   parameter type credit_t        = logic,
   parameter int  NumCredits      = -1,
   parameter int  ForceSendThresh = NumCredits - 4,
-  // If the parameter is enabled, smaller messages may be collected and sent in a single physical
-  // transfer in order to increase the physical links utilization.
-  // NOTE: If the physical link is too narrow, this feature is not supported and will be
-  // automatically disabled. A warning will be printed to the console, should that be the case.
-  parameter bit  PackMultipleMsg = 1,
   // Enable (assign to 1) to support valiable data sizes (of the AXIS). If enabled, the AXIS input
   // should contain clearly defined strobe bits (x values are not allowed)!
   // The size of the AXIS beat that is transmitted depends on the strobe. Leading zeros indicate
   // non-valid data which will not be transmitted. After the first 1 in the strobe sequence,
   // everything is transmitted, even if a zero follows in the strb mask later on.
   parameter bit  AllowVarAxisLen = 1'b0,
+  // If the parameter is enabled, smaller messages may be collected and sent in a single physical
+  // transfer in order to increase the physical links utilization.
+  // NOTE: If the physical link is too narrow, this feature is not supported and will be
+  // automatically disabled. A warning will be printed to the console, should that be the case.
+  parameter bit  PackMultipleMsg = AllowVarAxisLen,
 
 
   //////////////////////////
@@ -275,10 +275,10 @@ import serial_link_pkg::*;
     );
   end else begin : choose_consumption_type
     serial_link_credit_synchronization #(
-      .credit_t          ( credit_t      ),
-      .data_t            ( axis_packet_t ),
-      .NumCredits        ( NumCredits    ),
-      .CredOnlyConsCred  ( 1             )
+      .credit_t          ( credit_t       ),
+      .data_t            ( aligned_axis_t ),
+      .NumCredits        ( NumCredits     ),
+      .CredOnlyConsCred  ( 1              )
     ) i_synchronization_flow_control (
       .clk_i                  ( clk_i                               ),
       .rst_ni                 ( rst_ni                              ),
@@ -409,15 +409,15 @@ import serial_link_pkg::*;
   logic credit_only_packet_incoming;
   credit_t cred_count_for_cred_only;
 
-  if (AllowVarAxisLen) begin
-    always_comb begin : credit_only_control
+  if (AllowVarAxisLen) begin : credit_only_control
+    always_comb begin
       incoming_hdr   = flow_control_fifo_data_out;
       fifo_ready_out = flow_control_fifo_ready_out;
       cred_count_for_cred_only    = 0;
       credit_only_packet_incoming = 0;
       flow_control_fifo_valid_out = fifo_valid_out;
 
-      if (recv_reg_index_q == 0 && flow_control_fifo_valid_out) begin
+      if (recv_reg_index_q == 0 & fifo_valid_out) begin
         credit_only_packet_incoming = incoming_hdr.is_credits_only;
         cred_count_for_cred_only    = incoming_hdr.amount_of_credits;
         // make sure the credit only packet is consumed here and not forwarded...
@@ -427,15 +427,15 @@ import serial_link_pkg::*;
         end
       end
     end
-  end else begin
-    always_comb begin : credit_only_control
+  end else begin : credit_only_control
+    always_comb begin
       incoming_hdr   = flow_control_fifo_data_out;
       fifo_ready_out = flow_control_fifo_ready_out;
       cred_count_for_cred_only    = 0;
       credit_only_packet_incoming = 0;
       flow_control_fifo_valid_out = fifo_valid_out;
 
-      if (recv_reg_index_q == 0 && flow_control_fifo_valid_out) begin
+      if (recv_reg_index_q == 0 & fifo_valid_out & fifo_ready_out) begin
         credit_only_packet_incoming = incoming_hdr.is_credits_only;
         cred_count_for_cred_only    = incoming_hdr.amount_of_credits;
       end
