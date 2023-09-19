@@ -136,18 +136,18 @@ module floo_serial_link_narrow_wide
       .axis_rsp_t           ( axis_rsp_t        ),
       .preventIoTimingPaths ( 1'b0              )
     ) i_serial_link_network (
-      .clk_i             ( clk_sl_i          ),
-      .rst_ni            ( rst_sl_ni         ),
-      .narrow_req_o      ( narrow_req_o      ),
-      .narrow_rsp_o      ( narrow_rsp_o      ),
-      .narrow_req_i      ( narrow_req_i      ),
-      .narrow_rsp_i      ( narrow_rsp_i      ),
-      .wide_i            ( wide_i            ),
-      .wide_o            ( wide_o            ),
-      .axis_out_req_o    ( axis_out_req      ),
-      .axis_in_rsp_o     ( axis_in_rsp       ),
-      .axis_in_req_i     ( axis_in_req       ),
-      .axis_out_rsp_i    ( axis_out_rsp      )
+      .clk_i          ( clk_sl_i     ),
+      .rst_ni         ( rst_sl_ni    ),
+      .narrow_req_o   ( narrow_req_o ),
+      .narrow_rsp_o   ( narrow_rsp_o ),
+      .narrow_req_i   ( narrow_req_i ),
+      .narrow_rsp_i   ( narrow_rsp_i ),
+      .wide_i         ( wide_i       ),
+      .wide_o         ( wide_o       ),
+      .axis_out_req_o ( axis_out_req ),
+      .axis_in_rsp_o  ( axis_in_rsp  ),
+      .axis_in_req_i  ( axis_in_req  ),
+      .axis_out_rsp_i ( axis_out_rsp )
     );
   end else begin : bridge
     floo_axis_noc_bridge_narrow_wide #(
@@ -158,18 +158,18 @@ module floo_serial_link_narrow_wide
       .axis_req_t        ( axis_req_t        ),
       .axis_rsp_t        ( axis_rsp_t        )
     ) i_serial_link_network (
-      .clk_i             ( clk_sl_i          ),
-      .rst_ni            ( rst_sl_ni         ),
-      .narrow_req_o      ( narrow_req_o      ),
-      .narrow_rsp_o      ( narrow_rsp_o      ),
-      .narrow_req_i      ( narrow_req_i      ),
-      .narrow_rsp_i      ( narrow_rsp_i      ),
-      .wide_i            ( wide_i            ),
-      .wide_o            ( wide_o            ),
-      .axis_out_req_o    ( axis_out_req      ),
-      .axis_in_rsp_o     ( axis_in_rsp       ),
-      .axis_in_req_i     ( axis_in_req       ),
-      .axis_out_rsp_i    ( axis_out_rsp      )
+      .clk_i          ( clk_sl_i     ),
+      .rst_ni         ( rst_sl_ni    ),
+      .narrow_req_o   ( narrow_req_o ),
+      .narrow_rsp_o   ( narrow_rsp_o ),
+      .narrow_req_i   ( narrow_req_i ),
+      .narrow_rsp_i   ( narrow_rsp_i ),
+      .wide_i         ( wide_i       ),
+      .wide_o         ( wide_o       ),
+      .axis_out_req_o ( axis_out_req ),
+      .axis_in_rsp_o  ( axis_in_rsp  ),
+      .axis_in_req_i  ( axis_in_req  ),
+      .axis_out_rsp_i ( axis_out_rsp )
     );
   end
 

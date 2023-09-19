@@ -264,6 +264,10 @@ module enqueue_register
     if ( valid_data_into_reg ) begin
       occupied_blocks_d = occupied_blocks_q + required_blocks;
     end
+    // When I force shift, I occupie another block with an empty block element.
+    if (~shift_in_progress & shift_for_no_lat) begin
+      occupied_blocks_d = occupied_blocks_q + 1;
+    end
     if ( valid_reg_in & ready_reg_in ) begin
       if ( valid_i & ready_o & ~msg_bypass ) begin
         occupied_blocks_d = required_blocks;
