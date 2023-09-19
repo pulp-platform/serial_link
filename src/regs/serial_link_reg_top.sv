@@ -10,7 +10,7 @@
 module serial_link_reg_top #(
   parameter type reg_req_t = logic,
   parameter type reg_rsp_t = logic,
-  parameter int AW = 8
+  parameter int AW = 9
 ) (
   input logic clk_i,
   input logic rst_ni,
@@ -144,6 +144,60 @@ module serial_link_reg_top #(
   logic [10:0] tx_phy_ctrl1_19_qs;
   logic [10:0] tx_phy_ctrl1_19_wd;
   logic tx_phy_ctrl1_19_we;
+  logic [10:0] tx_phy_ctrl1_20_qs;
+  logic [10:0] tx_phy_ctrl1_20_wd;
+  logic tx_phy_ctrl1_20_we;
+  logic [10:0] tx_phy_ctrl1_21_qs;
+  logic [10:0] tx_phy_ctrl1_21_wd;
+  logic tx_phy_ctrl1_21_we;
+  logic [10:0] tx_phy_ctrl1_22_qs;
+  logic [10:0] tx_phy_ctrl1_22_wd;
+  logic tx_phy_ctrl1_22_we;
+  logic [10:0] tx_phy_ctrl1_23_qs;
+  logic [10:0] tx_phy_ctrl1_23_wd;
+  logic tx_phy_ctrl1_23_we;
+  logic [10:0] tx_phy_ctrl1_24_qs;
+  logic [10:0] tx_phy_ctrl1_24_wd;
+  logic tx_phy_ctrl1_24_we;
+  logic [10:0] tx_phy_ctrl1_25_qs;
+  logic [10:0] tx_phy_ctrl1_25_wd;
+  logic tx_phy_ctrl1_25_we;
+  logic [10:0] tx_phy_ctrl1_26_qs;
+  logic [10:0] tx_phy_ctrl1_26_wd;
+  logic tx_phy_ctrl1_26_we;
+  logic [10:0] tx_phy_ctrl1_27_qs;
+  logic [10:0] tx_phy_ctrl1_27_wd;
+  logic tx_phy_ctrl1_27_we;
+  logic [10:0] tx_phy_ctrl1_28_qs;
+  logic [10:0] tx_phy_ctrl1_28_wd;
+  logic tx_phy_ctrl1_28_we;
+  logic [10:0] tx_phy_ctrl1_29_qs;
+  logic [10:0] tx_phy_ctrl1_29_wd;
+  logic tx_phy_ctrl1_29_we;
+  logic [10:0] tx_phy_ctrl1_30_qs;
+  logic [10:0] tx_phy_ctrl1_30_wd;
+  logic tx_phy_ctrl1_30_we;
+  logic [10:0] tx_phy_ctrl1_31_qs;
+  logic [10:0] tx_phy_ctrl1_31_wd;
+  logic tx_phy_ctrl1_31_we;
+  logic [10:0] tx_phy_ctrl1_32_qs;
+  logic [10:0] tx_phy_ctrl1_32_wd;
+  logic tx_phy_ctrl1_32_we;
+  logic [10:0] tx_phy_ctrl1_33_qs;
+  logic [10:0] tx_phy_ctrl1_33_wd;
+  logic tx_phy_ctrl1_33_we;
+  logic [10:0] tx_phy_ctrl1_34_qs;
+  logic [10:0] tx_phy_ctrl1_34_wd;
+  logic tx_phy_ctrl1_34_we;
+  logic [10:0] tx_phy_ctrl1_35_qs;
+  logic [10:0] tx_phy_ctrl1_35_wd;
+  logic tx_phy_ctrl1_35_we;
+  logic [10:0] tx_phy_ctrl1_36_qs;
+  logic [10:0] tx_phy_ctrl1_36_wd;
+  logic tx_phy_ctrl1_36_we;
+  logic [10:0] tx_phy_ctrl1_37_qs;
+  logic [10:0] tx_phy_ctrl1_37_wd;
+  logic tx_phy_ctrl1_37_we;
   logic [10:0] tx_phy_ctrl2_0_clk_shift_start_0_qs;
   logic [10:0] tx_phy_ctrl2_0_clk_shift_start_0_wd;
   logic tx_phy_ctrl2_0_clk_shift_start_0_we;
@@ -264,92 +318,272 @@ module serial_link_reg_top #(
   logic [10:0] tx_phy_ctrl2_19_clk_shift_end_19_qs;
   logic [10:0] tx_phy_ctrl2_19_clk_shift_end_19_wd;
   logic tx_phy_ctrl2_19_clk_shift_end_19_we;
+  logic [10:0] tx_phy_ctrl2_20_clk_shift_start_20_qs;
+  logic [10:0] tx_phy_ctrl2_20_clk_shift_start_20_wd;
+  logic tx_phy_ctrl2_20_clk_shift_start_20_we;
+  logic [10:0] tx_phy_ctrl2_20_clk_shift_end_20_qs;
+  logic [10:0] tx_phy_ctrl2_20_clk_shift_end_20_wd;
+  logic tx_phy_ctrl2_20_clk_shift_end_20_we;
+  logic [10:0] tx_phy_ctrl2_21_clk_shift_start_21_qs;
+  logic [10:0] tx_phy_ctrl2_21_clk_shift_start_21_wd;
+  logic tx_phy_ctrl2_21_clk_shift_start_21_we;
+  logic [10:0] tx_phy_ctrl2_21_clk_shift_end_21_qs;
+  logic [10:0] tx_phy_ctrl2_21_clk_shift_end_21_wd;
+  logic tx_phy_ctrl2_21_clk_shift_end_21_we;
+  logic [10:0] tx_phy_ctrl2_22_clk_shift_start_22_qs;
+  logic [10:0] tx_phy_ctrl2_22_clk_shift_start_22_wd;
+  logic tx_phy_ctrl2_22_clk_shift_start_22_we;
+  logic [10:0] tx_phy_ctrl2_22_clk_shift_end_22_qs;
+  logic [10:0] tx_phy_ctrl2_22_clk_shift_end_22_wd;
+  logic tx_phy_ctrl2_22_clk_shift_end_22_we;
+  logic [10:0] tx_phy_ctrl2_23_clk_shift_start_23_qs;
+  logic [10:0] tx_phy_ctrl2_23_clk_shift_start_23_wd;
+  logic tx_phy_ctrl2_23_clk_shift_start_23_we;
+  logic [10:0] tx_phy_ctrl2_23_clk_shift_end_23_qs;
+  logic [10:0] tx_phy_ctrl2_23_clk_shift_end_23_wd;
+  logic tx_phy_ctrl2_23_clk_shift_end_23_we;
+  logic [10:0] tx_phy_ctrl2_24_clk_shift_start_24_qs;
+  logic [10:0] tx_phy_ctrl2_24_clk_shift_start_24_wd;
+  logic tx_phy_ctrl2_24_clk_shift_start_24_we;
+  logic [10:0] tx_phy_ctrl2_24_clk_shift_end_24_qs;
+  logic [10:0] tx_phy_ctrl2_24_clk_shift_end_24_wd;
+  logic tx_phy_ctrl2_24_clk_shift_end_24_we;
+  logic [10:0] tx_phy_ctrl2_25_clk_shift_start_25_qs;
+  logic [10:0] tx_phy_ctrl2_25_clk_shift_start_25_wd;
+  logic tx_phy_ctrl2_25_clk_shift_start_25_we;
+  logic [10:0] tx_phy_ctrl2_25_clk_shift_end_25_qs;
+  logic [10:0] tx_phy_ctrl2_25_clk_shift_end_25_wd;
+  logic tx_phy_ctrl2_25_clk_shift_end_25_we;
+  logic [10:0] tx_phy_ctrl2_26_clk_shift_start_26_qs;
+  logic [10:0] tx_phy_ctrl2_26_clk_shift_start_26_wd;
+  logic tx_phy_ctrl2_26_clk_shift_start_26_we;
+  logic [10:0] tx_phy_ctrl2_26_clk_shift_end_26_qs;
+  logic [10:0] tx_phy_ctrl2_26_clk_shift_end_26_wd;
+  logic tx_phy_ctrl2_26_clk_shift_end_26_we;
+  logic [10:0] tx_phy_ctrl2_27_clk_shift_start_27_qs;
+  logic [10:0] tx_phy_ctrl2_27_clk_shift_start_27_wd;
+  logic tx_phy_ctrl2_27_clk_shift_start_27_we;
+  logic [10:0] tx_phy_ctrl2_27_clk_shift_end_27_qs;
+  logic [10:0] tx_phy_ctrl2_27_clk_shift_end_27_wd;
+  logic tx_phy_ctrl2_27_clk_shift_end_27_we;
+  logic [10:0] tx_phy_ctrl2_28_clk_shift_start_28_qs;
+  logic [10:0] tx_phy_ctrl2_28_clk_shift_start_28_wd;
+  logic tx_phy_ctrl2_28_clk_shift_start_28_we;
+  logic [10:0] tx_phy_ctrl2_28_clk_shift_end_28_qs;
+  logic [10:0] tx_phy_ctrl2_28_clk_shift_end_28_wd;
+  logic tx_phy_ctrl2_28_clk_shift_end_28_we;
+  logic [10:0] tx_phy_ctrl2_29_clk_shift_start_29_qs;
+  logic [10:0] tx_phy_ctrl2_29_clk_shift_start_29_wd;
+  logic tx_phy_ctrl2_29_clk_shift_start_29_we;
+  logic [10:0] tx_phy_ctrl2_29_clk_shift_end_29_qs;
+  logic [10:0] tx_phy_ctrl2_29_clk_shift_end_29_wd;
+  logic tx_phy_ctrl2_29_clk_shift_end_29_we;
+  logic [10:0] tx_phy_ctrl2_30_clk_shift_start_30_qs;
+  logic [10:0] tx_phy_ctrl2_30_clk_shift_start_30_wd;
+  logic tx_phy_ctrl2_30_clk_shift_start_30_we;
+  logic [10:0] tx_phy_ctrl2_30_clk_shift_end_30_qs;
+  logic [10:0] tx_phy_ctrl2_30_clk_shift_end_30_wd;
+  logic tx_phy_ctrl2_30_clk_shift_end_30_we;
+  logic [10:0] tx_phy_ctrl2_31_clk_shift_start_31_qs;
+  logic [10:0] tx_phy_ctrl2_31_clk_shift_start_31_wd;
+  logic tx_phy_ctrl2_31_clk_shift_start_31_we;
+  logic [10:0] tx_phy_ctrl2_31_clk_shift_end_31_qs;
+  logic [10:0] tx_phy_ctrl2_31_clk_shift_end_31_wd;
+  logic tx_phy_ctrl2_31_clk_shift_end_31_we;
+  logic [10:0] tx_phy_ctrl2_32_clk_shift_start_32_qs;
+  logic [10:0] tx_phy_ctrl2_32_clk_shift_start_32_wd;
+  logic tx_phy_ctrl2_32_clk_shift_start_32_we;
+  logic [10:0] tx_phy_ctrl2_32_clk_shift_end_32_qs;
+  logic [10:0] tx_phy_ctrl2_32_clk_shift_end_32_wd;
+  logic tx_phy_ctrl2_32_clk_shift_end_32_we;
+  logic [10:0] tx_phy_ctrl2_33_clk_shift_start_33_qs;
+  logic [10:0] tx_phy_ctrl2_33_clk_shift_start_33_wd;
+  logic tx_phy_ctrl2_33_clk_shift_start_33_we;
+  logic [10:0] tx_phy_ctrl2_33_clk_shift_end_33_qs;
+  logic [10:0] tx_phy_ctrl2_33_clk_shift_end_33_wd;
+  logic tx_phy_ctrl2_33_clk_shift_end_33_we;
+  logic [10:0] tx_phy_ctrl2_34_clk_shift_start_34_qs;
+  logic [10:0] tx_phy_ctrl2_34_clk_shift_start_34_wd;
+  logic tx_phy_ctrl2_34_clk_shift_start_34_we;
+  logic [10:0] tx_phy_ctrl2_34_clk_shift_end_34_qs;
+  logic [10:0] tx_phy_ctrl2_34_clk_shift_end_34_wd;
+  logic tx_phy_ctrl2_34_clk_shift_end_34_we;
+  logic [10:0] tx_phy_ctrl2_35_clk_shift_start_35_qs;
+  logic [10:0] tx_phy_ctrl2_35_clk_shift_start_35_wd;
+  logic tx_phy_ctrl2_35_clk_shift_start_35_we;
+  logic [10:0] tx_phy_ctrl2_35_clk_shift_end_35_qs;
+  logic [10:0] tx_phy_ctrl2_35_clk_shift_end_35_wd;
+  logic tx_phy_ctrl2_35_clk_shift_end_35_we;
+  logic [10:0] tx_phy_ctrl2_36_clk_shift_start_36_qs;
+  logic [10:0] tx_phy_ctrl2_36_clk_shift_start_36_wd;
+  logic tx_phy_ctrl2_36_clk_shift_start_36_we;
+  logic [10:0] tx_phy_ctrl2_36_clk_shift_end_36_qs;
+  logic [10:0] tx_phy_ctrl2_36_clk_shift_end_36_wd;
+  logic tx_phy_ctrl2_36_clk_shift_end_36_we;
+  logic [10:0] tx_phy_ctrl2_37_clk_shift_start_37_qs;
+  logic [10:0] tx_phy_ctrl2_37_clk_shift_start_37_wd;
+  logic tx_phy_ctrl2_37_clk_shift_start_37_we;
+  logic [10:0] tx_phy_ctrl2_37_clk_shift_end_37_qs;
+  logic [10:0] tx_phy_ctrl2_37_clk_shift_end_37_wd;
+  logic tx_phy_ctrl2_37_clk_shift_end_37_we;
   logic raw_mode_en_wd;
   logic raw_mode_en_we;
-  logic [4:0] raw_mode_in_ch_sel_wd;
+  logic [5:0] raw_mode_in_ch_sel_wd;
   logic raw_mode_in_ch_sel_we;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_0_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_0_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_1_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_1_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_2_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_2_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_3_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_3_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_4_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_4_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_5_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_5_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_6_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_6_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_7_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_7_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_8_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_8_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_9_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_9_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_10_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_10_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_11_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_11_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_12_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_12_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_13_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_13_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_14_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_14_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_15_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_15_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_16_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_16_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_17_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_17_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_18_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_18_re;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_19_qs;
-  logic raw_mode_in_data_valid_raw_mode_in_data_valid_19_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_0_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_0_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_1_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_1_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_2_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_2_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_3_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_3_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_4_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_4_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_5_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_5_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_6_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_6_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_7_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_7_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_8_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_8_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_9_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_9_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_10_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_10_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_11_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_11_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_12_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_12_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_13_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_13_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_14_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_14_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_15_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_15_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_16_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_16_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_17_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_17_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_18_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_18_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_19_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_19_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_20_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_20_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_21_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_21_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_22_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_22_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_23_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_23_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_24_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_24_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_25_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_25_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_26_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_26_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_27_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_27_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_28_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_28_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_29_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_29_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_30_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_30_re;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_31_qs;
+  logic raw_mode_in_data_valid_0_raw_mode_in_data_valid_31_re;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_32_qs;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_32_re;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_33_qs;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_33_re;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_34_qs;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_34_re;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_35_qs;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_35_re;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_36_qs;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_36_re;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_37_qs;
+  logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_37_re;
   logic [15:0] raw_mode_in_data_qs;
   logic raw_mode_in_data_re;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_0_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_0_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_1_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_1_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_2_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_2_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_3_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_3_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_4_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_4_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_5_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_5_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_6_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_6_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_7_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_7_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_8_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_8_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_9_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_9_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_10_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_10_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_11_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_11_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_12_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_12_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_13_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_13_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_14_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_14_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_15_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_15_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_16_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_16_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_17_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_17_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_18_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_18_we;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_19_wd;
-  logic raw_mode_out_ch_mask_raw_mode_out_ch_mask_19_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_0_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_0_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_1_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_1_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_2_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_2_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_3_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_3_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_4_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_4_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_5_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_5_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_6_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_6_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_7_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_7_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_8_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_8_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_9_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_9_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_10_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_10_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_11_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_11_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_12_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_12_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_13_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_13_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_14_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_14_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_15_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_15_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_16_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_16_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_17_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_17_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_18_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_18_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_19_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_19_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_20_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_20_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_21_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_21_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_22_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_22_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_23_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_23_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_24_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_24_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_25_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_25_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_26_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_26_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_27_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_27_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_28_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_28_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_29_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_29_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_30_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_30_we;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_31_wd;
+  logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_31_we;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_32_wd;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_32_we;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_33_wd;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_33_we;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_34_wd;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_34_we;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_35_wd;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_35_we;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_36_wd;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_36_we;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_37_wd;
+  logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_37_we;
   logic [15:0] raw_mode_out_data_fifo_wd;
   logic raw_mode_out_data_fifo_we;
   logic raw_mode_out_data_fifo_ctrl_clear_wd;
@@ -372,66 +606,120 @@ module serial_link_reg_top #(
   logic [7:0] channel_alloc_tx_cfg_auto_flush_count_qs;
   logic [7:0] channel_alloc_tx_cfg_auto_flush_count_wd;
   logic channel_alloc_tx_cfg_auto_flush_count_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_0_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_0_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_0_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_1_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_1_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_1_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_2_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_2_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_2_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_3_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_3_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_3_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_4_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_4_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_4_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_5_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_5_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_5_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_6_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_6_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_6_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_7_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_7_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_7_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_8_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_8_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_8_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_9_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_9_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_9_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_10_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_10_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_10_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_11_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_11_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_11_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_12_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_12_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_12_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_13_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_13_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_13_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_14_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_14_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_14_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_15_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_15_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_15_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_16_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_16_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_16_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_17_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_17_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_17_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_18_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_18_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_18_we;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_19_qs;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_19_wd;
-  logic channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_19_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_0_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_0_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_0_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_1_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_1_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_1_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_2_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_2_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_2_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_3_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_3_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_3_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_4_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_4_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_4_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_5_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_5_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_5_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_6_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_6_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_6_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_7_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_7_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_7_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_8_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_8_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_8_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_9_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_9_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_9_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_10_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_10_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_10_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_11_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_11_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_11_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_12_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_12_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_12_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_13_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_13_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_13_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_14_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_14_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_14_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_15_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_15_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_15_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_16_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_16_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_16_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_17_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_17_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_17_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_18_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_18_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_18_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_19_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_19_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_19_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_20_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_20_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_20_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_21_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_21_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_21_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_22_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_22_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_22_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_23_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_23_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_23_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_24_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_24_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_24_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_25_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_25_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_25_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_26_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_26_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_26_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_27_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_27_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_27_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_28_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_28_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_28_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_29_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_29_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_29_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_30_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_30_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_30_we;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_31_qs;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_31_wd;
+  logic channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_31_we;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_32_qs;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_32_wd;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_32_we;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_33_qs;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_33_wd;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_33_we;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_34_qs;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_34_wd;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_34_we;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_35_qs;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_35_wd;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_35_we;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_36_qs;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_36_wd;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_36_we;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_37_qs;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_37_wd;
+  logic channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_37_we;
   logic channel_alloc_tx_ctrl_clear_wd;
   logic channel_alloc_tx_ctrl_clear_we;
   logic channel_alloc_tx_ctrl_flush_wd;
@@ -450,66 +738,120 @@ module serial_link_reg_top #(
   logic channel_alloc_rx_cfg_sync_en_we;
   logic channel_alloc_rx_ctrl_wd;
   logic channel_alloc_rx_ctrl_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_0_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_0_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_0_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_1_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_1_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_1_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_2_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_2_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_2_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_3_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_3_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_3_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_4_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_4_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_4_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_5_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_5_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_5_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_6_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_6_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_6_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_7_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_7_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_7_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_8_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_8_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_8_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_9_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_9_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_9_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_10_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_10_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_10_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_11_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_11_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_11_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_12_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_12_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_12_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_13_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_13_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_13_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_14_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_14_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_14_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_15_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_15_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_15_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_16_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_16_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_16_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_17_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_17_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_17_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_18_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_18_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_18_we;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_19_qs;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_19_wd;
-  logic channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_19_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_0_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_0_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_0_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_1_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_1_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_1_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_2_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_2_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_2_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_3_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_3_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_3_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_4_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_4_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_4_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_5_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_5_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_5_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_6_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_6_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_6_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_7_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_7_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_7_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_8_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_8_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_8_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_9_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_9_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_9_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_10_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_10_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_10_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_11_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_11_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_11_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_12_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_12_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_12_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_13_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_13_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_13_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_14_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_14_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_14_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_15_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_15_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_15_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_16_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_16_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_16_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_17_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_17_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_17_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_18_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_18_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_18_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_19_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_19_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_19_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_20_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_20_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_20_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_21_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_21_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_21_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_22_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_22_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_22_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_23_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_23_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_23_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_24_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_24_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_24_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_25_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_25_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_25_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_26_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_26_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_26_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_27_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_27_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_27_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_28_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_28_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_28_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_29_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_29_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_29_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_30_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_30_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_30_we;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_31_qs;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_31_wd;
+  logic channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_31_we;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_32_qs;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_32_wd;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_32_we;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_33_qs;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_33_wd;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_33_we;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_34_qs;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_34_wd;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_34_we;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_35_qs;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_35_wd;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_35_we;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_36_qs;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_36_wd;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_36_we;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_37_qs;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_37_wd;
+  logic channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_37_we;
 
   // Register instances
   // R[ctrl]: V(False)
@@ -1189,6 +1531,492 @@ module serial_link_reg_top #(
 
     // to register interface (read)
     .qs     (tx_phy_ctrl1_19_qs)
+  );
+
+  // Subregister 20 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_20]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_20 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_20_we),
+    .wd     (tx_phy_ctrl1_20_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[20].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_20_qs)
+  );
+
+  // Subregister 21 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_21]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_21 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_21_we),
+    .wd     (tx_phy_ctrl1_21_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[21].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_21_qs)
+  );
+
+  // Subregister 22 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_22]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_22 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_22_we),
+    .wd     (tx_phy_ctrl1_22_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[22].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_22_qs)
+  );
+
+  // Subregister 23 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_23]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_23 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_23_we),
+    .wd     (tx_phy_ctrl1_23_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[23].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_23_qs)
+  );
+
+  // Subregister 24 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_24]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_24 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_24_we),
+    .wd     (tx_phy_ctrl1_24_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[24].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_24_qs)
+  );
+
+  // Subregister 25 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_25]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_25 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_25_we),
+    .wd     (tx_phy_ctrl1_25_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[25].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_25_qs)
+  );
+
+  // Subregister 26 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_26]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_26 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_26_we),
+    .wd     (tx_phy_ctrl1_26_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[26].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_26_qs)
+  );
+
+  // Subregister 27 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_27]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_27 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_27_we),
+    .wd     (tx_phy_ctrl1_27_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[27].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_27_qs)
+  );
+
+  // Subregister 28 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_28]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_28 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_28_we),
+    .wd     (tx_phy_ctrl1_28_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[28].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_28_qs)
+  );
+
+  // Subregister 29 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_29]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_29 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_29_we),
+    .wd     (tx_phy_ctrl1_29_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[29].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_29_qs)
+  );
+
+  // Subregister 30 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_30]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_30 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_30_we),
+    .wd     (tx_phy_ctrl1_30_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[30].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_30_qs)
+  );
+
+  // Subregister 31 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_31]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_31 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_31_we),
+    .wd     (tx_phy_ctrl1_31_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[31].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_31_qs)
+  );
+
+  // Subregister 32 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_32]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_32 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_32_we),
+    .wd     (tx_phy_ctrl1_32_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[32].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_32_qs)
+  );
+
+  // Subregister 33 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_33]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_33 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_33_we),
+    .wd     (tx_phy_ctrl1_33_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[33].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_33_qs)
+  );
+
+  // Subregister 34 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_34]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_34 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_34_we),
+    .wd     (tx_phy_ctrl1_34_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[34].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_34_qs)
+  );
+
+  // Subregister 35 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_35]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_35 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_35_we),
+    .wd     (tx_phy_ctrl1_35_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[35].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_35_qs)
+  );
+
+  // Subregister 36 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_36]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_36 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_36_we),
+    .wd     (tx_phy_ctrl1_36_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[36].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_36_qs)
+  );
+
+  // Subregister 37 of Multireg tx_phy_ctrl1
+  // R[tx_phy_ctrl1_37]: V(False)
+
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h8)
+  ) u_tx_phy_ctrl1_37 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl1_37_we),
+    .wd     (tx_phy_ctrl1_37_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl1[37].q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl1_37_qs)
   );
 
 
@@ -2293,6 +3121,996 @@ module serial_link_reg_top #(
   );
 
 
+  // Subregister 20 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_20]: V(False)
+
+  // F[clk_shift_start_20]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_20_clk_shift_start_20 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_20_clk_shift_start_20_we),
+    .wd     (tx_phy_ctrl2_20_clk_shift_start_20_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[20].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_20_clk_shift_start_20_qs)
+  );
+
+
+  // F[clk_shift_end_20]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_20_clk_shift_end_20 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_20_clk_shift_end_20_we),
+    .wd     (tx_phy_ctrl2_20_clk_shift_end_20_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[20].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_20_clk_shift_end_20_qs)
+  );
+
+
+  // Subregister 21 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_21]: V(False)
+
+  // F[clk_shift_start_21]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_21_clk_shift_start_21 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_21_clk_shift_start_21_we),
+    .wd     (tx_phy_ctrl2_21_clk_shift_start_21_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[21].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_21_clk_shift_start_21_qs)
+  );
+
+
+  // F[clk_shift_end_21]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_21_clk_shift_end_21 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_21_clk_shift_end_21_we),
+    .wd     (tx_phy_ctrl2_21_clk_shift_end_21_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[21].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_21_clk_shift_end_21_qs)
+  );
+
+
+  // Subregister 22 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_22]: V(False)
+
+  // F[clk_shift_start_22]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_22_clk_shift_start_22 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_22_clk_shift_start_22_we),
+    .wd     (tx_phy_ctrl2_22_clk_shift_start_22_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[22].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_22_clk_shift_start_22_qs)
+  );
+
+
+  // F[clk_shift_end_22]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_22_clk_shift_end_22 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_22_clk_shift_end_22_we),
+    .wd     (tx_phy_ctrl2_22_clk_shift_end_22_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[22].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_22_clk_shift_end_22_qs)
+  );
+
+
+  // Subregister 23 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_23]: V(False)
+
+  // F[clk_shift_start_23]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_23_clk_shift_start_23 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_23_clk_shift_start_23_we),
+    .wd     (tx_phy_ctrl2_23_clk_shift_start_23_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[23].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_23_clk_shift_start_23_qs)
+  );
+
+
+  // F[clk_shift_end_23]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_23_clk_shift_end_23 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_23_clk_shift_end_23_we),
+    .wd     (tx_phy_ctrl2_23_clk_shift_end_23_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[23].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_23_clk_shift_end_23_qs)
+  );
+
+
+  // Subregister 24 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_24]: V(False)
+
+  // F[clk_shift_start_24]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_24_clk_shift_start_24 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_24_clk_shift_start_24_we),
+    .wd     (tx_phy_ctrl2_24_clk_shift_start_24_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[24].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_24_clk_shift_start_24_qs)
+  );
+
+
+  // F[clk_shift_end_24]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_24_clk_shift_end_24 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_24_clk_shift_end_24_we),
+    .wd     (tx_phy_ctrl2_24_clk_shift_end_24_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[24].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_24_clk_shift_end_24_qs)
+  );
+
+
+  // Subregister 25 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_25]: V(False)
+
+  // F[clk_shift_start_25]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_25_clk_shift_start_25 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_25_clk_shift_start_25_we),
+    .wd     (tx_phy_ctrl2_25_clk_shift_start_25_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[25].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_25_clk_shift_start_25_qs)
+  );
+
+
+  // F[clk_shift_end_25]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_25_clk_shift_end_25 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_25_clk_shift_end_25_we),
+    .wd     (tx_phy_ctrl2_25_clk_shift_end_25_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[25].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_25_clk_shift_end_25_qs)
+  );
+
+
+  // Subregister 26 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_26]: V(False)
+
+  // F[clk_shift_start_26]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_26_clk_shift_start_26 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_26_clk_shift_start_26_we),
+    .wd     (tx_phy_ctrl2_26_clk_shift_start_26_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[26].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_26_clk_shift_start_26_qs)
+  );
+
+
+  // F[clk_shift_end_26]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_26_clk_shift_end_26 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_26_clk_shift_end_26_we),
+    .wd     (tx_phy_ctrl2_26_clk_shift_end_26_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[26].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_26_clk_shift_end_26_qs)
+  );
+
+
+  // Subregister 27 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_27]: V(False)
+
+  // F[clk_shift_start_27]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_27_clk_shift_start_27 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_27_clk_shift_start_27_we),
+    .wd     (tx_phy_ctrl2_27_clk_shift_start_27_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[27].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_27_clk_shift_start_27_qs)
+  );
+
+
+  // F[clk_shift_end_27]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_27_clk_shift_end_27 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_27_clk_shift_end_27_we),
+    .wd     (tx_phy_ctrl2_27_clk_shift_end_27_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[27].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_27_clk_shift_end_27_qs)
+  );
+
+
+  // Subregister 28 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_28]: V(False)
+
+  // F[clk_shift_start_28]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_28_clk_shift_start_28 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_28_clk_shift_start_28_we),
+    .wd     (tx_phy_ctrl2_28_clk_shift_start_28_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[28].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_28_clk_shift_start_28_qs)
+  );
+
+
+  // F[clk_shift_end_28]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_28_clk_shift_end_28 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_28_clk_shift_end_28_we),
+    .wd     (tx_phy_ctrl2_28_clk_shift_end_28_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[28].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_28_clk_shift_end_28_qs)
+  );
+
+
+  // Subregister 29 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_29]: V(False)
+
+  // F[clk_shift_start_29]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_29_clk_shift_start_29 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_29_clk_shift_start_29_we),
+    .wd     (tx_phy_ctrl2_29_clk_shift_start_29_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[29].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_29_clk_shift_start_29_qs)
+  );
+
+
+  // F[clk_shift_end_29]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_29_clk_shift_end_29 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_29_clk_shift_end_29_we),
+    .wd     (tx_phy_ctrl2_29_clk_shift_end_29_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[29].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_29_clk_shift_end_29_qs)
+  );
+
+
+  // Subregister 30 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_30]: V(False)
+
+  // F[clk_shift_start_30]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_30_clk_shift_start_30 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_30_clk_shift_start_30_we),
+    .wd     (tx_phy_ctrl2_30_clk_shift_start_30_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[30].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_30_clk_shift_start_30_qs)
+  );
+
+
+  // F[clk_shift_end_30]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_30_clk_shift_end_30 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_30_clk_shift_end_30_we),
+    .wd     (tx_phy_ctrl2_30_clk_shift_end_30_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[30].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_30_clk_shift_end_30_qs)
+  );
+
+
+  // Subregister 31 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_31]: V(False)
+
+  // F[clk_shift_start_31]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_31_clk_shift_start_31 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_31_clk_shift_start_31_we),
+    .wd     (tx_phy_ctrl2_31_clk_shift_start_31_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[31].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_31_clk_shift_start_31_qs)
+  );
+
+
+  // F[clk_shift_end_31]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_31_clk_shift_end_31 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_31_clk_shift_end_31_we),
+    .wd     (tx_phy_ctrl2_31_clk_shift_end_31_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[31].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_31_clk_shift_end_31_qs)
+  );
+
+
+  // Subregister 32 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_32]: V(False)
+
+  // F[clk_shift_start_32]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_32_clk_shift_start_32 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_32_clk_shift_start_32_we),
+    .wd     (tx_phy_ctrl2_32_clk_shift_start_32_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[32].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_32_clk_shift_start_32_qs)
+  );
+
+
+  // F[clk_shift_end_32]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_32_clk_shift_end_32 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_32_clk_shift_end_32_we),
+    .wd     (tx_phy_ctrl2_32_clk_shift_end_32_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[32].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_32_clk_shift_end_32_qs)
+  );
+
+
+  // Subregister 33 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_33]: V(False)
+
+  // F[clk_shift_start_33]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_33_clk_shift_start_33 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_33_clk_shift_start_33_we),
+    .wd     (tx_phy_ctrl2_33_clk_shift_start_33_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[33].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_33_clk_shift_start_33_qs)
+  );
+
+
+  // F[clk_shift_end_33]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_33_clk_shift_end_33 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_33_clk_shift_end_33_we),
+    .wd     (tx_phy_ctrl2_33_clk_shift_end_33_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[33].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_33_clk_shift_end_33_qs)
+  );
+
+
+  // Subregister 34 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_34]: V(False)
+
+  // F[clk_shift_start_34]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_34_clk_shift_start_34 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_34_clk_shift_start_34_we),
+    .wd     (tx_phy_ctrl2_34_clk_shift_start_34_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[34].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_34_clk_shift_start_34_qs)
+  );
+
+
+  // F[clk_shift_end_34]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_34_clk_shift_end_34 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_34_clk_shift_end_34_we),
+    .wd     (tx_phy_ctrl2_34_clk_shift_end_34_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[34].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_34_clk_shift_end_34_qs)
+  );
+
+
+  // Subregister 35 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_35]: V(False)
+
+  // F[clk_shift_start_35]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_35_clk_shift_start_35 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_35_clk_shift_start_35_we),
+    .wd     (tx_phy_ctrl2_35_clk_shift_start_35_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[35].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_35_clk_shift_start_35_qs)
+  );
+
+
+  // F[clk_shift_end_35]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_35_clk_shift_end_35 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_35_clk_shift_end_35_we),
+    .wd     (tx_phy_ctrl2_35_clk_shift_end_35_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[35].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_35_clk_shift_end_35_qs)
+  );
+
+
+  // Subregister 36 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_36]: V(False)
+
+  // F[clk_shift_start_36]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_36_clk_shift_start_36 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_36_clk_shift_start_36_we),
+    .wd     (tx_phy_ctrl2_36_clk_shift_start_36_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[36].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_36_clk_shift_start_36_qs)
+  );
+
+
+  // F[clk_shift_end_36]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_36_clk_shift_end_36 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_36_clk_shift_end_36_we),
+    .wd     (tx_phy_ctrl2_36_clk_shift_end_36_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[36].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_36_clk_shift_end_36_qs)
+  );
+
+
+  // Subregister 37 of Multireg tx_phy_ctrl2
+  // R[tx_phy_ctrl2_37]: V(False)
+
+  // F[clk_shift_start_37]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h2)
+  ) u_tx_phy_ctrl2_37_clk_shift_start_37 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_37_clk_shift_start_37_we),
+    .wd     (tx_phy_ctrl2_37_clk_shift_start_37_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[37].clk_shift_start.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_37_clk_shift_start_37_qs)
+  );
+
+
+  // F[clk_shift_end_37]: 10:0
+  prim_subreg #(
+    .DW      (11),
+    .SWACCESS("RW"),
+    .RESVAL  (11'h6)
+  ) u_tx_phy_ctrl2_37_clk_shift_end_37 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (tx_phy_ctrl2_37_clk_shift_end_37_we),
+    .wd     (tx_phy_ctrl2_37_clk_shift_end_37_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.tx_phy_ctrl2[37].clk_shift_end.q ),
+
+    // to register interface (read)
+    .qs     (tx_phy_ctrl2_37_clk_shift_end_37_qs)
+  );
+
+
 
   // R[raw_mode_en]: V(False)
 
@@ -2323,9 +4141,9 @@ module serial_link_reg_top #(
   // R[raw_mode_in_ch_sel]: V(False)
 
   prim_subreg #(
-    .DW      (5),
+    .DW      (6),
     .SWACCESS("WO"),
-    .RESVAL  (5'h0)
+    .RESVAL  (6'h0)
   ) u_raw_mode_in_ch_sel (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2348,305 +4166,578 @@ module serial_link_reg_top #(
 
 
   // Subregister 0 of Multireg raw_mode_in_data_valid
-  // R[raw_mode_in_data_valid]: V(True)
+  // R[raw_mode_in_data_valid_0]: V(True)
 
   // F[raw_mode_in_data_valid_0]: 0:0
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_0 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_0_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_0 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_0_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[0].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_0_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_0_qs)
   );
 
 
   // F[raw_mode_in_data_valid_1]: 1:1
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_1 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_1_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_1 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_1_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[1].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_1_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_1_qs)
   );
 
 
   // F[raw_mode_in_data_valid_2]: 2:2
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_2 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_2_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_2 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_2_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[2].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_2_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_2_qs)
   );
 
 
   // F[raw_mode_in_data_valid_3]: 3:3
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_3 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_3_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_3 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_3_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[3].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_3_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_3_qs)
   );
 
 
   // F[raw_mode_in_data_valid_4]: 4:4
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_4 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_4_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_4 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_4_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[4].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_4_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_4_qs)
   );
 
 
   // F[raw_mode_in_data_valid_5]: 5:5
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_5 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_5_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_5 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_5_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[5].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_5_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_5_qs)
   );
 
 
   // F[raw_mode_in_data_valid_6]: 6:6
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_6 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_6_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_6 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_6_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[6].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_6_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_6_qs)
   );
 
 
   // F[raw_mode_in_data_valid_7]: 7:7
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_7 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_7_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_7 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_7_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[7].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_7_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_7_qs)
   );
 
 
   // F[raw_mode_in_data_valid_8]: 8:8
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_8 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_8_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_8 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_8_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[8].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_8_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_8_qs)
   );
 
 
   // F[raw_mode_in_data_valid_9]: 9:9
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_9 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_9_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_9 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_9_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[9].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_9_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_9_qs)
   );
 
 
   // F[raw_mode_in_data_valid_10]: 10:10
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_10 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_10_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_10 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_10_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[10].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_10_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_10_qs)
   );
 
 
   // F[raw_mode_in_data_valid_11]: 11:11
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_11 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_11_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_11 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_11_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[11].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_11_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_11_qs)
   );
 
 
   // F[raw_mode_in_data_valid_12]: 12:12
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_12 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_12_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_12 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_12_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[12].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_12_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_12_qs)
   );
 
 
   // F[raw_mode_in_data_valid_13]: 13:13
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_13 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_13_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_13 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_13_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[13].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_13_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_13_qs)
   );
 
 
   // F[raw_mode_in_data_valid_14]: 14:14
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_14 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_14_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_14 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_14_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[14].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_14_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_14_qs)
   );
 
 
   // F[raw_mode_in_data_valid_15]: 15:15
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_15 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_15_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_15 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_15_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[15].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_15_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_15_qs)
   );
 
 
   // F[raw_mode_in_data_valid_16]: 16:16
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_16 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_16_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_16 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_16_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[16].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_16_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_16_qs)
   );
 
 
   // F[raw_mode_in_data_valid_17]: 17:17
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_17 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_17_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_17 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_17_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[17].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_17_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_17_qs)
   );
 
 
   // F[raw_mode_in_data_valid_18]: 18:18
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_18 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_18_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_18 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_18_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[18].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_18_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_18_qs)
   );
 
 
   // F[raw_mode_in_data_valid_19]: 19:19
   prim_subreg_ext #(
     .DW    (1)
-  ) u_raw_mode_in_data_valid_raw_mode_in_data_valid_19 (
-    .re     (raw_mode_in_data_valid_raw_mode_in_data_valid_19_re),
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_19 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_19_re),
     .we     (1'b0),
     .wd     ('0),
     .d      (hw2reg.raw_mode_in_data_valid[19].d),
     .qre    (),
     .qe     (),
     .q      (),
-    .qs     (raw_mode_in_data_valid_raw_mode_in_data_valid_19_qs)
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_19_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_20]: 20:20
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_20 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_20_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[20].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_20_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_21]: 21:21
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_21 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_21_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[21].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_21_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_22]: 22:22
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_22 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_22_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[22].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_22_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_23]: 23:23
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_23 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_23_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[23].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_23_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_24]: 24:24
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_24 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_24_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[24].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_24_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_25]: 25:25
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_25 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_25_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[25].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_25_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_26]: 26:26
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_26 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_26_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[26].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_26_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_27]: 27:27
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_27 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_27_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[27].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_27_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_28]: 28:28
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_28 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_28_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[28].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_28_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_29]: 29:29
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_29 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_29_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[29].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_29_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_30]: 30:30
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_30 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_30_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[30].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_30_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_31]: 31:31
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_0_raw_mode_in_data_valid_31 (
+    .re     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_31_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[31].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_0_raw_mode_in_data_valid_31_qs)
+  );
+
+
+  // Subregister 32 of Multireg raw_mode_in_data_valid
+  // R[raw_mode_in_data_valid_1]: V(True)
+
+  // F[raw_mode_in_data_valid_32]: 0:0
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_1_raw_mode_in_data_valid_32 (
+    .re     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_32_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[32].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_32_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_33]: 1:1
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_1_raw_mode_in_data_valid_33 (
+    .re     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_33_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[33].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_33_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_34]: 2:2
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_1_raw_mode_in_data_valid_34 (
+    .re     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_34_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[34].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_34_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_35]: 3:3
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_1_raw_mode_in_data_valid_35 (
+    .re     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_35_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[35].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_35_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_36]: 4:4
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_1_raw_mode_in_data_valid_36 (
+    .re     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_36_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[36].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_36_qs)
+  );
+
+
+  // F[raw_mode_in_data_valid_37]: 5:5
+  prim_subreg_ext #(
+    .DW    (1)
+  ) u_raw_mode_in_data_valid_1_raw_mode_in_data_valid_37 (
+    .re     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_37_re),
+    .we     (1'b0),
+    .wd     ('0),
+    .d      (hw2reg.raw_mode_in_data_valid[37].d),
+    .qre    (),
+    .qe     (),
+    .q      (),
+    .qs     (raw_mode_in_data_valid_1_raw_mode_in_data_valid_37_qs)
   );
 
 
@@ -2669,20 +4760,20 @@ module serial_link_reg_top #(
 
 
   // Subregister 0 of Multireg raw_mode_out_ch_mask
-  // R[raw_mode_out_ch_mask]: V(False)
+  // R[raw_mode_out_ch_mask_0]: V(False)
 
   // F[raw_mode_out_ch_mask_0]: 0:0
   prim_subreg #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_0 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_0 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_0_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_0_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_0_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_0_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2701,13 +4792,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_1 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_1 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_1_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_1_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_1_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_1_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2726,13 +4817,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_2 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_2 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_2_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_2_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_2_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_2_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2751,13 +4842,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_3 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_3 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_3_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_3_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_3_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_3_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2776,13 +4867,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_4 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_4 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_4_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_4_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_4_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_4_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2801,13 +4892,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_5 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_5 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_5_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_5_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_5_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_5_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2826,13 +4917,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_6 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_6 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_6_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_6_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_6_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_6_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2851,13 +4942,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_7 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_7 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_7_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_7_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_7_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_7_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2876,13 +4967,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_8 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_8 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_8_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_8_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_8_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_8_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2901,13 +4992,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_9 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_9 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_9_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_9_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_9_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_9_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2926,13 +5017,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_10 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_10 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_10_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_10_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_10_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_10_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2951,13 +5042,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_11 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_11 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_11_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_11_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_11_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_11_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -2976,13 +5067,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_12 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_12 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_12_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_12_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_12_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_12_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3001,13 +5092,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_13 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_13 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_13_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_13_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_13_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_13_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3026,13 +5117,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_14 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_14 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_14_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_14_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_14_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_14_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3051,13 +5142,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_15 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_15 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_15_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_15_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_15_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_15_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3076,13 +5167,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_16 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_16 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_16_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_16_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_16_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_16_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3101,13 +5192,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_17 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_17 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_17_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_17_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_17_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_17_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3126,13 +5217,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_18 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_18 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_18_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_18_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_18_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_18_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3151,13 +5242,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("WO"),
     .RESVAL  (1'h0)
-  ) u_raw_mode_out_ch_mask_raw_mode_out_ch_mask_19 (
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_19 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_19_we),
-    .wd     (raw_mode_out_ch_mask_raw_mode_out_ch_mask_19_wd),
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_19_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_19_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3166,6 +5257,459 @@ module serial_link_reg_top #(
     // to internal hardware
     .qe     (),
     .q      (reg2hw.raw_mode_out_ch_mask[19].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_20]: 20:20
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_20 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_20_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_20_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[20].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_21]: 21:21
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_21 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_21_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_21_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[21].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_22]: 22:22
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_22 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_22_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_22_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[22].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_23]: 23:23
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_23 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_23_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_23_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[23].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_24]: 24:24
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_24 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_24_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_24_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[24].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_25]: 25:25
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_25 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_25_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_25_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[25].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_26]: 26:26
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_26 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_26_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_26_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[26].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_27]: 27:27
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_27 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_27_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_27_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[27].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_28]: 28:28
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_28 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_28_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_28_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[28].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_29]: 29:29
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_29 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_29_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_29_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[29].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_30]: 30:30
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_30 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_30_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_30_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[30].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_31]: 31:31
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_31 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_31_we),
+    .wd     (raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_31_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[31].q ),
+
+    .qs     ()
+  );
+
+
+  // Subregister 32 of Multireg raw_mode_out_ch_mask
+  // R[raw_mode_out_ch_mask_1]: V(False)
+
+  // F[raw_mode_out_ch_mask_32]: 0:0
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_32 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_32_we),
+    .wd     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_32_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[32].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_33]: 1:1
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_33 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_33_we),
+    .wd     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_33_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[33].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_34]: 2:2
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_34 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_34_we),
+    .wd     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_34_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[34].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_35]: 3:3
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_35 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_35_we),
+    .wd     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_35_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[35].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_36]: 4:4
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_36 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_36_we),
+    .wd     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_36_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[36].q ),
+
+    .qs     ()
+  );
+
+
+  // F[raw_mode_out_ch_mask_37]: 5:5
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("WO"),
+    .RESVAL  (1'h0)
+  ) u_raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_37 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_37_we),
+    .wd     (raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_37_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.raw_mode_out_ch_mask[37].q ),
 
     .qs     ()
   );
@@ -3370,20 +5914,20 @@ module serial_link_reg_top #(
 
 
   // Subregister 0 of Multireg channel_alloc_tx_ch_en
-  // R[channel_alloc_tx_ch_en]: V(False)
+  // R[channel_alloc_tx_ch_en_0]: V(False)
 
   // F[channel_alloc_tx_ch_en_0]: 0:0
   prim_subreg #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_0 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_0 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_0_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_0_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_0_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_0_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3394,7 +5938,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[0].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_0_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_0_qs)
   );
 
 
@@ -3403,13 +5947,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_1 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_1 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_1_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_1_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_1_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_1_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3420,7 +5964,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[1].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_1_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_1_qs)
   );
 
 
@@ -3429,13 +5973,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_2 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_2 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_2_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_2_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_2_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_2_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3446,7 +5990,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[2].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_2_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_2_qs)
   );
 
 
@@ -3455,13 +5999,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_3 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_3 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_3_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_3_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_3_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_3_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3472,7 +6016,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[3].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_3_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_3_qs)
   );
 
 
@@ -3481,13 +6025,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_4 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_4 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_4_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_4_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_4_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_4_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3498,7 +6042,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[4].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_4_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_4_qs)
   );
 
 
@@ -3507,13 +6051,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_5 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_5 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_5_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_5_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_5_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_5_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3524,7 +6068,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[5].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_5_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_5_qs)
   );
 
 
@@ -3533,13 +6077,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_6 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_6 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_6_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_6_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_6_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_6_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3550,7 +6094,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[6].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_6_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_6_qs)
   );
 
 
@@ -3559,13 +6103,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_7 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_7 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_7_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_7_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_7_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_7_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3576,7 +6120,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[7].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_7_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_7_qs)
   );
 
 
@@ -3585,13 +6129,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_8 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_8 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_8_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_8_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_8_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_8_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3602,7 +6146,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[8].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_8_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_8_qs)
   );
 
 
@@ -3611,13 +6155,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_9 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_9 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_9_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_9_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_9_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_9_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3628,7 +6172,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[9].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_9_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_9_qs)
   );
 
 
@@ -3637,13 +6181,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_10 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_10 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_10_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_10_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_10_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_10_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3654,7 +6198,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[10].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_10_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_10_qs)
   );
 
 
@@ -3663,13 +6207,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_11 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_11 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_11_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_11_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_11_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_11_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3680,7 +6224,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[11].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_11_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_11_qs)
   );
 
 
@@ -3689,13 +6233,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_12 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_12 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_12_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_12_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_12_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_12_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3706,7 +6250,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[12].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_12_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_12_qs)
   );
 
 
@@ -3715,13 +6259,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_13 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_13 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_13_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_13_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_13_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_13_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3732,7 +6276,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[13].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_13_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_13_qs)
   );
 
 
@@ -3741,13 +6285,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_14 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_14 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_14_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_14_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_14_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_14_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3758,7 +6302,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[14].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_14_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_14_qs)
   );
 
 
@@ -3767,13 +6311,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_15 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_15 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_15_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_15_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_15_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_15_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3784,7 +6328,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[15].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_15_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_15_qs)
   );
 
 
@@ -3793,13 +6337,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_16 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_16 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_16_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_16_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_16_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_16_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3810,7 +6354,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[16].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_16_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_16_qs)
   );
 
 
@@ -3819,13 +6363,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_17 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_17 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_17_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_17_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_17_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_17_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3836,7 +6380,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[17].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_17_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_17_qs)
   );
 
 
@@ -3845,13 +6389,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_18 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_18 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_18_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_18_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_18_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_18_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3862,7 +6406,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[18].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_18_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_18_qs)
   );
 
 
@@ -3871,13 +6415,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_19 (
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_19 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_19_we),
-    .wd     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_19_wd),
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_19_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_19_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -3888,7 +6432,478 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_tx_ch_en[19].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_19_qs)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_19_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_20]: 20:20
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_20 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_20_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_20_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[20].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_20_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_21]: 21:21
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_21 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_21_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_21_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[21].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_21_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_22]: 22:22
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_22 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_22_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_22_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[22].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_22_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_23]: 23:23
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_23 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_23_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_23_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[23].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_23_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_24]: 24:24
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_24 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_24_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_24_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[24].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_24_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_25]: 25:25
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_25 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_25_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_25_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[25].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_25_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_26]: 26:26
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_26 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_26_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_26_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[26].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_26_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_27]: 27:27
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_27 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_27_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_27_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[27].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_27_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_28]: 28:28
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_28 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_28_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_28_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[28].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_28_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_29]: 29:29
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_29 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_29_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_29_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[29].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_29_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_30]: 30:30
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_30 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_30_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_30_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[30].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_30_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_31]: 31:31
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_31 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_31_we),
+    .wd     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_31_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[31].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_31_qs)
+  );
+
+
+  // Subregister 32 of Multireg channel_alloc_tx_ch_en
+  // R[channel_alloc_tx_ch_en_1]: V(False)
+
+  // F[channel_alloc_tx_ch_en_32]: 0:0
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_32 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_32_we),
+    .wd     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_32_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[32].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_32_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_33]: 1:1
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_33 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_33_we),
+    .wd     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_33_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[33].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_33_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_34]: 2:2
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_34 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_34_we),
+    .wd     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_34_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[34].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_34_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_35]: 3:3
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_35 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_35_we),
+    .wd     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_35_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[35].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_35_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_36]: 4:4
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_36 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_36_we),
+    .wd     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_36_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[36].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_36_qs)
+  );
+
+
+  // F[channel_alloc_tx_ch_en_37]: 5:5
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_37 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_37_we),
+    .wd     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_37_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_tx_ch_en[37].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_37_qs)
   );
 
 
@@ -4049,20 +7064,20 @@ module serial_link_reg_top #(
 
 
   // Subregister 0 of Multireg channel_alloc_rx_ch_en
-  // R[channel_alloc_rx_ch_en]: V(False)
+  // R[channel_alloc_rx_ch_en_0]: V(False)
 
   // F[channel_alloc_rx_ch_en_0]: 0:0
   prim_subreg #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_0 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_0 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_0_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_0_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_0_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_0_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4073,7 +7088,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[0].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_0_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_0_qs)
   );
 
 
@@ -4082,13 +7097,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_1 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_1 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_1_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_1_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_1_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_1_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4099,7 +7114,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[1].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_1_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_1_qs)
   );
 
 
@@ -4108,13 +7123,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_2 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_2 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_2_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_2_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_2_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_2_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4125,7 +7140,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[2].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_2_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_2_qs)
   );
 
 
@@ -4134,13 +7149,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_3 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_3 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_3_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_3_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_3_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_3_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4151,7 +7166,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[3].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_3_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_3_qs)
   );
 
 
@@ -4160,13 +7175,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_4 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_4 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_4_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_4_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_4_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_4_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4177,7 +7192,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[4].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_4_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_4_qs)
   );
 
 
@@ -4186,13 +7201,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_5 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_5 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_5_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_5_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_5_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_5_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4203,7 +7218,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[5].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_5_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_5_qs)
   );
 
 
@@ -4212,13 +7227,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_6 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_6 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_6_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_6_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_6_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_6_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4229,7 +7244,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[6].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_6_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_6_qs)
   );
 
 
@@ -4238,13 +7253,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_7 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_7 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_7_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_7_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_7_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_7_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4255,7 +7270,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[7].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_7_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_7_qs)
   );
 
 
@@ -4264,13 +7279,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_8 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_8 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_8_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_8_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_8_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_8_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4281,7 +7296,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[8].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_8_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_8_qs)
   );
 
 
@@ -4290,13 +7305,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_9 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_9 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_9_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_9_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_9_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_9_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4307,7 +7322,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[9].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_9_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_9_qs)
   );
 
 
@@ -4316,13 +7331,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_10 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_10 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_10_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_10_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_10_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_10_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4333,7 +7348,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[10].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_10_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_10_qs)
   );
 
 
@@ -4342,13 +7357,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_11 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_11 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_11_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_11_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_11_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_11_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4359,7 +7374,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[11].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_11_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_11_qs)
   );
 
 
@@ -4368,13 +7383,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_12 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_12 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_12_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_12_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_12_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_12_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4385,7 +7400,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[12].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_12_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_12_qs)
   );
 
 
@@ -4394,13 +7409,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_13 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_13 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_13_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_13_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_13_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_13_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4411,7 +7426,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[13].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_13_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_13_qs)
   );
 
 
@@ -4420,13 +7435,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_14 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_14 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_14_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_14_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_14_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_14_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4437,7 +7452,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[14].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_14_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_14_qs)
   );
 
 
@@ -4446,13 +7461,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_15 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_15 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_15_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_15_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_15_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_15_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4463,7 +7478,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[15].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_15_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_15_qs)
   );
 
 
@@ -4472,13 +7487,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_16 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_16 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_16_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_16_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_16_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_16_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4489,7 +7504,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[16].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_16_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_16_qs)
   );
 
 
@@ -4498,13 +7513,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_17 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_17 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_17_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_17_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_17_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_17_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4515,7 +7530,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[17].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_17_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_17_qs)
   );
 
 
@@ -4524,13 +7539,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_18 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_18 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_18_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_18_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_18_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_18_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4541,7 +7556,7 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[18].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_18_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_18_qs)
   );
 
 
@@ -4550,13 +7565,13 @@ module serial_link_reg_top #(
     .DW      (1),
     .SWACCESS("RW"),
     .RESVAL  (1'h1)
-  ) u_channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_19 (
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_19 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_19_we),
-    .wd     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_19_wd),
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_19_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_19_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -4567,14 +7582,485 @@ module serial_link_reg_top #(
     .q      (reg2hw.channel_alloc_rx_ch_en[19].q ),
 
     // to register interface (read)
-    .qs     (channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_19_qs)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_19_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_20]: 20:20
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_20 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_20_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_20_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[20].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_20_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_21]: 21:21
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_21 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_21_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_21_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[21].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_21_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_22]: 22:22
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_22 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_22_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_22_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[22].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_22_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_23]: 23:23
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_23 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_23_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_23_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[23].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_23_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_24]: 24:24
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_24 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_24_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_24_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[24].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_24_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_25]: 25:25
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_25 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_25_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_25_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[25].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_25_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_26]: 26:26
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_26 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_26_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_26_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[26].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_26_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_27]: 27:27
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_27 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_27_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_27_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[27].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_27_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_28]: 28:28
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_28 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_28_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_28_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[28].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_28_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_29]: 29:29
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_29 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_29_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_29_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[29].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_29_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_30]: 30:30
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_30 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_30_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_30_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[30].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_30_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_31]: 31:31
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_31 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_31_we),
+    .wd     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_31_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[31].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_31_qs)
+  );
+
+
+  // Subregister 32 of Multireg channel_alloc_rx_ch_en
+  // R[channel_alloc_rx_ch_en_1]: V(False)
+
+  // F[channel_alloc_rx_ch_en_32]: 0:0
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_32 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_32_we),
+    .wd     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_32_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[32].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_32_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_33]: 1:1
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_33 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_33_we),
+    .wd     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_33_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[33].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_33_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_34]: 2:2
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_34 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_34_we),
+    .wd     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_34_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[34].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_34_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_35]: 3:3
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_35 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_35_we),
+    .wd     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_35_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[35].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_35_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_36]: 4:4
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_36 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_36_we),
+    .wd     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_36_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[36].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_36_qs)
+  );
+
+
+  // F[channel_alloc_rx_ch_en_37]: 5:5
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RW"),
+    .RESVAL  (1'h1)
+  ) u_channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_37 (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_37_we),
+    .wd     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_37_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.channel_alloc_rx_ch_en[37].q ),
+
+    // to register interface (read)
+    .qs     (channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_37_qs)
   );
 
 
 
 
 
-  logic [56:0] addr_hit;
+  logic [96:0] addr_hit;
   always_comb begin
     addr_hit = '0;
     addr_hit[ 0] = (reg_addr == SERIAL_LINK_CTRL_OFFSET);
@@ -4599,41 +8085,81 @@ module serial_link_reg_top #(
     addr_hit[19] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_17_OFFSET);
     addr_hit[20] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_18_OFFSET);
     addr_hit[21] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_19_OFFSET);
-    addr_hit[22] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_0_OFFSET);
-    addr_hit[23] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_1_OFFSET);
-    addr_hit[24] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_2_OFFSET);
-    addr_hit[25] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_3_OFFSET);
-    addr_hit[26] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_4_OFFSET);
-    addr_hit[27] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_5_OFFSET);
-    addr_hit[28] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_6_OFFSET);
-    addr_hit[29] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_7_OFFSET);
-    addr_hit[30] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_8_OFFSET);
-    addr_hit[31] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_9_OFFSET);
-    addr_hit[32] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_10_OFFSET);
-    addr_hit[33] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_11_OFFSET);
-    addr_hit[34] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_12_OFFSET);
-    addr_hit[35] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_13_OFFSET);
-    addr_hit[36] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_14_OFFSET);
-    addr_hit[37] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_15_OFFSET);
-    addr_hit[38] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_16_OFFSET);
-    addr_hit[39] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_17_OFFSET);
-    addr_hit[40] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_18_OFFSET);
-    addr_hit[41] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_19_OFFSET);
-    addr_hit[42] = (reg_addr == SERIAL_LINK_RAW_MODE_EN_OFFSET);
-    addr_hit[43] = (reg_addr == SERIAL_LINK_RAW_MODE_IN_CH_SEL_OFFSET);
-    addr_hit[44] = (reg_addr == SERIAL_LINK_RAW_MODE_IN_DATA_VALID_OFFSET);
-    addr_hit[45] = (reg_addr == SERIAL_LINK_RAW_MODE_IN_DATA_OFFSET);
-    addr_hit[46] = (reg_addr == SERIAL_LINK_RAW_MODE_OUT_CH_MASK_OFFSET);
-    addr_hit[47] = (reg_addr == SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_OFFSET);
-    addr_hit[48] = (reg_addr == SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_CTRL_OFFSET);
-    addr_hit[49] = (reg_addr == SERIAL_LINK_RAW_MODE_OUT_EN_OFFSET);
-    addr_hit[50] = (reg_addr == SERIAL_LINK_FLOW_CONTROL_FIFO_CLEAR_OFFSET);
-    addr_hit[51] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_TX_CFG_OFFSET);
-    addr_hit[52] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_OFFSET);
-    addr_hit[53] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_TX_CTRL_OFFSET);
-    addr_hit[54] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_RX_CFG_OFFSET);
-    addr_hit[55] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_RX_CTRL_OFFSET);
-    addr_hit[56] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_OFFSET);
+    addr_hit[22] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_20_OFFSET);
+    addr_hit[23] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_21_OFFSET);
+    addr_hit[24] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_22_OFFSET);
+    addr_hit[25] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_23_OFFSET);
+    addr_hit[26] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_24_OFFSET);
+    addr_hit[27] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_25_OFFSET);
+    addr_hit[28] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_26_OFFSET);
+    addr_hit[29] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_27_OFFSET);
+    addr_hit[30] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_28_OFFSET);
+    addr_hit[31] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_29_OFFSET);
+    addr_hit[32] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_30_OFFSET);
+    addr_hit[33] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_31_OFFSET);
+    addr_hit[34] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_32_OFFSET);
+    addr_hit[35] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_33_OFFSET);
+    addr_hit[36] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_34_OFFSET);
+    addr_hit[37] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_35_OFFSET);
+    addr_hit[38] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_36_OFFSET);
+    addr_hit[39] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL1_37_OFFSET);
+    addr_hit[40] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_0_OFFSET);
+    addr_hit[41] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_1_OFFSET);
+    addr_hit[42] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_2_OFFSET);
+    addr_hit[43] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_3_OFFSET);
+    addr_hit[44] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_4_OFFSET);
+    addr_hit[45] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_5_OFFSET);
+    addr_hit[46] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_6_OFFSET);
+    addr_hit[47] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_7_OFFSET);
+    addr_hit[48] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_8_OFFSET);
+    addr_hit[49] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_9_OFFSET);
+    addr_hit[50] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_10_OFFSET);
+    addr_hit[51] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_11_OFFSET);
+    addr_hit[52] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_12_OFFSET);
+    addr_hit[53] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_13_OFFSET);
+    addr_hit[54] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_14_OFFSET);
+    addr_hit[55] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_15_OFFSET);
+    addr_hit[56] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_16_OFFSET);
+    addr_hit[57] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_17_OFFSET);
+    addr_hit[58] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_18_OFFSET);
+    addr_hit[59] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_19_OFFSET);
+    addr_hit[60] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_20_OFFSET);
+    addr_hit[61] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_21_OFFSET);
+    addr_hit[62] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_22_OFFSET);
+    addr_hit[63] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_23_OFFSET);
+    addr_hit[64] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_24_OFFSET);
+    addr_hit[65] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_25_OFFSET);
+    addr_hit[66] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_26_OFFSET);
+    addr_hit[67] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_27_OFFSET);
+    addr_hit[68] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_28_OFFSET);
+    addr_hit[69] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_29_OFFSET);
+    addr_hit[70] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_30_OFFSET);
+    addr_hit[71] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_31_OFFSET);
+    addr_hit[72] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_32_OFFSET);
+    addr_hit[73] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_33_OFFSET);
+    addr_hit[74] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_34_OFFSET);
+    addr_hit[75] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_35_OFFSET);
+    addr_hit[76] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_36_OFFSET);
+    addr_hit[77] = (reg_addr == SERIAL_LINK_TX_PHY_CTRL2_37_OFFSET);
+    addr_hit[78] = (reg_addr == SERIAL_LINK_RAW_MODE_EN_OFFSET);
+    addr_hit[79] = (reg_addr == SERIAL_LINK_RAW_MODE_IN_CH_SEL_OFFSET);
+    addr_hit[80] = (reg_addr == SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_OFFSET);
+    addr_hit[81] = (reg_addr == SERIAL_LINK_RAW_MODE_IN_DATA_VALID_1_OFFSET);
+    addr_hit[82] = (reg_addr == SERIAL_LINK_RAW_MODE_IN_DATA_OFFSET);
+    addr_hit[83] = (reg_addr == SERIAL_LINK_RAW_MODE_OUT_CH_MASK_0_OFFSET);
+    addr_hit[84] = (reg_addr == SERIAL_LINK_RAW_MODE_OUT_CH_MASK_1_OFFSET);
+    addr_hit[85] = (reg_addr == SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_OFFSET);
+    addr_hit[86] = (reg_addr == SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_CTRL_OFFSET);
+    addr_hit[87] = (reg_addr == SERIAL_LINK_RAW_MODE_OUT_EN_OFFSET);
+    addr_hit[88] = (reg_addr == SERIAL_LINK_FLOW_CONTROL_FIFO_CLEAR_OFFSET);
+    addr_hit[89] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_TX_CFG_OFFSET);
+    addr_hit[90] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_0_OFFSET);
+    addr_hit[91] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_1_OFFSET);
+    addr_hit[92] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_TX_CTRL_OFFSET);
+    addr_hit[93] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_RX_CFG_OFFSET);
+    addr_hit[94] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_RX_CTRL_OFFSET);
+    addr_hit[95] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_0_OFFSET);
+    addr_hit[96] = (reg_addr == SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_1_OFFSET);
   end
 
   assign addrmiss = (reg_re || reg_we) ? ~|addr_hit : 1'b0 ;
@@ -4697,7 +8223,47 @@ module serial_link_reg_top #(
                (addr_hit[53] & (|(SERIAL_LINK_PERMIT[53] & ~reg_be))) |
                (addr_hit[54] & (|(SERIAL_LINK_PERMIT[54] & ~reg_be))) |
                (addr_hit[55] & (|(SERIAL_LINK_PERMIT[55] & ~reg_be))) |
-               (addr_hit[56] & (|(SERIAL_LINK_PERMIT[56] & ~reg_be)))));
+               (addr_hit[56] & (|(SERIAL_LINK_PERMIT[56] & ~reg_be))) |
+               (addr_hit[57] & (|(SERIAL_LINK_PERMIT[57] & ~reg_be))) |
+               (addr_hit[58] & (|(SERIAL_LINK_PERMIT[58] & ~reg_be))) |
+               (addr_hit[59] & (|(SERIAL_LINK_PERMIT[59] & ~reg_be))) |
+               (addr_hit[60] & (|(SERIAL_LINK_PERMIT[60] & ~reg_be))) |
+               (addr_hit[61] & (|(SERIAL_LINK_PERMIT[61] & ~reg_be))) |
+               (addr_hit[62] & (|(SERIAL_LINK_PERMIT[62] & ~reg_be))) |
+               (addr_hit[63] & (|(SERIAL_LINK_PERMIT[63] & ~reg_be))) |
+               (addr_hit[64] & (|(SERIAL_LINK_PERMIT[64] & ~reg_be))) |
+               (addr_hit[65] & (|(SERIAL_LINK_PERMIT[65] & ~reg_be))) |
+               (addr_hit[66] & (|(SERIAL_LINK_PERMIT[66] & ~reg_be))) |
+               (addr_hit[67] & (|(SERIAL_LINK_PERMIT[67] & ~reg_be))) |
+               (addr_hit[68] & (|(SERIAL_LINK_PERMIT[68] & ~reg_be))) |
+               (addr_hit[69] & (|(SERIAL_LINK_PERMIT[69] & ~reg_be))) |
+               (addr_hit[70] & (|(SERIAL_LINK_PERMIT[70] & ~reg_be))) |
+               (addr_hit[71] & (|(SERIAL_LINK_PERMIT[71] & ~reg_be))) |
+               (addr_hit[72] & (|(SERIAL_LINK_PERMIT[72] & ~reg_be))) |
+               (addr_hit[73] & (|(SERIAL_LINK_PERMIT[73] & ~reg_be))) |
+               (addr_hit[74] & (|(SERIAL_LINK_PERMIT[74] & ~reg_be))) |
+               (addr_hit[75] & (|(SERIAL_LINK_PERMIT[75] & ~reg_be))) |
+               (addr_hit[76] & (|(SERIAL_LINK_PERMIT[76] & ~reg_be))) |
+               (addr_hit[77] & (|(SERIAL_LINK_PERMIT[77] & ~reg_be))) |
+               (addr_hit[78] & (|(SERIAL_LINK_PERMIT[78] & ~reg_be))) |
+               (addr_hit[79] & (|(SERIAL_LINK_PERMIT[79] & ~reg_be))) |
+               (addr_hit[80] & (|(SERIAL_LINK_PERMIT[80] & ~reg_be))) |
+               (addr_hit[81] & (|(SERIAL_LINK_PERMIT[81] & ~reg_be))) |
+               (addr_hit[82] & (|(SERIAL_LINK_PERMIT[82] & ~reg_be))) |
+               (addr_hit[83] & (|(SERIAL_LINK_PERMIT[83] & ~reg_be))) |
+               (addr_hit[84] & (|(SERIAL_LINK_PERMIT[84] & ~reg_be))) |
+               (addr_hit[85] & (|(SERIAL_LINK_PERMIT[85] & ~reg_be))) |
+               (addr_hit[86] & (|(SERIAL_LINK_PERMIT[86] & ~reg_be))) |
+               (addr_hit[87] & (|(SERIAL_LINK_PERMIT[87] & ~reg_be))) |
+               (addr_hit[88] & (|(SERIAL_LINK_PERMIT[88] & ~reg_be))) |
+               (addr_hit[89] & (|(SERIAL_LINK_PERMIT[89] & ~reg_be))) |
+               (addr_hit[90] & (|(SERIAL_LINK_PERMIT[90] & ~reg_be))) |
+               (addr_hit[91] & (|(SERIAL_LINK_PERMIT[91] & ~reg_be))) |
+               (addr_hit[92] & (|(SERIAL_LINK_PERMIT[92] & ~reg_be))) |
+               (addr_hit[93] & (|(SERIAL_LINK_PERMIT[93] & ~reg_be))) |
+               (addr_hit[94] & (|(SERIAL_LINK_PERMIT[94] & ~reg_be))) |
+               (addr_hit[95] & (|(SERIAL_LINK_PERMIT[95] & ~reg_be))) |
+               (addr_hit[96] & (|(SERIAL_LINK_PERMIT[96] & ~reg_be)))));
   end
 
   assign ctrl_clk_ena_we = addr_hit[0] & reg_we & !reg_error;
@@ -4776,399 +8342,759 @@ module serial_link_reg_top #(
   assign tx_phy_ctrl1_19_we = addr_hit[21] & reg_we & !reg_error;
   assign tx_phy_ctrl1_19_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_0_clk_shift_start_0_we = addr_hit[22] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_20_we = addr_hit[22] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_20_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_21_we = addr_hit[23] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_21_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_22_we = addr_hit[24] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_22_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_23_we = addr_hit[25] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_23_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_24_we = addr_hit[26] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_24_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_25_we = addr_hit[27] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_25_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_26_we = addr_hit[28] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_26_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_27_we = addr_hit[29] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_27_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_28_we = addr_hit[30] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_28_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_29_we = addr_hit[31] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_29_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_30_we = addr_hit[32] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_30_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_31_we = addr_hit[33] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_31_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_32_we = addr_hit[34] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_32_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_33_we = addr_hit[35] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_33_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_34_we = addr_hit[36] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_34_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_35_we = addr_hit[37] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_35_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_36_we = addr_hit[38] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_36_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl1_37_we = addr_hit[39] & reg_we & !reg_error;
+  assign tx_phy_ctrl1_37_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_0_clk_shift_start_0_we = addr_hit[40] & reg_we & !reg_error;
   assign tx_phy_ctrl2_0_clk_shift_start_0_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_0_clk_shift_end_0_we = addr_hit[22] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_0_clk_shift_end_0_we = addr_hit[40] & reg_we & !reg_error;
   assign tx_phy_ctrl2_0_clk_shift_end_0_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_1_clk_shift_start_1_we = addr_hit[23] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_1_clk_shift_start_1_we = addr_hit[41] & reg_we & !reg_error;
   assign tx_phy_ctrl2_1_clk_shift_start_1_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_1_clk_shift_end_1_we = addr_hit[23] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_1_clk_shift_end_1_we = addr_hit[41] & reg_we & !reg_error;
   assign tx_phy_ctrl2_1_clk_shift_end_1_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_2_clk_shift_start_2_we = addr_hit[24] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_2_clk_shift_start_2_we = addr_hit[42] & reg_we & !reg_error;
   assign tx_phy_ctrl2_2_clk_shift_start_2_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_2_clk_shift_end_2_we = addr_hit[24] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_2_clk_shift_end_2_we = addr_hit[42] & reg_we & !reg_error;
   assign tx_phy_ctrl2_2_clk_shift_end_2_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_3_clk_shift_start_3_we = addr_hit[25] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_3_clk_shift_start_3_we = addr_hit[43] & reg_we & !reg_error;
   assign tx_phy_ctrl2_3_clk_shift_start_3_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_3_clk_shift_end_3_we = addr_hit[25] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_3_clk_shift_end_3_we = addr_hit[43] & reg_we & !reg_error;
   assign tx_phy_ctrl2_3_clk_shift_end_3_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_4_clk_shift_start_4_we = addr_hit[26] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_4_clk_shift_start_4_we = addr_hit[44] & reg_we & !reg_error;
   assign tx_phy_ctrl2_4_clk_shift_start_4_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_4_clk_shift_end_4_we = addr_hit[26] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_4_clk_shift_end_4_we = addr_hit[44] & reg_we & !reg_error;
   assign tx_phy_ctrl2_4_clk_shift_end_4_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_5_clk_shift_start_5_we = addr_hit[27] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_5_clk_shift_start_5_we = addr_hit[45] & reg_we & !reg_error;
   assign tx_phy_ctrl2_5_clk_shift_start_5_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_5_clk_shift_end_5_we = addr_hit[27] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_5_clk_shift_end_5_we = addr_hit[45] & reg_we & !reg_error;
   assign tx_phy_ctrl2_5_clk_shift_end_5_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_6_clk_shift_start_6_we = addr_hit[28] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_6_clk_shift_start_6_we = addr_hit[46] & reg_we & !reg_error;
   assign tx_phy_ctrl2_6_clk_shift_start_6_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_6_clk_shift_end_6_we = addr_hit[28] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_6_clk_shift_end_6_we = addr_hit[46] & reg_we & !reg_error;
   assign tx_phy_ctrl2_6_clk_shift_end_6_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_7_clk_shift_start_7_we = addr_hit[29] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_7_clk_shift_start_7_we = addr_hit[47] & reg_we & !reg_error;
   assign tx_phy_ctrl2_7_clk_shift_start_7_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_7_clk_shift_end_7_we = addr_hit[29] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_7_clk_shift_end_7_we = addr_hit[47] & reg_we & !reg_error;
   assign tx_phy_ctrl2_7_clk_shift_end_7_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_8_clk_shift_start_8_we = addr_hit[30] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_8_clk_shift_start_8_we = addr_hit[48] & reg_we & !reg_error;
   assign tx_phy_ctrl2_8_clk_shift_start_8_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_8_clk_shift_end_8_we = addr_hit[30] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_8_clk_shift_end_8_we = addr_hit[48] & reg_we & !reg_error;
   assign tx_phy_ctrl2_8_clk_shift_end_8_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_9_clk_shift_start_9_we = addr_hit[31] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_9_clk_shift_start_9_we = addr_hit[49] & reg_we & !reg_error;
   assign tx_phy_ctrl2_9_clk_shift_start_9_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_9_clk_shift_end_9_we = addr_hit[31] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_9_clk_shift_end_9_we = addr_hit[49] & reg_we & !reg_error;
   assign tx_phy_ctrl2_9_clk_shift_end_9_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_10_clk_shift_start_10_we = addr_hit[32] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_10_clk_shift_start_10_we = addr_hit[50] & reg_we & !reg_error;
   assign tx_phy_ctrl2_10_clk_shift_start_10_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_10_clk_shift_end_10_we = addr_hit[32] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_10_clk_shift_end_10_we = addr_hit[50] & reg_we & !reg_error;
   assign tx_phy_ctrl2_10_clk_shift_end_10_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_11_clk_shift_start_11_we = addr_hit[33] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_11_clk_shift_start_11_we = addr_hit[51] & reg_we & !reg_error;
   assign tx_phy_ctrl2_11_clk_shift_start_11_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_11_clk_shift_end_11_we = addr_hit[33] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_11_clk_shift_end_11_we = addr_hit[51] & reg_we & !reg_error;
   assign tx_phy_ctrl2_11_clk_shift_end_11_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_12_clk_shift_start_12_we = addr_hit[34] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_12_clk_shift_start_12_we = addr_hit[52] & reg_we & !reg_error;
   assign tx_phy_ctrl2_12_clk_shift_start_12_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_12_clk_shift_end_12_we = addr_hit[34] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_12_clk_shift_end_12_we = addr_hit[52] & reg_we & !reg_error;
   assign tx_phy_ctrl2_12_clk_shift_end_12_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_13_clk_shift_start_13_we = addr_hit[35] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_13_clk_shift_start_13_we = addr_hit[53] & reg_we & !reg_error;
   assign tx_phy_ctrl2_13_clk_shift_start_13_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_13_clk_shift_end_13_we = addr_hit[35] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_13_clk_shift_end_13_we = addr_hit[53] & reg_we & !reg_error;
   assign tx_phy_ctrl2_13_clk_shift_end_13_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_14_clk_shift_start_14_we = addr_hit[36] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_14_clk_shift_start_14_we = addr_hit[54] & reg_we & !reg_error;
   assign tx_phy_ctrl2_14_clk_shift_start_14_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_14_clk_shift_end_14_we = addr_hit[36] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_14_clk_shift_end_14_we = addr_hit[54] & reg_we & !reg_error;
   assign tx_phy_ctrl2_14_clk_shift_end_14_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_15_clk_shift_start_15_we = addr_hit[37] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_15_clk_shift_start_15_we = addr_hit[55] & reg_we & !reg_error;
   assign tx_phy_ctrl2_15_clk_shift_start_15_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_15_clk_shift_end_15_we = addr_hit[37] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_15_clk_shift_end_15_we = addr_hit[55] & reg_we & !reg_error;
   assign tx_phy_ctrl2_15_clk_shift_end_15_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_16_clk_shift_start_16_we = addr_hit[38] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_16_clk_shift_start_16_we = addr_hit[56] & reg_we & !reg_error;
   assign tx_phy_ctrl2_16_clk_shift_start_16_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_16_clk_shift_end_16_we = addr_hit[38] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_16_clk_shift_end_16_we = addr_hit[56] & reg_we & !reg_error;
   assign tx_phy_ctrl2_16_clk_shift_end_16_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_17_clk_shift_start_17_we = addr_hit[39] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_17_clk_shift_start_17_we = addr_hit[57] & reg_we & !reg_error;
   assign tx_phy_ctrl2_17_clk_shift_start_17_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_17_clk_shift_end_17_we = addr_hit[39] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_17_clk_shift_end_17_we = addr_hit[57] & reg_we & !reg_error;
   assign tx_phy_ctrl2_17_clk_shift_end_17_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_18_clk_shift_start_18_we = addr_hit[40] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_18_clk_shift_start_18_we = addr_hit[58] & reg_we & !reg_error;
   assign tx_phy_ctrl2_18_clk_shift_start_18_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_18_clk_shift_end_18_we = addr_hit[40] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_18_clk_shift_end_18_we = addr_hit[58] & reg_we & !reg_error;
   assign tx_phy_ctrl2_18_clk_shift_end_18_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_19_clk_shift_start_19_we = addr_hit[41] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_19_clk_shift_start_19_we = addr_hit[59] & reg_we & !reg_error;
   assign tx_phy_ctrl2_19_clk_shift_start_19_wd = reg_wdata[10:0];
 
-  assign tx_phy_ctrl2_19_clk_shift_end_19_we = addr_hit[41] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_19_clk_shift_end_19_we = addr_hit[59] & reg_we & !reg_error;
   assign tx_phy_ctrl2_19_clk_shift_end_19_wd = reg_wdata[10:0];
 
-  assign raw_mode_en_we = addr_hit[42] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_20_clk_shift_start_20_we = addr_hit[60] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_20_clk_shift_start_20_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_20_clk_shift_end_20_we = addr_hit[60] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_20_clk_shift_end_20_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_21_clk_shift_start_21_we = addr_hit[61] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_21_clk_shift_start_21_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_21_clk_shift_end_21_we = addr_hit[61] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_21_clk_shift_end_21_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_22_clk_shift_start_22_we = addr_hit[62] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_22_clk_shift_start_22_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_22_clk_shift_end_22_we = addr_hit[62] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_22_clk_shift_end_22_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_23_clk_shift_start_23_we = addr_hit[63] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_23_clk_shift_start_23_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_23_clk_shift_end_23_we = addr_hit[63] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_23_clk_shift_end_23_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_24_clk_shift_start_24_we = addr_hit[64] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_24_clk_shift_start_24_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_24_clk_shift_end_24_we = addr_hit[64] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_24_clk_shift_end_24_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_25_clk_shift_start_25_we = addr_hit[65] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_25_clk_shift_start_25_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_25_clk_shift_end_25_we = addr_hit[65] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_25_clk_shift_end_25_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_26_clk_shift_start_26_we = addr_hit[66] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_26_clk_shift_start_26_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_26_clk_shift_end_26_we = addr_hit[66] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_26_clk_shift_end_26_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_27_clk_shift_start_27_we = addr_hit[67] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_27_clk_shift_start_27_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_27_clk_shift_end_27_we = addr_hit[67] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_27_clk_shift_end_27_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_28_clk_shift_start_28_we = addr_hit[68] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_28_clk_shift_start_28_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_28_clk_shift_end_28_we = addr_hit[68] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_28_clk_shift_end_28_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_29_clk_shift_start_29_we = addr_hit[69] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_29_clk_shift_start_29_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_29_clk_shift_end_29_we = addr_hit[69] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_29_clk_shift_end_29_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_30_clk_shift_start_30_we = addr_hit[70] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_30_clk_shift_start_30_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_30_clk_shift_end_30_we = addr_hit[70] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_30_clk_shift_end_30_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_31_clk_shift_start_31_we = addr_hit[71] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_31_clk_shift_start_31_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_31_clk_shift_end_31_we = addr_hit[71] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_31_clk_shift_end_31_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_32_clk_shift_start_32_we = addr_hit[72] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_32_clk_shift_start_32_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_32_clk_shift_end_32_we = addr_hit[72] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_32_clk_shift_end_32_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_33_clk_shift_start_33_we = addr_hit[73] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_33_clk_shift_start_33_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_33_clk_shift_end_33_we = addr_hit[73] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_33_clk_shift_end_33_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_34_clk_shift_start_34_we = addr_hit[74] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_34_clk_shift_start_34_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_34_clk_shift_end_34_we = addr_hit[74] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_34_clk_shift_end_34_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_35_clk_shift_start_35_we = addr_hit[75] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_35_clk_shift_start_35_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_35_clk_shift_end_35_we = addr_hit[75] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_35_clk_shift_end_35_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_36_clk_shift_start_36_we = addr_hit[76] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_36_clk_shift_start_36_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_36_clk_shift_end_36_we = addr_hit[76] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_36_clk_shift_end_36_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_37_clk_shift_start_37_we = addr_hit[77] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_37_clk_shift_start_37_wd = reg_wdata[10:0];
+
+  assign tx_phy_ctrl2_37_clk_shift_end_37_we = addr_hit[77] & reg_we & !reg_error;
+  assign tx_phy_ctrl2_37_clk_shift_end_37_wd = reg_wdata[10:0];
+
+  assign raw_mode_en_we = addr_hit[78] & reg_we & !reg_error;
   assign raw_mode_en_wd = reg_wdata[0];
 
-  assign raw_mode_in_ch_sel_we = addr_hit[43] & reg_we & !reg_error;
-  assign raw_mode_in_ch_sel_wd = reg_wdata[4:0];
+  assign raw_mode_in_ch_sel_we = addr_hit[79] & reg_we & !reg_error;
+  assign raw_mode_in_ch_sel_wd = reg_wdata[5:0];
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_0_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_0_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_1_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_1_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_2_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_2_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_3_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_3_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_4_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_4_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_5_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_5_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_6_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_6_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_7_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_7_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_8_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_8_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_9_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_9_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_10_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_10_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_11_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_11_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_12_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_12_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_13_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_13_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_14_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_14_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_15_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_15_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_16_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_16_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_17_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_17_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_18_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_18_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_valid_raw_mode_in_data_valid_19_re = addr_hit[44] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_19_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_in_data_re = addr_hit[45] & reg_re & !reg_error;
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_20_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_0_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_0_wd = reg_wdata[0];
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_21_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_1_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_1_wd = reg_wdata[1];
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_22_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_2_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_2_wd = reg_wdata[2];
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_23_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_3_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_3_wd = reg_wdata[3];
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_24_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_4_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_4_wd = reg_wdata[4];
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_25_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_5_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_5_wd = reg_wdata[5];
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_26_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_6_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_6_wd = reg_wdata[6];
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_27_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_7_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_7_wd = reg_wdata[7];
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_28_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_8_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_8_wd = reg_wdata[8];
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_29_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_9_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_9_wd = reg_wdata[9];
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_30_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_10_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_10_wd = reg_wdata[10];
+  assign raw_mode_in_data_valid_0_raw_mode_in_data_valid_31_re = addr_hit[80] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_11_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_11_wd = reg_wdata[11];
+  assign raw_mode_in_data_valid_1_raw_mode_in_data_valid_32_re = addr_hit[81] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_12_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_12_wd = reg_wdata[12];
+  assign raw_mode_in_data_valid_1_raw_mode_in_data_valid_33_re = addr_hit[81] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_13_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_13_wd = reg_wdata[13];
+  assign raw_mode_in_data_valid_1_raw_mode_in_data_valid_34_re = addr_hit[81] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_14_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_14_wd = reg_wdata[14];
+  assign raw_mode_in_data_valid_1_raw_mode_in_data_valid_35_re = addr_hit[81] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_15_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_15_wd = reg_wdata[15];
+  assign raw_mode_in_data_valid_1_raw_mode_in_data_valid_36_re = addr_hit[81] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_16_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_16_wd = reg_wdata[16];
+  assign raw_mode_in_data_valid_1_raw_mode_in_data_valid_37_re = addr_hit[81] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_17_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_17_wd = reg_wdata[17];
+  assign raw_mode_in_data_re = addr_hit[82] & reg_re & !reg_error;
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_18_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_18_wd = reg_wdata[18];
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_0_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_0_wd = reg_wdata[0];
 
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_19_we = addr_hit[46] & reg_we & !reg_error;
-  assign raw_mode_out_ch_mask_raw_mode_out_ch_mask_19_wd = reg_wdata[19];
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_1_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_1_wd = reg_wdata[1];
 
-  assign raw_mode_out_data_fifo_we = addr_hit[47] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_2_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_2_wd = reg_wdata[2];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_3_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_3_wd = reg_wdata[3];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_4_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_4_wd = reg_wdata[4];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_5_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_5_wd = reg_wdata[5];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_6_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_6_wd = reg_wdata[6];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_7_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_7_wd = reg_wdata[7];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_8_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_8_wd = reg_wdata[8];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_9_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_9_wd = reg_wdata[9];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_10_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_10_wd = reg_wdata[10];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_11_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_11_wd = reg_wdata[11];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_12_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_12_wd = reg_wdata[12];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_13_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_13_wd = reg_wdata[13];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_14_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_14_wd = reg_wdata[14];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_15_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_15_wd = reg_wdata[15];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_16_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_16_wd = reg_wdata[16];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_17_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_17_wd = reg_wdata[17];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_18_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_18_wd = reg_wdata[18];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_19_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_19_wd = reg_wdata[19];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_20_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_20_wd = reg_wdata[20];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_21_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_21_wd = reg_wdata[21];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_22_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_22_wd = reg_wdata[22];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_23_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_23_wd = reg_wdata[23];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_24_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_24_wd = reg_wdata[24];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_25_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_25_wd = reg_wdata[25];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_26_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_26_wd = reg_wdata[26];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_27_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_27_wd = reg_wdata[27];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_28_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_28_wd = reg_wdata[28];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_29_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_29_wd = reg_wdata[29];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_30_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_30_wd = reg_wdata[30];
+
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_31_we = addr_hit[83] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_31_wd = reg_wdata[31];
+
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_32_we = addr_hit[84] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_32_wd = reg_wdata[0];
+
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_33_we = addr_hit[84] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_33_wd = reg_wdata[1];
+
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_34_we = addr_hit[84] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_34_wd = reg_wdata[2];
+
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_35_we = addr_hit[84] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_35_wd = reg_wdata[3];
+
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_36_we = addr_hit[84] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_36_wd = reg_wdata[4];
+
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_37_we = addr_hit[84] & reg_we & !reg_error;
+  assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_37_wd = reg_wdata[5];
+
+  assign raw_mode_out_data_fifo_we = addr_hit[85] & reg_we & !reg_error;
   assign raw_mode_out_data_fifo_wd = reg_wdata[15:0];
 
-  assign raw_mode_out_data_fifo_ctrl_clear_we = addr_hit[48] & reg_we & !reg_error;
+  assign raw_mode_out_data_fifo_ctrl_clear_we = addr_hit[86] & reg_we & !reg_error;
   assign raw_mode_out_data_fifo_ctrl_clear_wd = reg_wdata[0];
 
-  assign raw_mode_out_data_fifo_ctrl_fill_state_re = addr_hit[48] & reg_re & !reg_error;
+  assign raw_mode_out_data_fifo_ctrl_fill_state_re = addr_hit[86] & reg_re & !reg_error;
 
-  assign raw_mode_out_data_fifo_ctrl_is_full_re = addr_hit[48] & reg_re & !reg_error;
+  assign raw_mode_out_data_fifo_ctrl_is_full_re = addr_hit[86] & reg_re & !reg_error;
 
-  assign raw_mode_out_en_we = addr_hit[49] & reg_we & !reg_error;
+  assign raw_mode_out_en_we = addr_hit[87] & reg_we & !reg_error;
   assign raw_mode_out_en_wd = reg_wdata[0];
 
-  assign flow_control_fifo_clear_we = addr_hit[50] & reg_we & !reg_error;
+  assign flow_control_fifo_clear_we = addr_hit[88] & reg_we & !reg_error;
   assign flow_control_fifo_clear_wd = reg_wdata[0];
 
-  assign channel_alloc_tx_cfg_bypass_en_we = addr_hit[51] & reg_we & !reg_error;
+  assign channel_alloc_tx_cfg_bypass_en_we = addr_hit[89] & reg_we & !reg_error;
   assign channel_alloc_tx_cfg_bypass_en_wd = reg_wdata[0];
 
-  assign channel_alloc_tx_cfg_auto_flush_en_we = addr_hit[51] & reg_we & !reg_error;
+  assign channel_alloc_tx_cfg_auto_flush_en_we = addr_hit[89] & reg_we & !reg_error;
   assign channel_alloc_tx_cfg_auto_flush_en_wd = reg_wdata[1];
 
-  assign channel_alloc_tx_cfg_auto_flush_count_we = addr_hit[51] & reg_we & !reg_error;
+  assign channel_alloc_tx_cfg_auto_flush_count_we = addr_hit[89] & reg_we & !reg_error;
   assign channel_alloc_tx_cfg_auto_flush_count_wd = reg_wdata[15:8];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_0_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_0_wd = reg_wdata[0];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_0_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_0_wd = reg_wdata[0];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_1_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_1_wd = reg_wdata[1];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_1_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_1_wd = reg_wdata[1];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_2_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_2_wd = reg_wdata[2];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_2_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_2_wd = reg_wdata[2];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_3_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_3_wd = reg_wdata[3];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_3_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_3_wd = reg_wdata[3];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_4_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_4_wd = reg_wdata[4];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_4_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_4_wd = reg_wdata[4];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_5_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_5_wd = reg_wdata[5];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_5_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_5_wd = reg_wdata[5];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_6_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_6_wd = reg_wdata[6];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_6_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_6_wd = reg_wdata[6];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_7_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_7_wd = reg_wdata[7];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_7_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_7_wd = reg_wdata[7];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_8_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_8_wd = reg_wdata[8];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_8_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_8_wd = reg_wdata[8];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_9_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_9_wd = reg_wdata[9];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_9_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_9_wd = reg_wdata[9];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_10_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_10_wd = reg_wdata[10];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_10_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_10_wd = reg_wdata[10];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_11_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_11_wd = reg_wdata[11];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_11_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_11_wd = reg_wdata[11];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_12_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_12_wd = reg_wdata[12];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_12_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_12_wd = reg_wdata[12];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_13_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_13_wd = reg_wdata[13];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_13_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_13_wd = reg_wdata[13];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_14_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_14_wd = reg_wdata[14];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_14_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_14_wd = reg_wdata[14];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_15_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_15_wd = reg_wdata[15];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_15_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_15_wd = reg_wdata[15];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_16_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_16_wd = reg_wdata[16];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_16_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_16_wd = reg_wdata[16];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_17_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_17_wd = reg_wdata[17];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_17_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_17_wd = reg_wdata[17];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_18_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_18_wd = reg_wdata[18];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_18_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_18_wd = reg_wdata[18];
 
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_19_we = addr_hit[52] & reg_we & !reg_error;
-  assign channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_19_wd = reg_wdata[19];
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_19_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_19_wd = reg_wdata[19];
 
-  assign channel_alloc_tx_ctrl_clear_we = addr_hit[53] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_20_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_20_wd = reg_wdata[20];
+
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_21_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_21_wd = reg_wdata[21];
+
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_22_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_22_wd = reg_wdata[22];
+
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_23_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_23_wd = reg_wdata[23];
+
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_24_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_24_wd = reg_wdata[24];
+
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_25_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_25_wd = reg_wdata[25];
+
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_26_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_26_wd = reg_wdata[26];
+
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_27_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_27_wd = reg_wdata[27];
+
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_28_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_28_wd = reg_wdata[28];
+
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_29_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_29_wd = reg_wdata[29];
+
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_30_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_30_wd = reg_wdata[30];
+
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_31_we = addr_hit[90] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_31_wd = reg_wdata[31];
+
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_32_we = addr_hit[91] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_32_wd = reg_wdata[0];
+
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_33_we = addr_hit[91] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_33_wd = reg_wdata[1];
+
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_34_we = addr_hit[91] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_34_wd = reg_wdata[2];
+
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_35_we = addr_hit[91] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_35_wd = reg_wdata[3];
+
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_36_we = addr_hit[91] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_36_wd = reg_wdata[4];
+
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_37_we = addr_hit[91] & reg_we & !reg_error;
+  assign channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_37_wd = reg_wdata[5];
+
+  assign channel_alloc_tx_ctrl_clear_we = addr_hit[92] & reg_we & !reg_error;
   assign channel_alloc_tx_ctrl_clear_wd = reg_wdata[0];
 
-  assign channel_alloc_tx_ctrl_flush_we = addr_hit[53] & reg_we & !reg_error;
+  assign channel_alloc_tx_ctrl_flush_we = addr_hit[92] & reg_we & !reg_error;
   assign channel_alloc_tx_ctrl_flush_wd = reg_wdata[1];
 
-  assign channel_alloc_rx_cfg_bypass_en_we = addr_hit[54] & reg_we & !reg_error;
+  assign channel_alloc_rx_cfg_bypass_en_we = addr_hit[93] & reg_we & !reg_error;
   assign channel_alloc_rx_cfg_bypass_en_wd = reg_wdata[0];
 
-  assign channel_alloc_rx_cfg_auto_flush_en_we = addr_hit[54] & reg_we & !reg_error;
+  assign channel_alloc_rx_cfg_auto_flush_en_we = addr_hit[93] & reg_we & !reg_error;
   assign channel_alloc_rx_cfg_auto_flush_en_wd = reg_wdata[1];
 
-  assign channel_alloc_rx_cfg_auto_flush_count_we = addr_hit[54] & reg_we & !reg_error;
+  assign channel_alloc_rx_cfg_auto_flush_count_we = addr_hit[93] & reg_we & !reg_error;
   assign channel_alloc_rx_cfg_auto_flush_count_wd = reg_wdata[15:8];
 
-  assign channel_alloc_rx_cfg_sync_en_we = addr_hit[54] & reg_we & !reg_error;
+  assign channel_alloc_rx_cfg_sync_en_we = addr_hit[93] & reg_we & !reg_error;
   assign channel_alloc_rx_cfg_sync_en_wd = reg_wdata[16];
 
-  assign channel_alloc_rx_ctrl_we = addr_hit[55] & reg_we & !reg_error;
+  assign channel_alloc_rx_ctrl_we = addr_hit[94] & reg_we & !reg_error;
   assign channel_alloc_rx_ctrl_wd = reg_wdata[0];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_0_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_0_wd = reg_wdata[0];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_0_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_0_wd = reg_wdata[0];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_1_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_1_wd = reg_wdata[1];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_1_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_1_wd = reg_wdata[1];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_2_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_2_wd = reg_wdata[2];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_2_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_2_wd = reg_wdata[2];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_3_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_3_wd = reg_wdata[3];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_3_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_3_wd = reg_wdata[3];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_4_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_4_wd = reg_wdata[4];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_4_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_4_wd = reg_wdata[4];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_5_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_5_wd = reg_wdata[5];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_5_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_5_wd = reg_wdata[5];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_6_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_6_wd = reg_wdata[6];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_6_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_6_wd = reg_wdata[6];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_7_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_7_wd = reg_wdata[7];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_7_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_7_wd = reg_wdata[7];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_8_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_8_wd = reg_wdata[8];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_8_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_8_wd = reg_wdata[8];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_9_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_9_wd = reg_wdata[9];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_9_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_9_wd = reg_wdata[9];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_10_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_10_wd = reg_wdata[10];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_10_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_10_wd = reg_wdata[10];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_11_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_11_wd = reg_wdata[11];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_11_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_11_wd = reg_wdata[11];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_12_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_12_wd = reg_wdata[12];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_12_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_12_wd = reg_wdata[12];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_13_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_13_wd = reg_wdata[13];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_13_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_13_wd = reg_wdata[13];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_14_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_14_wd = reg_wdata[14];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_14_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_14_wd = reg_wdata[14];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_15_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_15_wd = reg_wdata[15];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_15_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_15_wd = reg_wdata[15];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_16_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_16_wd = reg_wdata[16];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_16_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_16_wd = reg_wdata[16];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_17_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_17_wd = reg_wdata[17];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_17_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_17_wd = reg_wdata[17];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_18_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_18_wd = reg_wdata[18];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_18_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_18_wd = reg_wdata[18];
 
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_19_we = addr_hit[56] & reg_we & !reg_error;
-  assign channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_19_wd = reg_wdata[19];
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_19_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_19_wd = reg_wdata[19];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_20_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_20_wd = reg_wdata[20];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_21_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_21_wd = reg_wdata[21];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_22_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_22_wd = reg_wdata[22];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_23_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_23_wd = reg_wdata[23];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_24_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_24_wd = reg_wdata[24];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_25_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_25_wd = reg_wdata[25];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_26_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_26_wd = reg_wdata[26];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_27_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_27_wd = reg_wdata[27];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_28_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_28_wd = reg_wdata[28];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_29_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_29_wd = reg_wdata[29];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_30_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_30_wd = reg_wdata[30];
+
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_31_we = addr_hit[95] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_31_wd = reg_wdata[31];
+
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_32_we = addr_hit[96] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_32_wd = reg_wdata[0];
+
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_33_we = addr_hit[96] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_33_wd = reg_wdata[1];
+
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_34_we = addr_hit[96] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_34_wd = reg_wdata[2];
+
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_35_we = addr_hit[96] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_35_wd = reg_wdata[3];
+
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_36_we = addr_hit[96] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_36_wd = reg_wdata[4];
+
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_37_we = addr_hit[96] & reg_we & !reg_error;
+  assign channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_37_wd = reg_wdata[5];
 
   // Read data return
   always_comb begin
@@ -5267,141 +9193,324 @@ module serial_link_reg_top #(
       end
 
       addr_hit[22]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_20_qs;
+      end
+
+      addr_hit[23]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_21_qs;
+      end
+
+      addr_hit[24]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_22_qs;
+      end
+
+      addr_hit[25]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_23_qs;
+      end
+
+      addr_hit[26]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_24_qs;
+      end
+
+      addr_hit[27]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_25_qs;
+      end
+
+      addr_hit[28]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_26_qs;
+      end
+
+      addr_hit[29]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_27_qs;
+      end
+
+      addr_hit[30]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_28_qs;
+      end
+
+      addr_hit[31]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_29_qs;
+      end
+
+      addr_hit[32]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_30_qs;
+      end
+
+      addr_hit[33]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_31_qs;
+      end
+
+      addr_hit[34]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_32_qs;
+      end
+
+      addr_hit[35]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_33_qs;
+      end
+
+      addr_hit[36]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_34_qs;
+      end
+
+      addr_hit[37]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_35_qs;
+      end
+
+      addr_hit[38]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_36_qs;
+      end
+
+      addr_hit[39]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl1_37_qs;
+      end
+
+      addr_hit[40]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_0_clk_shift_start_0_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_0_clk_shift_end_0_qs;
       end
 
-      addr_hit[23]: begin
+      addr_hit[41]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_1_clk_shift_start_1_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_1_clk_shift_end_1_qs;
       end
 
-      addr_hit[24]: begin
+      addr_hit[42]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_2_clk_shift_start_2_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_2_clk_shift_end_2_qs;
       end
 
-      addr_hit[25]: begin
+      addr_hit[43]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_3_clk_shift_start_3_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_3_clk_shift_end_3_qs;
       end
 
-      addr_hit[26]: begin
+      addr_hit[44]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_4_clk_shift_start_4_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_4_clk_shift_end_4_qs;
       end
 
-      addr_hit[27]: begin
+      addr_hit[45]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_5_clk_shift_start_5_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_5_clk_shift_end_5_qs;
       end
 
-      addr_hit[28]: begin
+      addr_hit[46]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_6_clk_shift_start_6_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_6_clk_shift_end_6_qs;
       end
 
-      addr_hit[29]: begin
+      addr_hit[47]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_7_clk_shift_start_7_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_7_clk_shift_end_7_qs;
       end
 
-      addr_hit[30]: begin
+      addr_hit[48]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_8_clk_shift_start_8_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_8_clk_shift_end_8_qs;
       end
 
-      addr_hit[31]: begin
+      addr_hit[49]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_9_clk_shift_start_9_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_9_clk_shift_end_9_qs;
       end
 
-      addr_hit[32]: begin
+      addr_hit[50]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_10_clk_shift_start_10_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_10_clk_shift_end_10_qs;
       end
 
-      addr_hit[33]: begin
+      addr_hit[51]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_11_clk_shift_start_11_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_11_clk_shift_end_11_qs;
       end
 
-      addr_hit[34]: begin
+      addr_hit[52]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_12_clk_shift_start_12_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_12_clk_shift_end_12_qs;
       end
 
-      addr_hit[35]: begin
+      addr_hit[53]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_13_clk_shift_start_13_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_13_clk_shift_end_13_qs;
       end
 
-      addr_hit[36]: begin
+      addr_hit[54]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_14_clk_shift_start_14_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_14_clk_shift_end_14_qs;
       end
 
-      addr_hit[37]: begin
+      addr_hit[55]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_15_clk_shift_start_15_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_15_clk_shift_end_15_qs;
       end
 
-      addr_hit[38]: begin
+      addr_hit[56]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_16_clk_shift_start_16_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_16_clk_shift_end_16_qs;
       end
 
-      addr_hit[39]: begin
+      addr_hit[57]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_17_clk_shift_start_17_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_17_clk_shift_end_17_qs;
       end
 
-      addr_hit[40]: begin
+      addr_hit[58]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_18_clk_shift_start_18_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_18_clk_shift_end_18_qs;
       end
 
-      addr_hit[41]: begin
+      addr_hit[59]: begin
         reg_rdata_next[10:0] = tx_phy_ctrl2_19_clk_shift_start_19_qs;
         reg_rdata_next[10:0] = tx_phy_ctrl2_19_clk_shift_end_19_qs;
       end
 
-      addr_hit[42]: begin
+      addr_hit[60]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_20_clk_shift_start_20_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_20_clk_shift_end_20_qs;
+      end
+
+      addr_hit[61]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_21_clk_shift_start_21_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_21_clk_shift_end_21_qs;
+      end
+
+      addr_hit[62]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_22_clk_shift_start_22_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_22_clk_shift_end_22_qs;
+      end
+
+      addr_hit[63]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_23_clk_shift_start_23_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_23_clk_shift_end_23_qs;
+      end
+
+      addr_hit[64]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_24_clk_shift_start_24_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_24_clk_shift_end_24_qs;
+      end
+
+      addr_hit[65]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_25_clk_shift_start_25_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_25_clk_shift_end_25_qs;
+      end
+
+      addr_hit[66]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_26_clk_shift_start_26_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_26_clk_shift_end_26_qs;
+      end
+
+      addr_hit[67]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_27_clk_shift_start_27_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_27_clk_shift_end_27_qs;
+      end
+
+      addr_hit[68]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_28_clk_shift_start_28_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_28_clk_shift_end_28_qs;
+      end
+
+      addr_hit[69]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_29_clk_shift_start_29_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_29_clk_shift_end_29_qs;
+      end
+
+      addr_hit[70]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_30_clk_shift_start_30_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_30_clk_shift_end_30_qs;
+      end
+
+      addr_hit[71]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_31_clk_shift_start_31_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_31_clk_shift_end_31_qs;
+      end
+
+      addr_hit[72]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_32_clk_shift_start_32_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_32_clk_shift_end_32_qs;
+      end
+
+      addr_hit[73]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_33_clk_shift_start_33_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_33_clk_shift_end_33_qs;
+      end
+
+      addr_hit[74]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_34_clk_shift_start_34_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_34_clk_shift_end_34_qs;
+      end
+
+      addr_hit[75]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_35_clk_shift_start_35_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_35_clk_shift_end_35_qs;
+      end
+
+      addr_hit[76]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_36_clk_shift_start_36_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_36_clk_shift_end_36_qs;
+      end
+
+      addr_hit[77]: begin
+        reg_rdata_next[10:0] = tx_phy_ctrl2_37_clk_shift_start_37_qs;
+        reg_rdata_next[10:0] = tx_phy_ctrl2_37_clk_shift_end_37_qs;
+      end
+
+      addr_hit[78]: begin
         reg_rdata_next[0] = '0;
       end
 
-      addr_hit[43]: begin
-        reg_rdata_next[4:0] = '0;
+      addr_hit[79]: begin
+        reg_rdata_next[5:0] = '0;
       end
 
-      addr_hit[44]: begin
-        reg_rdata_next[0] = raw_mode_in_data_valid_raw_mode_in_data_valid_0_qs;
-        reg_rdata_next[1] = raw_mode_in_data_valid_raw_mode_in_data_valid_1_qs;
-        reg_rdata_next[2] = raw_mode_in_data_valid_raw_mode_in_data_valid_2_qs;
-        reg_rdata_next[3] = raw_mode_in_data_valid_raw_mode_in_data_valid_3_qs;
-        reg_rdata_next[4] = raw_mode_in_data_valid_raw_mode_in_data_valid_4_qs;
-        reg_rdata_next[5] = raw_mode_in_data_valid_raw_mode_in_data_valid_5_qs;
-        reg_rdata_next[6] = raw_mode_in_data_valid_raw_mode_in_data_valid_6_qs;
-        reg_rdata_next[7] = raw_mode_in_data_valid_raw_mode_in_data_valid_7_qs;
-        reg_rdata_next[8] = raw_mode_in_data_valid_raw_mode_in_data_valid_8_qs;
-        reg_rdata_next[9] = raw_mode_in_data_valid_raw_mode_in_data_valid_9_qs;
-        reg_rdata_next[10] = raw_mode_in_data_valid_raw_mode_in_data_valid_10_qs;
-        reg_rdata_next[11] = raw_mode_in_data_valid_raw_mode_in_data_valid_11_qs;
-        reg_rdata_next[12] = raw_mode_in_data_valid_raw_mode_in_data_valid_12_qs;
-        reg_rdata_next[13] = raw_mode_in_data_valid_raw_mode_in_data_valid_13_qs;
-        reg_rdata_next[14] = raw_mode_in_data_valid_raw_mode_in_data_valid_14_qs;
-        reg_rdata_next[15] = raw_mode_in_data_valid_raw_mode_in_data_valid_15_qs;
-        reg_rdata_next[16] = raw_mode_in_data_valid_raw_mode_in_data_valid_16_qs;
-        reg_rdata_next[17] = raw_mode_in_data_valid_raw_mode_in_data_valid_17_qs;
-        reg_rdata_next[18] = raw_mode_in_data_valid_raw_mode_in_data_valid_18_qs;
-        reg_rdata_next[19] = raw_mode_in_data_valid_raw_mode_in_data_valid_19_qs;
+      addr_hit[80]: begin
+        reg_rdata_next[0] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_0_qs;
+        reg_rdata_next[1] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_1_qs;
+        reg_rdata_next[2] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_2_qs;
+        reg_rdata_next[3] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_3_qs;
+        reg_rdata_next[4] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_4_qs;
+        reg_rdata_next[5] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_5_qs;
+        reg_rdata_next[6] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_6_qs;
+        reg_rdata_next[7] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_7_qs;
+        reg_rdata_next[8] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_8_qs;
+        reg_rdata_next[9] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_9_qs;
+        reg_rdata_next[10] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_10_qs;
+        reg_rdata_next[11] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_11_qs;
+        reg_rdata_next[12] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_12_qs;
+        reg_rdata_next[13] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_13_qs;
+        reg_rdata_next[14] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_14_qs;
+        reg_rdata_next[15] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_15_qs;
+        reg_rdata_next[16] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_16_qs;
+        reg_rdata_next[17] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_17_qs;
+        reg_rdata_next[18] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_18_qs;
+        reg_rdata_next[19] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_19_qs;
+        reg_rdata_next[20] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_20_qs;
+        reg_rdata_next[21] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_21_qs;
+        reg_rdata_next[22] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_22_qs;
+        reg_rdata_next[23] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_23_qs;
+        reg_rdata_next[24] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_24_qs;
+        reg_rdata_next[25] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_25_qs;
+        reg_rdata_next[26] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_26_qs;
+        reg_rdata_next[27] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_27_qs;
+        reg_rdata_next[28] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_28_qs;
+        reg_rdata_next[29] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_29_qs;
+        reg_rdata_next[30] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_30_qs;
+        reg_rdata_next[31] = raw_mode_in_data_valid_0_raw_mode_in_data_valid_31_qs;
       end
 
-      addr_hit[45]: begin
+      addr_hit[81]: begin
+        reg_rdata_next[0] = raw_mode_in_data_valid_1_raw_mode_in_data_valid_32_qs;
+        reg_rdata_next[1] = raw_mode_in_data_valid_1_raw_mode_in_data_valid_33_qs;
+        reg_rdata_next[2] = raw_mode_in_data_valid_1_raw_mode_in_data_valid_34_qs;
+        reg_rdata_next[3] = raw_mode_in_data_valid_1_raw_mode_in_data_valid_35_qs;
+        reg_rdata_next[4] = raw_mode_in_data_valid_1_raw_mode_in_data_valid_36_qs;
+        reg_rdata_next[5] = raw_mode_in_data_valid_1_raw_mode_in_data_valid_37_qs;
+      end
+
+      addr_hit[82]: begin
         reg_rdata_next[15:0] = raw_mode_in_data_qs;
       end
 
-      addr_hit[46]: begin
+      addr_hit[83]: begin
         reg_rdata_next[0] = '0;
         reg_rdata_next[1] = '0;
         reg_rdata_next[2] = '0;
@@ -5422,92 +9531,155 @@ module serial_link_reg_top #(
         reg_rdata_next[17] = '0;
         reg_rdata_next[18] = '0;
         reg_rdata_next[19] = '0;
+        reg_rdata_next[20] = '0;
+        reg_rdata_next[21] = '0;
+        reg_rdata_next[22] = '0;
+        reg_rdata_next[23] = '0;
+        reg_rdata_next[24] = '0;
+        reg_rdata_next[25] = '0;
+        reg_rdata_next[26] = '0;
+        reg_rdata_next[27] = '0;
+        reg_rdata_next[28] = '0;
+        reg_rdata_next[29] = '0;
+        reg_rdata_next[30] = '0;
+        reg_rdata_next[31] = '0;
       end
 
-      addr_hit[47]: begin
+      addr_hit[84]: begin
+        reg_rdata_next[0] = '0;
+        reg_rdata_next[1] = '0;
+        reg_rdata_next[2] = '0;
+        reg_rdata_next[3] = '0;
+        reg_rdata_next[4] = '0;
+        reg_rdata_next[5] = '0;
+      end
+
+      addr_hit[85]: begin
         reg_rdata_next[15:0] = '0;
       end
 
-      addr_hit[48]: begin
+      addr_hit[86]: begin
         reg_rdata_next[0] = '0;
         reg_rdata_next[10:8] = raw_mode_out_data_fifo_ctrl_fill_state_qs;
         reg_rdata_next[31] = raw_mode_out_data_fifo_ctrl_is_full_qs;
       end
 
-      addr_hit[49]: begin
+      addr_hit[87]: begin
         reg_rdata_next[0] = raw_mode_out_en_qs;
       end
 
-      addr_hit[50]: begin
+      addr_hit[88]: begin
         reg_rdata_next[0] = '0;
       end
 
-      addr_hit[51]: begin
+      addr_hit[89]: begin
         reg_rdata_next[0] = channel_alloc_tx_cfg_bypass_en_qs;
         reg_rdata_next[1] = channel_alloc_tx_cfg_auto_flush_en_qs;
         reg_rdata_next[15:8] = channel_alloc_tx_cfg_auto_flush_count_qs;
       end
 
-      addr_hit[52]: begin
-        reg_rdata_next[0] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_0_qs;
-        reg_rdata_next[1] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_1_qs;
-        reg_rdata_next[2] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_2_qs;
-        reg_rdata_next[3] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_3_qs;
-        reg_rdata_next[4] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_4_qs;
-        reg_rdata_next[5] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_5_qs;
-        reg_rdata_next[6] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_6_qs;
-        reg_rdata_next[7] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_7_qs;
-        reg_rdata_next[8] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_8_qs;
-        reg_rdata_next[9] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_9_qs;
-        reg_rdata_next[10] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_10_qs;
-        reg_rdata_next[11] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_11_qs;
-        reg_rdata_next[12] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_12_qs;
-        reg_rdata_next[13] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_13_qs;
-        reg_rdata_next[14] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_14_qs;
-        reg_rdata_next[15] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_15_qs;
-        reg_rdata_next[16] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_16_qs;
-        reg_rdata_next[17] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_17_qs;
-        reg_rdata_next[18] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_18_qs;
-        reg_rdata_next[19] = channel_alloc_tx_ch_en_channel_alloc_tx_ch_en_19_qs;
+      addr_hit[90]: begin
+        reg_rdata_next[0] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_0_qs;
+        reg_rdata_next[1] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_1_qs;
+        reg_rdata_next[2] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_2_qs;
+        reg_rdata_next[3] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_3_qs;
+        reg_rdata_next[4] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_4_qs;
+        reg_rdata_next[5] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_5_qs;
+        reg_rdata_next[6] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_6_qs;
+        reg_rdata_next[7] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_7_qs;
+        reg_rdata_next[8] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_8_qs;
+        reg_rdata_next[9] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_9_qs;
+        reg_rdata_next[10] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_10_qs;
+        reg_rdata_next[11] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_11_qs;
+        reg_rdata_next[12] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_12_qs;
+        reg_rdata_next[13] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_13_qs;
+        reg_rdata_next[14] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_14_qs;
+        reg_rdata_next[15] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_15_qs;
+        reg_rdata_next[16] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_16_qs;
+        reg_rdata_next[17] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_17_qs;
+        reg_rdata_next[18] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_18_qs;
+        reg_rdata_next[19] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_19_qs;
+        reg_rdata_next[20] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_20_qs;
+        reg_rdata_next[21] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_21_qs;
+        reg_rdata_next[22] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_22_qs;
+        reg_rdata_next[23] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_23_qs;
+        reg_rdata_next[24] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_24_qs;
+        reg_rdata_next[25] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_25_qs;
+        reg_rdata_next[26] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_26_qs;
+        reg_rdata_next[27] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_27_qs;
+        reg_rdata_next[28] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_28_qs;
+        reg_rdata_next[29] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_29_qs;
+        reg_rdata_next[30] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_30_qs;
+        reg_rdata_next[31] = channel_alloc_tx_ch_en_0_channel_alloc_tx_ch_en_31_qs;
       end
 
-      addr_hit[53]: begin
+      addr_hit[91]: begin
+        reg_rdata_next[0] = channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_32_qs;
+        reg_rdata_next[1] = channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_33_qs;
+        reg_rdata_next[2] = channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_34_qs;
+        reg_rdata_next[3] = channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_35_qs;
+        reg_rdata_next[4] = channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_36_qs;
+        reg_rdata_next[5] = channel_alloc_tx_ch_en_1_channel_alloc_tx_ch_en_37_qs;
+      end
+
+      addr_hit[92]: begin
         reg_rdata_next[0] = '0;
         reg_rdata_next[1] = '0;
       end
 
-      addr_hit[54]: begin
+      addr_hit[93]: begin
         reg_rdata_next[0] = channel_alloc_rx_cfg_bypass_en_qs;
         reg_rdata_next[1] = channel_alloc_rx_cfg_auto_flush_en_qs;
         reg_rdata_next[15:8] = channel_alloc_rx_cfg_auto_flush_count_qs;
         reg_rdata_next[16] = channel_alloc_rx_cfg_sync_en_qs;
       end
 
-      addr_hit[55]: begin
+      addr_hit[94]: begin
         reg_rdata_next[0] = '0;
       end
 
-      addr_hit[56]: begin
-        reg_rdata_next[0] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_0_qs;
-        reg_rdata_next[1] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_1_qs;
-        reg_rdata_next[2] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_2_qs;
-        reg_rdata_next[3] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_3_qs;
-        reg_rdata_next[4] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_4_qs;
-        reg_rdata_next[5] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_5_qs;
-        reg_rdata_next[6] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_6_qs;
-        reg_rdata_next[7] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_7_qs;
-        reg_rdata_next[8] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_8_qs;
-        reg_rdata_next[9] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_9_qs;
-        reg_rdata_next[10] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_10_qs;
-        reg_rdata_next[11] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_11_qs;
-        reg_rdata_next[12] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_12_qs;
-        reg_rdata_next[13] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_13_qs;
-        reg_rdata_next[14] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_14_qs;
-        reg_rdata_next[15] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_15_qs;
-        reg_rdata_next[16] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_16_qs;
-        reg_rdata_next[17] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_17_qs;
-        reg_rdata_next[18] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_18_qs;
-        reg_rdata_next[19] = channel_alloc_rx_ch_en_channel_alloc_rx_ch_en_19_qs;
+      addr_hit[95]: begin
+        reg_rdata_next[0] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_0_qs;
+        reg_rdata_next[1] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_1_qs;
+        reg_rdata_next[2] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_2_qs;
+        reg_rdata_next[3] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_3_qs;
+        reg_rdata_next[4] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_4_qs;
+        reg_rdata_next[5] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_5_qs;
+        reg_rdata_next[6] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_6_qs;
+        reg_rdata_next[7] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_7_qs;
+        reg_rdata_next[8] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_8_qs;
+        reg_rdata_next[9] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_9_qs;
+        reg_rdata_next[10] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_10_qs;
+        reg_rdata_next[11] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_11_qs;
+        reg_rdata_next[12] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_12_qs;
+        reg_rdata_next[13] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_13_qs;
+        reg_rdata_next[14] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_14_qs;
+        reg_rdata_next[15] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_15_qs;
+        reg_rdata_next[16] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_16_qs;
+        reg_rdata_next[17] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_17_qs;
+        reg_rdata_next[18] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_18_qs;
+        reg_rdata_next[19] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_19_qs;
+        reg_rdata_next[20] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_20_qs;
+        reg_rdata_next[21] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_21_qs;
+        reg_rdata_next[22] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_22_qs;
+        reg_rdata_next[23] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_23_qs;
+        reg_rdata_next[24] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_24_qs;
+        reg_rdata_next[25] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_25_qs;
+        reg_rdata_next[26] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_26_qs;
+        reg_rdata_next[27] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_27_qs;
+        reg_rdata_next[28] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_28_qs;
+        reg_rdata_next[29] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_29_qs;
+        reg_rdata_next[30] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_30_qs;
+        reg_rdata_next[31] = channel_alloc_rx_ch_en_0_channel_alloc_rx_ch_en_31_qs;
+      end
+
+      addr_hit[96]: begin
+        reg_rdata_next[0] = channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_32_qs;
+        reg_rdata_next[1] = channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_33_qs;
+        reg_rdata_next[2] = channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_34_qs;
+        reg_rdata_next[3] = channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_35_qs;
+        reg_rdata_next[4] = channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_36_qs;
+        reg_rdata_next[5] = channel_alloc_rx_ch_en_1_channel_alloc_rx_ch_en_37_qs;
       end
 
       default: begin
@@ -5532,7 +9704,7 @@ endmodule
 
 module serial_link_reg_top_intf
 #(
-  parameter int AW = 8,
+  parameter int AW = 9,
   localparam int DW = 32
 ) (
   input logic clk_i,
