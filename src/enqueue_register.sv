@@ -109,7 +109,8 @@ module enqueue_register
     // However, only the first ClkDiv blocks are relevant for data-flow control.
     localparam int  NumDatBlocks = ClkDiv * MaxPossibleTransferSplits,
     localparam int  StrbSize     = $bits(strb_t),
-    localparam type data_out_t   = logic[$bits(data_in_t)+NumDatBlocks-1:0],
+    localparam int  NumDatBitsIn = $bits(data_in_t),
+    localparam type data_out_t   = logic[NumDatBitsIn+NumDatBlocks-1:0],
 
     localparam int  BlockSize   = $bits(data_block_t),
     // exclude the block control bits (they will be added to the output but are not
