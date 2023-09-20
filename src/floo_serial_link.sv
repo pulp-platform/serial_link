@@ -28,7 +28,7 @@ module floo_serial_link
   localparam int  Log2NumChannels = (NumChannels > 1) ? $clog2(NumChannels) : 1,
   localparam int  channelCount    = 2,
   localparam bit  BridgeVirtualChannels = (noc_bridge_pkg::NumCred_NocBridge == 0) ? 1'b0 : 1'b1,
-  parameter  bit  printFeedback   = 1'b0
+  parameter  bit  PrintFeedback   = 1'b0
 ) (
   // There are 3 different clock/resets:
   // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
@@ -168,7 +168,7 @@ module floo_serial_link
   /////////////////////////////////////////////////////////
 
   initial begin
-    if (printFeedback) begin
+    if (PrintFeedback) begin
       if (BridgeVirtualChannels) begin
         $display("INFO: The virtual channel NoC bridge is being used");
       end else begin

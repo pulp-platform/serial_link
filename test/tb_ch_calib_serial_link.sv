@@ -289,6 +289,7 @@ module tb_ch_calib_serial_link();
   static axi_rand_slave_t axi_rand_slave_2   = new ( axi_out_2 );
 
   logic [1:0] mst_done;
+  logic config_done_1, config_done_2;
 
   initial begin
     axi_rand_slave_1.reset();
@@ -304,17 +305,27 @@ module tb_ch_calib_serial_link();
 
   initial begin
     mst_done[0] = 0;
+    $info("[SYNCH1] --------------------> prepare reset of rand master =---");
     axi_rand_master_1.reset();
     wait_for_reset_1();
+    $info("[SYNCH1] --------------------> finished reset of rand master -=--");
+    wait_for_config_1();
+    $info("[SYNCH1] --------------------> finished configuration of rand master --=-");
     axi_rand_master_1.run(TestDuration, TestDuration);
+    $info("[SYNCH1] --------------------> finished stimuli application of rand master ---=");
     mst_done[0] = 1;
   end
 
   initial begin
     mst_done[1] = 0;
+    $info("[SYNCH2] --------------------> prepare reset of rand master =---");
     axi_rand_master_2.reset();
     wait_for_reset_2();
+    $info("[SYNCH2] --------------------> finished reset of rand master -=--");
+    wait_for_config_2();
+    $info("[SYNCH2] --------------------> finished configuration of rand master --=-");
     axi_rand_master_2.run(TestDuration, TestDuration);
+    $info("[SYNCH2] --------------------> finished stimuli application of rand master ---=");
     mst_done[1] = 1;
   end
 
@@ -323,6 +334,9 @@ module tb_ch_calib_serial_link();
   int NumChannelFaults2 = FaultyChannels;
 
   initial begin : calib_process
+    // Activate the config wait blocks
+    config_done_1 = 0;
+    config_done_2 = 0;
     if ($value$plusargs("NUM_FAULTS_1=%d", NumChannelFaults1)) begin
       $info("[DDR1] Number of faulty channels specified as %d", NumChannelFaults1);
     end
@@ -394,6 +408,18 @@ module tb_ch_calib_serial_link();
   // ==============
   //    Tasks
   // ==============
+
+  task automatic wait_for_config_1();
+    while (config_done_1 != 1) begin
+      @(posedge clk_1);
+    end
+  endtask
+
+  task automatic wait_for_config_2();
+    while (config_done_2 != 1) begin
+      @(posedge clk_2);
+    end
+  endtask
 
   task automatic wait_for_reset_1();
     @(posedge rst_1_n);
@@ -611,6 +637,11 @@ module tb_ch_calib_serial_link();
     end while(data != 0); // Wait until both isolation status bits are 0 to
                           // indicate disabling of isolation
     $info("[DDR%0d] Link is ready", id);
+    if (id == 1) begin
+      config_done_1 = 1;
+    end else if (id == 2) begin
+      config_done_2 = 1;
+    end
   endtask;
 
 endmodule : tb_ch_calib_serial_link

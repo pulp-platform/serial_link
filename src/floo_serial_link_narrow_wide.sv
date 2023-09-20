@@ -25,17 +25,21 @@ module floo_serial_link_narrow_wide
   parameter  int  NumLanes          = serial_link_pkg::NumLanes,
   parameter  int  MaxClkDiv         = serial_link_pkg::MaxClkDiv,
   parameter  bit  NoRegCdc          = 1'b0,
-  // If the noc_bridge has zero credits, the non-virtual channel version of the noc-bridge is being used
+  // If the noc_bridge has zero credits, the non-virtual channel version of the noc-bridge is
+  // being used
   localparam int  Log2NumChannels   = (NumChannels > 1) ? $clog2(NumChannels) : 1,
   localparam bit  BridgeVirtualChannels = (noc_bridge_narrow_wide_pkg::NumCred_NocBridge == 0) ? 1'b0 : 1'b1,
-  parameter  bit  printFeedback     = 1'b0
+  parameter  bit  PrintFeedback     = 1'b0
 ) (
   // There are 3 different clock/resets:
-  // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
-  // 2) clk_sl_i & rst_sl_ni: Same as 1) but clock is gated and reset is SW synchronized. This is the clock that drives the serial link
-  //    i.e. network, data-link and physical layer all run on this clock and can be clock gated if needed. If no clock gating, reset synchronization
-  //    is desired, you can tie clk_sl_i -> clk_i resp. rst_sl_ni -> rst_ni
-  // 3) clk_reg_i & rst_reg_ni: peripheral clock and reset. Only connected to RegBus CDC. If NoRegCdc is set, this clock must be the same as 1)
+  // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only
+  //    config registers are conected to this clock
+  // 2) clk_sl_i & rst_sl_ni: Same as 1) but clock is gated and reset is SW synchronized.
+  //    This is the clock that drives the serial link i.e. network, data-link and physical layer
+  //    all run on this clock and can be clock gated if needed. If no clock gating, reset
+  //    synchronization is desired, you can tie clk_sl_i -> clk_i resp. rst_sl_ni -> rst_ni
+  // 3) clk_reg_i & rst_reg_ni: peripheral clock and reset. Only connected to RegBus CDC. If
+  //    NoRegCdc is set, this clock must be the same as 1)
   input  logic                                 clk_i,
   input  logic                                 rst_ni,
   input  logic                                 clk_sl_i,
@@ -178,7 +182,7 @@ module floo_serial_link_narrow_wide
   /////////////////////////////////////////////////////////
 
   initial begin
-    if (printFeedback) begin
+    if (PrintFeedback) begin
       if (BridgeVirtualChannels) begin
         $display("INFO: The virtual channel NoC bridge is being used");
       end else begin

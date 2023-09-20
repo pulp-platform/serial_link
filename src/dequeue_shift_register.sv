@@ -53,7 +53,7 @@ import serial_link_pkg::*;
     // Input port
     input  logic      valid_i,
     output logic      ready_o,
-    input  data_i_t   data_i,     // The data input has 1 interleaved bit per sub-split in the LSB pos.
+    input  data_i_t   data_i, // The data input has 1 interleaved bit per sub-split in the LSB pos.
     // Output port
     output logic      valid_o,
     input  logic      ready_i,

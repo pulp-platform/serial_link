@@ -64,10 +64,11 @@ module find_req_blocks #(
 
     // One set strobe bit corresponds to 8 bits (1 byte) of data.
     assign required_bits = {num_trailing_ones,3'b0} + NumExternalBitsAdded;
-    // When input strobe is fully '1, all blocks are occupied. The condition is needed to ensure the max is not exceeded,
-    // which could happen when the front most data byte is not a full byte (not all bits are required). This would lead
-    // to a mismatch in the determined MaxNumSplits opposed to the optained number by comparing the block count.
-    assign required_blocks_o = (all_ones) ? TotalNumBlocks : (required_bits + BlockSize - 2) / (BlockSize-1);
+    // When input strobe is fully '1, all blocks are occupied. The condition is needed to ensure
+    // the max is not exceeded, which could happen when the front most data byte is not a full byte
+    // (not all bits are required). This would lead to a mismatch in the determined MaxNumSplits
+    // opposed to the optained number by comparing the block count.
+    assign required_blocks_o = (all_ones) ? TotalNumBlocks : (required_bits+BlockSize-2)/(BlockSize-1);
   end else begin
     assign required_blocks_o = TotalNumBlocks;
   end
@@ -204,27 +205,30 @@ module enqueue_register
   assign ready_o         = (msg_bypass) ? ready_reg_in : (valid_reg_data | ~contains_valid_data);
   assign valid_reg_in    = (msg_bypass) ? valid_i : (contains_valid_data & allow_new_out_transac);
 
+  // The number of shifts required to shift an element from the input to the last shift-position.
+  localparam int ShiftDepth = ClkDiv - MinReqBlocks;
+
   always_comb begin : shifter_control_logic
     // Is the incoming data size small enough to fit at least 2
-    acceptable_size   = required_blocks <= (ClkDiv - MinReqBlocks);
+    acceptable_size   = required_blocks <= ShiftDepth;
     // I should not have an ongoing (un-terminated) shiftoperation
     no_ongoing_shift  = remaining_shifts_q <= 1;
     // Is a delayless shift insertion possible?
-    no_lat_introduced = ClkDiv - occupied_blocks_q < cycle_delay_q + MinReqBlocks;
+    no_lat_introduced = ShiftDepth < cycle_delay_q + occupied_blocks_q;
     // Am I in a delay phase (output not yet ready) and I have sufficient time to
     // shift the input message into the out_block section )
     enough_time_left  = (required_blocks - MinReqBlocks) < cycle_delay_q;
     // Combination of above signals to evaluate if I am able to receive new blocks
     accept_next_block = no_ongoing_shift & no_lat_introduced & enough_time_left;
     // shift_register it emptied, resulting in the new incoming element to be the first in the reg.
-    is_first_element  = contains_valid_data & allow_new_out_transac & ready_reg_in & contains_valid_data;
+    is_first_element  = contains_valid_data & allow_new_out_transac & ready_reg_in;
 
     // The data block has not yet moved out of the input-intersecting region.
     shift_in_progress = remaining_shifts_q != 0;
     // I need to shift in order to not introduce latency. (No more shift delaying allowed)
-    shift_for_no_lat  = ClkDiv - occupied_blocks_q + remaining_shifts_q >= cycle_delay_q + MinReqBlocks;
+    shift_for_no_lat  = ShiftDepth + remaining_shifts_q >= cycle_delay_q + occupied_blocks_q;
     // I still have free shift positions: Shifting further will not result in loosing data-blocks
-    empty_shift_pos   = occupied_blocks_q - remaining_shifts_q < ClkDiv - MinReqBlocks;
+    empty_shift_pos   = occupied_blocks_q - remaining_shifts_q < ShiftDepth;
 
     // If the input data is valid and has an acceptable size, it may be consumed,
     // given it does not conflict with existing data and can be fully shifted
@@ -309,15 +313,15 @@ module enqueue_register
   ///////////////////////
 
   for (genvar i = 0; i < NumRegBlocks; i++) begin : load_and_shift_register
-    if (i < ClkDiv - MinReqBlocks) begin
+    if (i < ShiftDepth) begin
       assign reg_blocks_d[i] = reg_blocks_q[i + 1];
       `FFL(reg_blocks_q[i], reg_blocks_d[i], allow_shifts, '0, clk_i, rst_ni)
     end else begin
       if (i == NumRegBlocks - 1) begin
         // The first register block has no other register block to read the data from when in shift mode.
-        assign reg_blocks_d[i] = (valid_data_into_reg) ? data_with_ctrl_bits[i - ClkDiv + MinReqBlocks] : '0;
+        assign reg_blocks_d[i] = (valid_data_into_reg) ? data_with_ctrl_bits[i - ShiftDepth] : '0;
       end else begin
-        assign reg_blocks_d[i] = (valid_data_into_reg) ? data_with_ctrl_bits[i - ClkDiv + MinReqBlocks] : reg_blocks_q[i + 1];
+        assign reg_blocks_d[i] = (valid_data_into_reg) ? data_with_ctrl_bits[i - ShiftDepth] : reg_blocks_q[i + 1];
       end
       `FFL(reg_blocks_q[i], reg_blocks_d[i], (valid_data_into_reg | allow_shifts), '0, clk_i, rst_ni)
     end
