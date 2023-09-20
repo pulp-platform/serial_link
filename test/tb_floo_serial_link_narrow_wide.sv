@@ -223,7 +223,7 @@ module tb_floo_serial_link_narrow_wide();
     .NumChannels       ( NumChannels       ),
     .NumLanes          ( NumLanes          ),
     .MaxClkDiv         ( MaxClkDiv         ),
-    .printFeedback     ( 1'b1              )
+    .PrintFeedback     ( 1'b1              )
   ) i_serial_link_0 (
     .clk_i         ( clk_1                 ),
     .rst_ni        ( rst_1_n               ),

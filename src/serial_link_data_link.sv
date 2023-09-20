@@ -15,7 +15,8 @@ import serial_link_pkg::*;
 #(
   parameter type axis_req_t      = logic,
   parameter type axis_rsp_t      = logic,
-  // The type of the payload sent via data channel of the axis. Must not be a multiple of entire bytes.
+  // The type of the payload sent via data channel of the axis.
+  // Must not be a multiple of entire bytes.
   parameter type payload_t       = logic,
   parameter type phy_data_t      = serial_link_pkg::phy_data_t,
   parameter int  NumChannels     = serial_link_pkg::NumChannels,
@@ -88,10 +89,10 @@ import serial_link_pkg::*;
   // TODO: fetch the correct clock divider ...
   localparam int  ClockDiv     = 8;
   // The width of phy_data_chan_t corresponds to the BandWidth
-  localparam int  input_size   = $bits(phy_data_chan_t);
+  localparam int  InputSize    = $bits(phy_data_chan_t);
   // Find blocksize when input-data is split into ClockDiv number of equi-sized blocks.
-  localparam int  block_size   = (input_size + ClockDiv  - 1) / ClockDiv;
-  localparam type data_block_t = logic [block_size-1:0];
+  localparam int  BlockSize    = (InputSize + ClockDiv  - 1) / ClockDiv;
+  localparam type data_block_t = logic [BlockSize-1:0];
 
   localparam int NumStrbBitsIncoming = $bits(axis_in_req_i.t.strb);
   typedef  logic [NumStrbBitsIncoming-1:0] axis_strb_bits_t;
@@ -116,10 +117,12 @@ import serial_link_pkg::*;
     logic is_credits_only;
   } data_hdr_info_t;
 
-  // The width used to transfer all the data contained in one axis-packet (so far data, user & strb bits are supported)
+  // The width used to transfer all the data contained in one axis-packet
+  // (so far data, user & strb bits are supported)
   localparam int MaxNumOfBitsToBeTransfered = $bits(axis_packet_t) + $bits(data_hdr_info_t);
 
-  // If PackMultipleMsg is enabled, but the physical link is too narrow, I may disable the parameter automatically.
+  // If PackMultipleMsg is enabled, but the physical link is too narrow, I may disable the
+  // parameter automatically.
   localparam bit PackSmallerMsgIntoSingleTransfer = (PackMultipleMsg) ? ($bits(data_block_t)>$bits(data_hdr_info_t)) : 0;
   localparam int BlockCount = (PackSmallerMsgIntoSingleTransfer) ? ClockDiv : 0;
 
@@ -137,9 +140,10 @@ import serial_link_pkg::*;
   // Software: Print warning if parameter value had to be changed.
   initial begin
     if (PackMultipleMsg & ($bits(data_block_t)<=$bits(data_hdr_info_t))) begin
-      $display("INFO: WARNING: PackMultipleMsg was enabled, but got disabled due to the dimensions of the physical link.");
+      $display("INFO: WARNING: PackMultipleMsg was enabled, but got disabled due to the dimensions\
+ of the physical link.");
     end
-    $display("INFO: PackSmallerMsgIntoSingleTransfer = %0d (%m)", PackSmallerMsgIntoSingleTransfer);
+    $display("INFO: PackSmallerMsgIntoSingleTransfer=%0d (%m)", PackSmallerMsgIntoSingleTransfer);
     // $error("Simulation was terminated by debug code section in %m");
     // $stop();
   end
@@ -151,7 +155,8 @@ import serial_link_pkg::*;
   axis_req_t axis_out_req_unfiltered;
   axis_rsp_t axis_out_rsp_unfiltered;
 
-  // credit-based-flow-control related signals (The axis user-bits are now also packed and transfered)
+  // credit-based-flow-control related signals
+  // (The axis user-bits are now also packed and transfered)
   axis_packet_t axis_packet_out;
   aligned_axis_t axis_packet_in_synch_out, axis_packet_in_synch_in, axis_packet_in_enqueue_out;
   logic axis_in_req_tvalid_afterFlowControl;
@@ -161,13 +166,15 @@ import serial_link_pkg::*;
   credit_t credits_incoming;
 
   logic [MaxPossibleTransferSplits-1:0] recv_reg_in_valid, recv_reg_in_ready;
-  logic [MaxPossibleTransferSplits-1:0] recv_reg_out_valid, recv_reg_out_ready, recv_reg_contains_data;
+  logic [MaxPossibleTransferSplits-1:0] recv_reg_out_valid, recv_reg_out_ready;
+  logic [MaxPossibleTransferSplits-1:0] recv_reg_contains_data;
   // The block-control-bits are removed from dequeue_shift_registers output (thus -ClockDiv).
   logic [MaxPossibleTransferSplits-1:0][NumChannels*NumLanes*2-1-BlockCount:0] recv_reg_data;
   logic [$clog2(MaxPossibleTransferSplits)-1:0] recv_reg_index_q, recv_reg_index_d;
 
   link_state_e link_state_q, link_state_d;
-  logic [$clog2(MaxPossibleTransferSplits*NumChannels*NumLanes*2):0] link_out_index_q, link_out_index_d;
+  logic [$clog2(MaxPossibleTransferSplits*NumChannels*NumLanes*2):0] link_out_index_q;
+  logic [$clog2(MaxPossibleTransferSplits*NumChannels*NumLanes*2):0] link_out_index_d;
 
   logic raw_mode_fifo_full, raw_mode_fifo_empty;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
@@ -306,8 +313,8 @@ import serial_link_pkg::*;
   //////////////////
 
   // wrapped_output_data stream.
-  localparam int transfer_data_width = $bits({axis_packet_in_synch_out, send_hdr});
-  logic [transfer_data_width-1:0] wrapped_output_data;
+  localparam int TransferDataWidth = $bits({axis_packet_in_synch_out, send_hdr});
+  logic [TransferDataWidth-1:0] wrapped_output_data;
   assign wrapped_output_data = {axis_packet_in_synch_out, send_hdr};
 
   // logic for splitting and transfering the wrapped_output_data stream.
@@ -460,15 +467,15 @@ import serial_link_pkg::*;
   for (genvar i = 0; i < MaxPossibleTransferSplits; i++) begin : gen_recv_reg
 
     if (PackSmallerMsgIntoSingleTransfer) begin : gen_recv_reg_type
-      assign last_blocks[i] = (i<MaxPossibleTransferSplits-1) ? recv_reg_data[i+1] : '0;
-      localparam bit use_hdr = (i==0) ? 1 : 0;
+      assign last_blocks[i]  = (i<MaxPossibleTransferSplits-1) ? recv_reg_data[i+1] : '0;
+      localparam bit UseHdr  = (i==0) ? 1 : 0;
       assign shift_enable[i] = (i==0) ? 1 : shifts_allowed[i-1];
 
       dequeue_shift_register #(
         .data_block_t ( data_block_t    ),
         .data_i_t     ( phy_data_chan_t ),
         .header_t     ( data_hdr_info_t ),
-        .UseHeader    ( use_hdr         ),
+        .UseHeader    ( UseHdr          ),
         .UseShiftedBlockBit ( 1'b1      )
       ) i_recv_reg (
         .clk_i        ( clk_i                      ),
@@ -565,13 +572,15 @@ import serial_link_pkg::*;
       if (flow_control_fifo_valid_out & recv_reg_in_ready[recv_reg_index_q]) begin
         recv_reg_in_valid[recv_reg_index_q] = 1'b1;
         flow_control_fifo_ready_out = 1'b1;
-        // Increment recv reg counter (if I have a valid handshake at the output, consuming the data in the stream_registers, while
-        // a new packet is being shifted in, the new header is accessible from the pre_received_hdr and not from the received_hdr)
+        // Increment recv reg counter (if I have a valid handshake at the output, consuming the
+        // data in the stream_registers, while a new packet is being shifted in, the new header is
+        // accessible from the pre_received_hdr and not from the received_hdr)
         if (recv_reg_out_valid[0] & !(axis_out_rsp_unfiltered.tready & axis_out_req_unfiltered.tvalid)) begin
           // The header info is received and savely stored in the first stream_register
           recv_reg_index_d = (recv_reg_index_q == received_hdr.req_num_splits - 1) ? 0 : recv_reg_index_q + 1;
         end else begin
-          // The valid header info has not yet passed to the register and is only available in the pre_register stage
+          // The valid header info has not yet passed to the register and is only available in the
+          // pre_register stage
           recv_reg_index_d = (recv_reg_index_q == pre_received_hdr.req_num_splits - 1) ? 0 : recv_reg_index_q + 1;
         end
       end
@@ -589,9 +598,9 @@ import serial_link_pkg::*;
   // Bandwidth must be large enough to support the packet-header
   // to be sent in the first split of a physical transfer.
   `ASSERT_INIT(BandWidthTooSmall, BandWidth >= $bits(data_hdr_info_t))
-  // It is assumed that no valid data can be inputed with a zero strobe (when AllowVarAxisLen is enabled).
-  // Should this feature be desired, the port empty_o of the instance i_leading_zero_counter should be
-  // utilized to declare what ought to happen in this case.
+  // It is assumed that no valid data can be inputed with a zero strobe (when AllowVarAxisLen
+  // is enabled). Should this feature be desired, the port empty_o of the instance
+  // i_leading_zero_counter should be utilized to declare what ought to happen in this case.
   `ASSERT(ZeroStrobe, !(AllowVarAxisLen & axis_in_req_i.t.strb == '0 & axis_in_req_i.tvalid & axis_in_rsp_o.tready))
 
 endmodule

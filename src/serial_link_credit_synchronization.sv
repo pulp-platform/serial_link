@@ -9,7 +9,7 @@ module serial_link_credit_synchronization #(
   // declare eighter the data_t type or alternatively assign the data-width directly. In the
   // latter case the type will not be considered.
   parameter  type  data_t            = logic,
-  parameter  int   data_width        = $bits(data_t),
+  parameter  int   DataWidth         = $bits(data_t),
   // For credit-based control flow
   parameter  int   NumCredits        = -1,
   // Force send out credits belonging to the other side
@@ -37,56 +37,56 @@ module serial_link_credit_synchronization #(
   localparam type credit_decrem_t = logic[$clog2(MaxCredPerPktOut+1)-1:0]
 ) (
   // clock signal
-  input  logic                  clk_i,
+  input  logic                 clk_i,
   // reset on low
-  input  logic                  rst_ni,
+  input  logic                 rst_ni,
   // When receive_cred_i is driven to 1, the internal counter value (available credits) is
   // incremented by the amount signaled by credits_received_i. The port is therewith used to
   // receive credits which are being returned from the other sides credit_synchronization (via
   // credits_to_send_o).
-  input  credit_t               credits_received_i,
+  input  credit_t              credits_received_i,
   // Whenever the local input buffer-fifo-queue releases an element, the amount of credits that
   // can be returned to the opposite credit counter module can be incremented. The resulting number
   // of credits is outputed via credits_to_send_o. For further infos see the description of the
   // buffer_queue_out_*_i ports.
-  output credit_t               credits_to_send_o,
+  output credit_t              credits_to_send_o,
   // Data which should be sent to the receiver side.
-  input  logic [data_width-1:0] data_to_send_i,
+  input  logic [DataWidth-1:0] data_to_send_i,
   // Data being sent to the receiver. In case of a force-send credit scenario the control logic of
   // this module may disconnect from the incoming data-stream and tie this value to zero instead.
   // The credits_only_packet_o signal below contains information on the type of data-packet
   // (valid-data packet or credits-only packet without valid data.)
-  output logic [data_width-1:0] data_to_send_o,
+  output logic [DataWidth-1:0] data_to_send_o,
   // The valid signal indicating if the data received on data_to_send_i is valid.
-  input  logic                  send_valid_i,
+  input  logic                 send_valid_i,
   // Connect to the data source feeding data_to_send_i to signal that new data can be received.
-  output logic                  send_ready_o,
+  output logic                 send_ready_o,
   // This signal indicates if the queue (to be provided externally & should be able to buffer
   // NumCredits amount of data) has valid data to be released. A handshake with
   // buffer_queue_out_rdy_i indicates that a data element has been released and new space is
   // available in the fifo-queue.
-  input  logic                  buffer_queue_out_val_i,
+  input  logic                 buffer_queue_out_val_i,
   // The ready signal of the data sink, signaling to the queue that data can be consumed.
   // Works in combination with buffer_queue_out_val_i, acting as handshaking signals.
-  input  logic                  buffer_queue_out_rdy_i,
+  input  logic                 buffer_queue_out_rdy_i,
   // indicates if the number of credits provided via credits_received_i port can be restored
   // and added to available credits.
-  input  logic                  receive_cred_i,
+  input  logic                 receive_cred_i,
   // Asserted if the data_to_send_o port contains valid data. Alternatively, credits-only
   // packets (credits_only_packet_o will be driven to high) might override this value and
   // set the port to valid, even when no valid input data is available.
-  output logic                  send_valid_o,
+  output logic                 send_valid_o,
   // Signal coming from the receiver indicating whether or not the receiver is ready to receive
   // data.
-  input  logic                  send_ready_i,
+  input  logic                 send_ready_i,
   // This port is usually assigned to 1. If the parameter MaxCredPerPktOut is assigned a value
   // larger than 1, however, the pin can signal how many credits are required in order to buffer
   // the outgoing message. This feature is originally intended to be used in the
   // serial_link_data_link to support a more efficient use of credits for variable message sizes.
-  input  credit_decrem_t        req_cred_to_buffer_msg,
+  input  credit_decrem_t       req_cred_to_buffer_msg,
   // If a credits only packet is being sent, this value is driven to high. This value might be
   // wrapped into the data-stream to indicate if valid data is contained.
-  output logic                  credits_only_packet_o,
+  output logic                 credits_only_packet_o,
   // This input can be tied to 1 should it not be required.
   // Intended to specify if the credits_to_send_o port can be forwarded. If the input is set to
   // zero, the credits_to_send_o port can still update its value, but in case of a valid
@@ -94,13 +94,13 @@ module serial_link_credit_synchronization #(
   // be used if multiple channels are to be arbitrated and send over a virtual channel. In this
   // case, it allows decoupling of the selected channel data and the credits to be sent. For
   // example: I might forward the data of channel 1, but sent the credits info of channel 2.
-  input logic                   allow_cred_consume_i,
+  input logic                  allow_cred_consume_i,
   // This pin can be used in combination with the above pin. While the previous input blocks
   // credits_to_send_o to be consumed in case of a valid data output handshake, this pin
   // (consume_cred_to_send_i) can force the consumption of the credits. This allows the credits
   // to be consumed, eventhough the data at data_to_send_o is not forwarded (and not handshake
   // between send_valid_o & send_ready_i occurs).
-  input logic                   consume_cred_to_send_i
+  input logic                  consume_cred_to_send_i
 );
 
   import serial_link_pkg::*;
@@ -126,7 +126,7 @@ module serial_link_credit_synchronization #(
   logic return_credits;
 
   logic send_ready_out, send_valid_in;
-  logic [data_width-1:0] data_to_send_in;
+  logic [DataWidth-1:0] data_to_send_in;
 
   assign send_ready_out        = send_ready_i & send_normal_packet_q & send_valid_o;
   assign credits_to_send_o     = credits_to_send_q;
@@ -139,7 +139,7 @@ module serial_link_credit_synchronization #(
 
   if (IsolateIO) begin : IO_isolation
     stream_register #(
-      .T          ( logic [data_width-1:0] )
+      .T          ( logic [DataWidth-1:0] )
     ) i_IO_isolate (
       .clk_i      ( clk_i           ),
       .rst_ni     ( rst_ni          ),
@@ -295,7 +295,8 @@ module serial_link_credit_synchronization #(
   assign credits_to_send_d = credits_to_send_q + credits_to_send_offset + credits_to_send_increment - credits_to_send_decrement;
 
   always_comb begin : credits_to_send_hidden_counter //=> complements prev counter: if send_valid_o
-    // When the buffer queue releases one element, I can increment the amount of credits to be returned by one.
+    // When the buffer queue releases one element,
+    // I can increment the amount of credits to be returned by one.
     credits_to_send_hidden_increment = '0;
     credits_to_send_hidden_decrement = '0;
 
