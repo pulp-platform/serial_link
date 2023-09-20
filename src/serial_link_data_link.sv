@@ -429,22 +429,15 @@ import serial_link_pkg::*;
     end
   end else begin : credit_only_control
     always_comb begin
-      incoming_hdr   = flow_control_fifo_data_out;
       fifo_ready_out = flow_control_fifo_ready_out;
       cred_count_for_cred_only    = 0;
       credit_only_packet_incoming = 0;
       flow_control_fifo_valid_out = fifo_valid_out;
-
-      if (recv_reg_index_q == 0 & fifo_valid_out & fifo_ready_out) begin
-        credit_only_packet_incoming = incoming_hdr.is_credits_only;
-        cred_count_for_cred_only    = incoming_hdr.amount_of_credits;
-      end
     end
   end
 
   // TODO: where should I place these two line?
-  // TODO: additional condition: it needs to be a real data handshake. If not, the credits have already been consumed and do not need to be consumed again...
-  assign consume_incoming_credits = (credit_only_packet_incoming) ? 1 : (first_hs[0] & axis_out_rsp_i.tready);
+  assign consume_incoming_credits = (credit_only_packet_incoming | first_hs[0]);
   assign credits_incoming = (credit_only_packet_incoming) ? cred_count_for_cred_only : received_hdr.amount_of_credits;
 
   stream_fifo #(
