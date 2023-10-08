@@ -11,7 +11,8 @@ module serial_link_benchmarking_unit #(
   parameter type narrow_axi_rand_master_t = logic,
   parameter type narrow_axi_rand_slave_t = logic,
   parameter type wide_axi_rand_master_t = logic,
-  parameter type wide_axi_rand_slave_t = logic
+  parameter type wide_axi_rand_slave_t = logic,
+  parameter int  DelayTime = 0
 ) (
   output logic[31:0] serial_link_0_number_cycles,
   output logic[31:0] serial_link_0_valid_cycles_to_phys,
@@ -75,6 +76,106 @@ module serial_link_benchmarking_unit #(
   output logic[31:0] lat_38,
   output logic[31:0] lat_39
 );
+
+
+
+  // TMP test
+  int nar_req_1_2_flit_lat  [$];
+  int nar_rsp_1_2_flit_lat  [$];
+  int wide_flit_1_2_latency [$];
+  int num_req_1_2_flits  = 0;
+  int num_rsp_1_2_flits  = 0;
+  int num_wide_1_2_flits = 0;
+  int time_sum_req_1_2   = 0;
+  int time_sum_rsp_1_2   = 0;
+  int time_sum_wide_1_2  = 0;
+
+  int nar_req_2_1_flit_lat  [$];
+  int nar_rsp_2_1_flit_lat  [$];
+  int wide_flit_2_1_latency [$];
+  int num_req_2_1_flits  = 0;
+  int num_rsp_2_1_flits  = 0;
+  int num_wide_2_1_flits = 0;
+  int time_sum_req_2_1   = 0;
+  int time_sum_rsp_2_1   = 0;
+  int time_sum_wide_2_1  = 0;
+
+  int min_lat_req_1_2 = 2147483640;
+  int min_lat_rsp_1_2 = 2147483640;
+  int min_lat_wide_1_2 = 2147483640;
+  int min_lat_req_2_1 = 2147483640;
+  int min_lat_rsp_2_1 = 2147483640;
+  int min_lat_wide_2_1 = 2147483640;
+
+  always_ff @(posedge i_serial_link_0.clk_i) begin : avg_latency_send_1_2
+    if ((i_serial_link_0.narrow_req_i.valid & i_serial_link_0.narrow_req_o.ready)) begin
+      num_req_1_2_flits ++;
+      nar_req_1_2_flit_lat.push_back($time);
+    end
+    if ((i_serial_link_0.narrow_rsp_i.valid & i_serial_link_0.narrow_rsp_o.ready)) begin
+      num_rsp_1_2_flits ++;
+      nar_rsp_1_2_flit_lat.push_back($time);
+    end
+    if ((i_serial_link_0.wide_i.valid & i_serial_link_0.wide_o.ready)) begin
+      num_wide_1_2_flits ++;
+      wide_flit_1_2_latency.push_back($time);
+    end
+  end
+  always_ff @(posedge i_serial_link_1.clk_i) begin : avg_latency_receive_1_2
+    if (i_serial_link_1.narrow_req_o.valid & i_serial_link_1.narrow_req_i.ready) begin
+      automatic int required_time;
+      required_time = $time - nar_req_1_2_flit_lat.pop_front();
+      time_sum_req_1_2 = time_sum_req_1_2 + required_time;
+      if (required_time < min_lat_req_1_2) min_lat_req_1_2 = required_time;
+    end
+    if (i_serial_link_1.narrow_rsp_o.valid & i_serial_link_1.narrow_rsp_i.ready) begin
+      automatic int required_time;
+      required_time = $time - nar_rsp_1_2_flit_lat.pop_front();
+      time_sum_rsp_1_2 = time_sum_rsp_1_2 + required_time;
+      if (required_time < min_lat_rsp_1_2) min_lat_rsp_1_2 = required_time;
+    end
+    if (i_serial_link_1.wide_o.valid & i_serial_link_1.wide_i.ready) begin
+      automatic int required_time;
+      required_time = $time - wide_flit_1_2_latency.pop_front();
+      time_sum_wide_1_2 = time_sum_wide_1_2 + required_time;
+      if (required_time < min_lat_wide_1_2) min_lat_wide_1_2 = required_time;
+    end
+  end
+
+  always_ff @(posedge i_serial_link_1.clk_i) begin : avg_latency_send_2_1
+    if (i_serial_link_1.narrow_req_i.valid & i_serial_link_1.narrow_req_o.ready) begin
+      num_req_2_1_flits ++;
+      nar_req_2_1_flit_lat.push_back($time);
+    end
+    if (i_serial_link_1.narrow_rsp_i.valid & i_serial_link_1.narrow_rsp_o.ready) begin
+      num_rsp_2_1_flits ++;
+      nar_rsp_2_1_flit_lat.push_back($time);
+    end
+    if (i_serial_link_1.wide_i.valid & i_serial_link_1.wide_o.ready) begin
+      num_wide_2_1_flits ++;
+      wide_flit_2_1_latency.push_back($time);
+    end
+  end
+  always_ff @(posedge i_serial_link_0.clk_i) begin : avg_latency_receive_2_1
+    if (i_serial_link_0.narrow_req_o.valid & i_serial_link_0.narrow_req_i.ready) begin
+      automatic int required_time;
+      required_time = $time - nar_req_2_1_flit_lat.pop_front();
+      time_sum_req_2_1 = time_sum_req_2_1 + required_time;
+      if (required_time < min_lat_req_2_1) min_lat_req_2_1 = required_time;
+    end
+    if (i_serial_link_0.narrow_rsp_o.valid & i_serial_link_0.narrow_rsp_i.ready) begin
+      automatic int required_time;
+      required_time = $time - nar_rsp_2_1_flit_lat.pop_front();
+      time_sum_rsp_2_1 = time_sum_rsp_2_1 + required_time;
+      if (required_time < min_lat_rsp_2_1) min_lat_rsp_2_1 = required_time;
+    end
+    if (i_serial_link_0.wide_o.valid & i_serial_link_0.wide_i.ready) begin
+      automatic int required_time;
+      required_time = $time - wide_flit_2_1_latency.pop_front();
+      time_sum_wide_2_1 = time_sum_wide_2_1 + required_time;
+      if (required_time < min_lat_wide_2_1) min_lat_wide_2_1 = required_time;
+    end
+  end
 
   /////////////////////////////////////
   //  min & max latency calculation  //
@@ -475,12 +576,15 @@ module serial_link_benchmarking_unit #(
     $fgets(narrow_req, fd);
     $fgets(narrow_req, fd);
     $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
+    $fgets(narrow_req, fd);
     $fgets(narrow_rsp, fd);
     $fgets(wide, fd);
     $display("settings: latency_of_delay_module;%0d_ns bandwidth_physical_channel;%0d_bits_per_offchip_rising_clockedge number_of_channels;%0d \
 number_of_lanes;%0d max_data_transfer_size;%0d_bits data_link_stream_fifo_depth;%0d !MaxSendThresh_data_link;NumCred-%0d!\
 MaxSendThresh_bridge_narrow_req;%0d!MaxSendThresh_bridge_narrow_rsp;%0d!MaxSendThresh_bridge_wide;%s",
-    i_serial_link_0.i_signal_shifter.delay, i_serial_link_0.i_serial_link_data_link.BandWidth, i_serial_link_0.i_serial_link_data_link.NumChannels,
+    i_serial_link_0.i_signal_shifter.DelayInNs, i_serial_link_0.i_serial_link_data_link.BandWidth, i_serial_link_0.i_serial_link_data_link.NumChannels,
     i_serial_link_0.i_serial_link_data_link.NumLanes, i_serial_link_0.i_serial_link_data_link.MaxNumOfBitsToBeTransfered,
     i_serial_link_0.i_serial_link_data_link.RecvFifoDepth,
     (i_serial_link_0.i_serial_link_data_link.NumCredits - i_serial_link_0.i_serial_link_data_link.ForceSendThresh),

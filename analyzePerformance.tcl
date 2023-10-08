@@ -1,6 +1,6 @@
 #!/usr/bin/tclsh
 # execute this script in serial_link with "tclsh analyzePerformance.tcl"
-# result will be printed out to perfAnalysis.csv
+# result will be printed out to perfAnalysis.csv which can be copy pasted into the template ods file for formatted viewing
 
 # define the desired sweep
 set noc_credits_include_zero 1
@@ -32,7 +32,7 @@ proc print_field_explanation {} {
 proc print_csv_header {performedSteps numTransactionsAvailable} {
 	if {$performedSteps == 0} {
 		# Fetch the configuration of the random_axi_devices (masters/slaves)
-		exec echo -n "results generated per analyzePerformance script (version 1.2) on [exec date]. The latest commit was: " >> perfAnalysis.csv
+		exec echo -n "results generated per analyzePerformance script (version 1.3) on [exec date]. The latest commit was: " >> perfAnalysis.csv
 		exec cat .git/COMMIT_EDITMSG >> perfAnalysis.csv
 		exec echo "---------- random masters/slaves configuration ----------" >> perfAnalysis.csv
 		exec echo -n "narrow_axi_rand_master_t,,AW," >> perfAnalysis.csv
@@ -222,7 +222,8 @@ proc print_csv_header {performedSteps numTransactionsAvailable} {
 		exec echo -n ", " >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 4 | cut -d ";" -f 1 | head -c-1 >> perfAnalysis.csv
 		exec echo -n ", " >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 5 | cut -d ";" -f 1 >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 5 | cut -d ";" -f 1 | head -c-1 >> perfAnalysis.csv
+		exec echo ", #bits: narrow_req, #bits: narrow_rsp, #bits: wide" >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "settings: " | cut -d " " -f 3 | cut -d ";" -f 2 | head -c-1 >> perfAnalysis.csv
 		exec echo -n ", , " >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "settings: " | cut -d " " -f 4 | cut -d ";" -f 2 | head -c-1 >> perfAnalysis.csv
@@ -252,10 +253,17 @@ proc print_csv_header {performedSteps numTransactionsAvailable} {
 		exec echo -n ", " >> perfAnalysis.csv
 		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 4 | cut -d ";" -f 2 | cut -d ":" -f 3 | head -c-1 >> perfAnalysis.csv
 		exec echo -n ", " >> perfAnalysis.csv
-		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 5 | cut -d ";" -f 2 | cut -d ":" -f 3 >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "settings: " | cut -d "!" -f 5 | cut -d ";" -f 2 | cut -d ":" -f 3 | head -c-1 >> perfAnalysis.csv
+
+		exec echo -n ", " >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "INFO: narrow_req.width" | cut -d " " -f 4 | head -c-1 >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "INFO: narrow_rsp.width" | cut -d " " -f 4 | head -c-1 >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec cat perfAnalysis.tmp | grep "INFO: wide.width" | cut -d " " -f 4 >> perfAnalysis.csv
 		print_field_explanation
-		exec echo "---------- start of the simulation ----------,,,,,,,,,,,,,,,,,,,,,,,average latency (rand_master runtime per packet),,,,min and max latency numbers for the narrow channel from side 1 to 2,,,,,,,,,,min and max latency numbers for the narrow channel from side 2 to 1,,,,,,,,,,min and max latency numbers for the wide channel from side 1 to 2,,,,,,,,,,min and max latency numbers for the wide channel from side 2 to 1" >> perfAnalysis.csv
-		exec echo "NumCredits, NumCred_NocBridge, avg_time_per_read/write (lower is better), narrow1 BW (sent/rcv) Mbit/s, narrow2 BW (sent/rcv) Mbit/s, wide1 BW (sent/rcv) Mbit/s, wide2 BW (sent/rcv) Mbit/s, data_link_0: valid_coverage_to_phys, data_link_0: valid_coverage_from_phys, data_link_0: num_cred_only, data_link_0: valid_in_but_not_valid_out, data_link_1: valid_coverage_to_phys, data_link_1: valid_coverage_from_phys, data_link_1: num_cred_only, data_link_1: valid_in_but_not_valid_out, noc_bridge_0: valid_coverage_to_phys, noc_bridge_0: valid_coverage_from_phys, noc_bridge_0: num_cred_only, noc_bridge_0: valid_in_but_not_valid_out, noc_bridge_1: valid_coverage_to_phys, noc_bridge_1: valid_coverage_from_phys, noc_bridge_1: num_cred_only, noc_bridge_1: valid_in_but_not_valid_out,narrow_1 \[ns\],narrow_2 \[ns\],wide_1 \[ns\],wide_2 \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\]" >> perfAnalysis.csv
+		exec echo "---------- start of the simulation ----------,,,,,,,,,,,,,,,,,,,,,,,average serial_link latency,,,,,,minimal serial_link latency,,,,,,average latency (rand_master runtime per packet),,,,min and max latency numbers for the narrow channel from side 1 to 2,,,,,,,,,,min and max latency numbers for the narrow channel from side 2 to 1,,,,,,,,,,min and max latency numbers for the wide channel from side 1 to 2,,,,,,,,,,min and max latency numbers for the wide channel from side 2 to 1" >> perfAnalysis.csv
+		exec echo "NumCredits, NumCred_NocBridge, avg_time_per_read/write (lower is better), narrow1 BW (sent/rcv) Mbit/s, narrow2 BW (sent/rcv) Mbit/s, wide1 BW (sent/rcv) Mbit/s, wide2 BW (sent/rcv) Mbit/s, data_link_0: valid_coverage_to_phys, data_link_0: valid_coverage_from_phys, data_link_0: num_cred_only, data_link_0: valid_in_but_not_valid_out, data_link_1: valid_coverage_to_phys, data_link_1: valid_coverage_from_phys, data_link_1: num_cred_only, data_link_1: valid_in_but_not_valid_out, noc_bridge_0: valid_coverage_to_phys, noc_bridge_0: valid_coverage_from_phys, noc_bridge_0: num_cred_only, noc_bridge_0: valid_in_but_not_valid_out, noc_bridge_1: valid_coverage_to_phys, noc_bridge_1: valid_coverage_from_phys, noc_bridge_1: num_cred_only, noc_bridge_1: valid_in_but_not_valid_out,nar_req_12,nar_rsp_12,wide_12,nar_req_21,nar_rsp_21,wide_21,nar_req_12,nar_rsp_12,wide_12,nar_req_21,nar_rsp_21,wide_21,narrow_1 \[ns\],narrow_2 \[ns\],wide_1 \[ns\],wide_2 \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\]" >> perfAnalysis.csv
 	}
 }
 
@@ -330,6 +338,33 @@ proc results_collector {} {
 		exec echo -n ",N/A,N/A,N/A,N/A" >> perfAnalysis.csv
 	}
 	if {[exec cat perfAnalysis.tmp | grep -e "benchmarking: Performance Rating (lower is better): " -e "INFO: narrow_rand_master_1 finished" | wc -l] == "2"} {
+		# serial link latency (avg)
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: narrow_req_avg_1_2 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: narrow_rsp_avg_1_2 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: wide_avg_1_2 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: narrow_req_avg_2_1 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: narrow_rsp_avg_2_1 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: wide_avg_2_1 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		# serial link latency (min)
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: narrow_req_min_1_2 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: narrow_rsp_min_1_2 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: wide_min_1_2 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: narrow_req_min_2_1 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: narrow_rsp_min_2_1 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		exec echo -n ", " >> perfAnalysis.csv
+		exec echo -n [exec cat perfAnalysis.tmp | grep "LATENCY: wide_min_2_1 " | cut -d " " -f 4 | head -c-1] >> perfAnalysis.csv
+		# avg. axi latency
 		exec echo -n ", " >> perfAnalysis.csv
 		set narrow_1_finish [exec cat perfAnalysis.tmp | grep "INFO: narrow_rand_master_1 finished (time = " | cut -d " " -f 7 | head -c-1]
 		exec echo -n [expr $narrow_1_finish / 100] >> perfAnalysis.csv

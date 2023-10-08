@@ -9,7 +9,7 @@ package noc_bridge_narrow_wide_pkg;
 
   // With this parameter you can set the maximal credit count for the NoC bridge. If set to 0, the NoC-bridge without
   // virtualization will be used instead.
-  localparam int NumCred_NocBridge = 20;
+  localparam int NumCred_NocBridge = 10;
 
   // new parameters to allow for variable number of credits for the individual channels in the virtual channel noc_bridge verison
   localparam int NumCred_NocBridge_narrow_req = NumCred_NocBridge;
@@ -69,6 +69,12 @@ package noc_bridge_narrow_wide_pkg;
     channel_hdr_e credits_hdr;
     bridge_credit_t credits;
   } user_bits_t;
+
+  // Data bits utilized in the AXIS interface
+  typedef struct packed {
+    channel_hdr_e data_hdr;
+    narrow_flit_data_t data;
+  } narrow_data_bits_t;
 
   // Data bits utilized in the AXIS interface
   typedef struct packed {

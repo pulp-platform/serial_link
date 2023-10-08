@@ -342,10 +342,10 @@ module floo_serial_link_narrow_wide
   `endif
   `ifndef performSynthesis
     insert_latency_to_signal #(
-      .data_width  ( (NumChannels*NumLanes) + NumChannels ),
-      .delay       ( 5  ),
-      .use_default ( 1  ),
-      .default_val ( '1 )
+      .DataWidth    ( (NumChannels*NumLanes) + NumChannels ),
+      .DelayInNs    ( i_benchmarking.DelayTime ),
+      .UseDefault   ( 1   ),
+      .DefaultValue ( '1  )
     ) i_signal_shifter (
       .signal_i ( {ddr_i, ddr_rcv_clk_i}             ),
       .signal_o ( {ddr_delayed, ddr_rcv_clk_delayed} )
