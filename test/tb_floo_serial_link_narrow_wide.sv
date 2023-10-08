@@ -29,14 +29,35 @@ module tb_floo_serial_link_narrow_wide();
   localparam int unsigned NumChannels     = serial_link_pkg::NumChannels;
   localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;
 
-  localparam time         TckSys1         = 50ns;
-  localparam time         TckSys2         = 54ns;
-  localparam time         TckReg          = 200ns;
+  localparam time         TckSys1         = 1ns;
+  localparam time         TckSys2         = 1ns;
+  localparam time         TckReg          = 4ns;
   localparam int unsigned RstClkCyclesSys = 1;
 
   // Random-master/slave behaviour (randomized delays)
-  localparam int          MinWaitCycles   = 0;
-  localparam int          MaxWaitCycles   = 0;
+  localparam int MasterMinWaitCycles  = 10;
+  localparam int MasterMaxWaitCycles  = 30;
+  localparam int SlaveMinWaitCycles   = 0;
+  localparam int SlaveMaxWaitCycles   = 0;
+
+  // delay time
+  localparam int DelayTime = 1;
+
+  // localparam int NarrowOutstandingTRX = 4;
+  // localparam int WideOutstandingTRX   = 32;
+  localparam int NarrowOutstandingTRX = 1000;
+  localparam int WideOutstandingTRX   = 1000;
+
+  // By default perform Testduration Reads & Writes (to disable a master,
+  // assign its read and write count to zero)
+  int NumWrites_narrow_1  = TestDuration;
+  int NumReads_narrow_1   = TestDuration;
+  int NumWrites_narrow_2  = TestDuration;
+  int NumReads_narrow_2   = TestDuration;
+  int NumWrites_wide_1    = TestDuration;
+  int NumReads_wide_1     = TestDuration;
+  int NumWrites_wide_2    = TestDuration;
+  int NumReads_wide_2     = TestDuration;
 
   localparam int unsigned RegAddrWidth    = 32;
   localparam int unsigned RegDataWidth    = 32;
@@ -398,26 +419,26 @@ module tb_floo_serial_link_narrow_wide();
 
   // narrow master type
   typedef axi_test_mod::axi_rand_master #(
-    .AW                   ( NarrowInAddrWidth ),
-    .DW                   ( NarrowInDataWidth ),
-    .IW                   ( NarrowInIdWidth   ),
-    .UW                   ( NarrowInUserWidth ),
-    .TA                   ( 100ps             ),
-    .TT                   ( 500ps             ),
-    .MAX_READ_TXNS        ( 4                 ),
-    .MAX_WRITE_TXNS       ( 4                 ),
-    .AX_MIN_WAIT_CYCLES   ( MinWaitCycles     ),
-    .AX_MAX_WAIT_CYCLES   ( MaxWaitCycles     ),
-    .W_MIN_WAIT_CYCLES    ( MinWaitCycles     ),
-    .W_MAX_WAIT_CYCLES    ( MaxWaitCycles     ),
-    .RESP_MIN_WAIT_CYCLES ( MinWaitCycles     ),
-    .RESP_MAX_WAIT_CYCLES ( MaxWaitCycles     ),
-    .TRAFFIC_SHAPING      ( 1                 ),
-    .AXI_EXCLS            ( 1'b0              ),
-    .AXI_ATOPS            ( 1'b0              ),
-    .AXI_BURST_FIXED      ( 1'b1              ),
-    .AXI_BURST_INCR       ( 1'b1              ),
-    .AXI_BURST_WRAP       ( 1'b0              )
+    .AW                   ( NarrowInAddrWidth    ),
+    .DW                   ( NarrowInDataWidth    ),
+    .IW                   ( NarrowInIdWidth      ),
+    .UW                   ( NarrowInUserWidth    ),
+    .TA                   ( 100ps                ),
+    .TT                   ( 500ps                ),
+    .MAX_READ_TXNS        ( NarrowOutstandingTRX ),
+    .MAX_WRITE_TXNS       ( NarrowOutstandingTRX ),
+    .AX_MIN_WAIT_CYCLES   ( MasterMinWaitCycles  ),
+    .AX_MAX_WAIT_CYCLES   ( MasterMaxWaitCycles  ),
+    .W_MIN_WAIT_CYCLES    ( MasterMinWaitCycles  ),
+    .W_MAX_WAIT_CYCLES    ( MasterMaxWaitCycles  ),
+    .RESP_MIN_WAIT_CYCLES ( MasterMinWaitCycles  ),
+    .RESP_MAX_WAIT_CYCLES ( MasterMaxWaitCycles  ),
+    .TRAFFIC_SHAPING      ( 1                    ),
+    .AXI_EXCLS            ( 1'b0                 ),
+    .AXI_ATOPS            ( 1'b0                 ),
+    .AXI_BURST_FIXED      ( 1'b1                 ),
+    .AXI_BURST_INCR       ( 1'b1                 ),
+    .AXI_BURST_WRAP       ( 1'b0                 )
   ) narrow_axi_rand_master_t;
 
   // narrow slave type
@@ -429,53 +450,53 @@ module tb_floo_serial_link_narrow_wide();
     .TA                   ( 100ps              ),
     .TT                   ( 500ps              ),
     .RAND_RESP            ( 0                  ),
-    .AX_MIN_WAIT_CYCLES   ( 0                  ),
-    .AX_MAX_WAIT_CYCLES   ( 0                  ),
-    .R_MIN_WAIT_CYCLES    ( 0                  ),
-    .R_MAX_WAIT_CYCLES    ( 0                  ),
-    .RESP_MIN_WAIT_CYCLES ( 0                  ),
-    .RESP_MAX_WAIT_CYCLES ( 0                  )
+    .AX_MIN_WAIT_CYCLES   ( SlaveMinWaitCycles ),
+    .AX_MAX_WAIT_CYCLES   ( SlaveMaxWaitCycles ),
+    .R_MIN_WAIT_CYCLES    ( SlaveMinWaitCycles ),
+    .R_MAX_WAIT_CYCLES    ( SlaveMaxWaitCycles ),
+    .RESP_MIN_WAIT_CYCLES ( SlaveMinWaitCycles ),
+    .RESP_MAX_WAIT_CYCLES ( SlaveMaxWaitCycles )
   ) narrow_axi_rand_slave_t;
 
   // wide master type
   typedef axi_test_mod::axi_rand_master #(
-    .AW                   ( WideInAddrWidth ),
-    .DW                   ( WideInDataWidth ),
-    .IW                   ( WideInIdWidth   ),
-    .UW                   ( WideInUserWidth ),
-    .TA                   ( 100ps           ),
-    .TT                   ( 500ps           ),
-    .MAX_READ_TXNS        ( 32              ),
-    .MAX_WRITE_TXNS       ( 32              ),
-    .AX_MIN_WAIT_CYCLES   ( MinWaitCycles   ),
-    .AX_MAX_WAIT_CYCLES   ( MaxWaitCycles   ),
-    .W_MIN_WAIT_CYCLES    ( MinWaitCycles   ),
-    .W_MAX_WAIT_CYCLES    ( MaxWaitCycles   ),
-    .RESP_MIN_WAIT_CYCLES ( MinWaitCycles   ),
-    .RESP_MAX_WAIT_CYCLES ( MaxWaitCycles   ),
-    .TRAFFIC_SHAPING      ( 1               ),
-    .AXI_EXCLS            ( 1'b0            ),
-    .AXI_ATOPS            ( 1'b0            ),
-    .AXI_BURST_FIXED      ( 1'b1            ),
-    .AXI_BURST_INCR       ( 1'b1            ),
-    .AXI_BURST_WRAP       ( 1'b0            )
+    .AW                   ( WideInAddrWidth     ),
+    .DW                   ( WideInDataWidth     ),
+    .IW                   ( WideInIdWidth       ),
+    .UW                   ( WideInUserWidth     ),
+    .TA                   ( 100ps               ),
+    .TT                   ( 500ps               ),
+    .MAX_READ_TXNS        ( WideOutstandingTRX  ),
+    .MAX_WRITE_TXNS       ( WideOutstandingTRX  ),
+    .AX_MIN_WAIT_CYCLES   ( MasterMinWaitCycles ),
+    .AX_MAX_WAIT_CYCLES   ( MasterMaxWaitCycles ),
+    .W_MIN_WAIT_CYCLES    ( MasterMinWaitCycles ),
+    .W_MAX_WAIT_CYCLES    ( MasterMaxWaitCycles ),
+    .RESP_MIN_WAIT_CYCLES ( MasterMinWaitCycles ),
+    .RESP_MAX_WAIT_CYCLES ( MasterMaxWaitCycles ),
+    .TRAFFIC_SHAPING      ( 1                   ),
+    .AXI_EXCLS            ( 1'b0                ),
+    .AXI_ATOPS            ( 1'b0                ),
+    .AXI_BURST_FIXED      ( 1'b1                ),
+    .AXI_BURST_INCR       ( 1'b1                ),
+    .AXI_BURST_WRAP       ( 1'b0                )
   ) wide_axi_rand_master_t;
 
   // wide slave type
   typedef axi_test_mod::axi_rand_slave #(
-    .AW                   ( WideOutAddrWidth ),
-    .DW                   ( WideOutDataWidth ),
-    .IW                   ( WideOutIdWidth   ),
-    .UW                   ( WideOutUserWidth ),
-    .TA                   ( 100ps            ),
-    .TT                   ( 500ps            ),
-    .RAND_RESP            ( 0                ),
-    .AX_MIN_WAIT_CYCLES   ( 0                ),
-    .AX_MAX_WAIT_CYCLES   ( 0                ),
-    .R_MIN_WAIT_CYCLES    ( 0                ),
-    .R_MAX_WAIT_CYCLES    ( 0                ),
-    .RESP_MIN_WAIT_CYCLES ( 0                ),
-    .RESP_MAX_WAIT_CYCLES ( 0                )
+    .AW                   ( WideOutAddrWidth   ),
+    .DW                   ( WideOutDataWidth   ),
+    .IW                   ( WideOutIdWidth     ),
+    .UW                   ( WideOutUserWidth   ),
+    .TA                   ( 100ps              ),
+    .TT                   ( 500ps              ),
+    .RAND_RESP            ( 0                  ),
+    .AX_MIN_WAIT_CYCLES   ( SlaveMinWaitCycles ),
+    .AX_MAX_WAIT_CYCLES   ( SlaveMaxWaitCycles ),
+    .R_MIN_WAIT_CYCLES    ( SlaveMinWaitCycles ),
+    .R_MAX_WAIT_CYCLES    ( SlaveMaxWaitCycles ),
+    .RESP_MIN_WAIT_CYCLES ( SlaveMinWaitCycles ),
+    .RESP_MAX_WAIT_CYCLES ( SlaveMaxWaitCycles )
   ) wide_axi_rand_slave_t;
 
   // narrow channels
@@ -498,16 +519,6 @@ module tb_floo_serial_link_narrow_wide();
   int time_narrow_2;
   int time_wide_1;
   int time_wide_2;
-
-  // By default perform Testduration Reads & Writes (to disable a master, assign its read and write count to zero)
-  int NumWrites_narrow_1 = TestDuration;
-  int NumReads_narrow_1  = TestDuration;
-  int NumWrites_narrow_2 = TestDuration;
-  int NumReads_narrow_2  = TestDuration;
-  int NumWrites_wide_1   = TestDuration;
-  int NumReads_wide_1    = TestDuration;
-  int NumWrites_wide_2   = TestDuration;
-  int NumReads_wide_2    = TestDuration;
 
   initial begin
     narrow_rand_slave_1.reset();
@@ -542,7 +553,9 @@ module tb_floo_serial_link_narrow_wide();
     end else begin
       $display("INFO: The two sides of the off-chip link do not share the same frequency.");
     end
-    $display("max_possible_bandwidth_physical_link !%0d Mbit/s, %0d Mbit/s",(1000*i_serial_link_0.i_serial_link_data_link.BandWidth)/(TckSys1*8),(1000*i_serial_link_1.i_serial_link_data_link.BandWidth)/(TckSys2*8));
+    $display("max_possible_bandwidth_physical_link !%0d Mbit/s, %0d Mbit/s",
+      (1000*i_serial_link_0.i_serial_link_data_link.BandWidth)/(TckSys1*8),
+      (1000*i_serial_link_1.i_serial_link_data_link.BandWidth)/(TckSys2*8));
     reg_master_1.reset_master();
     reg_master_2.reset_master();
     fork
@@ -560,7 +573,8 @@ module tb_floo_serial_link_narrow_wide();
       @(posedge clk_1);
       if ($time >= StopSimAfter) begin
         $error("Simulation terminated");
-        $display("INFO: Simulation timed out after %1d ns. => You may change the stop time in the tb_floo_serial_link_narrow_wide testbench (localparam).", $time);
+        $display("INFO: Simulation timed out after %1d ns. => You \
+may change the stop time in the tb_floo_serial_link_narrow_wide testbench (localparam).", $time);
         $stop;
       end
     end
@@ -641,7 +655,8 @@ module tb_floo_serial_link_narrow_wide();
       1000 / TckSys2,
       1000 / TckSys2 / 8);
 
-    $display("INFO: narrow_rand_master_2 finished (time = %0d ns)", (end_cycle_narrow2 - start_cycle_narrow2));
+    $display("INFO: narrow_rand_master_2 finished (time = %0d ns)",
+      (end_cycle_narrow2 - start_cycle_narrow2));
     time_narrow_2 = (end_cycle_narrow2 - start_cycle_narrow2);
     mst_done[1] = 1;
   end
@@ -678,7 +693,8 @@ module tb_floo_serial_link_narrow_wide();
       data_received_wide * 1000 / (end_cycle_wide - start_cycle_wide),
       1000 / TckSys1,
       1000 / TckSys1 / 8);
-    $display("INFO: wide_rand_master_1 finished (time = %0d ns)", (end_cycle_wide - start_cycle_wide));
+    $display("INFO: wide_rand_master_1 finished (time = %0d ns)",
+      (end_cycle_wide - start_cycle_wide));
     time_wide_1 = (end_cycle_wide - start_cycle_wide);
     mst_done[2] = 1;
   end
@@ -715,7 +731,8 @@ module tb_floo_serial_link_narrow_wide();
       data_received_wide2 * 1000 / (end_cycle_wide2 - start_cycle_wide2),
       1000 / TckSys2,
       1000 / TckSys2 / 8);
-    $display("INFO: wide_rand_master_2 finished (time = %0d ns)", (end_cycle_wide2 - start_cycle_wide2));
+    $display("INFO: wide_rand_master_2 finished (time = %0d ns)",
+      (end_cycle_wide2 - start_cycle_wide2));
     time_wide_2 = (end_cycle_wide2 - start_cycle_wide2);
     mst_done[3] = 1;
   end
@@ -827,7 +844,8 @@ module tb_floo_serial_link_narrow_wide();
     .narrow_axi_rand_master_t ( narrow_axi_rand_master_t ),
     .narrow_axi_rand_slave_t  ( narrow_axi_rand_slave_t  ),
     .wide_axi_rand_master_t   ( wide_axi_rand_master_t   ),
-    .wide_axi_rand_slave_t    ( wide_axi_rand_slave_t    )
+    .wide_axi_rand_slave_t    ( wide_axi_rand_slave_t    ),
+    .DelayTime                ( DelayTime                )
   ) i_benchmarking (
     .serial_link_0_valid_cycles_from_phys   ( serial_link_0_valid_cycles_from_phys   ),
     .serial_link_0_number_cycles            ( serial_link_0_number_cycles            ),
@@ -921,34 +939,82 @@ module tb_floo_serial_link_narrow_wide();
     end
     $display("[SYS] Simulation Stopped (%d ns)", $time);
     // benchmarking simulation results printout
-    $display("latency_array: %0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d",
+    $display("latency_array: %0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,\
+%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d",
       lat_0, lat_1, lat_2, lat_3, lat_4, lat_5, lat_6, lat_7, lat_8, lat_9,
       lat_10, lat_11, lat_12, lat_13, lat_14, lat_15, lat_16, lat_17, lat_18, lat_19,
       lat_20, lat_21, lat_22, lat_23, lat_24, lat_25, lat_26, lat_27, lat_28, lat_29,
       lat_30, lat_31, lat_32, lat_33, lat_34, lat_35, lat_36, lat_37, lat_38, lat_39);
-    $display("numberOfTransactions: %0d %0d %0d %0d %0d %0d %0d %0d",NumWrites_narrow_1,NumReads_narrow_1,NumWrites_narrow_2,NumReads_narrow_2,NumWrites_wide_1,NumReads_wide_1,NumWrites_wide_2,NumReads_wide_2);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.benchmarking_attempts ||| \
-valid_coverage_to_phys %3.2f%%, valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d",
+    $display("numberOfTransactions: %0d %0d %0d %0d %0d %0d %0d %0d",NumWrites_narrow_1,
+      NumReads_narrow_1,NumWrites_narrow_2,NumReads_narrow_2,NumWrites_wide_1,NumReads_wide_1,
+      NumWrites_wide_2,NumReads_wide_2);
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.benchmarking_attempts \
+||| valid_coverage_to_phys %3.2f%%, valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d",
       100*serial_link_0_valid_cycles_to_phys/(1.0*serial_link_0_number_cycles),
-      100*serial_link_0_valid_cycles_from_phys/(1.0*serial_link_0_number_cycles), serial_link_0_number_cycles, serial_link_0_valid_cycles_to_phys,
+      100*serial_link_0_valid_cycles_from_phys/(1.0*serial_link_0_number_cycles),
+      serial_link_0_number_cycles, serial_link_0_valid_cycles_to_phys,
       serial_link_0_valid_cycles_from_phys);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.num_cred_only ||| cred_only_packets_sent(...and_others) %0d,%0d",
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.num_cred_only \
+||| cred_only_packets_sent(...and_others) %0d,%0d",
       data_link_0_num_cred_only_pack_sent, data_link_0_sum_stalled_cyc_cred_cntrs);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.noc_bridge_benchmarking ||| %3.2f%% %3.2f%% %0d %0d",
-      100*network_0_valid_cycles_to_phys/(1.0*network_0_number_cycles), 100*network_0_valid_cycles_from_phys/(1.0*network_0_number_cycles),
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_0.noc_bridge_benchmarking \
+||| %3.2f%% %3.2f%% %0d %0d",100*network_0_valid_cycles_to_phys/(1.0*network_0_number_cycles),
+      100*network_0_valid_cycles_from_phys/(1.0*network_0_number_cycles),
       network_0_num_cred_only_pack_sent, network_0_sum_stalled_cyc_cred_cntrs);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.benchmarking_attempts ||| valid_coverage_to_phys %3.2f%%, \
-valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d", 100*serial_link_1_valid_cycles_to_phys/(1.0*serial_link_1_number_cycles),
-      100*serial_link_1_valid_cycles_from_phys/(1.0*serial_link_1_number_cycles), serial_link_1_number_cycles, serial_link_1_valid_cycles_to_phys,
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.benchmarking_attempts \
+||| valid_coverage_to_phys %3.2f%%, \
+valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d",
+      100*serial_link_1_valid_cycles_to_phys/(1.0*serial_link_1_number_cycles),
+      100*serial_link_1_valid_cycles_from_phys/(1.0*serial_link_1_number_cycles),
+      serial_link_1_number_cycles, serial_link_1_valid_cycles_to_phys,
       serial_link_1_valid_cycles_from_phys);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.num_cred_only ||| cred_only_packets_sent(...and_others) %0d,%0d",
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.num_cred_only \
+||| cred_only_packets_sent(...and_others) %0d,%0d",
       data_link_1_num_cred_only_pack_sent, data_link_1_sum_stalled_cyc_cred_cntrs);
-    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.noc_bridge_benchmarking ||| %3.2f%% %3.2f%% %0d %0d",
-      100*network_1_valid_cycles_to_phys/(1.0*network_1_number_cycles), 100*network_1_valid_cycles_from_phys/(1.0*network_1_number_cycles),
+    $display("benchmarking: tb_floo_serial_link_narrow_wide.i_serial_link_1.noc_bridge_benchmarking \
+||| %3.2f%% %3.2f%% %0d %0d", 100*network_1_valid_cycles_to_phys/(1.0*network_1_number_cycles),
+      100*network_1_valid_cycles_from_phys/(1.0*network_1_number_cycles),
       network_1_num_cred_only_pack_sent, network_1_sum_stalled_cyc_cred_cntrs);
-    $display("benchmarking: additionalMetricsForTheSweepScript ||| %0d %0d", data_link_0_sum_stalled_cyc_cred_cntrs,
-      data_link_1_sum_stalled_cyc_cred_cntrs);
-    $display("benchmarking: Performance Rating (lower is better): %0d (avg)", (time_narrow_1+time_narrow_2+time_wide_1+time_wide_2)/(TestDuration*4));
+    $display("benchmarking: additionalMetricsForTheSweepScript ||| %0d %0d",
+      data_link_0_sum_stalled_cyc_cred_cntrs, data_link_1_sum_stalled_cyc_cred_cntrs);
+    $display("benchmarking: Performance Rating (lower is better): %0d (avg)",
+      (time_narrow_1+time_narrow_2+time_wide_1+time_wide_2)/(TestDuration*4));
+    $display("LATENCY: narrow_req_avg_1_2 %0d (sum: %0d, num_flits: %0d)",
+      i_benchmarking.time_sum_req_1_2/i_benchmarking.num_req_1_2_flits,
+      i_benchmarking.time_sum_req_1_2,  i_benchmarking.num_req_1_2_flits);
+    $display("LATENCY: narrow_rsp_avg_1_2 %0d (sum: %0d, num_flits: %0d)",
+      i_benchmarking.time_sum_rsp_1_2/i_benchmarking.num_rsp_1_2_flits,
+      i_benchmarking.time_sum_rsp_1_2,  i_benchmarking.num_rsp_1_2_flits);
+    $display("LATENCY: wide_avg_1_2 %0d (sum: %0d, num_flits: %0d)",
+      i_benchmarking.time_sum_wide_1_2/i_benchmarking.num_wide_1_2_flits,
+      i_benchmarking.time_sum_wide_1_2,  i_benchmarking.num_wide_1_2_flits);
+    $display("LATENCY: narrow_req_avg_2_1 %0d (sum: %0d, num_flits: %0d)",
+      i_benchmarking.time_sum_req_2_1/i_benchmarking.num_req_2_1_flits,
+      i_benchmarking.time_sum_req_2_1,  i_benchmarking.num_req_2_1_flits);
+    $display("LATENCY: narrow_rsp_avg_2_1 %0d (sum: %0d, num_flits: %0d)",
+      i_benchmarking.time_sum_rsp_2_1/i_benchmarking.num_rsp_2_1_flits,
+      i_benchmarking.time_sum_rsp_2_1,  i_benchmarking.num_rsp_2_1_flits);
+    $display("LATENCY: wide_avg_2_1 %0d (sum: %0d, num_flits: %0d)",
+      i_benchmarking.time_sum_wide_2_1/i_benchmarking.num_wide_2_1_flits,
+      i_benchmarking.time_sum_wide_2_1,  i_benchmarking.num_wide_2_1_flits);
+    $display("LATENCY: narrow_req_min_1_2 %0d", i_benchmarking.min_lat_req_1_2);
+    $display("LATENCY: narrow_rsp_min_1_2 %0d", i_benchmarking.min_lat_rsp_1_2);
+    $display("LATENCY: wide_min_1_2 %0d", i_benchmarking.min_lat_wide_1_2);
+    $display("LATENCY: narrow_req_min_2_1 %0d", i_benchmarking.min_lat_req_2_1);
+    $display("LATENCY: narrow_rsp_min_2_1 %0d", i_benchmarking.min_lat_rsp_2_1);
+    $display("LATENCY: wide_min_2_1 %0d", i_benchmarking.min_lat_wide_2_1);
+
+    $display("INFO: narrow_req.width: %0d",$bits(narrow_flit_req_in_2.data) + 2 +
+      $bits(user_bits_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
+    $display("INFO: narrow_rsp.width: %0d",$bits(narrow_flit_rsp_in_2.data) + 2 +
+      $bits(user_bits_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
+    $display("INFO: wide.width: %0d",$bits(wide_flit_out_1.data) + 2 +
+      $bits(user_bits_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
+    // $display("INFO: AXIS-size of user_bits_t: %0d",$bits(user_bits_t));
+    // $display("INFO: AXIS-size of narrow_data_bits_t: %0d",$bits(narrow_data_bits_t));
+    // $display("INFO: AXIS-size of data_bits_t: %0d",$bits(data_bits_t));
+    // $display("INFO: AXIS-size of axis_packet_t: %0d",$bits(axis_packet_t));
+    // $display("INFO: AXIS-size of narrow_axis_packet_t: %0d",$bits(narrow_axis_packet_t));
     $stop();
   endtask
 

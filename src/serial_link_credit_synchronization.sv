@@ -30,7 +30,8 @@ module serial_link_credit_synchronization #(
   // send_valid_o is HIGH, the below parameter might be set to 1, which will disable the internal
   // shadow_counter.
   parameter  logic DontUseShadowCtnr = 0,
-  // TODO: description
+  // If this parameter is enabled, a stream_register is inserted at the input of this module.
+  // This can be useful to decouple existing IO paths between the handshake signals.
   parameter  logic IsolateIO         = 0,
 
   // dependant parameter: Do not change!
@@ -181,7 +182,6 @@ module serial_link_credit_synchronization #(
       ((credits_available_q > CredOnlyConsCred) ||
       (credits_available_q == CredOnlyConsCred && return_credits))) begin
       // cannot send data (despite valid input data), but can send credits_only
-      // TODO: old version I had a static assignment to 1...
       cannot_send_data_but_credits_only = send_valid_in;
     end
   end
@@ -189,8 +189,12 @@ module serial_link_credit_synchronization #(
   // select if input-data can be forwarded, or if a credits_only packet sould be sent instead.
   always_comb begin : packet_source_selection
     send_normal_packet_d = send_normal_packet_q;
-    // TODO: explain why I added the send_valid_o condition...
-    if ((~send_valid_in | cannot_send_data_but_credits_only) & force_send_credits & ~send_valid_o) begin
+    // NOTE: The second line of the condition makes sure that the credit only mode is only
+    // entered if the threshold for credit only packets is overstepped and no valid output data
+    // is available at the moment. If the ~send_valid_o is not added, it can happen that the
+    // credit only mode is not exited correctly.
+    if ((~send_valid_in | cannot_send_data_but_credits_only) &
+        force_send_credits & ~send_valid_o) begin
       // When I don't have valid data at the input and I overstepped the ForceSendThreshold, I
       // switch to the credits_only mode.
       // EXCEPTION: When there is valid data at the input and I have force_send_credits=1, but I
@@ -221,7 +225,9 @@ module serial_link_credit_synchronization #(
     // => force the output valid signal to zero if no credits are available or I want to prevent
     // the deadlock situation from above
     send_valid_o = '0;
-    if ((credits_available_q > req_credits_for_output_msg) || (credits_available_q == req_credits_for_output_msg && credits_to_send_q > 0 && allow_cred_consume_i)) begin
+    if ((credits_available_q > req_credits_for_output_msg) ||
+        (credits_available_q == req_credits_for_output_msg &&
+        credits_to_send_q > 0 && allow_cred_consume_i)) begin
       send_valid_o = (send_valid_in | credits_only_packet_o);
     end
   end
@@ -255,7 +261,8 @@ module serial_link_credit_synchronization #(
     end
   end
 
-  assign credits_available_d = credits_available_q + credits_available_increment - credits_available_decrement;
+  assign credits_available_d =
+         credits_available_q + credits_available_increment - credits_available_decrement;
 
   always_comb begin : credits_to_send_counter  //=> tracks credits to return (released from queue)
     credits_to_send_increment = '0;
@@ -266,7 +273,8 @@ module serial_link_credit_synchronization #(
     if (DontUseShadowCtnr) begin
       // Credits are only released if they are allowed to be consumed & I have a valid packet OR
       // force consume credits.
-      if ((send_valid_o & send_ready_i & allow_cred_consume_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+      if ((send_valid_o & send_ready_i & allow_cred_consume_i) |
+          (consume_cred_to_send_i & allow_cred_consume_i)) begin
         // The counter is decremented by the amount of credits being released
         credits_to_send_decrement = credits_to_send_q;
       end
@@ -280,7 +288,8 @@ module serial_link_credit_synchronization #(
       end
       // Credits are only released if they are allowed to be consumed & I have a valid packet OR
       // force consume credits.
-      if ((send_valid_o & send_ready_i & allow_cred_consume_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+      if ((send_valid_o & send_ready_i & allow_cred_consume_i) |
+          (consume_cred_to_send_i & allow_cred_consume_i)) begin
         // The counter is decremented by the amount of credits being released
         credits_to_send_decrement = credits_to_send_q;
       end
@@ -292,7 +301,9 @@ module serial_link_credit_synchronization #(
     end
   end
 
-  assign credits_to_send_d = credits_to_send_q + credits_to_send_offset + credits_to_send_increment - credits_to_send_decrement;
+  assign credits_to_send_d =
+         credits_to_send_q + credits_to_send_offset
+         + credits_to_send_increment - credits_to_send_decrement;
 
   always_comb begin : credits_to_send_hidden_counter //=> complements prev counter: if send_valid_o
     // When the buffer queue releases one element,
@@ -319,7 +330,9 @@ module serial_link_credit_synchronization #(
     end
   end
 
-  assign credits_to_send_hidden_d = credits_to_send_hidden_q + credits_to_send_hidden_increment - credits_to_send_hidden_decrement;
+  assign credits_to_send_hidden_d =
+         credits_to_send_hidden_q + credits_to_send_hidden_increment
+         - credits_to_send_hidden_decrement;
 
 
   //////////////////////
@@ -342,10 +355,6 @@ module serial_link_credit_synchronization #(
   // When MaxCredPerPktOut is declared and packets may consume more than 1 credit, it can happen
   // that virtual credits are received (credits that are returned, eventhough the TX side has not
   // yet consumed those credits. This can happen when a message is transmitted in multiple splits).
-  // Therefore, it is important to ensure these "virtual credits" can be held in the available
-  // credit counter type as well.
-  // TODO: assertion got triggered by CI-tests. Find a solution to it...
-  // `ASSERT_INIT(MaxCredCntrCapExceeded, (2**$bits(credit_t)-1) >= (MaxCredPerPktOut - 1 + NumCredits))
   `ASSERT(MaxCredits, credits_available_q <= (NumCredits + MaxCredPerPktOut - 1))
   `ASSERT(MaxSendCredits, (credits_to_send_q + credits_to_send_hidden_q) <= NumCredits)
   `ASSERT(CredConsParamTooLarge, CredOnlyConsCred < 2**$bits(credit_decrem_t))

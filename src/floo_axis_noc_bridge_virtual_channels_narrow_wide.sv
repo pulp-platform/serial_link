@@ -15,9 +15,9 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   // Attention: Enabling results in extra area since another register is inserted per channel.
   parameter  bit  preventIoTimingPaths = 1'b0,
   // finde suitable ForceSendThresh margin (do not change line number or ordering!)
-  parameter  int  ForceSendThresh_narrow_req = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_narrow_req-4,
-  parameter  int  ForceSendThresh_narrow_rsp = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_narrow_rsp-4,
-  parameter  int  ForceSendThresh_wide_chan  = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_wide_chan-4
+  parameter  int  ForceSendThresh_narrow_req = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_narrow_req-1,
+  parameter  int  ForceSendThresh_narrow_rsp = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_narrow_rsp-1,
+  parameter  int  ForceSendThresh_wide_chan  = noc_bridge_narrow_wide_pkg::NumCred_NocBridge_wide_chan-1
 ) (
   // global signals
   input  logic      clk_i,

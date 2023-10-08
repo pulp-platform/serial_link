@@ -12,7 +12,8 @@ set T_CLK [exec cat [file dirname [info script]]/constraints/serial_link.sdc | g
 
 # Assign clock which is declared in the constraints-file (serial_link.sdc)
 set TCK       [exec echo [expr $T_CLK] | cut -d "." -f1]
-set TIMESTAMP [exec date | tr " " "_" | cut -d "_" -f1]_[exec date | tr " " "_" | cut -d "_" -f3]_[exec date | tr " " "_" | cut -d "_" -f2]_[exec date | tr " " "_" | cut -d "_" -f4]
+# set TIMESTAMP [exec date | tr " " "_" | cut -d "_" -f1]_[exec date | tr " " "_" | cut -d "_" -f3]_[exec date | tr " " "_" | cut -d "_" -f2]_[exec date | tr " " "_" | cut -d "_" -f4]
+set TIMESTAMP [exec date | tr " " "_" | cut -d "_" -f1]_[exec date | tr " " "_" | cut -d "_" -f4]_[exec date | tr " " "_" | cut -d "_" -f2]_[exec date | tr " " "_" | cut -d "_" -f5]
 
 
 # set the name of the design => please give your design a reasonable name

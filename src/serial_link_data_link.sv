@@ -106,7 +106,9 @@ import serial_link_pkg::*;
   // the split count can be found to be:
   // NOTE: There are 'ClockDiv' control bits sent per physical transfer,
   // reducing the effectively available bandwidth.
-  localparam int MaxSplitsWithoutCntr  = (($bits(credit_t) + 1 + $bits(axis_packet_t)) + (BandWidth - ClockDiv) - 1) / (BandWidth - ClockDiv);
+  localparam int MaxSplitsWithoutCntr  =
+             ($bits(credit_t) + $bits(axis_packet_t) + BandWidth - ClockDiv)
+             / (BandWidth - ClockDiv);
   // At most one additional split occurs due to the split coutner
   localparam int SplitCntrRequiredBits = $clog2(MaxSplitsWithoutCntr + 1);
   typedef  logic [SplitCntrRequiredBits-1:0] split_cntr_t;
@@ -123,14 +125,18 @@ import serial_link_pkg::*;
 
   // If PackMultipleMsg is enabled, but the physical link is too narrow, I may disable the
   // parameter automatically.
-  localparam bit PackSmallerMsgIntoSingleTransfer = (PackMultipleMsg) ? ($bits(data_block_t)>$bits(data_hdr_info_t)) : 0;
+  localparam bit PackSmallerMsgIntoSingleTransfer =
+             (PackMultipleMsg) ? ($bits(data_block_t)>$bits(data_hdr_info_t)) : 0;
   localparam int BlockCount = (PackSmallerMsgIntoSingleTransfer) ? ClockDiv : 0;
 
-  localparam int MaxPossibleTransferSplits = (MaxNumOfBitsToBeTransfered + (BandWidth - BlockCount) - 1) / (BandWidth - BlockCount);
-  localparam int RecvFifoDepth = (AllowVarAxisLen) ? NumCredits : NumCredits * MaxPossibleTransferSplits;
+  localparam int MaxPossibleTransferSplits =
+             (MaxNumOfBitsToBeTransfered + BandWidth - BlockCount - 1) / (BandWidth - BlockCount);
+  localparam int RecvFifoDepth =
+             (AllowVarAxisLen) ? NumCredits : NumCredits * MaxPossibleTransferSplits;
 
   // find additional block control bits count.
-  localparam int AdditionalBits = (PackSmallerMsgIntoSingleTransfer) ? (ClockDiv*MaxPossibleTransferSplits) : 0;
+  localparam int AdditionalBits =
+             (PackSmallerMsgIntoSingleTransfer) ? (ClockDiv*MaxPossibleTransferSplits) : 0;
 
   // The largest possible size of AXIS out data contains the payload itself,
   // the axis user-bits and the shift control bits.
@@ -180,14 +186,14 @@ import serial_link_pkg::*;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
   phy_data_t raw_mode_fifo_data_in, raw_mode_fifo_data_out;
 
-  // TODO: where to put this?
   data_block_t [MaxPossibleTransferSplits-1:0] last_blocks;
   logic        [MaxPossibleTransferSplits-1:0] first_hs, shift_enable, shifts_allowed;
   logic        fifo_valid_out, fifo_ready_out;
 
-  // TODO: where to put this?
   split_cntr_t required_splits_reg_out;
   logic valid_synch_in, ready_synch_in;
+
+  logic output_handshake;
 
 
   //////////////////////////////////////
@@ -207,7 +213,8 @@ import serial_link_pkg::*;
       .data_in_t                 ( axis_packet_t                          ),
       .split_cntr_t              ( split_cntr_t                           ),
       .MaxPossibleTransferSplits ( MaxPossibleTransferSplits              ),
-      .NumExternalBitsAdded      ( $bits(send_hdr) + NumUserBits          ),
+      .NumExternalBitsAdded      ( NumUserBits                            ),
+      .NumExternalBitsAddedFirst ( $bits(send_hdr)                        ),
       .NarrowStrbCount           ( noc_bridge_narrow_wide_pkg::NarrowSize )
     ) i_data_collector (
       .clk_i        ( clk_i                   ),
@@ -237,8 +244,9 @@ import serial_link_pkg::*;
       .NumExternalBitsAdded      ( $bits(send_hdr) + NumUserBits ),
       .BlockSize                 ( BandWidth                     )
     ) i_find_splits (
-      .strb_i            ( axis_in_req_i.t.strb    ),
-      .required_blocks_o ( required_splits_reg_out )
+      .use_first_externals_i ( 0                       ),
+      .strb_i                ( axis_in_req_i.t.strb    ),
+      .required_blocks_o     ( required_splits_reg_out )
     );
   end
 
@@ -340,12 +348,12 @@ import serial_link_pkg::*;
       unique case (link_state_q)
         LinkSendIdle: begin
           if (axis_in_req_tvalid_afterFlowControl) begin
-            link_out_index_d = BandWidth;
+            link_out_index_d = 1;
             data_out_valid_o = '1;
             data_out_o = wrapped_output_data;
             if (data_out_ready_i) begin
               link_state_d = LinkSendBusy;
-              if (link_out_index_d >= BandWidth * send_hdr.req_num_splits) begin
+              if (link_out_index_d >= send_hdr.req_num_splits) begin
                 link_state_d = LinkSendIdle;
                 axis_in_rsp_tready_afterFlowControl = 1'b1;
               end
@@ -355,10 +363,10 @@ import serial_link_pkg::*;
 
         LinkSendBusy: begin
           data_out_valid_o = '1;
-          data_out_o = wrapped_output_data >> link_out_index_q;
+          data_out_o = wrapped_output_data >> (link_out_index_q * BandWidth);
           if (data_out_ready_i) begin
-            link_out_index_d = link_out_index_q + BandWidth;
-            if (link_out_index_d >= BandWidth * send_hdr.req_num_splits) begin
+            link_out_index_d = link_out_index_q + 1;
+            if (link_out_index_d >= send_hdr.req_num_splits) begin
               link_state_d = LinkSendIdle;
               axis_in_rsp_tready_afterFlowControl = 1'b1;
             end
@@ -367,16 +375,6 @@ import serial_link_pkg::*;
         default:;
       endcase
     end
-  end
-
-  // Credit only packets should not be forwarded as they do not contain valid data
-  // NOTE: If AllowVarAxisLen is enabled, credit only packets are filtered out before already
-  always_comb begin
-    axis_out_req_o.tvalid = (credits_only_packet_in == 1) ? 0 : axis_out_req_unfiltered.tvalid;
-    axis_out_req_o.t.data = axis_out_req_unfiltered.t.data;
-    axis_out_req_o.t.user = axis_out_req_unfiltered.t.user;
-    // make the credit only packet disappear (consume it)
-    axis_out_rsp_unfiltered.tready = axis_out_rsp_i.tready || (credits_only_packet_in == 1);
   end
 
   fifo_v3 #(
@@ -445,7 +443,8 @@ import serial_link_pkg::*;
 
   // TODO: where should I place these two line?
   assign consume_incoming_credits = (credit_only_packet_incoming | first_hs[0]);
-  assign credits_incoming = (credit_only_packet_incoming) ? cred_count_for_cred_only : received_hdr.amount_of_credits;
+  assign credits_incoming =
+         (credit_only_packet_incoming) ? cred_count_for_cred_only : received_hdr.amount_of_credits;
 
   stream_fifo #(
     .T     ( phy_data_chan_t ),
@@ -522,6 +521,16 @@ import serial_link_pkg::*;
 
   assign axis_out_req_unfiltered.t.data = axis_packet_out.data_bits;
 
+  // Credit only packets should not be forwarded as they do not contain valid data
+  // NOTE: If AllowVarAxisLen is enabled, credit only packets are filtered out before already
+  always_comb begin
+    axis_out_req_o.tvalid = (credits_only_packet_in == 1) ? 0 : axis_out_req_unfiltered.tvalid;
+    axis_out_req_o.t.data = axis_out_req_unfiltered.t.data;
+    axis_out_req_o.t.user = axis_out_req_unfiltered.t.user;
+    // make the credit only packet disappear (consume it)
+    axis_out_rsp_unfiltered.tready = axis_out_rsp_i.tready || (credits_only_packet_in == 1);
+  end
+
   initial begin
     $display("INFO: data_link_hdr = %0d, BandWidth = %0d", $bits(received_hdr), BandWidth);
     $display("INFO: AllowVarAxisLen = %0d", AllowVarAxisLen);
@@ -564,24 +573,28 @@ import serial_link_pkg::*;
         axis_out_req_unfiltered.tvalid = recv_reg_out_valid[0];
       end
 
-      recv_reg_out_ready = {MaxPossibleTransferSplits{axis_out_rsp_unfiltered.tready & axis_out_req_unfiltered.tvalid}};
+      recv_reg_out_ready =
+      {MaxPossibleTransferSplits{axis_out_rsp_unfiltered.tready & axis_out_req_unfiltered.tvalid}};
 
       // If all inputs of each channel have valid data, push it to fifo
       flow_control_fifo_valid_in = &data_in_valid_i;
-      data_in_ready_o = {NumChannels{flow_control_fifo_valid_in & flow_control_fifo_ready_in}};
+      data_in_ready_o  = {NumChannels{flow_control_fifo_valid_in & flow_control_fifo_ready_in}};
+      output_handshake = axis_out_rsp_unfiltered.tready & axis_out_req_unfiltered.tvalid;
       if (flow_control_fifo_valid_out & recv_reg_in_ready[recv_reg_index_q]) begin
         recv_reg_in_valid[recv_reg_index_q] = 1'b1;
         flow_control_fifo_ready_out = 1'b1;
         // Increment recv reg counter (if I have a valid handshake at the output, consuming the
         // data in the stream_registers, while a new packet is being shifted in, the new header is
         // accessible from the pre_received_hdr and not from the received_hdr)
-        if (recv_reg_out_valid[0] & !(axis_out_rsp_unfiltered.tready & axis_out_req_unfiltered.tvalid)) begin
+        if (recv_reg_out_valid[0] & !output_handshake) begin
           // The header info is received and savely stored in the first stream_register
-          recv_reg_index_d = (recv_reg_index_q == received_hdr.req_num_splits - 1) ? 0 : recv_reg_index_q + 1;
+          recv_reg_index_d =
+          (recv_reg_index_q == received_hdr.req_num_splits - 1) ? 0 : recv_reg_index_q + 1;
         end else begin
           // The valid header info has not yet passed to the register and is only available in the
           // pre_register stage
-          recv_reg_index_d = (recv_reg_index_q == pre_received_hdr.req_num_splits - 1) ? 0 : recv_reg_index_q + 1;
+          recv_reg_index_d =
+          (recv_reg_index_q == pre_received_hdr.req_num_splits - 1) ? 0 : recv_reg_index_q + 1;
         end
       end
     end
@@ -601,6 +614,7 @@ import serial_link_pkg::*;
   // It is assumed that no valid data can be inputed with a zero strobe (when AllowVarAxisLen
   // is enabled). Should this feature be desired, the port empty_o of the instance
   // i_leading_zero_counter should be utilized to declare what ought to happen in this case.
-  `ASSERT(ZeroStrobe, !(AllowVarAxisLen & axis_in_req_i.t.strb == '0 & axis_in_req_i.tvalid & axis_in_rsp_o.tready))
+  `ASSERT(ZeroStrobe, !(AllowVarAxisLen & axis_in_req_i.t.strb == '0 &
+    axis_in_req_i.tvalid & axis_in_rsp_o.tready))
 
 endmodule

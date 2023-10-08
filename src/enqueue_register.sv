@@ -36,15 +36,17 @@ module find_req_blocks #(
     parameter  type block_cntr_t              = logic,
     parameter  int  MaxPossibleTransferSplits = 1,
     parameter  int  NumExternalBitsAdded      = 0,
+    parameter  int  NumExternalBitsAddedFirst = 0,
 
     parameter  int  BlockSize                 = 2,
     localparam int  TotalNumBlocks            = MaxPossibleTransferSplits*ClkDiv
 ) (
+  input  logic use_first_externals_i,
   input  logic [StrbSize-1:0] strb_i,
   output block_cntr_t         required_blocks_o
 );
 
-  localparam NumDataBits   = $clog2(9*StrbSize + NumExternalBitsAdded + 1);
+  localparam NumDataBits   = $clog2(9*StrbSize+NumExternalBitsAdded+NumExternalBitsAddedFirst+1);
   localparam StrobeCounter = $clog2(StrbSize+1);
 
   logic [NumDataBits-1:0]   required_bits;
@@ -63,7 +65,9 @@ module find_req_blocks #(
     );
 
     // One set strobe bit corresponds to 8 bits (1 byte) of data.
-    assign required_bits = {num_trailing_ones,3'b0} + NumExternalBitsAdded;
+    assign required_bits = (use_first_externals_i) ?
+                         (8*num_trailing_ones + NumExternalBitsAdded + NumExternalBitsAddedFirst) :
+                         (8*num_trailing_ones + NumExternalBitsAdded);
     // When input strobe is fully '1, all blocks are occupied. The condition is needed to ensure
     // the max is not exceeded, which could happen when the front most data byte is not a full byte
     // (not all bits are required). This would lead to a mismatch in the determined MaxNumSplits
@@ -97,6 +101,8 @@ module enqueue_register
     // data whose size is not correlating with the strobe signal, I might add the offset
     // here as well. Eg. axis user bits
     parameter  int  NumExternalBitsAdded      = 0,
+    // Same as above, but only the first data packet features these additional bits.
+    parameter  int  NumExternalBitsAddedFirst = 0,
     // The minimal number of strobe bits to be set (smallest possible message). Will be used to
     // calculate the number of blocks which are required to process the smallest possible message.
     parameter  int  NarrowStrbCount           = 1,
@@ -119,7 +125,8 @@ module enqueue_register
     localparam type block_in_t   = logic [BlockSize-2:0],
     localparam type block_cntr_t = logic [$clog2(NumDatBlocks+1)-1:0],
 
-    localparam int  MinDataSize  = 8*NarrowStrbCount + NumExternalBitsAdded,
+    // TODO: remove the last parameter...
+    localparam int  MinDataSize  = 8*NarrowStrbCount + NumExternalBitsAdded + NumExternalBitsAddedFirst,
     localparam int  MinReqBlocks = (MinDataSize + BlockSize - 2) / (BlockSize-1),
     // Find the number of required register blocks
     localparam int  NumRegBlocks = 2*ClkDiv - 2*MinReqBlocks
@@ -179,14 +186,16 @@ module enqueue_register
   find_req_blocks #(
     .ClkDiv                    ( ClkDiv                    ),
     .StrbSize                  ( StrbSize                  ),
-    .NumExternalBitsAdded      ( NumExternalBitsAdded      ),
     .MaxPossibleTransferSplits ( MaxPossibleTransferSplits ),
+    .NumExternalBitsAddedFirst ( NumExternalBitsAddedFirst ),
+    .NumExternalBitsAdded      ( NumExternalBitsAdded      ),
     .block_cntr_t              ( block_cntr_t              ),
     .AllowVarAxisLen           ( AllowVarAxisLen           ),
     .BlockSize                 ( BlockSize                 )
   ) i_block_counter (
-    .strb_i            ( strb_i          ),
-    .required_blocks_o ( required_blocks )
+    .use_first_externals_i ( is_first_element | (valid_i & ~contains_valid_data)),
+    .strb_i                ( strb_i           ),
+    .required_blocks_o     ( required_blocks  )
   );
 
 
@@ -208,35 +217,37 @@ module enqueue_register
   // The number of shifts required to shift an element from the input to the last shift-position.
   localparam int ShiftDepth = ClkDiv - MinReqBlocks;
 
-  always_comb begin : shifter_control_logic
-    // Is the incoming data size small enough to fit at least 2
-    acceptable_size   = required_blocks <= ShiftDepth;
-    // I should not have an ongoing (un-terminated) shiftoperation
-    no_ongoing_shift  = remaining_shifts_q <= 1;
-    // Is a delayless shift insertion possible?
-    no_lat_introduced = ShiftDepth < cycle_delay_q + occupied_blocks_q;
-    // Am I in a delay phase (output not yet ready) and I have sufficient time to
-    // shift the input message into the out_block section )
-    enough_time_left  = (required_blocks - MinReqBlocks) < cycle_delay_q;
-    // Combination of above signals to evaluate if I am able to receive new blocks
-    accept_next_block = no_ongoing_shift & no_lat_introduced & enough_time_left;
-    // shift_register it emptied, resulting in the new incoming element to be the first in the reg.
-    is_first_element  = contains_valid_data & allow_new_out_transac & ready_reg_in;
+  logic [cnt_length:0] block_cycl_sum;
+  assign block_cycl_sum = cycle_delay_q + occupied_blocks_q;
 
-    // The data block has not yet moved out of the input-intersecting region.
-    shift_in_progress = remaining_shifts_q != 0;
-    // I need to shift in order to not introduce latency. (No more shift delaying allowed)
-    shift_for_no_lat  = ShiftDepth + remaining_shifts_q >= cycle_delay_q + occupied_blocks_q;
-    // I still have free shift positions: Shifting further will not result in loosing data-blocks
-    empty_shift_pos   = occupied_blocks_q - remaining_shifts_q < ShiftDepth;
+  // Is the incoming data size small enough to fit at least 2
+  assign acceptable_size   = required_blocks <= ShiftDepth;
+  // I should not have an ongoing (un-terminated) shiftoperation
+  // no_ongoing_shift  = remaining_shifts_q <= 1;
+  assign no_ongoing_shift  = (remaining_shifts_q == 'd1 & allow_shifts) | remaining_shifts_q == '0;
+  // Is a delayless shift insertion possible?
+  assign no_lat_introduced = ShiftDepth < block_cycl_sum;
+  // Am I in a delay phase (output not yet ready) and I have sufficient time to
+  // shift the input message into the out_block section )
+  assign enough_time_left  = required_blocks < cycle_delay_q + MinReqBlocks;
+  // Combination of above signals to evaluate if I am able to receive new blocks
+  assign accept_next_block = no_ongoing_shift & no_lat_introduced & enough_time_left & (occupied_blocks_q + required_blocks <= ClkDiv);
+  // shift_register it emptied, resulting in the new incoming element to be the first in the reg.
+  assign is_first_element  = contains_valid_data & allow_new_out_transac & ready_reg_in;
 
-    // If the input data is valid and has an acceptable size, it may be consumed,
-    // given it does not conflict with existing data and can be fully shifted
-    // into position within the given delay_cycle time.
-    valid_reg_data = valid_i & acceptable_size & (accept_next_block | is_first_element);
-    // Declares if the register chain is allowed to right-shift the data blocks by another position
-    allow_shifts   = (shift_in_progress | shift_for_no_lat) & empty_shift_pos;
-  end
+  // The data block has not yet moved out of the input-intersecting region.
+  assign shift_in_progress = remaining_shifts_q != 0;
+  // I need to shift in order to not introduce latency. (No more shift delaying allowed)
+  assign shift_for_no_lat  = contains_valid_data & (ShiftDepth+remaining_shifts_q>=block_cycl_sum);
+  // I still have free shift positions: Shifting further will not result in loosing data-blocks
+  assign empty_shift_pos   = occupied_blocks_q - remaining_shifts_q < ShiftDepth;
+
+  // If the input data is valid and has an acceptable size, it may be consumed,
+  // given it does not conflict with existing data and can be fully shifted
+  // into position within the given delay_cycle time.
+  assign valid_reg_data = valid_i & acceptable_size & (accept_next_block | is_first_element);
+  // Declares if the register chain is allowed to right-shift the data blocks by another position
+  assign allow_shifts   = (shift_in_progress | shift_for_no_lat) & empty_shift_pos;
 
 
   /////////////////////////////////////
@@ -284,10 +295,10 @@ module enqueue_register
   `FF(occupied_blocks_q, occupied_blocks_d, '0)
 
   always_comb begin : available_space
-    remaining_shifts_d = remaining_shifts_q - 1;
+    remaining_shifts_d = remaining_shifts_q - allow_shifts;
     if ( valid_data_into_reg ) begin
       remaining_shifts_d = required_blocks;
-    end else if (remaining_shifts_q == 0) begin
+    end else if (remaining_shifts_q == 0 | ~empty_shift_pos) begin
       remaining_shifts_d = 0;
     end
   end
