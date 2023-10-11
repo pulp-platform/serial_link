@@ -1,3 +1,9 @@
+# Copyright 2023 ETH Zurich and University of Bologna.
+# Solderpad Hardware License, Version 0.51, see LICENSE for details.
+# SPDX-License-Identifier: SHL-0.51
+
+# Author: Yannick Baumann <baumanny@student.ethz.ch>
+
 # If single channel version is simulated: gen_multi_channel_serial_link => gen_single_channel_serial_link
 
 onerror {resume}

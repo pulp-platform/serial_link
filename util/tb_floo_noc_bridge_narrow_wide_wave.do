@@ -1,3 +1,9 @@
+# Copyright 2023 ETH Zurich and University of Bologna.
+# Solderpad Hardware License, Version 0.51, see LICENSE for details.
+# SPDX-License-Identifier: SHL-0.51
+
+# Author: Yannick Baumann <baumanny@student.ethz.ch>
+
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -group full_data_path_debugging -expand -group flit_to_axis_bridge_0 -color Yellow /tb_floo_noc_bridge_narrow_wide/gen_bridge/i_floo_axis_noc_bridge_narrow_wide_0/clk_i

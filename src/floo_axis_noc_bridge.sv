@@ -50,11 +50,11 @@ module floo_axis_noc_bridge
   axis_data_t axis_out_payload, axis_in_payload;
   axis_data_t axis_out_data_reg_out;
   logic axis_out_ready, axis_out_valid;
-  localparam int payloadSize = $bits(axis_data_t);
+  localparam int PayloadSize = $bits(axis_data_t);
 
   // the axis data payload also contains the header bit which is why the flit data width is one
   // bit smaller than the payload
-  logic [payloadSize-2:0] req_i_data, rsp_i_data;
+  logic [PayloadSize-2:0] req_i_data, rsp_i_data;
 
   ////////////////////////////////////////////////
   //  CONNECT INCOMING FLITS WITH THE AXIS_OUT  //
@@ -67,7 +67,7 @@ module floo_axis_noc_bridge
 
   rr_arb_tree #(
     .NumIn      ( NumNocChanPerDir           ),
-    .DataWidth  ( payloadSize - 1            ),
+    .DataWidth  ( PayloadSize - 1            ),
     .ExtPrio    ( 1'b0                       ),
     .AxiVldRdy  ( 1'b1                       ),
     .LockIn     ( 1'b0                       )
@@ -97,7 +97,7 @@ module floo_axis_noc_bridge
   assign axis_out_payload.hdr = channel_hdr_e'(selected_index);
 
   stream_fifo #(
-    .DATA_WIDTH ( payloadSize           ),
+    .DATA_WIDTH ( PayloadSize           ),
     .DEPTH      ( 2                     )
   ) i_axis_out_reg (
     .clk_i      ( clk_i                 ),

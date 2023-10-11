@@ -41,7 +41,7 @@ module insert_latency_to_signal #(
     useDefaultVal = 1'b0;
   end
 
-  for (genvar i = 0; i < DelayInNs; i++) begin
+  for (genvar i = 0; i < DelayInNs; i++) begin : gen_latency_array
     insert_latency_of_one #(
       .data_t   ( data_t )
     ) i_latency_inserter (

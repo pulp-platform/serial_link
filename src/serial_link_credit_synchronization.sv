@@ -159,7 +159,7 @@ module serial_link_credit_synchronization #(
       .ready_i    ( send_ready_out  ),
       .data_o     ( data_to_send_in )
     );
-  end else begin
+  end else begin : gen_IO_isolation
     assign send_valid_in   = send_valid_i;
     assign send_ready_o    = send_ready_out;
     assign data_to_send_in = data_to_send_i;

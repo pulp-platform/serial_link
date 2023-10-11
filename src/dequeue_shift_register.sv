@@ -147,9 +147,9 @@ import serial_link_pkg::*;
 
       if (BitRemovalIndex==0) begin : gen_remove_block_ctrl_bit
         assign data_out_blocks[i] = data_out[i][BlockSize-1:1];
-      end else if (BitRemovalIndex==BlockSize) begin
+      end else if (BitRemovalIndex==BlockSize) begin : gen_remove_block_ctrl_bit
         assign data_out_blocks[i] = data_out[i][BlockSize-2:0];
-      end else begin
+      end else begin : gen_remove_block_ctrl_bit
         assign data_out_blocks[i] =
                {data_out[i][BlockSize-1:BitRemovalIndex+1], data_out[i][BitRemovalIndex-1:0]};
       end
@@ -165,7 +165,7 @@ import serial_link_pkg::*;
 
     if (UseHeader) begin : gen_use_hdr
       `FFL(header_o, data_i, load_new_data, 1'b0, clk_i, rst_ni)
-    end else begin
+    end else begin : gen_use_hdr
       assign header_o = '0;
     end
 
