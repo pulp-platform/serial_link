@@ -46,13 +46,13 @@ module find_req_blocks #(
   output block_cntr_t         required_blocks_o
 );
 
-  localparam NumDataBits   = $clog2(9*StrbSize+NumExternalBitsAdded+NumExternalBitsAddedFirst+1);
-  localparam StrobeCounter = $clog2(StrbSize+1);
+  localparam int NumDataBits = $clog2(9*StrbSize+NumExternalBitsAdded+NumExternalBitsAddedFirst+1);
+  localparam int StrobeCounter = $clog2(StrbSize+1);
 
   logic [NumDataBits-1:0]   required_bits;
   logic [StrobeCounter-1:0] num_trailing_ones;
 
-  if (AllowVarAxisLen) begin : splitDetermination
+  if (AllowVarAxisLen) begin : gen_split_determination
     logic all_ones;
 
     lzc #(
@@ -74,7 +74,7 @@ module find_req_blocks #(
     // opposed to the optained number by comparing the block count.
     assign required_blocks_o =
            (all_ones) ? TotalNumBlocks : (required_bits+BlockSize-2)/(BlockSize-1);
-  end else begin
+  end else begin : gen_split_determination
     assign required_blocks_o = TotalNumBlocks;
   end
 
@@ -166,19 +166,19 @@ module enqueue_register
   block_out_t [NumDatBlocks-1:0] data_out_blocks;
   data_out_t                     data_out;
 
-  localparam int cnt_length = $clog2(ClkDiv);
+  localparam int CntLength = $clog2(ClkDiv);
 
-  logic [cnt_length-1:0] cycle_delay_q, cycle_delay_d;
-  split_cntr_t           splits_by_data_in, num_splits_reg_in;
-  block_cntr_t           utilized_blocks, required_blocks;
-  block_cntr_t           occupied_blocks_q, occupied_blocks_d;
-  block_cntr_t           remaining_shifts_q, remaining_shifts_d;
-  logic                  allow_new_out_transac, msg_bypass, shift_shift_regs;
-  logic                  valid_data_into_reg, can_receive_new_data;
-  logic                  no_ongoing_shift, no_lat_introduced, enough_time_left;
-  logic                  valid_reg_in, ready_reg_in, contains_valid_data;
-  logic                  valid_reg_data, acceptable_size, accept_next_block, is_first_element;
-  logic                  allow_shifts, shift_in_progress, shift_for_no_lat, empty_shift_pos;
+  logic [CntLength-1:0] cycle_delay_q, cycle_delay_d;
+  split_cntr_t          splits_by_data_in, num_splits_reg_in;
+  block_cntr_t          utilized_blocks, required_blocks;
+  block_cntr_t          occupied_blocks_q, occupied_blocks_d;
+  block_cntr_t          remaining_shifts_q, remaining_shifts_d;
+  logic                 allow_new_out_transac, msg_bypass, shift_shift_regs;
+  logic                 valid_data_into_reg, can_receive_new_data;
+  logic                 no_ongoing_shift, no_lat_introduced, enough_time_left;
+  logic                 valid_reg_in, ready_reg_in, contains_valid_data;
+  logic                 valid_reg_data, acceptable_size, accept_next_block, is_first_element;
+  logic                 allow_shifts, shift_in_progress, shift_for_no_lat, empty_shift_pos;
 
 
   ////////////////////////////
@@ -219,7 +219,7 @@ module enqueue_register
   // The number of shifts required to shift an element from the input to the last shift-position.
   localparam int ShiftDepth = ClkDiv - MinReqBlocks;
 
-  logic [cnt_length:0] block_cycl_sum;
+  logic [CntLength:0] block_cycl_sum;
   assign block_cycl_sum = cycle_delay_q + occupied_blocks_q;
 
   // Is the incoming data size small enough to fit at least 2
@@ -260,16 +260,16 @@ module enqueue_register
 
   // Insertion of block-control-bits into the data stream
   assign data_in_blocks = data_i;
-  for (genvar i = 0; i < NumDatBlocks; i++) begin
+  for (genvar i = 0; i < NumDatBlocks; i++) begin gen_insert_block_ctrl_bit
     localparam bit BlockCtrlBit   = (i==0) ? 1'b1 : 1'b0;
     assign data_with_ctrl_bits[i] = {data_in_blocks[i], BlockCtrlBit};
   end
 
   // Assign input data or register content to the output
-  for (genvar i = 0; i < NumDatBlocks; i++) begin
-    if (i < ClkDiv) begin
+  for (genvar i = 0; i < NumDatBlocks; i++) begin : gen_assign_data_output
+    if (i < ClkDiv) begin : gen_block_type
       assign data_out_blocks[i] = (msg_bypass) ? data_with_ctrl_bits[i] : reg_blocks_q[i];
-    end else begin
+    end else begin : gen_block_type
       assign data_out_blocks[i] = data_with_ctrl_bits[i];
     end
   end
@@ -327,16 +327,16 @@ module enqueue_register
   //  SHIFT REGISTERS  //
   ///////////////////////
 
-  for (genvar i = 0; i < NumRegBlocks; i++) begin : load_and_shift_register
-    if (i < ShiftDepth) begin
+  for (genvar i = 0; i < NumRegBlocks; i++) begin : gen_load_and_shift_register
+    if (i < ShiftDepth) begin : gen_register_type
       assign reg_blocks_d[i] = reg_blocks_q[i + 1];
       `FFL(reg_blocks_q[i], reg_blocks_d[i], allow_shifts, '0, clk_i, rst_ni)
-    end else begin
-      if (i == NumRegBlocks - 1) begin
+    end else begin : gen_register_type
+      if (i == NumRegBlocks - 1) begin : gen_assign_reg_block
         // The first register block has no other register block to
         // read the data from when in shift mode.
         assign reg_blocks_d[i] = (valid_data_into_reg) ? data_with_ctrl_bits[i - ShiftDepth] : '0;
-      end else begin
+      end else begin : gen_assign_reg_block
         assign reg_blocks_d[i] =
                (valid_data_into_reg) ? data_with_ctrl_bits[i - ShiftDepth] : reg_blocks_q[i + 1];
       end

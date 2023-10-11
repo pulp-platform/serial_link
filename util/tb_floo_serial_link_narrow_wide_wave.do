@@ -1,3 +1,9 @@
+# Copyright 2023 ETH Zurich and University of Bologna.
+# Solderpad Hardware License, Version 0.51, see LICENSE for details.
+# SPDX-License-Identifier: SHL-0.51
+
+# Author: Yannick Baumann <baumanny@student.ethz.ch>
+
 onerror {resume}
 
 quietly virtual function -install /tb_floo_serial_link_narrow_wide/i_serial_link_0/gen_bridge/i_serial_link_network -env /tb_floo_serial_link_narrow_wide/i_serial_link_0/gen_bridge/i_serial_link_network { &{/tb_floo_serial_link_narrow_wide/i_serial_link_0/gen_bridge/i_serial_link_network/narrow_req_i.data.gen.rob_req, /tb_floo_serial_link_narrow_wide/i_serial_link_0/gen_bridge/i_serial_link_network/narrow_req_i.data.gen.rob_idx, /tb_floo_serial_link_narrow_wide/i_serial_link_0/gen_bridge/i_serial_link_network/narrow_req_i.data.gen.dst_id, /tb_floo_serial_link_narrow_wide/i_serial_link_0/gen_bridge/i_serial_link_network/narrow_req_i.data.gen.src_id, /tb_floo_serial_link_narrow_wide/i_serial_link_0/gen_bridge/i_serial_link_network/narrow_req_i.data.gen.last, /tb_floo_serial_link_narrow_wide/i_serial_link_0/gen_bridge/i_serial_link_network/narrow_req_i.data.gen.atop, /tb_floo_serial_link_narrow_wide/i_serial_link_0/gen_bridge/i_serial_link_network/narrow_req_i.data.gen.axi_ch, /tb_floo_serial_link_narrow_wide/i_serial_link_0/gen_bridge/i_serial_link_network/narrow_req_i.data.gen.rsvd }} data_flattened

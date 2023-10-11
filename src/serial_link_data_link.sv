@@ -1,4 +1,4 @@
-// Copyright 2022 ETH Zurich and University of Bologna.
+// Copyright 2023 ETH Zurich and University of Bologna.
 // Solderpad Hardware License, Version 0.51, see LICENSE for details.
 // SPDX-License-Identifier: SHL-0.51
 
@@ -253,7 +253,7 @@ import serial_link_pkg::*;
   // credit_only messages consume only once split
   if (AllowVarAxisLen) begin : gen_num_split_assignment
     assign send_hdr.req_num_splits =  (send_hdr.is_credits_only) ? 'd1 : required_splits_reg_out;
-  end else begin
+  end else begin : gen_num_split_assignment
     assign send_hdr.req_num_splits =  MaxPossibleTransferSplits;
   end
 
