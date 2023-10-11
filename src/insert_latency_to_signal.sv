@@ -24,7 +24,7 @@ endmodule : insert_latency_of_one
 module insert_latency_to_signal #(
   parameter int    DataWidth    = 1,
   parameter type   data_t       = logic[DataWidth-1:0],
-	parameter int    DelayInNs    = 0,
+  parameter int    DelayInNs    = 0,
   parameter bit    UseDefault   = 0,
   parameter data_t DefaultValue = '0
 ) (

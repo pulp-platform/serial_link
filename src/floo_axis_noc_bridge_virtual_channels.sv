@@ -1,20 +1,26 @@
-// Yannick Baumann <baumanny@student.ethz.ch>
+// Copyright 2023 ETH Zurich and University of Bologna.
+// Solderpad Hardware License, Version 0.51, see LICENSE for details.
+// SPDX-License-Identifier: SHL-0.51
+
+// Authors:
+//  - Yannick Baumann <baumanny@student.ethz.ch>
 `include "common_cells/assertions.svh"
 
 module floo_axis_noc_bridge_virtual_channels
 #(
   // If the parameter is set to 1, all the assertion checks within this module will be ignored.
-  parameter  bit  ignore_assert     = 1'b0,
-  // If the parameter is set to 1, a set of debug messages will be printed upon arival of data from the axis channel.
-  // This feature is temporary and is supposed to ease the developement. It will be removed at a later stage...
-  parameter  bit  allow_debug_msg   = 1'b0,
+  parameter  bit  IgnoreAssert      = 1'b0,
+  // If the parameter is set to 1, a set of debug messages will be printed upon arival of data
+  // from the axis channel. This feature is temporary and is supposed to ease the developement.
+  // It will be removed at a later stage...
+  parameter  bit  AllowDebugMsg   = 1'b0,
   parameter  type rsp_flit_t        = logic,
   parameter  type req_flit_t        = logic,
   parameter  type axis_req_t        = logic,
   parameter  type axis_rsp_t        = logic,
-  parameter  int  ForceSendThresh   = noc_bridge_pkg::NumCred_NocBridge-4,
+  parameter  int  ForceSendThresh   = noc_bridge_pkg::NumCredNocBridge-4,
   // currently this parameter should not be changed!
-  parameter  int  numNocChanPerDir  = 2
+  parameter  int  NumNocChanPerDir  = 2
 ) (
   // global signals
   input  logic      clk_i,
@@ -43,9 +49,11 @@ module floo_axis_noc_bridge_virtual_channels
   logic axis_cred_in_req_valid, axis_cred_in_rsp_valid;
 
   // data_bits_t req_rsp_queue_in
-  axis_packet_t req_rsp_queue_in, req_arbiter_in, rsp_arbiter_in, req_rsp_arbiter_out, req_rsp_axis_out;
+  axis_packet_t req_rsp_queue_in, req_arbiter_in, rsp_arbiter_in;
+  axis_packet_t req_rsp_arbiter_out, req_rsp_axis_out;
 
-  // the axis data payload also contains the header bit which is why the flit data width is one bit smaller than the payload
+  // the axis data payload also contains the header bit which is why the flit data width is
+  // one bit smaller than the payload
   flit_data_t req_i_data, rsp_i_data, req_data_synchr_out, rsp_data_synchr_out;
   logic req_valid_synchr_out, rsp_valid_synchr_out, req_ready_synchr_out, rsp_ready_synchr_out;
 
@@ -64,7 +72,8 @@ module floo_axis_noc_bridge_virtual_channels
   //  CONNECT INCOMING FLITS WITH THE AXIS_OUT  //
   ////////////////////////////////////////////////
 
-  // Assignment required to match the data width of the two channels (rr_arb_tree needs equi-size signals)
+  // Assignment required to match the data width of the two channels
+  // (rr_arb_tree needs equi-size signals)
   assign req_i_data = req_i.data;
   assign rsp_i_data = rsp_i.data;
 
@@ -82,7 +91,7 @@ module floo_axis_noc_bridge_virtual_channels
   serial_link_credit_synchronization #(
     .credit_t               ( bridge_credit_t           ),
     .data_t                 ( flit_data_t               ),
-    .NumCredits             ( NumCred_NocBridge         ),
+    .NumCredits             ( NumCredNocBridge          ),
     .ForceSendThresh        ( ForceSendThresh           ),
     .CredOnlyConsCred       ( 0                         )
   ) i_synchronization_req (
@@ -106,25 +115,27 @@ module floo_axis_noc_bridge_virtual_channels
   );
 
   assign req_read_incoming_credits = (axis_cred_in_req_valid & axis_in_rsp_o.tready);
-  assign force_consume_req_credits = axis_out_valid & axis_out_ready & (req_rsp_arbiter_out.credits_hdr == request);
+  assign force_consume_req_credits =
+         axis_out_valid & axis_out_ready & (req_rsp_arbiter_out.credits_hdr == request);
 
   // TODO: for debugging only. Please remove the always_ff block...
   always_ff @(posedge clk_i) begin
-    if (req_read_incoming_credits & allow_debug_msg) begin
+    if (req_read_incoming_credits & AllowDebugMsg) begin
       $display("INFO: received credits for req-channel = %1d", req_rsp_queue_in.credits);
     end
   end
 
   assign req_arbiter_in.data          = req_data_synchr_out;
   assign req_arbiter_in.data_validity = ~credits_only_packet_req;
-  assign req_arbiter_in.credits       = (forward_req_credits) ? credits_to_send_req : credits_to_send_rsp;
+  assign req_arbiter_in.credits       =
+         (forward_req_credits) ? credits_to_send_req : credits_to_send_rsp;
   assign req_arbiter_in.data_hdr      = request;
   assign req_arbiter_in.credits_hdr   = (forward_req_credits) ? request : response;
 
   serial_link_credit_synchronization #(
     .credit_t               ( bridge_credit_t           ),
     .data_t                 ( flit_data_t               ),
-    .NumCredits             ( NumCred_NocBridge         ),
+    .NumCredits             ( NumCredNocBridge         ),
     .ForceSendThresh        ( ForceSendThresh           ),
     .CredOnlyConsCred       ( 0                         )
   ) i_synchronization_rsp (
@@ -148,23 +159,25 @@ module floo_axis_noc_bridge_virtual_channels
   );
 
   assign rsp_read_incoming_credits = (axis_cred_in_rsp_valid & axis_in_rsp_o.tready);
-  assign force_consume_rsp_credits = axis_out_valid & axis_out_ready & (req_rsp_arbiter_out.credits_hdr == response);
+  assign force_consume_rsp_credits =
+         axis_out_valid & axis_out_ready & (req_rsp_arbiter_out.credits_hdr == response);
 
   // TODO: for debugging only. Please remove the always_ff block...
   always_ff @(posedge clk_i) begin
-    if (rsp_read_incoming_credits & allow_debug_msg) begin
+    if (rsp_read_incoming_credits & AllowDebugMsg) begin
       $display("INFO: received credits for rsp-channel = %1d", req_rsp_queue_in.credits);
     end
   end
 
   assign rsp_arbiter_in.data          = rsp_data_synchr_out;
   assign rsp_arbiter_in.data_validity = ~credits_only_packet_rsp;
-  assign rsp_arbiter_in.credits       = (forward_rsp_credits) ? credits_to_send_rsp : credits_to_send_req;
+  assign rsp_arbiter_in.credits       =
+         (forward_rsp_credits) ? credits_to_send_rsp : credits_to_send_req;
   assign rsp_arbiter_in.data_hdr      = response;
   assign rsp_arbiter_in.credits_hdr   = (forward_rsp_credits) ? response : request;
 
   rr_arb_tree #(
-    .NumIn      ( numNocChanPerDir ),
+    .NumIn      ( NumNocChanPerDir ),
     .DataType   ( axis_packet_t    ),
     .ExtPrio    ( 1'b0             ),
     .AxiVldRdy  ( 1'b1             ),
@@ -172,21 +185,22 @@ module floo_axis_noc_bridge_virtual_channels
   ) i_rr_arb_tree (
     .clk_i      ( clk_i                                        ),
     .rst_ni     ( rst_ni                                       ),
-    /// Clears the arbiter state. Only used if `ExtPrio` is `1'b0` or `LockIn` is `1'b1`.
+    // Clears the arbiter state. Only used if `ExtPrio` is `1'b0` or `LockIn` is `1'b1`.
     .flush_i    ( 1'b0                                         ),
-    /// Input requests arbitration.
+    // Input requests arbitration.
     .req_i      ( {req_valid_synchr_out, rsp_valid_synchr_out} ),
-    /// Input request is granted.
+    // Input request is granted.
     .gnt_o      ( {req_ready_synchr_out, rsp_ready_synchr_out} ),
-    /// Input data for arbitration.
+    // Input data for arbitration.
     .data_i     ( {req_arbiter_in, rsp_arbiter_in}             ),
-    /// Output request is valid.
+    // Output request is valid.
     .req_o      ( axis_out_valid                               ),
-    /// Output request is granted.
+    // Output request is granted.
     .gnt_i      ( axis_out_ready                               ),
-    /// Output data.
+    // Output data.
     .data_o     ( req_rsp_arbiter_out                          ),
-    /// Index from which input the data came from. => I don't need the index anymore as the info is contained in the data-line
+    // Index from which input the data came from.
+    // => I don't need the index anymore as the info is contained in the data-line
     .idx_o      (                                              )
   );
 
@@ -214,20 +228,24 @@ module floo_axis_noc_bridge_virtual_channels
   assign axis_out_req_o.t.last = '0;
   assign axis_out_req_o.t.id   = '0;
   assign axis_out_req_o.t.dest = '0;
-  assign axis_out_req_o.t.user = {req_rsp_axis_out.data_validity, req_rsp_axis_out.credits_hdr, req_rsp_axis_out.credits};
+  assign axis_out_req_o.t.user =
+         {req_rsp_axis_out.data_validity, req_rsp_axis_out.credits_hdr, req_rsp_axis_out.credits};
 
 
   ///////////////////////////////////////////////
   //  CONNECT AXIS_IN WITH THE OUTGOING FLITS  //
   ///////////////////////////////////////////////
 
-  assign {req_rsp_queue_in.data_hdr, req_rsp_queue_in.data}                                       = axis_in_req_i.t.data;
-  assign {req_rsp_queue_in.data_validity, req_rsp_queue_in.credits_hdr, req_rsp_queue_in.credits} = axis_in_req_i.t.user;
+  assign {req_rsp_queue_in.data_hdr, req_rsp_queue_in.data} = axis_in_req_i.t.data;
+  assign {req_rsp_queue_in.data_validity, req_rsp_queue_in.credits_hdr, req_rsp_queue_in.credits} =
+         axis_in_req_i.t.user;
 
   // TODO: for debugging only. Please remove the always_ff block...
   always_ff @(posedge clk_i) begin
-    if (axis_in_req_i.tvalid & axis_in_rsp_o.tready & allow_debug_msg) begin
-      $display("INFO: received axis packet (@%8d) = | %1d | %30d | %1d | %1d | %2d |", $time, req_rsp_queue_in.data_hdr, req_rsp_queue_in.data, req_rsp_queue_in.data_validity, req_rsp_queue_in.credits_hdr, req_rsp_queue_in.credits);
+    if (axis_in_req_i.tvalid & axis_in_rsp_o.tready & AllowDebugMsg) begin
+      $display("INFO: received axis packet (@%8d) = | %1d | %30d | %1d | %1d | %2d |", $time,
+        req_rsp_queue_in.data_hdr, req_rsp_queue_in.data, req_rsp_queue_in.data_validity,
+        req_rsp_queue_in.credits_hdr, req_rsp_queue_in.credits);
     end
   end
   // FOR THE TIME BEING THE SIGNALS BELOW ARE IGNORED...
@@ -237,10 +255,14 @@ module floo_axis_noc_bridge_virtual_channels
   // assign ??? = axis_in_req_i.t.id;
   // assign ??? = axis_in_req_i.t.dest;
 
-  assign axis_data_in_req_valid = (req_rsp_queue_in.data_hdr    == request)  ? (axis_in_req_i.tvalid & req_rsp_queue_in.data_validity) : 0;
-  assign axis_data_in_rsp_valid = (req_rsp_queue_in.data_hdr    == response) ? (axis_in_req_i.tvalid & req_rsp_queue_in.data_validity) : 0;
-  assign axis_cred_in_req_valid = (req_rsp_queue_in.credits_hdr == request)  ? axis_in_req_i.tvalid : 0;
-  assign axis_cred_in_rsp_valid = (req_rsp_queue_in.credits_hdr == response) ? axis_in_req_i.tvalid : 0;
+  assign axis_data_in_req_valid = (req_rsp_queue_in.data_hdr    == request)  ?
+         (axis_in_req_i.tvalid & req_rsp_queue_in.data_validity) : 0;
+  assign axis_data_in_rsp_valid = (req_rsp_queue_in.data_hdr    == response) ?
+         (axis_in_req_i.tvalid & req_rsp_queue_in.data_validity) : 0;
+  assign axis_cred_in_req_valid = (req_rsp_queue_in.credits_hdr == request)  ?
+         axis_in_req_i.tvalid : 0;
+  assign axis_cred_in_rsp_valid = (req_rsp_queue_in.credits_hdr == response) ?
+         axis_in_req_i.tvalid : 0;
 
   assign request_ready        = (axis_data_in_req_ready & axis_data_in_req_valid);
   assign response_ready       = (axis_data_in_rsp_ready & axis_data_in_rsp_valid);
@@ -250,7 +272,7 @@ module floo_axis_noc_bridge_virtual_channels
   // Input queue for the req channel.
   stream_fifo #(
     .T          ( flit_req_data_t        ),
-    .DEPTH      ( NumCred_NocBridge      )
+    .DEPTH      ( NumCredNocBridge      )
   ) i_axis_in_req_reg (
     .clk_i      ( clk_i                  ),
     .rst_ni     ( rst_ni                 ),
@@ -270,7 +292,7 @@ module floo_axis_noc_bridge_virtual_channels
   // Input queue for the rsp channel.
   stream_fifo #(
     .T          ( flit_rsp_data_t        ),
-    .DEPTH      ( NumCred_NocBridge      )
+    .DEPTH      ( NumCredNocBridge      )
   ) i_axis_in_rsp_reg (
     .clk_i      ( clk_i                  ),
     .rst_ni     ( rst_ni                 ),
@@ -292,8 +314,8 @@ module floo_axis_noc_bridge_virtual_channels
   //  ASSERTIONS  //
   //////////////////
 
-  if (~ignore_assert) begin
-    `ASSERT(AxisStable, axis_out_req_o.tvalid & !axis_out_rsp_i.tready |=> $stable(axis_out_req_o.t))
-  end
+if (~IgnoreAssert) begin : gen_assertion
+  `ASSERT(AxisStable, axis_out_req_o.tvalid & !axis_out_rsp_i.tready |=> $stable(axis_out_req_o.t))
+end
 
 endmodule

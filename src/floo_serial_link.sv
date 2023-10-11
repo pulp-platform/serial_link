@@ -1,4 +1,4 @@
-// Copyright 2022 ETH Zurich and University of Bologna.
+// Copyright 2023 ETH Zurich and University of Bologna.
 // Solderpad Hardware License, Version 0.51, see LICENSE for details.
 // SPDX-License-Identifier: SHL-0.51
 
@@ -26,8 +26,8 @@ module floo_serial_link
   parameter  bit  NoRegCdc        = 1'b0,
   // If the noc_bridge has zero credits, the non-virtual channel version of the noc-bridge is being used
   localparam int  Log2NumChannels = (NumChannels > 1) ? $clog2(NumChannels) : 1,
-  localparam int  channelCount    = 2,
-  localparam bit  BridgeVirtualChannels = (noc_bridge_pkg::NumCred_NocBridge == 0) ? 1'b0 : 1'b1,
+  localparam int  ChannelCount    = 2,
+  localparam bit  BridgeVirtualChannels = (noc_bridge_pkg::NumCredNocBridge == 0) ? 1'b0 : 1'b1,
   parameter  bit  PrintFeedback   = 1'b0
 ) (
   // There are 3 different clock/resets:
@@ -85,7 +85,7 @@ module floo_serial_link
   // typedef logic tuser_t;
   typedef logic tready_t;
   // `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, tuser_t, tready_t)
-  `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, user_bits_t, tready_t)
+  `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, user_bit_t, tready_t)
 
   //typedefs for physical layer
   typedef logic [NumLanes*2-1:0] phy_data_t;
@@ -120,15 +120,15 @@ module floo_serial_link
   //   NoC Bridge   //
   ////////////////////
 
-  if (BridgeVirtualChannels) begin : bridge
+  if (BridgeVirtualChannels) begin : gen_bridge
     floo_axis_noc_bridge_virtual_channels #(
-      .ignore_assert     ( 1'b0            ),
-      // .allow_debug_msg   ( 1'b1            ),
+      .IgnoreAssert      ( 1'b0            ),
+      // .AllowDebugMsg   ( 1'b1            ),
       .req_flit_t        ( req_flit_t      ),
       .rsp_flit_t        ( rsp_flit_t      ),
       .axis_req_t        ( axis_req_t      ),
       .axis_rsp_t        ( axis_rsp_t      ),
-      .numNocChanPerDir  ( channelCount    )
+      .NumNocChanPerDir  ( ChannelCount    )
     ) i_serial_link_network (
       .clk_i             ( clk_sl_i        ),
       .rst_ni            ( rst_sl_ni       ),
@@ -141,14 +141,14 @@ module floo_serial_link
       .axis_in_req_i     ( axis_in_req     ),
       .axis_out_rsp_i    ( axis_out_rsp    )
     );
-  end else begin : bridge
+  end else begin : gen_bridge
     floo_axis_noc_bridge #(
-      .ignore_assert     ( 1'b0         ),
+      .IgnoreAssert      ( 1'b0         ),
       .req_flit_t        ( req_flit_t   ),
       .rsp_flit_t        ( rsp_flit_t   ),
       .axis_req_t        ( axis_req_t   ),
       .axis_rsp_t        ( axis_rsp_t   ),
-      .numNocChanPerDir  ( channelCount )
+      .NumNocChanPerDir  ( ChannelCount )
     ) i_serial_link_network (
       .clk_i             ( clk_sl_i     ),
       .rst_ni            ( rst_sl_ni    ),

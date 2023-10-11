@@ -1005,12 +1005,12 @@ valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d",
     $display("LATENCY: wide_min_2_1 %0d", i_benchmarking.min_lat_wide_2_1);
 
     $display("INFO: narrow_req.width: %0d",$bits(narrow_flit_req_in_2.data) + 2 +
-      $bits(user_bits_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
+      $bits(user_bit_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
     $display("INFO: narrow_rsp.width: %0d",$bits(narrow_flit_rsp_in_2.data) + 2 +
-      $bits(user_bits_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
+      $bits(user_bit_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
     $display("INFO: wide.width: %0d",$bits(wide_flit_out_1.data) + 2 +
-      $bits(user_bits_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
-    // $display("INFO: AXIS-size of user_bits_t: %0d",$bits(user_bits_t));
+      $bits(user_bit_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
+    // $display("INFO: AXIS-size of user_bit_t: %0d",$bits(user_bit_t));
     // $display("INFO: AXIS-size of narrow_data_bits_t: %0d",$bits(narrow_data_bits_t));
     // $display("INFO: AXIS-size of data_bits_t: %0d",$bits(data_bits_t));
     // $display("INFO: AXIS-size of axis_packet_t: %0d",$bits(axis_packet_t));

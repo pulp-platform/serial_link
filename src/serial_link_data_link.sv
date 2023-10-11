@@ -146,8 +146,8 @@ import serial_link_pkg::*;
   // Software: Print warning if parameter value had to be changed.
   initial begin
     if (PackMultipleMsg & ($bits(data_block_t)<=$bits(data_hdr_info_t))) begin
-      $display("INFO: WARNING: PackMultipleMsg was enabled, but got disabled due to the dimensions\
- of the physical link.");
+      $display("INFO: WARNING: PackMultipleMsg was enabled, but got disabled due to the",
+               "dimensions of the physical link.");
     end
     $display("INFO: PackSmallerMsgIntoSingleTransfer=%0d (%m)", PackSmallerMsgIntoSingleTransfer);
     // $error("Simulation was terminated by debug code section in %m");
@@ -204,7 +204,7 @@ import serial_link_pkg::*;
   assign axis_in_data_in.user_bits = axis_in_req_i.t.user;
   assign axis_in_data_in.data_bits = axis_in_req_i.t.data;
 
-  if (PackSmallerMsgIntoSingleTransfer) begin : pack_data_and_find_splits
+  if (PackSmallerMsgIntoSingleTransfer) begin : gen_pack_data_and_find_splits
     enqueue_register #(
       .AllowVarAxisLen           ( AllowVarAxisLen                        ),
       .ClkDiv                    ( ClockDiv                               ),
@@ -231,7 +231,7 @@ import serial_link_pkg::*;
 
       .num_splits_o ( required_splits_reg_out )
     );
-  end else begin : pack_data_and_find_splits
+  end else begin : gen_pack_data_and_find_splits
     assign axis_packet_in_synch_in = axis_in_data_in;
     assign valid_synch_in          = axis_in_req_i.tvalid;
     assign axis_in_rsp_o.tready    = ready_synch_in;
@@ -251,7 +251,7 @@ import serial_link_pkg::*;
   end
 
   // credit_only messages consume only once split
-  if (AllowVarAxisLen) begin
+  if (AllowVarAxisLen) begin : gen_num_split_assignment
     assign send_hdr.req_num_splits =  (send_hdr.is_credits_only) ? 'd1 : required_splits_reg_out;
   end else begin
     assign send_hdr.req_num_splits =  MaxPossibleTransferSplits;
@@ -262,7 +262,7 @@ import serial_link_pkg::*;
   //   FLOW-CONTROL-INSERTION   //
   ////////////////////////////////
 
-  if (AllowVarAxisLen) begin : choose_consumption_type
+  if (AllowVarAxisLen) begin : gen_choose_consumption_type
     serial_link_credit_synchronization #(
       .credit_t          ( credit_t                  ),
       .data_t            ( aligned_axis_t            ),
@@ -288,7 +288,7 @@ import serial_link_pkg::*;
       .allow_cred_consume_i   ( 1'b1                                ),
       .consume_cred_to_send_i ( 1'b0                                )
     );
-  end else begin : choose_consumption_type
+  end else begin : gen_choose_consumption_type
     serial_link_credit_synchronization #(
       .credit_t          ( credit_t       ),
       .data_t            ( aligned_axis_t ),
@@ -414,7 +414,7 @@ import serial_link_pkg::*;
   logic credit_only_packet_incoming;
   credit_t cred_count_for_cred_only;
 
-  if (AllowVarAxisLen) begin : credit_only_control
+  if (AllowVarAxisLen) begin : gen_credit_only_control
     always_comb begin
       incoming_hdr   = flow_control_fifo_data_out;
       fifo_ready_out = flow_control_fifo_ready_out;
@@ -432,7 +432,7 @@ import serial_link_pkg::*;
         end
       end
     end
-  end else begin : credit_only_control
+  end else begin : gen_credit_only_control
     always_comb begin
       fifo_ready_out = flow_control_fifo_ready_out;
       cred_count_for_cred_only    = 0;

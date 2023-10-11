@@ -1,17 +1,22 @@
-// Yannick Baumann <baumanny@student.ethz.ch>
+// Copyright 2023 ETH Zurich and University of Bologna.
+// Solderpad Hardware License, Version 0.51, see LICENSE for details.
+// SPDX-License-Identifier: SHL-0.51
+
+// Authors:
+//  - Yannick Baumann <baumanny@student.ethz.ch>
 `include "common_cells/assertions.svh"
 
 module floo_axis_noc_bridge
 #(
   // If the parameter is set to 1, all the assertion checks within this module will be ignored.
-  parameter  bit  ignore_assert    = 1'b0,
+  parameter  bit  IgnoreAssert     = 1'b0,
   parameter  type rsp_flit_t       = logic,
   parameter  type req_flit_t       = logic,
   parameter  type axis_req_t       = logic,
   parameter  type axis_rsp_t       = logic,
-  parameter  int  numNocChanPerDir = 2,
+  parameter  int  NumNocChanPerDir = 2,
 
-  localparam int unsigned IdxWidth   = unsigned'($clog2(numNocChanPerDir)),
+  localparam int unsigned IdxWidth   = unsigned'($clog2(NumNocChanPerDir)),
   localparam type         idx_t      = logic [IdxWidth-1:0]
 ) (
   // global signals
@@ -47,19 +52,21 @@ module floo_axis_noc_bridge
   logic axis_out_ready, axis_out_valid;
   localparam int payloadSize = $bits(axis_data_t);
 
-  // the axis data payload also contains the header bit which is why the flit data width is one bit smaller than the payload
+  // the axis data payload also contains the header bit which is why the flit data width is one
+  // bit smaller than the payload
   logic [payloadSize-2:0] req_i_data, rsp_i_data;
 
   ////////////////////////////////////////////////
   //  CONNECT INCOMING FLITS WITH THE AXIS_OUT  //
   ////////////////////////////////////////////////
 
-  // Assignment required to match the data width of the two channels (rr_arb_tree needs equi-size signals)
+  // Assignment required to match the data width of the two channels
+  // (rr_arb_tree needs equi-size signals)
   assign req_i_data = req_i.data;
   assign rsp_i_data = rsp_i.data;
 
   rr_arb_tree #(
-    .NumIn      ( numNocChanPerDir           ),
+    .NumIn      ( NumNocChanPerDir           ),
     .DataWidth  ( payloadSize - 1            ),
     .ExtPrio    ( 1'b0                       ),
     .AxiVldRdy  ( 1'b1                       ),
@@ -137,8 +144,8 @@ module floo_axis_noc_bridge
   //  ASSERTIONS  //
   //////////////////
 
-  if (~ignore_assert) begin
-    `ASSERT(AxisStable, axis_out_req_o.tvalid & !axis_out_rsp_i.tready |=> $stable(axis_out_req_o.t))
-  end
+if (~IgnoreAssert) begin : gen_assertion
+  `ASSERT(AxisStable, axis_out_req_o.tvalid & !axis_out_rsp_i.tready |=> $stable(axis_out_req_o.t))
+end
 
 endmodule

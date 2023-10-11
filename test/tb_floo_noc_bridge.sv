@@ -1,3 +1,9 @@
+// Copyright 2023 ETH Zurich and University of Bologna.
+// Solderpad Hardware License, Version 0.51, see LICENSE for details.
+// SPDX-License-Identifier: SHL-0.51
+
+// Authors:
+//  - Yannick Baumann <baumanny@student.ethz.ch>
 `include "axi/typedef.svh"
 `include "axi/assign.svh"
 `include "floo_noc/typedef.svh"
@@ -33,7 +39,7 @@ module tb_floo_noc_bridge;
   logic Bridge_0_req_o, Bridge_0_req_i, Bridge_1_req_o, Bridge_1_req_i;
   logic Bridge_0_rsp_o, Bridge_0_rsp_i, Bridge_1_rsp_o, Bridge_1_rsp_i;
 
-  localparam bit BridgeVirtualChannels = (NumCred_NocBridge>0);
+  localparam bit BridgeVirtualChannels = (NumCredNocBridge>0);
   // Stop the simulation if this simulation time (ns) is exceeded.
   localparam int stopSimAfter   = 1000000;
 
@@ -52,7 +58,7 @@ module tb_floo_noc_bridge;
   localparam type tdest_t  = logic;
   // The user bits serve as transfer line for the credit information utilized in the virtual-channel version of the noc-bridge.
   // The first bit of the user-bits is reserved for a data-specific valid field. (consider the hdr bit in the data_line)
-  localparam type tuser_t  = user_bits_t;
+  localparam type tuser_t  = user_bit_t;
   localparam type tready_t = logic;
   `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, tuser_t, tready_t)
 
@@ -171,14 +177,14 @@ module tb_floo_noc_bridge;
     .rsp_i         ( chimney_0_rsp[1] )
   );
 
-  if (BridgeVirtualChannels) begin : bridge
+  if (BridgeVirtualChannels) begin : gen_bridge
     floo_axis_noc_bridge_virtual_channels #(
-    	.ignore_assert    ( BridgeBypass     ),
+    	.IgnoreAssert     ( BridgeBypass     ),
       .req_flit_t       ( req_flit_t       ),
       .rsp_flit_t       ( rsp_flit_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
-      .numNocChanPerDir ( channelCount     )
+      .NumNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_0 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),
@@ -193,12 +199,12 @@ module tb_floo_noc_bridge;
     );
 
     floo_axis_noc_bridge_virtual_channels #(
-    	.ignore_assert    ( BridgeBypass     ),
+    	.IgnoreAssert     ( BridgeBypass     ),
       .req_flit_t       ( req_flit_t       ),
       .rsp_flit_t       ( rsp_flit_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
-      .numNocChanPerDir ( channelCount     )
+      .NumNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_1 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),
@@ -211,14 +217,14 @@ module tb_floo_noc_bridge;
       .axis_in_req_i    ( bridge_req[0]    ),
       .axis_out_rsp_i   ( bridge_rsp[0]    )
     );
-  end else begin : bridge
+  end else begin : gen_bridge
     floo_axis_noc_bridge #(
-    	.ignore_assert    ( BridgeBypass     ),
+    	.IgnoreAssert     ( BridgeBypass     ),
       .req_flit_t       ( req_flit_t       ),
       .rsp_flit_t       ( rsp_flit_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
-      .numNocChanPerDir ( channelCount     )
+      .NumNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_0 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),
@@ -233,12 +239,12 @@ module tb_floo_noc_bridge;
     );
 
     floo_axis_noc_bridge #(
-    	.ignore_assert    ( BridgeBypass     ),
+    	.IgnoreAssert     ( BridgeBypass     ),
       .req_flit_t       ( req_flit_t       ),
       .rsp_flit_t       ( rsp_flit_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
-      .numNocChanPerDir ( channelCount     )
+      .NumNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_1 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),

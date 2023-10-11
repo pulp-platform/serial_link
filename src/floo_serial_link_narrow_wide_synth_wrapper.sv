@@ -7,7 +7,7 @@
 
   `include "register_interface/typedef.svh"
   // required to suppress elaboration errors
-  `define performSynthesis
+  `define PERFORM_SYNTHESIS
 
   import serial_link_reg_pkg::*;
   import floo_narrow_wide_flit_pkg::*;
@@ -17,7 +17,7 @@
   localparam int unsigned RegDataWidth = 32;
   localparam int unsigned RegStrbWidth = RegDataWidth / 8;
 
-	// RegBus types for typedefs
+  // RegBus types for typedefs
   typedef logic [RegAddrWidth-1:0] cfg_addr_t;
   typedef logic [RegDataWidth-1:0] cfg_data_t;
   typedef logic [RegStrbWidth-1:0] cfg_strb_t;
@@ -28,11 +28,14 @@ module floo_serial_link_narrow_wide_synth_wrapper
 #(
 ) (
   // There are 3 different clock/resets:
-  // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
-  // 2) clk_sl_i & rst_sl_ni: Same as 1) but clock is gated and reset is SW synchronized. This is the clock that drives the serial link
-  //    i.e. network, data-link and physical layer all run on this clock and can be clock gated if needed. If no clock gating, reset synchronization
+  // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config
+  //    registers are conected to this clock
+  // 2) clk_sl_i & rst_sl_ni: Same as 1) but clock is gated and reset is SW synchronized. This is
+  //    the clock that drives the serial link i.e. network, data-link and physical layer all run on
+  //    this clock and can be clock gated if needed. If no clock gating, reset synchronization
   //    is desired, you can tie clk_sl_i -> clk_i resp. rst_sl_ni -> rst_ni
-  // 3) clk_reg_i & rst_reg_ni: peripheral clock and reset. Only connected to RegBus CDC. If NoRegCdc is set, this clock must be the same as 1)
+  // 3) clk_reg_i & rst_reg_ni: peripheral clock and reset. Only connected to RegBus CDC.
+  //    If NoRegCdc is set, this clock must be the same as 1)
   input  logic                                                                   clk_i,
   input  logic                                                                   rst_ni,
   input  logic                                                                   clk_sl_i,

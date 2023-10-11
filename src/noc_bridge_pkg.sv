@@ -9,7 +9,7 @@ package noc_bridge_pkg;
 
   // With this parameter you can set the maximal credit count for the NoC bridge. If set to 0, the NoC-bridge without
   // virtualization will be used instead.
-  localparam int NumCred_NocBridge = 8;
+  localparam int NumCredNocBridge = 8;
 
   ///////////////////////////////////////////
   // DEPENDANT PARAMETERS - DO NOT CHANGE  //
@@ -34,14 +34,14 @@ package noc_bridge_pkg;
     request   = 'd1
   } channel_hdr_e;
 
-  typedef logic [$clog2(NumCred_NocBridge+1)-1:0] bridge_credit_t;
+  typedef logic [$clog2(NumCredNocBridge+1)-1:0] bridge_credit_t;
 
   // User bits utilized in the AXIS interface
   typedef struct packed {
     logic data_validity;
     channel_hdr_e credits_hdr;
     bridge_credit_t credits;
-  } user_bits_t;
+  } user_bit_t;
 
   // Data bits utilized in the AXIS interface
   typedef struct packed {

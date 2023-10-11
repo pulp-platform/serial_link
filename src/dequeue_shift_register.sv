@@ -85,7 +85,8 @@ import serial_link_pkg::*;
     assign block_start_bit = data_out[0][NumHdrBits];
     assign valid_shift_pos = block_start_bit & contains_valid_data;
     assign valid_o         = contains_valid_data & valid_shift_pos;
-    assign shift_en_o      = ~load_new_data & (ready_i | ~valid_shift_pos) & shift_en_i & contains_valid_data;
+    assign shift_en_o      =
+           ~load_new_data & (ready_i | ~valid_shift_pos) & shift_en_i & contains_valid_data;
     assign first_hs_o      = valid_o & ready_i & first_outstanding_q;
 
 
@@ -127,7 +128,7 @@ import serial_link_pkg::*;
 
     assign data_in_blocks = data_i;
 
-    for (genvar i = 0; i < NumBlocks; i++) begin : load_or_shift_data
+    for (genvar i = 0; i < NumBlocks; i++) begin : gen_load_or_shift_data
       // assign inputs of the FFs
       always_comb begin
         data_in[i] = data_out[i];
@@ -144,12 +145,13 @@ import serial_link_pkg::*;
         end
       end
 
-      if (BitRemovalIndex==0) begin
+      if (BitRemovalIndex==0) begin : gen_remove_block_ctrl_bit
         assign data_out_blocks[i] = data_out[i][BlockSize-1:1];
       end else if (BitRemovalIndex==BlockSize) begin
         assign data_out_blocks[i] = data_out[i][BlockSize-2:0];
       end else begin
-        assign data_out_blocks[i] = {data_out[i][BlockSize-1:BitRemovalIndex+1], data_out[i][BitRemovalIndex-1:0]};
+        assign data_out_blocks[i] =
+               {data_out[i][BlockSize-1:BitRemovalIndex+1], data_out[i][BitRemovalIndex-1:0]};
       end
 
       `FF(data_out[i], data_in[i], '0)
@@ -161,7 +163,7 @@ import serial_link_pkg::*;
     `FF(block_idx_q, block_idx_d, '0)
     `FF(first_outstanding_q, first_outstanding_d, 1)
 
-    if (UseHeader) begin
+    if (UseHeader) begin : gen_use_hdr
       `FFL(header_o, data_i, load_new_data, 1'b0, clk_i, rst_ni)
     end else begin
       assign header_o = '0;
