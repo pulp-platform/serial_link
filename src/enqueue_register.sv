@@ -72,7 +72,8 @@ module find_req_blocks #(
     // the max is not exceeded, which could happen when the front most data byte is not a full byte
     // (not all bits are required). This would lead to a mismatch in the determined MaxNumSplits
     // opposed to the optained number by comparing the block count.
-    assign required_blocks_o = (all_ones) ? TotalNumBlocks : (required_bits+BlockSize-2)/(BlockSize-1);
+    assign required_blocks_o =
+           (all_ones) ? TotalNumBlocks : (required_bits+BlockSize-2)/(BlockSize-1);
   end else begin
     assign required_blocks_o = TotalNumBlocks;
   end
@@ -126,7 +127,8 @@ module enqueue_register
     localparam type block_cntr_t = logic [$clog2(NumDatBlocks+1)-1:0],
 
     // TODO: remove the last parameter...
-    localparam int  MinDataSize  = 8*NarrowStrbCount + NumExternalBitsAdded + NumExternalBitsAddedFirst,
+    localparam int  MinDataSize  =
+                    8*NarrowStrbCount + NumExternalBitsAdded + NumExternalBitsAddedFirst,
     localparam int  MinReqBlocks = (MinDataSize + BlockSize - 2) / (BlockSize-1),
     // Find the number of required register blocks
     localparam int  NumRegBlocks = 2*ClkDiv - 2*MinReqBlocks
@@ -231,7 +233,9 @@ module enqueue_register
   // shift the input message into the out_block section )
   assign enough_time_left  = required_blocks < cycle_delay_q + MinReqBlocks;
   // Combination of above signals to evaluate if I am able to receive new blocks
-  assign accept_next_block = no_ongoing_shift & no_lat_introduced & enough_time_left & (occupied_blocks_q + required_blocks <= ClkDiv);
+  assign accept_next_block =
+         no_ongoing_shift & no_lat_introduced & enough_time_left &
+         (occupied_blocks_q + required_blocks <= ClkDiv);
   // shift_register it emptied, resulting in the new incoming element to be the first in the reg.
   assign is_first_element  = contains_valid_data & allow_new_out_transac & ready_reg_in;
 
@@ -329,12 +333,14 @@ module enqueue_register
       `FFL(reg_blocks_q[i], reg_blocks_d[i], allow_shifts, '0, clk_i, rst_ni)
     end else begin
       if (i == NumRegBlocks - 1) begin
-        // The first register block has no other register block to read the data from when in shift mode.
+        // The first register block has no other register block to
+        // read the data from when in shift mode.
         assign reg_blocks_d[i] = (valid_data_into_reg) ? data_with_ctrl_bits[i - ShiftDepth] : '0;
       end else begin
-        assign reg_blocks_d[i] = (valid_data_into_reg) ? data_with_ctrl_bits[i - ShiftDepth] : reg_blocks_q[i + 1];
+        assign reg_blocks_d[i] =
+               (valid_data_into_reg) ? data_with_ctrl_bits[i - ShiftDepth] : reg_blocks_q[i + 1];
       end
-      `FFL(reg_blocks_q[i], reg_blocks_d[i], (valid_data_into_reg | allow_shifts), '0, clk_i, rst_ni)
+      `FFL(reg_blocks_q[i], reg_blocks_d[i], (valid_data_into_reg|allow_shifts), '0, clk_i, rst_ni)
     end
   end
 
@@ -343,8 +349,8 @@ module enqueue_register
   //  DATA OUTPUT REGISTER  //
   ////////////////////////////
 
-  localparam int  str_reg_wdt   = $bits(data_out_t) + $bits(split_cntr_t);
-  localparam type dat_and_spl_t = logic [str_reg_wdt-1:0];
+  localparam int  StrRegWdt   = $bits(data_out_t) + $bits(split_cntr_t);
+  localparam type dat_and_spl_t = logic [StrRegWdt-1:0];
 
   // suppress size missmatch warning...
   assign data_out = data_out_blocks;

@@ -22,7 +22,7 @@ proc print_field_explanation {} {
 	exec echo "->  data_link_stream_fifo_depth,,is an extraordinary field. All the other fields report general information which is independant of the parametric run. But this field is not representing globally true information. It shows the resulting stream_fifo depth for the very first simulation run. The information can be used to conclude on how the credits are being consumed and on how many splits may be expected." >> perfAnalysis.csv
 	exec echo "-> The {narrow_ax_len & narrow_ax_size & wide_ax_len & wide_ax_size},,,parameters show the selected numbers for the random masters (values passed via the traffic shaping function)" >> perfAnalysis.csv
 	exec echo "->  The column *NumCredits* is,,indicating the number of credits used by the credit counter/syncronization unit of the serial_link_data_link." >> perfAnalysis.csv
-	exec echo "-> NumCred_NocBridge lists the,,amount of credits available to the channels of the noc_bridge. All of the three virtual channels are make to have the same amount of credits. A value of zero indicates that the noc_bridge without virtual channels is being used (thus no blue background)." >> perfAnalysis.csv
+	exec echo "-> NumCredNocBridge lists the,,amount of credits available to the channels of the noc_bridge. All of the three virtual channels are make to have the same amount of credits. A value of zero indicates that the noc_bridge without virtual channels is being used (thus no blue background)." >> perfAnalysis.csv
 	exec echo "->  The four BW fields report the,,bandwidth which is found from the perspective of the noc_bridge. This means that the sum of all the bits (from all AXI channels) is calculated and devided by the overall required time for the transfers to complete. This is also why the number cannot be as high as the maximal possible transfer rate of the physical link itself. For one reason the physical links BW is shared between narrow & wide channels. Secondly the amount of bits can be different for the individual AXI channels. Lastly the serial_link_data_link may introduce additional payload by sending credit only packets." >> perfAnalysis.csv
 	exec echo "max_BW_physical_from_side_1:,,describes the maximal possible bandwidth supported by the physical channel connecting the two chiplets. The calculation considers the clock frequency of the first on-chip clock and devides by a factor of 8 (clock divider for off-chip clock). The resulting frequency is multiplied by the number reported under bandwidth_physical_channel." >> perfAnalysis.csv
 	exec echo "max_BW_physical_from_side_2:,,describes the maximal possible bandwidth supported by the physical channel connecting the two chiplets. The calculation considers the clock frequency of the second on-chip clock and devides by a factor of 8 (clock divider for off-chip clock). The resulting frequency is multiplied by the number reported under bandwidth_physical_channel" >> perfAnalysis.csv
@@ -263,7 +263,7 @@ proc print_csv_header {performedSteps numTransactionsAvailable} {
 		exec cat perfAnalysis.tmp | grep "INFO: wide.width" | cut -d " " -f 4 >> perfAnalysis.csv
 		print_field_explanation
 		exec echo "---------- start of the simulation ----------,,,,,,,,,,,,,,,,,,,,,,,average serial_link latency,,,,,,minimal serial_link latency,,,,,,average latency (rand_master runtime per packet),,,,min and max latency numbers for the narrow channel from side 1 to 2,,,,,,,,,,min and max latency numbers for the narrow channel from side 2 to 1,,,,,,,,,,min and max latency numbers for the wide channel from side 1 to 2,,,,,,,,,,min and max latency numbers for the wide channel from side 2 to 1" >> perfAnalysis.csv
-		exec echo "NumCredits, NumCred_NocBridge, avg_time_per_read/write (lower is better), narrow1 BW (sent/rcv) Mbit/s, narrow2 BW (sent/rcv) Mbit/s, wide1 BW (sent/rcv) Mbit/s, wide2 BW (sent/rcv) Mbit/s, data_link_0: valid_coverage_to_phys, data_link_0: valid_coverage_from_phys, data_link_0: num_cred_only, data_link_0: valid_in_but_not_valid_out, data_link_1: valid_coverage_to_phys, data_link_1: valid_coverage_from_phys, data_link_1: num_cred_only, data_link_1: valid_in_but_not_valid_out, noc_bridge_0: valid_coverage_to_phys, noc_bridge_0: valid_coverage_from_phys, noc_bridge_0: num_cred_only, noc_bridge_0: valid_in_but_not_valid_out, noc_bridge_1: valid_coverage_to_phys, noc_bridge_1: valid_coverage_from_phys, noc_bridge_1: num_cred_only, noc_bridge_1: valid_in_but_not_valid_out,nar_req_12,nar_rsp_12,wide_12,nar_req_21,nar_rsp_21,wide_21,nar_req_12,nar_rsp_12,wide_12,nar_req_21,nar_rsp_21,wide_21,narrow_1 \[ns\],narrow_2 \[ns\],wide_1 \[ns\],wide_2 \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\]" >> perfAnalysis.csv
+		exec echo "NumCredits, NumCredNocBridge, avg_time_per_read/write (lower is better), narrow1 BW (sent/rcv) Mbit/s, narrow2 BW (sent/rcv) Mbit/s, wide1 BW (sent/rcv) Mbit/s, wide2 BW (sent/rcv) Mbit/s, data_link_0: valid_coverage_to_phys, data_link_0: valid_coverage_from_phys, data_link_0: num_cred_only, data_link_0: valid_in_but_not_valid_out, data_link_1: valid_coverage_to_phys, data_link_1: valid_coverage_from_phys, data_link_1: num_cred_only, data_link_1: valid_in_but_not_valid_out, noc_bridge_0: valid_coverage_to_phys, noc_bridge_0: valid_coverage_from_phys, noc_bridge_0: num_cred_only, noc_bridge_0: valid_in_but_not_valid_out, noc_bridge_1: valid_coverage_to_phys, noc_bridge_1: valid_coverage_from_phys, noc_bridge_1: num_cred_only, noc_bridge_1: valid_in_but_not_valid_out,nar_req_12,nar_rsp_12,wide_12,nar_req_21,nar_rsp_21,wide_21,nar_req_12,nar_rsp_12,wide_12,nar_req_21,nar_rsp_21,wide_21,narrow_1 \[ns\],narrow_2 \[ns\],wide_1 \[ns\],wide_2 \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\],aw_max \[ns\],w_max \[ns\],b_max \[ns\],ar_max \[ns\],r_max \[ns\],aw_min \[ns\],w_min \[ns\],b_min \[ns\],ar_min \[ns\],r_min \[ns\]" >> perfAnalysis.csv
 	}
 }
 
@@ -415,8 +415,8 @@ for { set link_credits $link_credits_start}  {$link_credits <= $link_credits_sto
 		set fd [open src/noc_bridge_narrow_wide_pkg.sv r]
 		set newfd [open src/noc_bridge_narrow_wide_pkg.sv.tmp w]
 		while {[gets $fd line] >= 0} {
-			if {[string first "localparam int NumCred_NocBridge = " $line] != -1} {
-		    	puts $newfd "  localparam int NumCred_NocBridge = 0;"
+			if {[string first "localparam int NumCredNocBridge = " $line] != -1} {
+		    	puts $newfd "  localparam int NumCredNocBridge = 0;"
 			} else {
 		    	puts $newfd $line
 			}
@@ -449,8 +449,8 @@ for { set link_credits $link_credits_start}  {$link_credits <= $link_credits_sto
 		set fd [open src/noc_bridge_narrow_wide_pkg.sv r]
 		set newfd [open src/noc_bridge_narrow_wide_pkg.sv.tmp w]
 		while {[gets $fd line] >= 0} {
-			if {[string first "localparam int NumCred_NocBridge = " $line] != -1} {
-		    	puts $newfd "  localparam int NumCred_NocBridge = $noc_credits;"
+			if {[string first "localparam int NumCredNocBridge = " $line] != -1} {
+		    	puts $newfd "  localparam int NumCredNocBridge = $noc_credits;"
 			} else {
 		    	puts $newfd $line
 			}

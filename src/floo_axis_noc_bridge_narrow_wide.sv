@@ -5,7 +5,7 @@
 module floo_axis_noc_bridge_narrow_wide
 #(
   // If the parameter is set to 1, all the assertion checks within this module will be ignored.
-  parameter  bit  ignore_assert     = 1'b0,
+  parameter  bit  IgnoreAssert      = 1'b0,
   parameter  type narrow_rsp_flit_t = logic,
   parameter  type narrow_req_flit_t = logic,
   parameter  type wide_flit_t       = logic,
@@ -59,14 +59,16 @@ module floo_axis_noc_bridge_narrow_wide
   logic axis_out_ready, axis_out_valid;
   logic arbiter_ready_in, arbiter_valid_out;
 
-  // the axis data payload also contains the header bit which is why the flit data width is one bit smaller than the payload
+  // the axis data payload also contains the header bit which is why the flit data width is one
+  // bit smaller than the payload
   narrow_axis_data_t narrow_req_i_data, narrow_rsp_i_data;
 
   ////////////////////////////////////////////////
   //  CONNECT INCOMING FLITS WITH THE AXIS_OUT  //
   ////////////////////////////////////////////////
 
-  // Assignment required to match the data width of the two channels (rr_arb_tree needs equi-size signals)
+  // Assignment required to match the data width of the two channels
+  // (rr_arb_tree needs equi-size signals)
   assign narrow_req_i_data = { narrow_req_i.data, narrow_request  };
   assign narrow_rsp_i_data = { narrow_rsp_i.data, narrow_response };
 
@@ -148,7 +150,8 @@ module floo_axis_noc_bridge_narrow_wide
   );
 
   assign axis_out_req_o.t.data = axis_out_data_reg_out;
-  assign axis_out_req_o.t.strb = (axis_out_data_reg_out.hdr == wide_channel) ? WideStrobe : NarrowStrobe;
+  assign axis_out_req_o.t.strb =
+         (axis_out_data_reg_out.hdr == wide_channel) ? WideStrobe : NarrowStrobe;
   assign axis_out_req_o.t.keep = '0;
   assign axis_out_req_o.t.last = '0;
   assign axis_out_req_o.t.id   = '0;
@@ -160,9 +163,11 @@ module floo_axis_noc_bridge_narrow_wide
   ///////////////////////////////////////////////
 
   assign axis_in_payload      = wide_axis_data_t'(axis_in_req_i.t.data);
-  assign axis_in_rsp_o.tready = (narrow_req_i.ready & narrow_req_o.valid) || (narrow_rsp_i.ready & narrow_rsp_o.valid) || (wide_i.ready & wide_o.valid);
+  assign axis_in_rsp_o.tready = (narrow_req_i.ready & narrow_req_o.valid) ||
+                                (narrow_rsp_i.ready & narrow_rsp_o.valid) ||
+                                (wide_i.ready & wide_o.valid);
   assign narrow_req_o.valid   = (axis_in_payload.hdr == narrow_request) ? axis_in_req_i.tvalid : 0;
-  assign narrow_rsp_o.valid   = (axis_in_payload.hdr == narrow_response) ? axis_in_req_i.tvalid : 0;
+  assign narrow_rsp_o.valid   = (axis_in_payload.hdr == narrow_response)? axis_in_req_i.tvalid : 0;
   assign wide_o.valid         = (axis_in_payload.hdr == wide_channel) ? axis_in_req_i.tvalid : 0;
   assign narrow_req_o.data    = axis_in_payload.flit_data;
   assign narrow_rsp_o.data    = axis_in_payload.flit_data;
@@ -180,8 +185,8 @@ module floo_axis_noc_bridge_narrow_wide
   //  ASSERTIONS  //
   //////////////////
 
-  if (~ignore_assert) begin
-    `ASSERT(AxisStable, axis_out_req_o.tvalid & !axis_out_rsp_i.tready |=> $stable(axis_out_req_o.t))
-  end
+if (~IgnoreAssert) begin : gen_assertion
+  `ASSERT(AxisStable, axis_out_req_o.tvalid & !axis_out_rsp_i.tready |=> $stable(axis_out_req_o.t))
+end
 
 endmodule

@@ -1,3 +1,9 @@
+// Copyright 2023 ETH Zurich and University of Bologna.
+// Solderpad Hardware License, Version 0.51, see LICENSE for details.
+// SPDX-License-Identifier: SHL-0.51
+
+// Authors:
+//  - Yannick Baumann <baumanny@student.ethz.ch>
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
 
@@ -138,7 +144,7 @@ module serial_link_credit_synchronization #(
   //  IO delay path cut (optional)  //
   ////////////////////////////////////
 
-  if (IsolateIO) begin : IO_isolation
+  if (IsolateIO) begin : gen_IO_isolation
     stream_register #(
       .T          ( logic [DataWidth-1:0] )
     ) i_IO_isolate (
