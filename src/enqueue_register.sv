@@ -260,7 +260,7 @@ module enqueue_register
 
   // Insertion of block-control-bits into the data stream
   assign data_in_blocks = data_i;
-  for (genvar i = 0; i < NumDatBlocks; i++) begin gen_insert_block_ctrl_bit
+  for (genvar i = 0; i < NumDatBlocks; i++) begin : gen_insert_block_ctrl_bit
     localparam bit BlockCtrlBit   = (i==0) ? 1'b1 : 1'b0;
     assign data_with_ctrl_bits[i] = {data_in_blocks[i], BlockCtrlBit};
   end
