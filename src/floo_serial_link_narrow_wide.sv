@@ -49,7 +49,6 @@ module floo_serial_link_narrow_wide
   input  logic                                 rst_reg_ni,
   // Tie to zero if not used.
   input  logic                                 testmode_i,
-  // TODO: rename intput channel to narrow_sth
   input  floo_req_t                            floo_req_i,
   input  floo_rsp_t                            floo_rsp_i,
   output floo_req_t                            floo_req_o,
@@ -171,20 +170,6 @@ module floo_serial_link_narrow_wide
       .axis_in_req_i  ( axis_in_req  ),
       .axis_out_rsp_i ( axis_out_rsp )
     );
-  end
-
-  /////////////////////////////////////////////////////////
-  //   CONSOLE FEEDBACK ON THE SELECTED BRIDGE VERSION   //
-  /////////////////////////////////////////////////////////
-
-  initial begin
-    if (PrintFeedback) begin
-      if (BridgeVirtualChannels) begin
-        $display("INFO: The virtual channel NoC bridge is being used");
-      end else begin
-        $display("INFO: The simple NoC bridge version without virtual channels is being used");
-      end
-    end
   end
 
   /////////////////////////
