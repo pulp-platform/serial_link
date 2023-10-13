@@ -14,7 +14,7 @@ module tb_floo_noc_bridge;
   import floo_pkg::*;
   import noc_bridge_pkg::*;
   import serial_link_pkg::*;
-  import floo_axi_flit_pkg::*;
+  import floo_axi_pkg::*;
 
   // set to zero if the noc_bridge should be inserted. Assign to one if the bridge should be ignored/bypassede
   localparam bit BridgeBypass = 1'b0;
@@ -65,31 +65,31 @@ module tb_floo_noc_bridge;
   logic clk, rst_n;
 
   axi_in_req_t [NumTargets-1:0] node_man_req;
-  axi_in_resp_t [NumTargets-1:0] node_man_rsp;
+  axi_in_rsp_t [NumTargets-1:0] node_man_rsp;
 
   axi_out_req_t [NumTargets-1:0] node_sub_req;
-  axi_out_resp_t [NumTargets-1:0] node_sub_rsp;
+  axi_out_rsp_t [NumTargets-1:0] node_sub_rsp;
 
   axi_in_req_t [NumTargets-1:0] sub_req_id_mapped;
-  axi_in_resp_t [NumTargets-1:0] sub_rsp_id_mapped;
+  axi_in_rsp_t [NumTargets-1:0] sub_rsp_id_mapped;
 
   for (genvar i = 0; i < NumTargets; i++) begin : gen_axi_assign
     `AXI_ASSIGN_REQ_STRUCT(sub_req_id_mapped[i], node_sub_req[i])
     `AXI_ASSIGN_RESP_STRUCT(sub_rsp_id_mapped[i], node_sub_rsp[i])
   end
 
-  req_flit_t [NumTargets-1:0] chimney_0_req;
-  rsp_flit_t [NumTargets-1:0] chimney_0_rsp;
-  req_flit_t [NumTargets-1:0] chimney_1_req;
-  rsp_flit_t [NumTargets-1:0] chimney_1_rsp;
+  floo_req_t [NumTargets-1:0] chimney_0_req;
+  floo_rsp_t [NumTargets-1:0] chimney_0_rsp;
+  floo_req_t [NumTargets-1:0] chimney_1_req;
+  floo_rsp_t [NumTargets-1:0] chimney_1_rsp;
 
   axis_req_t [NumTargets-1:0] bridge_req;
   axis_rsp_t [NumTargets-1:0] bridge_rsp;
 
   logic [NumTargets-1:0] end_of_sim;
 
-  req_flit_t req_bridge_0_o, req_bridge_1_o;
-  rsp_flit_t rsp_bridge_0_o, rsp_bridge_1_o;
+  floo_req_t req_bridge_0_o, req_bridge_1_o;
+  floo_rsp_t rsp_bridge_0_o, rsp_bridge_1_o;
 
   clk_rst_gen #(
     .ClkPeriod    ( CyclTime ),
@@ -116,9 +116,9 @@ module tb_floo_noc_bridge;
     .AxiIdInWidth   ( AxiOutIdWidth      ),
     .AxiUserWidth   ( AxiInUserWidth     ),
     .mst_req_t      ( axi_in_req_t       ),
-    .mst_rsp_t      ( axi_in_resp_t      ),
+    .mst_rsp_t      ( axi_in_rsp_t       ),
     .slv_req_t      ( axi_out_req_t      ),
-    .slv_rsp_t      ( axi_out_resp_t     ),
+    .slv_rsp_t      ( axi_out_rsp_t      ),
     .ApplTime       ( ApplTime           ),
     .TestTime       ( TestTime           ),
     .AxiMaxBurstLen ( ReorderBufferSize  ),
@@ -145,7 +145,7 @@ module tb_floo_noc_bridge;
     .ar_chan_t ( axi_in_ar_chan_t     ),
     .r_chan_t  ( axi_in_r_chan_t      ),
     .req_t     ( axi_in_req_t         ),
-    .resp_t    ( axi_in_resp_t        )
+    .resp_t    ( axi_in_rsp_t        )
   ) i_axi_channel_compare_0 (
     .clk_a_i   ( clk                  ),
     .clk_b_i   ( clk                  ),
@@ -171,27 +171,27 @@ module tb_floo_noc_bridge;
     .axi_out_rsp_i ( node_sub_rsp[0]  ),
     .xy_id_i       (                  ),
     .id_i          ( '0               ),
-    .req_o         ( chimney_0_req[0] ),
-    .rsp_o         ( chimney_0_rsp[0] ),
-    .req_i         ( chimney_0_req[1] ),
-    .rsp_i         ( chimney_0_rsp[1] )
+    .floo_req_o    ( chimney_0_req[0] ),
+    .floo_rsp_o    ( chimney_0_rsp[0] ),
+    .floo_req_i    ( chimney_0_req[1] ),
+    .floo_rsp_i    ( chimney_0_rsp[1] )
   );
 
   if (BridgeVirtualChannels) begin : gen_bridge
     floo_axis_noc_bridge_virtual_channels #(
     	.IgnoreAssert     ( BridgeBypass     ),
-      .req_flit_t       ( req_flit_t       ),
-      .rsp_flit_t       ( rsp_flit_t       ),
+      .floo_req_t       ( floo_req_t       ),
+      .floo_rsp_t       ( floo_rsp_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
       .NumNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_0 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),
-      .req_o            ( req_bridge_0_o   ),
-      .rsp_o            ( rsp_bridge_0_o   ),
-      .req_i            ( chimney_0_req[0] ),
-      .rsp_i            ( chimney_0_rsp[0] ),
+      .floo_req_o       ( req_bridge_0_o   ),
+      .floo_rsp_o       ( rsp_bridge_0_o   ),
+      .floo_req_i       ( chimney_0_req[0] ),
+      .floo_rsp_i       ( chimney_0_rsp[0] ),
       .axis_out_req_o   ( bridge_req[0]    ),
       .axis_in_rsp_o    ( bridge_rsp[0]    ),
       .axis_in_req_i    ( bridge_req[1]    ),
@@ -200,18 +200,18 @@ module tb_floo_noc_bridge;
 
     floo_axis_noc_bridge_virtual_channels #(
     	.IgnoreAssert     ( BridgeBypass     ),
-      .req_flit_t       ( req_flit_t       ),
-      .rsp_flit_t       ( rsp_flit_t       ),
+      .floo_req_t       ( floo_req_t       ),
+      .floo_rsp_t       ( floo_rsp_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
       .NumNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_1 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),
-      .req_o            ( req_bridge_1_o   ),
-      .rsp_o            ( rsp_bridge_1_o   ),
-      .req_i            ( chimney_1_req[1] ),
-      .rsp_i            ( chimney_1_rsp[1] ),
+      .floo_req_o       ( req_bridge_1_o   ),
+      .floo_rsp_o       ( rsp_bridge_1_o   ),
+      .floo_req_i       ( chimney_1_req[1] ),
+      .floo_rsp_i       ( chimney_1_rsp[1] ),
       .axis_out_req_o   ( bridge_req[1]    ),
       .axis_in_rsp_o    ( bridge_rsp[1]    ),
       .axis_in_req_i    ( bridge_req[0]    ),
@@ -220,18 +220,18 @@ module tb_floo_noc_bridge;
   end else begin : gen_bridge
     floo_axis_noc_bridge #(
     	.IgnoreAssert     ( BridgeBypass     ),
-      .req_flit_t       ( req_flit_t       ),
-      .rsp_flit_t       ( rsp_flit_t       ),
+      .floo_req_t       ( floo_req_t       ),
+      .floo_rsp_t       ( floo_rsp_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
       .NumNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_0 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),
-      .req_o            ( req_bridge_0_o   ),
-      .rsp_o            ( rsp_bridge_0_o   ),
-      .req_i            ( chimney_0_req[0] ),
-      .rsp_i            ( chimney_0_rsp[0] ),
+      .floo_req_o            ( req_bridge_0_o   ),
+      .floo_rsp_o            ( rsp_bridge_0_o   ),
+      .floo_req_i            ( chimney_0_req[0] ),
+      .floo_rsp_i            ( chimney_0_rsp[0] ),
       .axis_out_req_o   ( bridge_req[0]    ),
       .axis_in_rsp_o    ( bridge_rsp[0]    ),
       .axis_in_req_i    ( bridge_req[1]    ),
@@ -240,18 +240,18 @@ module tb_floo_noc_bridge;
 
     floo_axis_noc_bridge #(
     	.IgnoreAssert     ( BridgeBypass     ),
-      .req_flit_t       ( req_flit_t       ),
-      .rsp_flit_t       ( rsp_flit_t       ),
+      .floo_req_t       ( floo_req_t       ),
+      .floo_rsp_t       ( floo_rsp_t       ),
       .axis_req_t       ( axis_req_t       ),
       .axis_rsp_t       ( axis_rsp_t       ),
       .NumNocChanPerDir ( channelCount     )
     ) i_floo_axis_noc_bridge_1 (
       .clk_i            ( clk              ),
       .rst_ni           ( rst_n            ),
-      .req_o            ( req_bridge_1_o   ),
-      .rsp_o            ( rsp_bridge_1_o   ),
-      .req_i            ( chimney_1_req[1] ),
-      .rsp_i            ( chimney_1_rsp[1] ),
+      .floo_req_o            ( req_bridge_1_o   ),
+      .floo_rsp_o            ( rsp_bridge_1_o   ),
+      .floo_req_i            ( chimney_1_req[1] ),
+      .floo_rsp_i            ( chimney_1_rsp[1] ),
       .axis_out_req_o   ( bridge_req[1]    ),
       .axis_in_rsp_o    ( bridge_rsp[1]    ),
       .axis_in_req_i    ( bridge_req[0]    ),
@@ -290,10 +290,10 @@ module tb_floo_noc_bridge;
     .axi_out_rsp_i ( node_sub_rsp[1]  ),
     .xy_id_i       (                  ),
     .id_i          ( '0               ),
-    .req_o         ( chimney_1_req[1] ),
-    .rsp_o         ( chimney_1_rsp[1] ),
-    .req_i         ( chimney_1_req[0] ),
-    .rsp_i         ( chimney_1_rsp[0] )
+    .floo_req_o    ( chimney_1_req[1] ),
+    .floo_rsp_o    ( chimney_1_rsp[1] ),
+    .floo_req_i    ( chimney_1_req[0] ),
+    .floo_rsp_i    ( chimney_1_rsp[0] )
   );
 
   axi_chan_compare #(
@@ -304,7 +304,7 @@ module tb_floo_noc_bridge;
     .ar_chan_t ( axi_in_ar_chan_t     ),
     .r_chan_t  ( axi_in_r_chan_t      ),
     .req_t     ( axi_in_req_t         ),
-    .resp_t    ( axi_in_resp_t        )
+    .resp_t    ( axi_in_rsp_t         )
   ) i_axi_channel_compare_1 (
     .clk_a_i   ( clk                  ),
     .clk_b_i   ( clk                  ),
@@ -321,9 +321,9 @@ module tb_floo_noc_bridge;
     .AxiIdOutWidth  ( AxiInIdWidth       ),
     .AxiUserWidth   ( AxiInUserWidth     ),
     .mst_req_t      ( axi_in_req_t       ),
-    .mst_rsp_t      ( axi_in_resp_t      ),
+    .mst_rsp_t      ( axi_in_rsp_t       ),
     .slv_req_t      ( axi_out_req_t      ),
-    .slv_rsp_t      ( axi_out_resp_t     ),
+    .slv_rsp_t      ( axi_out_rsp_t      ),
     .ApplTime       ( ApplTime           ),
     .TestTime       ( TestTime           ),
     .AxiMaxBurstLen ( ReorderBufferSize  ),

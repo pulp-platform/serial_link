@@ -10,9 +10,9 @@ module floo_axis_noc_bridge_narrow_wide
 #(
   // If the parameter is set to 1, all the assertion checks within this module will be ignored.
   parameter  bit  IgnoreAssert      = 1'b0,
-  parameter  type narrow_rsp_flit_t = logic,
-  parameter  type narrow_req_flit_t = logic,
-  parameter  type wide_flit_t       = logic,
+  parameter  type floo_rsp_t = logic,
+  parameter  type floo_req_t = logic,
+  parameter  type floo_wide_t       = logic,
   parameter  type axis_req_t        = logic,
   parameter  type axis_rsp_t        = logic
 ) (
@@ -21,14 +21,14 @@ module floo_axis_noc_bridge_narrow_wide
   input  logic      rst_ni,
   // flits from the NoC
     // flits to be sent out
-  output narrow_req_flit_t narrow_req_o,
-  output narrow_rsp_flit_t narrow_rsp_o,
+  output floo_req_t floo_req_o,
+  output floo_rsp_t floo_rsp_o,
     // flits to be received
-  input  narrow_req_flit_t narrow_req_i,
-  input  narrow_rsp_flit_t narrow_rsp_i,
+  input  floo_req_t floo_req_i,
+  input  floo_rsp_t floo_rsp_i,
     // wide channels
-  input  wide_flit_t       wide_i,
-  output wide_flit_t       wide_o,
+  input  floo_wide_t       floo_wide_i,
+  output floo_wide_t       floo_wide_o,
   // AXIS channels
     // AXIS outgoing data
   output axis_req_t axis_out_req_o,
@@ -73,8 +73,8 @@ module floo_axis_noc_bridge_narrow_wide
 
   // Assignment required to match the data width of the two channels
   // (rr_arb_tree needs equi-size signals)
-  assign narrow_req_i_data = { narrow_req_i.data, narrow_request  };
-  assign narrow_rsp_i_data = { narrow_rsp_i.data, narrow_response };
+  assign narrow_req_i_data = { floo_req_i.req, narrow_request  };
+  assign narrow_rsp_i_data = { floo_rsp_i.rsp, narrow_response };
 
   rr_arb_tree #(
     .NumIn     ( 2                  ),
@@ -88,10 +88,10 @@ module floo_axis_noc_bridge_narrow_wide
     /// Clears the arbiter state. Only used if `ExtPrio` is `1'b0` or `LockIn` is `1'b1`.
     .flush_i   ( 1'b0                                     ),
     /// Input requests arbitration.
-    .req_i     ( {narrow_req_i.valid, narrow_rsp_i.valid} ),
+    .req_i     ( {floo_req_i.valid, floo_rsp_i.valid} ),
     /* verilator lint_off UNOPTFLAT */
     /// Input request is granted.
-    .gnt_o     ( {narrow_req_o.ready, narrow_rsp_o.ready} ),
+    .gnt_o     ( {floo_req_o.ready, floo_rsp_o.ready} ),
     /* verilator lint_on UNOPTFLAT */
     /// Input data for arbitration.
     .data_i    ( {narrow_req_i_data, narrow_rsp_i_data}   ),
@@ -107,7 +107,7 @@ module floo_axis_noc_bridge_narrow_wide
 
   always_comb begin
     selChanType_d    = selChanType_q;
-    wide_o.ready     = '0;
+    floo_wide_o.ready     = '0;
     axis_out_valid   = '0;
     arbiter_ready_in = '0;
     axis_out_payload = '0;
@@ -117,16 +117,16 @@ module floo_axis_noc_bridge_narrow_wide
         axis_out_payload.flit_data = arbiter_out_payload.flit_data;
         axis_out_valid   = arbiter_valid_out;
         arbiter_ready_in = axis_out_ready;
-        if (wide_i.valid & !arbiter_valid_out) begin
+        if (floo_wide_i.valid & !arbiter_valid_out) begin
           selChanType_d = wideChan;
         end
       end
       wideChan : begin
         axis_out_payload.hdr = wide_channel;
-        axis_out_payload.flit_data = wide_i.data;
-        axis_out_valid = wide_i.valid;
-        wide_o.ready   = axis_out_ready;
-        if ((!wide_i.valid | wide_o.ready) & arbiter_valid_out) begin
+        axis_out_payload.flit_data = floo_wide_i.wide;
+        axis_out_valid = floo_wide_i.valid;
+        floo_wide_o.ready   = axis_out_ready;
+        if ((!floo_wide_i.valid | floo_wide_o.ready) & arbiter_valid_out) begin
           selChanType_d = narrowChan;
         end
       end
@@ -167,15 +167,15 @@ module floo_axis_noc_bridge_narrow_wide
   ///////////////////////////////////////////////
 
   assign axis_in_payload      = wide_axis_data_t'(axis_in_req_i.t.data);
-  assign axis_in_rsp_o.tready = (narrow_req_i.ready & narrow_req_o.valid) ||
-                                (narrow_rsp_i.ready & narrow_rsp_o.valid) ||
-                                (wide_i.ready & wide_o.valid);
-  assign narrow_req_o.valid   = (axis_in_payload.hdr == narrow_request) ? axis_in_req_i.tvalid : 0;
-  assign narrow_rsp_o.valid   = (axis_in_payload.hdr == narrow_response)? axis_in_req_i.tvalid : 0;
-  assign wide_o.valid         = (axis_in_payload.hdr == wide_channel) ? axis_in_req_i.tvalid : 0;
-  assign narrow_req_o.data    = axis_in_payload.flit_data;
-  assign narrow_rsp_o.data    = axis_in_payload.flit_data;
-  assign wide_o.data          = axis_in_payload.flit_data;
+  assign axis_in_rsp_o.tready = (floo_req_i.ready & floo_req_o.valid) ||
+                                (floo_rsp_i.ready & floo_rsp_o.valid) ||
+                                (floo_wide_i.ready & floo_wide_o.valid);
+  assign floo_req_o.valid   = (axis_in_payload.hdr == narrow_request) ? axis_in_req_i.tvalid : 0;
+  assign floo_rsp_o.valid   = (axis_in_payload.hdr == narrow_response)? axis_in_req_i.tvalid : 0;
+  assign floo_wide_o.valid         = (axis_in_payload.hdr == wide_channel) ? axis_in_req_i.tvalid : 0;
+  assign floo_req_o.req    = axis_in_payload.flit_data;
+  assign floo_rsp_o.rsp    = axis_in_payload.flit_data;
+  assign floo_wide_o.wide          = axis_in_payload.flit_data;
 
   // FOR THE TIME BEING THE SIGNALS BELOW ARE IGNORED...
   // assign ??? = axis_in_req_i.t.strb;

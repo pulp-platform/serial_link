@@ -17,7 +17,7 @@ module tb_floo_serial_link_narrow_wide();
   import floo_pkg::*;
   import serial_link_pkg::*;
   import serial_link_reg_pkg::*;
-  import floo_narrow_wide_flit_pkg::*;
+  import floo_narrow_wide_pkg::*;
   import noc_bridge_narrow_wide_pkg::*;
   import serial_link_single_channel_reg_pkg::*;
 
@@ -82,40 +82,6 @@ module tb_floo_serial_link_narrow_wide();
   //    DDR Link
   // ==============
 
-  // AXI types for typedefs of narrow channel
-  typedef logic [NarrowInIdWidth-1:0  ]   narrow_in_id_t;
-  typedef logic [NarrowInAddrWidth-1:0]   narrow_in_addr_t;
-  typedef logic [NarrowInDataWidth-1:0]   narrow_in_data_t;
-  typedef logic [NarrowInDataWidth/8-1:0] narrow_in_strb_t;
-  typedef logic [NarrowInUserWidth-1:0]   narrow_in_user_t;
-
-  `AXI_TYPEDEF_ALL(narrow_axi_in, narrow_in_addr_t, narrow_in_id_t, narrow_in_data_t, narrow_in_strb_t, narrow_in_user_t)
-
-  typedef logic [NarrowOutIdWidth-1:0  ]   narrow_out_id_t;
-  typedef logic [NarrowOutAddrWidth-1:0]   narrow_out_addr_t;
-  typedef logic [NarrowOutDataWidth-1:0]   narrow_out_data_t;
-  typedef logic [NarrowOutDataWidth/8-1:0] narrow_out_strb_t;
-  typedef logic [NarrowOutUserWidth-1:0]   narrow_out_user_t;
-
-  `AXI_TYPEDEF_ALL(narrow_axi_out, narrow_out_addr_t, narrow_out_id_t, narrow_out_data_t, narrow_out_strb_t, narrow_out_user_t)
-
-  // AXI types for typedefs of wide channel
-  typedef logic [WideInIdWidth-1:0  ]   wide_in_id_t;
-  typedef logic [WideInAddrWidth-1:0]   wide_in_addr_t;
-  typedef logic [WideInDataWidth-1:0]   wide_in_data_t;
-  typedef logic [WideInDataWidth/8-1:0] wide_in_strb_t;
-  typedef logic [WideInUserWidth-1:0]   wide_in_user_t;
-
-  `AXI_TYPEDEF_ALL(wide_axi_in, wide_in_addr_t, wide_in_id_t, wide_in_data_t, wide_in_strb_t, wide_in_user_t)
-
-  typedef logic [WideOutIdWidth-1:0  ]   wide_out_id_t;
-  typedef logic [WideOutAddrWidth-1:0]   wide_out_addr_t;
-  typedef logic [WideOutDataWidth-1:0]   wide_out_data_t;
-  typedef logic [WideOutDataWidth/8-1:0] wide_out_strb_t;
-  typedef logic [WideOutUserWidth-1:0]   wide_out_user_t;
-
-  `AXI_TYPEDEF_ALL(wide_axi_out, wide_out_addr_t, wide_out_id_t, wide_out_data_t, wide_out_strb_t, wide_out_user_t)
-
   // RegBus types for typedefs
   typedef logic [RegAddrWidth-1:0] cfg_addr_t;
   typedef logic [RegDataWidth-1:0] cfg_data_t;
@@ -127,24 +93,24 @@ module tb_floo_serial_link_narrow_wide();
   logic [NumChannels-1:0]  ddr_rcv_clk_1, ddr_rcv_clk_2;
 
   // narrow channels
-  narrow_axi_out_req_t  narrow_axi_out_req_1, narrow_axi_out_req_2;
-  narrow_axi_out_resp_t narrow_axi_out_rsp_1, narrow_axi_out_rsp_2;
-  narrow_axi_in_req_t   narrow_axi_in_req_1,  narrow_axi_in_req_2;
-  narrow_axi_in_resp_t  narrow_axi_in_rsp_1,  narrow_axi_in_rsp_2;
+  axi_narrow_out_req_t  narrow_axi_out_req_1, narrow_axi_out_req_2;
+  axi_narrow_out_rsp_t narrow_axi_out_rsp_1, narrow_axi_out_rsp_2;
+  axi_narrow_in_req_t   narrow_axi_in_req_1,  narrow_axi_in_req_2;
+  axi_narrow_in_rsp_t  narrow_axi_in_rsp_1,  narrow_axi_in_rsp_2;
 
-  narrow_req_flit_t  narrow_flit_req_out_1, narrow_flit_req_out_2;
-  narrow_rsp_flit_t  narrow_flit_rsp_out_1, narrow_flit_rsp_out_2;
-  narrow_req_flit_t  narrow_flit_req_in_1, narrow_flit_req_in_2;
-  narrow_rsp_flit_t  narrow_flit_rsp_in_1, narrow_flit_rsp_in_2;
+  floo_req_t  narrow_flit_req_out_1, narrow_flit_req_out_2;
+  floo_rsp_t  narrow_flit_rsp_out_1, narrow_flit_rsp_out_2;
+  floo_req_t  narrow_flit_req_in_1, narrow_flit_req_in_2;
+  floo_rsp_t  narrow_flit_rsp_in_1, narrow_flit_rsp_in_2;
 
   // wide channels
-  wide_axi_out_req_t  wide_axi_out_req_1, wide_axi_out_req_2;
-  wide_axi_out_resp_t wide_axi_out_rsp_1, wide_axi_out_rsp_2;
-  wide_axi_in_req_t   wide_axi_in_req_1, wide_axi_in_req_2;
-  wide_axi_in_resp_t  wide_axi_in_rsp_1, wide_axi_in_rsp_2;
+  axi_wide_out_req_t  wide_axi_out_req_1, wide_axi_out_req_2;
+  axi_wide_out_rsp_t wide_axi_out_rsp_1, wide_axi_out_rsp_2;
+  axi_wide_in_req_t   wide_axi_in_req_1, wide_axi_in_req_2;
+  axi_wide_in_rsp_t  wide_axi_in_rsp_1, wide_axi_in_rsp_2;
 
-  wide_flit_t wide_flit_out_1, wide_flit_out_2;
-  wide_flit_t wide_flit_in_1, wide_flit_in_2;
+  floo_wide_t wide_flit_out_1, wide_flit_out_2;
+  floo_wide_t wide_flit_in_1, wide_flit_in_2;
 
   // configuration
   cfg_req_t   cfg_req_1;
@@ -215,28 +181,28 @@ module tb_floo_serial_link_narrow_wide();
     .rst_ni           ( rst_1_n              ),
     .sram_cfg_i       ( '0                   ),
     .test_enable_i    ( 1'b0                 ),
-    .narrow_in_req_i  ( narrow_axi_in_req_1  ),
-    .narrow_in_rsp_o  ( narrow_axi_in_rsp_1  ),
-    .narrow_out_req_o ( narrow_axi_out_req_1 ),
-    .narrow_out_rsp_i ( narrow_axi_out_rsp_1 ),
-    .wide_in_req_i    ( wide_axi_in_req_1     ),
-    .wide_in_rsp_o    ( wide_axi_in_rsp_1     ),
-    .wide_out_req_o   ( wide_axi_out_req_1    ),
-    .wide_out_rsp_i   ( wide_axi_out_rsp_1    ),
+    .axi_narrow_in_req_i  ( narrow_axi_in_req_1  ),
+    .axi_narrow_in_rsp_o  ( narrow_axi_in_rsp_1  ),
+    .axi_narrow_out_req_o ( narrow_axi_out_req_1 ),
+    .axi_narrow_out_rsp_i ( narrow_axi_out_rsp_1 ),
+    .axi_wide_in_req_i    ( wide_axi_in_req_1     ),
+    .axi_wide_in_rsp_o    ( wide_axi_in_rsp_1     ),
+    .axi_wide_out_req_o   ( wide_axi_out_req_1    ),
+    .axi_wide_out_rsp_i   ( wide_axi_out_rsp_1    ),
     .xy_id_i          (                       ),
     .id_i             ( '0                    ),
-    .narrow_req_o     ( narrow_flit_req_out_1 ),
-    .narrow_rsp_o     ( narrow_flit_rsp_out_1 ),
-    .narrow_req_i     ( narrow_flit_req_in_1  ),
-    .narrow_rsp_i     ( narrow_flit_rsp_in_1  ),
-    .wide_o           ( wide_flit_out_1       ),
-    .wide_i           ( wide_flit_in_1        )
+    .floo_req_o     ( narrow_flit_req_out_1 ),
+    .floo_rsp_o     ( narrow_flit_rsp_out_1 ),
+    .floo_req_i     ( narrow_flit_req_in_1  ),
+    .floo_rsp_i     ( narrow_flit_rsp_in_1  ),
+    .floo_wide_o           ( wide_flit_out_1       ),
+    .floo_wide_i           ( wide_flit_in_1        )
   );
 
   floo_serial_link_narrow_wide #(
-    .narrow_req_flit_t ( narrow_req_flit_t ),
-    .narrow_rsp_flit_t ( narrow_rsp_flit_t ),
-    .wide_flit_t       ( wide_flit_t       ),
+    .floo_req_t ( floo_req_t ),
+    .floo_rsp_t ( floo_rsp_t ),
+    .floo_wide_t       ( floo_wide_t       ),
     .cfg_req_t         ( cfg_req_t         ),
     .cfg_rsp_t         ( cfg_rsp_t         ),
     .hw2reg_t          ( serial_link_reg_pkg::serial_link_hw2reg_t ),
@@ -252,12 +218,12 @@ module tb_floo_serial_link_narrow_wide();
     .rst_sl_ni     ( rst_1_n               ),
     .clk_reg_i     ( clk_reg               ),
     .rst_reg_ni    ( rst_reg_n             ),
-    .narrow_req_i  ( narrow_flit_req_out_1 ),
-    .narrow_rsp_i  ( narrow_flit_rsp_out_1 ),
-    .narrow_req_o  ( narrow_flit_req_in_1  ),
-    .narrow_rsp_o  ( narrow_flit_rsp_in_1  ),
-    .wide_i        ( wide_flit_out_1       ),
-    .wide_o        ( wide_flit_in_1        ),
+    .floo_req_i  ( narrow_flit_req_out_1 ),
+    .floo_rsp_i  ( narrow_flit_rsp_out_1 ),
+    .floo_req_o  ( narrow_flit_req_in_1  ),
+    .floo_rsp_o  ( narrow_flit_rsp_in_1  ),
+    .floo_wide_i        ( wide_flit_out_1       ),
+    .floo_wide_o        ( wide_flit_in_1        ),
     .cfg_req_i     ( cfg_req_1             ),
     .cfg_rsp_o     ( cfg_rsp_1             ),
     .ddr_rcv_clk_i ( ddr_rcv_clk_2         ),
@@ -273,9 +239,9 @@ module tb_floo_serial_link_narrow_wide();
 
   // second serial instance
   floo_serial_link_narrow_wide #(
-    .narrow_req_flit_t ( narrow_req_flit_t ),
-    .narrow_rsp_flit_t ( narrow_rsp_flit_t ),
-    .wide_flit_t       ( wide_flit_t       ),
+    .floo_req_t ( floo_req_t ),
+    .floo_rsp_t ( floo_rsp_t ),
+    .floo_wide_t       ( floo_wide_t       ),
     .cfg_req_t         ( cfg_req_t         ),
     .cfg_rsp_t         ( cfg_rsp_t         ),
     .hw2reg_t          ( serial_link_reg_pkg::serial_link_hw2reg_t ),
@@ -290,12 +256,12 @@ module tb_floo_serial_link_narrow_wide();
     .rst_sl_ni     ( rst_2_n               ),
     .clk_reg_i     ( clk_reg               ),
     .rst_reg_ni    ( rst_reg_n             ),
-    .narrow_req_i  ( narrow_flit_req_out_2 ),
-    .narrow_rsp_i  ( narrow_flit_rsp_out_2 ),
-    .narrow_req_o  ( narrow_flit_req_in_2  ),
-    .narrow_rsp_o  ( narrow_flit_rsp_in_2  ),
-    .wide_i        ( wide_flit_out_2       ),
-    .wide_o        ( wide_flit_in_2        ),
+    .floo_req_i  ( narrow_flit_req_out_2 ),
+    .floo_rsp_i  ( narrow_flit_rsp_out_2 ),
+    .floo_req_o  ( narrow_flit_req_in_2  ),
+    .floo_rsp_o  ( narrow_flit_rsp_in_2  ),
+    .floo_wide_i        ( wide_flit_out_2       ),
+    .floo_wide_o        ( wide_flit_in_2        ),
     .cfg_req_i     ( cfg_req_2             ),
     .cfg_rsp_o     ( cfg_rsp_2             ),
     .ddr_rcv_clk_i ( ddr_rcv_clk_1         ),
@@ -322,22 +288,22 @@ module tb_floo_serial_link_narrow_wide();
     .rst_ni           ( rst_2_n               ),
     .sram_cfg_i       ( '0                    ),
     .test_enable_i    ( 1'b0                  ),
-    .narrow_in_req_i  ( narrow_axi_in_req_2   ),
-    .narrow_in_rsp_o  ( narrow_axi_in_rsp_2   ),
-    .narrow_out_req_o ( narrow_axi_out_req_2  ),
-    .narrow_out_rsp_i ( narrow_axi_out_rsp_2  ),
-    .wide_in_req_i    ( wide_axi_in_req_2     ),
-    .wide_in_rsp_o    ( wide_axi_in_rsp_2     ),
-    .wide_out_req_o   ( wide_axi_out_req_2    ),
-    .wide_out_rsp_i   ( wide_axi_out_rsp_2    ),
+    .axi_narrow_in_req_i  ( narrow_axi_in_req_2   ),
+    .axi_narrow_in_rsp_o  ( narrow_axi_in_rsp_2   ),
+    .axi_narrow_out_req_o ( narrow_axi_out_req_2  ),
+    .axi_narrow_out_rsp_i ( narrow_axi_out_rsp_2  ),
+    .axi_wide_in_req_i    ( wide_axi_in_req_2     ),
+    .axi_wide_in_rsp_o    ( wide_axi_in_rsp_2     ),
+    .axi_wide_out_req_o   ( wide_axi_out_req_2    ),
+    .axi_wide_out_rsp_i   ( wide_axi_out_rsp_2    ),
     .xy_id_i          (                       ),
     .id_i             ( '0                    ),
-    .narrow_req_o     ( narrow_flit_req_out_2 ),
-    .narrow_rsp_o     ( narrow_flit_rsp_out_2 ),
-    .narrow_req_i     ( narrow_flit_req_in_2  ),
-    .narrow_rsp_i     ( narrow_flit_rsp_in_2  ),
-    .wide_o           ( wide_flit_out_2       ),
-    .wide_i           ( wide_flit_in_2        )
+    .floo_req_o     ( narrow_flit_req_out_2 ),
+    .floo_rsp_o     ( narrow_flit_rsp_out_2 ),
+    .floo_req_i     ( narrow_flit_req_in_2  ),
+    .floo_rsp_i     ( narrow_flit_rsp_in_2  ),
+    .floo_wide_o           ( wide_flit_out_2       ),
+    .floo_wide_i           ( wide_flit_in_2        )
   );
 
   REG_BUS #(
@@ -603,10 +569,10 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
       narrow_rand_master_1.run(NumWrites_narrow_1, NumReads_narrow_1);
       forever begin
         @(posedge clk_1);
-        if (narrow_flit_req_out_1.valid & narrow_flit_req_in_1.ready) data_sent     += $bits(narrow_flit_req_out_1.data);
-        if (narrow_flit_rsp_out_1.valid & narrow_flit_rsp_in_1.ready) data_sent     += $bits(narrow_flit_rsp_out_1.data);
-        if (narrow_flit_req_in_1.valid & narrow_flit_req_out_1.ready) data_received += $bits(narrow_flit_req_in_1.data);
-        if (narrow_flit_rsp_in_1.valid & narrow_flit_rsp_out_1.ready) data_received += $bits(narrow_flit_rsp_in_1.data);
+        if (narrow_flit_req_out_1.valid & narrow_flit_req_in_1.ready) data_sent     += $bits(narrow_flit_req_out_1.req);
+        if (narrow_flit_rsp_out_1.valid & narrow_flit_rsp_in_1.ready) data_sent     += $bits(narrow_flit_rsp_out_1.rsp);
+        if (narrow_flit_req_in_1.valid & narrow_flit_req_out_1.ready) data_received += $bits(narrow_flit_req_in_1.req);
+        if (narrow_flit_rsp_in_1.valid & narrow_flit_rsp_out_1.ready) data_received += $bits(narrow_flit_rsp_in_1.rsp);
       end
     join_any
     end_cycle = $realtime;
@@ -642,10 +608,10 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
       narrow_rand_master_2.run(NumWrites_narrow_2, NumReads_narrow_2);
       forever begin
         @(posedge clk_2);
-        if (narrow_flit_req_out_2.valid & narrow_flit_req_in_2.ready) data_sent_narrow2     += $bits(narrow_flit_req_out_2.data);
-        if (narrow_flit_rsp_out_2.valid & narrow_flit_rsp_in_2.ready) data_sent_narrow2     += $bits(narrow_flit_rsp_out_2.data);
-        if (narrow_flit_req_in_2.valid & narrow_flit_req_out_2.ready) data_received_narrow2 += $bits(narrow_flit_req_in_2.data);
-        if (narrow_flit_rsp_in_2.valid & narrow_flit_rsp_out_2.ready) data_received_narrow2 += $bits(narrow_flit_rsp_in_2.data);
+        if (narrow_flit_req_out_2.valid & narrow_flit_req_in_2.ready) data_sent_narrow2     += $bits(narrow_flit_req_out_2.req);
+        if (narrow_flit_rsp_out_2.valid & narrow_flit_rsp_in_2.ready) data_sent_narrow2     += $bits(narrow_flit_rsp_out_2.rsp);
+        if (narrow_flit_req_in_2.valid & narrow_flit_req_out_2.ready) data_received_narrow2 += $bits(narrow_flit_req_in_2.req);
+        if (narrow_flit_rsp_in_2.valid & narrow_flit_rsp_out_2.ready) data_received_narrow2 += $bits(narrow_flit_rsp_in_2.rsp);
       end
     join_any
     end_cycle_narrow2 = $realtime;
@@ -683,8 +649,8 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
       wide_rand_master_1.run(NumWrites_wide_1, NumReads_wide_1);
       forever begin
         @(posedge clk_1);
-        if (wide_flit_out_1.valid & wide_flit_in_1.ready) data_sent_wide     += $bits(wide_flit_out_1.data);
-        if (wide_flit_in_1.valid & wide_flit_out_1.ready) data_received_wide += $bits(wide_flit_in_1.data);
+        if (wide_flit_out_1.valid & wide_flit_in_1.ready) data_sent_wide     += $bits(wide_flit_out_1.wide);
+        if (wide_flit_in_1.valid & wide_flit_out_1.ready) data_received_wide += $bits(wide_flit_in_1.wide);
       end
     join_any
     end_cycle_wide = $realtime;
@@ -721,8 +687,8 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
       wide_rand_master_2.run(NumWrites_wide_2, NumReads_wide_2);
       forever begin
         @(posedge clk_2);
-        if (wide_flit_out_2.valid & wide_flit_in_2.ready) data_sent_wide2     += $bits(wide_flit_out_2.data);
-        if (wide_flit_in_2.valid & wide_flit_out_2.ready) data_received_wide2 += $bits(wide_flit_in_2.data);
+        if (wide_flit_out_2.valid & wide_flit_in_2.ready) data_sent_wide2     += $bits(wide_flit_out_2.wide);
+        if (wide_flit_in_2.valid & wide_flit_out_2.ready) data_received_wide2 += $bits(wide_flit_in_2.wide);
       end
     join_any
     end_cycle_wide2 = $realtime;
@@ -742,18 +708,18 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
   //    Checks - narrow_channel
   // =============================
 
-  narrow_axi_in_req_t narrow_remapped_out_req_1, narrow_remapped_out_req_2;
-  narrow_axi_in_resp_t narrow_remapped_out_rsp_1, narrow_remapped_out_rsp_2;
+  axi_narrow_in_req_t narrow_remapped_out_req_1, narrow_remapped_out_req_2;
+  axi_narrow_in_rsp_t narrow_remapped_out_rsp_1, narrow_remapped_out_rsp_2;
 
   axi_chan_compare #(
     .IgnoreId  ( 1'b1                      ),
-    .aw_chan_t ( narrow_axi_in_aw_chan_t   ),
-    .w_chan_t  ( narrow_axi_in_w_chan_t    ),
-    .b_chan_t  ( narrow_axi_in_b_chan_t    ),
-    .ar_chan_t ( narrow_axi_in_ar_chan_t   ),
-    .r_chan_t  ( narrow_axi_in_r_chan_t    ),
-    .req_t     ( narrow_axi_in_req_t       ),
-    .resp_t    ( narrow_axi_in_resp_t      )
+    .aw_chan_t ( axi_narrow_in_aw_chan_t   ),
+    .w_chan_t  ( axi_narrow_in_w_chan_t    ),
+    .b_chan_t  ( axi_narrow_in_b_chan_t    ),
+    .ar_chan_t ( axi_narrow_in_ar_chan_t   ),
+    .r_chan_t  ( axi_narrow_in_r_chan_t    ),
+    .req_t     ( axi_narrow_in_req_t       ),
+    .resp_t    ( axi_narrow_in_rsp_t      )
   ) i_narrow_channel_compare_1_to_2 (
     .clk_a_i   ( clk_1                     ),
     .clk_b_i   ( clk_2                     ),
@@ -768,13 +734,13 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
 
   axi_chan_compare #(
     .IgnoreId  ( 1'b1                      ),
-    .aw_chan_t ( narrow_axi_in_aw_chan_t   ),
-    .w_chan_t  ( narrow_axi_in_w_chan_t    ),
-    .b_chan_t  ( narrow_axi_in_b_chan_t    ),
-    .ar_chan_t ( narrow_axi_in_ar_chan_t   ),
-    .r_chan_t  ( narrow_axi_in_r_chan_t    ),
-    .req_t     ( narrow_axi_in_req_t       ),
-    .resp_t    ( narrow_axi_in_resp_t      )
+    .aw_chan_t ( axi_narrow_in_aw_chan_t   ),
+    .w_chan_t  ( axi_narrow_in_w_chan_t    ),
+    .b_chan_t  ( axi_narrow_in_b_chan_t    ),
+    .ar_chan_t ( axi_narrow_in_ar_chan_t   ),
+    .r_chan_t  ( axi_narrow_in_r_chan_t    ),
+    .req_t     ( axi_narrow_in_req_t       ),
+    .resp_t    ( axi_narrow_in_rsp_t      )
   ) i_narrow_channel_compare_2_to_1 (
     .clk_a_i   ( clk_2                     ),
     .clk_b_i   ( clk_1                     ),
@@ -791,18 +757,18 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
   //    Checks - wide_channel
   // ===========================
 
-  wide_axi_in_req_t wide_remapped_out_req_1, wide_remapped_out_req_2;
-  wide_axi_in_resp_t wide_remapped_out_rsp_1, wide_remapped_out_rsp_2;
+  axi_wide_in_req_t wide_remapped_out_req_1, wide_remapped_out_req_2;
+  axi_wide_in_rsp_t wide_remapped_out_rsp_1, wide_remapped_out_rsp_2;
 
   axi_chan_compare #(
     .IgnoreId  ( 1'b1                    ),
-    .aw_chan_t ( wide_axi_in_aw_chan_t   ),
-    .w_chan_t  ( wide_axi_in_w_chan_t    ),
-    .b_chan_t  ( wide_axi_in_b_chan_t    ),
-    .ar_chan_t ( wide_axi_in_ar_chan_t   ),
-    .r_chan_t  ( wide_axi_in_r_chan_t    ),
-    .req_t     ( wide_axi_in_req_t       ),
-    .resp_t    ( wide_axi_in_resp_t      )
+    .aw_chan_t ( axi_wide_in_aw_chan_t   ),
+    .w_chan_t  ( axi_wide_in_w_chan_t    ),
+    .b_chan_t  ( axi_wide_in_b_chan_t    ),
+    .ar_chan_t ( axi_wide_in_ar_chan_t   ),
+    .r_chan_t  ( axi_wide_in_r_chan_t    ),
+    .req_t     ( axi_wide_in_req_t       ),
+    .resp_t    ( axi_wide_in_rsp_t      )
   ) i_wide_channel_compare_1_to_2 (
     .clk_a_i   ( clk_1                   ),
     .clk_b_i   ( clk_2                   ),
@@ -817,13 +783,13 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
 
   axi_chan_compare #(
     .IgnoreId  ( 1'b1                    ),
-    .aw_chan_t ( wide_axi_in_aw_chan_t   ),
-    .w_chan_t  ( wide_axi_in_w_chan_t    ),
-    .b_chan_t  ( wide_axi_in_b_chan_t    ),
-    .ar_chan_t ( wide_axi_in_ar_chan_t   ),
-    .r_chan_t  ( wide_axi_in_r_chan_t    ),
-    .req_t     ( wide_axi_in_req_t       ),
-    .resp_t    ( wide_axi_in_resp_t      )
+    .aw_chan_t ( axi_wide_in_aw_chan_t   ),
+    .w_chan_t  ( axi_wide_in_w_chan_t    ),
+    .b_chan_t  ( axi_wide_in_b_chan_t    ),
+    .ar_chan_t ( axi_wide_in_ar_chan_t   ),
+    .r_chan_t  ( axi_wide_in_r_chan_t    ),
+    .req_t     ( axi_wide_in_req_t       ),
+    .resp_t    ( axi_wide_in_rsp_t      )
   ) i_wide_channel_compare_2_to_1 (
     .clk_a_i   ( clk_2                   ),
     .clk_b_i   ( clk_1                   ),
@@ -1004,11 +970,11 @@ valid_coverage_from_phys %3.2f%%, total_cycles %4d - %4d - %4d",
     $display("LATENCY: narrow_rsp_min_2_1 %0d", i_benchmarking.min_lat_rsp_2_1);
     $display("LATENCY: wide_min_2_1 %0d", i_benchmarking.min_lat_wide_2_1);
 
-    $display("INFO: narrow_req.width: %0d",$bits(narrow_flit_req_in_2.data) + 2 +
+    $display("INFO: narrow_req.width: %0d",$bits(narrow_flit_req_in_2.req) + 2 +
       $bits(user_bit_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
-    $display("INFO: narrow_rsp.width: %0d",$bits(narrow_flit_rsp_in_2.data) + 2 +
+    $display("INFO: narrow_rsp.width: %0d",$bits(narrow_flit_rsp_in_2.rsp) + 2 +
       $bits(user_bit_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
-    $display("INFO: wide.width: %0d",$bits(wide_flit_out_1.data) + 2 +
+    $display("INFO: wide.width: %0d",$bits(wide_flit_out_1.wide) + 2 +
       $bits(user_bit_t) + $bits(i_serial_link_0.i_serial_link_data_link.data_hdr_info_t));
     // $display("INFO: AXIS-size of user_bit_t: %0d",$bits(user_bit_t));
     // $display("INFO: AXIS-size of narrow_data_bits_t: %0d",$bits(narrow_data_bits_t));

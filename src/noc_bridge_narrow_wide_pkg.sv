@@ -27,10 +27,10 @@ package noc_bridge_narrow_wide_pkg;
   ///////////////////////////////////////////
 
   // load the flit types
-  import floo_narrow_wide_flit_pkg::*;
+  import floo_narrow_wide_pkg::*;
 
-  localparam int NarrowReqFlitSize  = $bits(narrow_req_flit_t);
-  localparam int NarrowRspFlitSize  = $bits(narrow_rsp_flit_t);
+  localparam int NarrowReqFlitSize  = $bits(floo_req_chan_t);
+  localparam int NarrowRspFlitSize  = $bits(floo_rsp_chan_t);
   // identify the larger of the two types
   localparam int NarrowFlitTypes[5] = {NarrowReqFlitSize, NarrowRspFlitSize, 0, 0, 0};
   // the minimal flit-data-size requirement corresponds to the larger of the two channels,
@@ -42,7 +42,7 @@ package noc_bridge_narrow_wide_pkg;
   typedef logic [NarrowRspFlitSize-3:0] narrow_flit_rsp_data_t;
 
 
-  localparam int WideFlitSize     = $bits(wide_flit_t);
+  localparam int WideFlitSize     = $bits(floo_wide_chan_t);
   localparam int WideFlitDataSize = WideFlitSize-2;
 
   typedef logic [WideFlitDataSize-1:0] wide_flit_data_t;
@@ -65,6 +65,7 @@ package noc_bridge_narrow_wide_pkg;
 
   localparam strb_noc_t NarrowStrobe = {NarrowSize{1'b1}};
   localparam strb_noc_t WideStrobe   = {WideSize{1'b1}};
+
 
   localparam int WideChannelHdr = $bits(channel_hdr_e);
 

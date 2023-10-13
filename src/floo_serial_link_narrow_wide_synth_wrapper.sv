@@ -10,7 +10,7 @@
   `define PERFORM_SYNTHESIS
 
   import serial_link_reg_pkg::*;
-  import floo_narrow_wide_flit_pkg::*;
+  import floo_narrow_wide_pkg::*;
   import serial_link_single_channel_reg_pkg::*;
 
   localparam int unsigned RegAddrWidth = 32;
@@ -45,12 +45,12 @@ module floo_serial_link_narrow_wide_synth_wrapper
   // Tie to zero if not used.
   input  logic                                                                   testmode_i,
   // TODO: rename intput channel to narrow_sth
-  input  narrow_req_flit_t                                                       narrow_req_i,
-  input  narrow_rsp_flit_t                                                       narrow_rsp_i,
-  output narrow_req_flit_t                                                       narrow_req_o,
-  output narrow_rsp_flit_t                                                       narrow_rsp_o,
-  input  wide_flit_t                                                             wide_i,
-  output wide_flit_t                                                             wide_o,
+  input  floo_req_t                                                              floo_req_i,
+  input  floo_rsp_t                                                              floo_rsp_i,
+  output floo_req_t                                                              floo_req_o,
+  output floo_rsp_t                                                              floo_rsp_o,
+  input  floo_wide_t                                                        floo_wide_i,
+  output floo_wide_t                                                        floo_wide_o,
   input  cfg_req_t                                                               cfg_req_i,
   output cfg_rsp_t                                                               cfg_rsp_o,
   input  logic [serial_link_pkg::NumChannels-1:0]                                ddr_rcv_clk_i,
@@ -68,9 +68,9 @@ module floo_serial_link_narrow_wide_synth_wrapper
 
 
 floo_serial_link_narrow_wide #(
-    .narrow_req_flit_t ( narrow_req_flit_t                         ),
-    .narrow_rsp_flit_t ( narrow_rsp_flit_t                         ),
-    .wide_flit_t       ( wide_flit_t                               ),
+    .floo_req_t ( floo_req_t                         ),
+    .floo_rsp_t ( floo_rsp_t                         ),
+    .floo_wide_t       ( floo_wide_t                   ),
     .cfg_req_t         ( cfg_req_t                                 ),
     .cfg_rsp_t         ( cfg_rsp_t                                 ),
     .hw2reg_t          ( serial_link_reg_pkg::serial_link_hw2reg_t ),
@@ -85,12 +85,12 @@ floo_serial_link_narrow_wide #(
     .rst_sl_ni,
     .clk_reg_i,
     .rst_reg_ni,
-    .narrow_req_i,
-    .narrow_rsp_i,
-    .narrow_req_o,
-    .narrow_rsp_o,
-    .wide_i,
-    .wide_o,
+    .floo_req_i,
+    .floo_rsp_i,
+    .floo_req_o,
+    .floo_rsp_o,
+    .floo_wide_i,
+    .floo_wide_o,
     .cfg_req_i,
     .cfg_rsp_o,
     .ddr_rcv_clk_i,

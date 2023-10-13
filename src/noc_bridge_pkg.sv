@@ -20,10 +20,10 @@ package noc_bridge_pkg;
   ///////////////////////////////////////////
 
   // load the flit types
-  import floo_axi_flit_pkg::*;
+  import floo_axi_pkg::*;
 
-  localparam int ReqFlitSize  = $bits(req_flit_t);
-  localparam int RspFlitSize  = $bits(rsp_flit_t);
+  localparam int ReqFlitSize  = $bits(floo_req_chan_t);
+  localparam int RspFlitSize  = $bits(floo_rsp_chan_t);
   // identify the larger of the two types
   localparam int FlitTypes[5] = {ReqFlitSize, RspFlitSize, 0, 0, 0};
   // the minimal flit-data-size requirement corresponds to the larger of the two channels, exclusive the handshake signals.

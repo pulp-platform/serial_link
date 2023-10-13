@@ -17,7 +17,7 @@ module tb_floo_serial_link();
   import floo_pkg::*;
   import noc_bridge_pkg::*;
   import serial_link_pkg::*;
-  import floo_axi_flit_pkg::*;
+  import floo_axi_pkg::*;
   import serial_link_reg_pkg::*;
   import serial_link_single_channel_reg_pkg::*;
 
@@ -85,10 +85,10 @@ module tb_floo_serial_link();
   axi_out_resp_t  axi_out_rsp_1, axi_out_rsp_2;
   axi_in_req_t   axi_in_req_1,  axi_in_req_2;
   axi_in_resp_t  axi_in_rsp_1,  axi_in_rsp_2;
-  req_flit_t  flit_req_out_1, flit_req_out_2;
-  rsp_flit_t  flit_rsp_out_1, flit_rsp_out_2;
-  req_flit_t  flit_req_in_1, flit_req_in_2;
-  rsp_flit_t  flit_rsp_in_1, flit_rsp_in_2;
+  floo_req_t  flit_req_out_1, flit_req_out_2;
+  floo_rsp_t  flit_rsp_out_1, flit_rsp_out_2;
+  floo_req_t  flit_req_in_1, flit_req_in_2;
+  floo_rsp_t  flit_rsp_in_1, flit_rsp_in_2;
   cfg_req_t   cfg_req_1;
   cfg_rsp_t   cfg_rsp_1;
   cfg_req_t   cfg_req_2;
@@ -144,15 +144,15 @@ module tb_floo_serial_link();
     .axi_out_rsp_i  ( axi_out_rsp_1  ),
     .xy_id_i        (                ),
     .id_i           ( '0             ),
-    .req_o          ( flit_req_out_1 ),
-    .rsp_o          ( flit_rsp_out_1 ),
-    .req_i          ( flit_req_in_1  ),
-    .rsp_i          ( flit_rsp_in_1  )
+    .floo_req_o          ( flit_req_out_1 ),
+    .floo_rsp_o          ( flit_rsp_out_1 ),
+    .floo_req_i          ( flit_req_in_1  ),
+    .floo_rsp_i          ( flit_rsp_in_1  )
   );
 
   floo_serial_link #(
-    .req_flit_t      ( req_flit_t        ),
-    .rsp_flit_t      ( rsp_flit_t        ),
+    .floo_req_t      ( floo_req_t        ),
+    .floo_rsp_t      ( floo_rsp_t        ),
     .cfg_req_t       ( cfg_req_t         ),
     .cfg_rsp_t       ( cfg_rsp_t         ),
     .hw2reg_t        ( serial_link_reg_pkg::serial_link_hw2reg_t ),
@@ -170,10 +170,10 @@ module tb_floo_serial_link();
     .rst_sl_ni       ( rst_1_n        ),
     .clk_reg_i       ( clk_reg        ),
     .rst_reg_ni      ( rst_reg_n      ),
-    .req_i           ( flit_req_out_1 ),
-    .rsp_i           ( flit_rsp_out_1 ),
-    .req_o           ( flit_req_in_1  ),
-    .rsp_o           ( flit_rsp_in_1  ),
+    .floo_req_i      ( flit_req_out_1 ),
+    .floo_rsp_i      ( flit_rsp_out_1 ),
+    .floo_req_o      ( flit_req_in_1  ),
+    .floo_rsp_o      ( flit_rsp_in_1  ),
     .cfg_req_i       ( cfg_req_1      ),
     .cfg_rsp_o       ( cfg_rsp_1      ),
     .ddr_rcv_clk_i   ( ddr_rcv_clk_2  ),
@@ -189,8 +189,8 @@ module tb_floo_serial_link();
 
   // second serial instance
   floo_serial_link #(
-    .req_flit_t      ( req_flit_t        ),
-    .rsp_flit_t      ( rsp_flit_t        ),
+    .floo_req_t      ( floo_req_t        ),
+    .floo_rsp_t      ( floo_rsp_t        ),
     .cfg_req_t       ( cfg_req_t         ),
     .cfg_rsp_t       ( cfg_rsp_t         ),
     .hw2reg_t        ( serial_link_reg_pkg::serial_link_hw2reg_t ),
@@ -207,10 +207,10 @@ module tb_floo_serial_link();
     .rst_sl_ni       ( rst_2_n        ),
     .clk_reg_i       ( clk_reg        ),
     .rst_reg_ni      ( rst_reg_n      ),
-    .req_i           ( flit_req_out_2 ),
-    .rsp_i           ( flit_rsp_out_2 ),
-    .req_o           ( flit_req_in_2  ),
-    .rsp_o           ( flit_rsp_in_2  ),
+    .floo_req_i           ( flit_req_out_2 ),
+    .floo_rsp_i           ( flit_rsp_out_2 ),
+    .floo_req_o           ( flit_req_in_2  ),
+    .floo_rsp_o           ( flit_rsp_in_2  ),
     .cfg_req_i       ( cfg_req_2      ),
     .cfg_rsp_o       ( cfg_rsp_2      ),
     .ddr_rcv_clk_i   ( ddr_rcv_clk_1  ),

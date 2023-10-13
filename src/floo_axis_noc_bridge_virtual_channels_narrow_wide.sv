@@ -12,9 +12,9 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
 #(
   // If the parameter is set to 1, all the assertion checks within this module will be ignored.
   parameter  bit  IgnoreAssert         = 1'b0,
-  parameter  type narrow_rsp_flit_t    = logic,
-  parameter  type narrow_req_flit_t    = logic,
-  parameter  type wide_flit_t          = logic,
+  parameter  type floo_rsp_t    = logic,
+  parameter  type floo_req_t    = logic,
+  parameter  type floo_wide_t          = logic,
   parameter  type axis_req_t           = logic,
   parameter  type axis_rsp_t           = logic,
   // Enable if timingpaths between the valid and ready signals of incoming messages is not allowed.
@@ -30,14 +30,14 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   input  logic      rst_ni,
   // flits from the NoC
     // flits to be sent out
-  output narrow_req_flit_t narrow_req_o,
-  output narrow_rsp_flit_t narrow_rsp_o,
+  output floo_req_t floo_req_o,
+  output floo_rsp_t floo_rsp_o,
     // flits to be received
-  input  narrow_req_flit_t narrow_req_i,
-  input  narrow_rsp_flit_t narrow_rsp_i,
+  input  floo_req_t floo_req_i,
+  input  floo_rsp_t floo_rsp_i,
   // wide channels
-  input  wide_flit_t       wide_i,
-  output wide_flit_t       wide_o,
+  input  floo_wide_t  floo_wide_i,
+  output floo_wide_t  floo_wide_o,
   // AXIS channels
     // AXIS outgoing data
   output axis_req_t axis_out_req_o,
@@ -134,8 +134,8 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
 
   // Assignment required to match the data width of the two channels
   // (rr_arb_tree needs equi-size signals)
-  assign narrow_req_i_data = narrow_req_i.data;
-  assign narrow_rsp_i_data = narrow_rsp_i.data;
+  assign narrow_req_i_data = floo_req_i.req;
+  assign narrow_rsp_i_data = floo_rsp_i.rsp;
 
 
   //-------------------//
@@ -157,15 +157,15 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .data_to_send_i         ( narrow_req_i_data          ),
     .data_to_send_o         ( req_data_synchr_out        ),
     .credits_to_send_o      ( credits_to_send_req        ),
-    .send_ready_o           ( narrow_req_o.ready         ),
-    .send_valid_i           ( narrow_req_i.valid         ),
+    .send_ready_o           ( floo_req_o.ready         ),
+    .send_valid_i           ( floo_req_i.valid         ),
     .send_valid_o           ( req_valid_synchr_out       ),
     .send_ready_i           ( req_ready_synchr_out       ),
     .req_cred_to_buffer_msg ( 1'b1                       ),
     .credits_received_i     ( narr_wide_queue_in.credits ),
     .receive_cred_i         ( req_read_incoming_credits  ),
-    .buffer_queue_out_val_i ( narrow_req_o.valid         ),
-    .buffer_queue_out_rdy_i ( narrow_req_i.ready         ),
+    .buffer_queue_out_val_i ( floo_req_o.valid         ),
+    .buffer_queue_out_rdy_i ( floo_req_i.ready         ),
     .credits_only_packet_o  ( credits_only_packet_req    ),
     .allow_cred_consume_i   ( forward_req_credits        ),
     .consume_cred_to_send_i ( force_consume_req_credits  )
@@ -196,15 +196,15 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .data_to_send_i         ( narrow_rsp_i_data          ),
     .data_to_send_o         ( rsp_data_synchr_out        ),
     .credits_to_send_o      ( credits_to_send_rsp        ),
-    .send_ready_o           ( narrow_rsp_o.ready         ),
-    .send_valid_i           ( narrow_rsp_i.valid         ),
+    .send_ready_o           ( floo_rsp_o.ready         ),
+    .send_valid_i           ( floo_rsp_i.valid         ),
     .send_valid_o           ( rsp_valid_synchr_out       ),
     .send_ready_i           ( rsp_ready_synchr_out       ),
     .req_cred_to_buffer_msg ( 1'b1                       ),
     .credits_received_i     ( narr_wide_queue_in.credits ),
     .receive_cred_i         ( rsp_read_incoming_credits  ),
-    .buffer_queue_out_val_i ( narrow_rsp_o.valid         ),
-    .buffer_queue_out_rdy_i ( narrow_rsp_i.ready         ),
+    .buffer_queue_out_val_i ( floo_rsp_o.valid         ),
+    .buffer_queue_out_rdy_i ( floo_rsp_i.ready         ),
     .credits_only_packet_o  ( credits_only_packet_rsp    ),
     .allow_cred_consume_i   ( forward_rsp_credits        ),
     .consume_cred_to_send_i ( force_consume_rsp_credits  )
@@ -237,18 +237,18 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   ) i_credit_counter_wide (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
-    .data_to_send_i         ( wide_i.data                ),
+    .data_to_send_i         ( floo_wide_i.wide                ),
     .data_to_send_o         ( wide_data_synchr_out       ),
     .credits_to_send_o      ( credits_to_send_wide       ),
-    .send_ready_o           ( wide_o.ready               ),
-    .send_valid_i           ( wide_i.valid               ),
+    .send_ready_o           ( floo_wide_o.ready               ),
+    .send_valid_i           ( floo_wide_i.valid               ),
     .send_valid_o           ( wide_valid_synchr_out      ),
     .send_ready_i           ( wide_ready_synchr_out      ),
     .req_cred_to_buffer_msg ( 1'b1                       ),
     .credits_received_i     ( narr_wide_queue_in.credits ),
     .receive_cred_i         ( wide_read_incoming_credits ),
-    .buffer_queue_out_val_i ( wide_o.valid               ),
-    .buffer_queue_out_rdy_i ( wide_i.ready               ),
+    .buffer_queue_out_val_i ( floo_wide_o.valid               ),
+    .buffer_queue_out_rdy_i ( floo_wide_i.ready               ),
     .credits_only_packet_o  ( credits_only_packet_wide   ),
     .allow_cred_consume_i   ( forward_wide_credits       ),
     .consume_cred_to_send_i ( force_consume_wide_credits )
@@ -413,9 +413,9 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .valid_i    ( axis_data_in_req_valid ),
     .ready_o    ( axis_data_in_req_ready ),
     .data_i     ( req_reg_data_in        ),
-    .valid_o    ( narrow_req_o.valid     ),
-    .ready_i    ( narrow_req_i.ready     ),
-    .data_o     ( narrow_req_o.data      )
+    .valid_o    ( floo_req_o.valid     ),
+    .ready_i    ( floo_req_i.ready     ),
+    .data_o     ( floo_req_o.req      )
   );
   // size casting to avoid error msg
   assign req_reg_data_in = narr_wide_queue_in.data;
@@ -433,9 +433,9 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .valid_i    ( axis_data_in_rsp_valid ),
     .ready_o    ( axis_data_in_rsp_ready ),
     .data_i     ( rsp_reg_data_in        ),
-    .valid_o    ( narrow_rsp_o.valid     ),
-    .ready_i    ( narrow_rsp_i.ready     ),
-    .data_o     ( narrow_rsp_o.data      )
+    .valid_o    ( floo_rsp_o.valid     ),
+    .ready_i    ( floo_rsp_i.ready     ),
+    .data_o     ( floo_rsp_o.rsp      )
   );
   // size casting to avoid error msg
   assign rsp_reg_data_in = narr_wide_queue_in.data;
@@ -453,9 +453,9 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .valid_i    ( axis_data_in_wide_valid ),
     .ready_o    ( axis_data_in_wide_ready ),
     .data_i     ( narr_wide_queue_in.data ),
-    .valid_o    ( wide_o.valid            ),
-    .ready_i    ( wide_i.ready            ),
-    .data_o     ( wide_o.data             )
+    .valid_o    ( floo_wide_o.valid            ),
+    .ready_i    ( floo_wide_i.ready            ),
+    .data_o     ( floo_wide_o.wide             )
   );
 
 

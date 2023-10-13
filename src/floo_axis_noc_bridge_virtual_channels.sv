@@ -14,8 +14,8 @@ module floo_axis_noc_bridge_virtual_channels
   // from the axis channel. This feature is temporary and is supposed to ease the developement.
   // It will be removed at a later stage...
   parameter  bit  AllowDebugMsg   = 1'b0,
-  parameter  type rsp_flit_t        = logic,
-  parameter  type req_flit_t        = logic,
+  parameter  type floo_rsp_t        = logic,
+  parameter  type floo_req_t        = logic,
   parameter  type axis_req_t        = logic,
   parameter  type axis_rsp_t        = logic,
   parameter  int  ForceSendThresh   = noc_bridge_pkg::NumCredNocBridge-4,
@@ -27,11 +27,11 @@ module floo_axis_noc_bridge_virtual_channels
   input  logic      rst_ni,
   // flits from the NoC
     // flits to be sent out
-  output req_flit_t req_o,
-  output rsp_flit_t rsp_o,
+  output floo_req_t floo_req_o,
+  output floo_rsp_t floo_rsp_o,
     // flits to be received
-  input  req_flit_t req_i,
-  input  rsp_flit_t rsp_i,
+  input  floo_req_t floo_req_i,
+  input  floo_rsp_t floo_rsp_i,
   // AXIS channels
     // AXIS outgoing data
   output axis_req_t axis_out_req_o,
@@ -74,8 +74,8 @@ module floo_axis_noc_bridge_virtual_channels
 
   // Assignment required to match the data width of the two channels
   // (rr_arb_tree needs equi-size signals)
-  assign req_i_data = req_i.data;
-  assign rsp_i_data = rsp_i.data;
+  assign req_i_data = floo_req_i.req;
+  assign rsp_i_data = floo_rsp_i.rsp;
 
   // Credit channel selection
   always_comb begin
@@ -100,15 +100,15 @@ module floo_axis_noc_bridge_virtual_channels
     .data_to_send_i         ( req_i_data                ),
     .data_to_send_o         ( req_data_synchr_out       ),
     .credits_to_send_o      ( credits_to_send_req       ),
-    .send_ready_o           ( req_o.ready               ),
-    .send_valid_i           ( req_i.valid               ),
+    .send_ready_o           ( floo_req_o.ready               ),
+    .send_valid_i           ( floo_req_i.valid               ),
     .send_valid_o           ( req_valid_synchr_out      ),
     .send_ready_i           ( req_ready_synchr_out      ),
     .req_cred_to_buffer_msg ( 1'b1                      ),
     .credits_received_i     ( req_rsp_queue_in.credits  ),
     .receive_cred_i         ( req_read_incoming_credits ),
-    .buffer_queue_out_val_i ( req_o.valid               ),
-    .buffer_queue_out_rdy_i ( req_i.ready               ),
+    .buffer_queue_out_val_i ( floo_req_o.valid               ),
+    .buffer_queue_out_rdy_i ( floo_req_i.ready               ),
     .credits_only_packet_o  ( credits_only_packet_req   ),
     .allow_cred_consume_i   ( forward_req_credits       ),
     .consume_cred_to_send_i ( force_consume_req_credits )
@@ -144,15 +144,15 @@ module floo_axis_noc_bridge_virtual_channels
     .data_to_send_i         ( rsp_i_data                ),
     .data_to_send_o         ( rsp_data_synchr_out       ),
     .credits_to_send_o      ( credits_to_send_rsp       ),
-    .send_ready_o           ( rsp_o.ready               ),
-    .send_valid_i           ( rsp_i.valid               ),
+    .send_ready_o           ( floo_rsp_o.ready               ),
+    .send_valid_i           ( floo_rsp_i.valid               ),
     .send_valid_o           ( rsp_valid_synchr_out      ),
     .send_ready_i           ( rsp_ready_synchr_out      ),
     .req_cred_to_buffer_msg ( 1'b1                      ),
     .credits_received_i     ( req_rsp_queue_in.credits  ),
     .receive_cred_i         ( rsp_read_incoming_credits ),
-    .buffer_queue_out_val_i ( rsp_o.valid               ),
-    .buffer_queue_out_rdy_i ( rsp_i.ready               ),
+    .buffer_queue_out_val_i ( floo_rsp_o.valid               ),
+    .buffer_queue_out_rdy_i ( floo_rsp_i.ready               ),
     .credits_only_packet_o  ( credits_only_packet_rsp   ),
     .allow_cred_consume_i   ( forward_rsp_credits       ),
     .consume_cred_to_send_i ( force_consume_rsp_credits )
@@ -282,9 +282,9 @@ module floo_axis_noc_bridge_virtual_channels
     .valid_i    ( axis_data_in_req_valid ),
     .ready_o    ( axis_data_in_req_ready ),
     .data_i     ( req_reg_data_in        ),
-    .valid_o    ( req_o.valid            ),
-    .ready_i    ( req_i.ready            ),
-    .data_o     ( req_o.data             )
+    .valid_o    ( floo_req_o.valid            ),
+    .ready_i    ( floo_req_i.ready            ),
+    .data_o     ( floo_req_o.req             )
   );
   // size casting to avoid error msg
   assign req_reg_data_in = req_rsp_queue_in.data;
@@ -302,9 +302,9 @@ module floo_axis_noc_bridge_virtual_channels
     .valid_i    ( axis_data_in_rsp_valid ),
     .ready_o    ( axis_data_in_rsp_ready ),
     .data_i     ( rsp_reg_data_in        ),
-    .valid_o    ( rsp_o.valid            ),
-    .ready_i    ( rsp_i.ready            ),
-    .data_o     ( rsp_o.data             )
+    .valid_o    ( floo_rsp_o.valid            ),
+    .ready_i    ( floo_rsp_i.ready            ),
+    .data_o     ( floo_rsp_o.rsp             )
   );
   // size casting to avoid error msg
   assign rsp_reg_data_in = req_rsp_queue_in.data;

@@ -14,8 +14,8 @@
 /// A simple serial link to go off-chip
 module floo_serial_link
 #(
-  parameter  type req_flit_t      = logic,
-  parameter  type rsp_flit_t      = logic,
+  parameter  type floo_req_t      = logic,
+  parameter  type floo_rsp_t      = logic,
   parameter  type cfg_req_t       = logic,
   parameter  type cfg_rsp_t       = logic,
   parameter  type hw2reg_t        = logic,
@@ -44,10 +44,10 @@ module floo_serial_link
   input  logic                                 rst_reg_ni,
   // Tie to zero if not used.
   input  logic                                 testmode_i,
-  input  req_flit_t                            req_i,
-  input  rsp_flit_t                            rsp_i,
-  output req_flit_t                            req_o,
-  output rsp_flit_t                            rsp_o,
+  input  floo_req_t                            floo_req_i,
+  input  floo_rsp_t                            floo_rsp_i,
+  output floo_req_t                            floo_req_o,
+  output floo_rsp_t                            floo_rsp_o,
   input  cfg_req_t                             cfg_req_i,
   output cfg_rsp_t                             cfg_rsp_o,
   input  logic [NumChannels-1:0]               ddr_rcv_clk_i,
@@ -124,18 +124,18 @@ module floo_serial_link
     floo_axis_noc_bridge_virtual_channels #(
       .IgnoreAssert      ( 1'b0            ),
       // .AllowDebugMsg   ( 1'b1            ),
-      .req_flit_t        ( req_flit_t      ),
-      .rsp_flit_t        ( rsp_flit_t      ),
+      .floo_req_t        ( floo_req_t      ),
+      .floo_rsp_t        ( floo_rsp_t      ),
       .axis_req_t        ( axis_req_t      ),
       .axis_rsp_t        ( axis_rsp_t      ),
       .NumNocChanPerDir  ( ChannelCount    )
     ) i_serial_link_network (
       .clk_i             ( clk_sl_i        ),
       .rst_ni            ( rst_sl_ni       ),
-      .req_o             ( req_o           ),
-      .rsp_o             ( rsp_o           ),
-      .req_i             ( req_i           ),
-      .rsp_i             ( rsp_i           ),
+      .floo_req_o        ( floo_req_o      ),
+      .floo_rsp_o        ( floo_rsp_o      ),
+      .floo_req_i        ( floo_req_i      ),
+      .floo_rsp_i        ( floo_rsp_i      ),
       .axis_out_req_o    ( axis_out_req    ),
       .axis_in_rsp_o     ( axis_in_rsp     ),
       .axis_in_req_i     ( axis_in_req     ),
@@ -144,18 +144,18 @@ module floo_serial_link
   end else begin : gen_bridge
     floo_axis_noc_bridge #(
       .IgnoreAssert      ( 1'b0         ),
-      .req_flit_t        ( req_flit_t   ),
-      .rsp_flit_t        ( rsp_flit_t   ),
+      .req_flit_t        ( floo_req_t   ),
+      .rsp_flit_t        ( floo_rsp_t   ),
       .axis_req_t        ( axis_req_t   ),
       .axis_rsp_t        ( axis_rsp_t   ),
       .NumNocChanPerDir  ( ChannelCount )
     ) i_serial_link_network (
       .clk_i             ( clk_sl_i     ),
       .rst_ni            ( rst_sl_ni    ),
-      .req_o             ( req_o        ),
-      .rsp_o             ( rsp_o        ),
-      .req_i             ( req_i        ),
-      .rsp_i             ( rsp_i        ),
+      .floo_req_o        ( floo_req_o   ),
+      .floo_rsp_o        ( floo_rsp_o   ),
+      .floo_req_i        ( floo_req_i   ),
+      .floo_rsp_i        ( floo_rsp_i   ),
       .axis_out_req_o    ( axis_out_req ),
       .axis_in_rsp_o     ( axis_in_rsp  ),
       .axis_in_req_i     ( axis_in_req  ),

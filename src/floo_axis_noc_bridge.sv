@@ -24,11 +24,11 @@ module floo_axis_noc_bridge
   input  logic      rst_ni,
   // flits from the NoC
     // flits to be sent out
-  output req_flit_t req_o,
-  output rsp_flit_t rsp_o,
+  output req_flit_t floo_req_o,
+  output rsp_flit_t floo_rsp_o,
     // flits to be received
-  input  req_flit_t req_i,
-  input  rsp_flit_t rsp_i,
+  input  req_flit_t floo_req_i,
+  input  rsp_flit_t floo_rsp_i,
   // AXIS channels
     // AXIS outgoing data
   output axis_req_t axis_out_req_o,
@@ -62,8 +62,8 @@ module floo_axis_noc_bridge
 
   // Assignment required to match the data width of the two channels
   // (rr_arb_tree needs equi-size signals)
-  assign req_i_data = req_i.data;
-  assign rsp_i_data = rsp_i.data;
+  assign req_i_data = floo_req_i.req;
+  assign rsp_i_data = floo_rsp_i.rsp;
 
   rr_arb_tree #(
     .NumIn      ( NumNocChanPerDir           ),
@@ -77,10 +77,10 @@ module floo_axis_noc_bridge
     /// Clears the arbiter state. Only used if `ExtPrio` is `1'b0` or `LockIn` is `1'b1`.
     .flush_i    ( 1'b0                       ),
     /// Input requests arbitration.
-    .req_i      ( {req_i.valid, rsp_i.valid} ),
+    .req_i      ( {floo_req_i.valid, floo_rsp_i.valid} ),
     /* verilator lint_off UNOPTFLAT */
     /// Input request is granted.
-    .gnt_o      ( {req_o.ready, rsp_o.ready} ),
+    .gnt_o      ( {floo_req_o.ready, floo_rsp_o.ready} ),
     /* verilator lint_on UNOPTFLAT */
     /// Input data for arbitration.
     .data_i     ( {req_i_data, rsp_i_data}   ),
@@ -126,11 +126,11 @@ module floo_axis_noc_bridge
   ///////////////////////////////////////////////
 
   assign axis_in_payload      = axis_data_t'(axis_in_req_i.t.data);
-  assign axis_in_rsp_o.tready = (req_i.ready & req_o.valid) || (rsp_i.ready & rsp_o.valid);
-  assign req_o.valid          = (axis_in_payload.hdr == request) ? axis_in_req_i.tvalid : 0;
-  assign rsp_o.valid          = (axis_in_payload.hdr == response) ? axis_in_req_i.tvalid : 0;
-  assign req_o.data           = axis_in_payload.flit_data;
-  assign rsp_o.data           = axis_in_payload.flit_data;
+  assign axis_in_rsp_o.tready = (floo_req_i.ready & floo_req_o.valid) || (floo_rsp_i.ready & floo_rsp_o.valid);
+  assign floo_req_o.valid          = (axis_in_payload.hdr == request) ? axis_in_req_i.tvalid : 0;
+  assign floo_rsp_o.valid          = (axis_in_payload.hdr == response) ? axis_in_req_i.tvalid : 0;
+  assign floo_req_o.req           = axis_in_payload.flit_data;
+  assign floo_rsp_o.rsp           = axis_in_payload.flit_data;
 
   // FOR THE TIME BEING THE SIGNALS BELOW ARE IGNORED...
   // assign ??? = axis_in_req_i.t.strb;
