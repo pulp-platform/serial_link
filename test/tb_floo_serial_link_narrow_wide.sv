@@ -418,7 +418,7 @@ module tb_floo_serial_link_narrow_wide();
   `AXI_ASSIGN_TO_RESP(wide_axi_out_rsp_2, wide_axi_out_2)
 
   // narrow master type
-  typedef axi_test_mod::axi_rand_master #(
+  typedef axi_test::axi_rand_master #(
     .AW                   ( NarrowInAddrWidth    ),
     .DW                   ( NarrowInDataWidth    ),
     .IW                   ( NarrowInIdWidth      ),
@@ -442,7 +442,7 @@ module tb_floo_serial_link_narrow_wide();
   ) narrow_axi_rand_master_t;
 
   // narrow slave type
-  typedef axi_test_mod::axi_rand_slave #(
+  typedef axi_test::axi_rand_slave #(
     .AW                   ( NarrowOutAddrWidth ),
     .DW                   ( NarrowOutDataWidth ),
     .IW                   ( NarrowOutIdWidth   ),
@@ -459,7 +459,7 @@ module tb_floo_serial_link_narrow_wide();
   ) narrow_axi_rand_slave_t;
 
   // wide master type
-  typedef axi_test_mod::axi_rand_master #(
+  typedef axi_test::axi_rand_master #(
     .AW                   ( WideInAddrWidth     ),
     .DW                   ( WideInDataWidth     ),
     .IW                   ( WideInIdWidth       ),
@@ -483,7 +483,7 @@ module tb_floo_serial_link_narrow_wide();
   ) wide_axi_rand_master_t;
 
   // wide slave type
-  typedef axi_test_mod::axi_rand_slave #(
+  typedef axi_test::axi_rand_slave #(
     .AW                   ( WideOutAddrWidth   ),
     .DW                   ( WideOutDataWidth   ),
     .IW                   ( WideOutIdWidth     ),
@@ -595,7 +595,7 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
     mst_done[0] = 0;
     narrow_rand_master_1.reset();
     wait_for_reset_1();
-    narrow_rand_master_1.add_traffic_shaping_fixed_size(1, 3, 1);
+    narrow_rand_master_1.add_traffic_shaping(1, 3);
 
     wait_for_config_1();
     start_cycle = $realtime;
@@ -634,7 +634,7 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
     mst_done[1] = 0;
     narrow_rand_master_2.reset();
     wait_for_reset_2();
-    narrow_rand_master_2.add_traffic_shaping_fixed_size(1, 3, 1);
+    narrow_rand_master_2.add_traffic_shaping(1, 3);
 
     wait_for_config_2();
     start_cycle_narrow2 = $realtime;
@@ -675,7 +675,7 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
     mst_done[2] = 0;
     wide_rand_master_1.reset();
     wait_for_reset_1();
-    wide_rand_master_1.add_traffic_shaping_fixed_size(32, 6, 1);
+    wide_rand_master_1.add_traffic_shaping(32, 6);
 
     wait_for_config_1();
     start_cycle_wide = $realtime;
@@ -713,7 +713,7 @@ may change the stop time in the tb_floo_serial_link_narrow_wide testbench (local
     mst_done[3] = 0;
     wide_rand_master_2.reset();
     wait_for_reset_2();
-    wide_rand_master_2.add_traffic_shaping_fixed_size(32, 6, 1);
+    wide_rand_master_2.add_traffic_shaping(32, 6);
 
     wait_for_config_2();
     start_cycle_wide2 = $realtime;
