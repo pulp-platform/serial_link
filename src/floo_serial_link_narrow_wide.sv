@@ -321,9 +321,9 @@ module floo_serial_link_narrow_wide
     ) i_serial_link_physical (
       .clk_i             ( clk_sl_i                                 ),
       .rst_ni            ( rst_sl_ni                                ),
-      .clk_div_i         ( reg2hw.tx_phy_ctrl1[i].q                 ),
-      .clk_shift_start_i ( reg2hw.tx_phy_ctrl2[i].clk_shift_start.q ),
-      .clk_shift_end_i   ( reg2hw.tx_phy_ctrl2[i].clk_shift_end.q   ),
+      .clk_div_i         ( reg2hw.tx_phy_clk_div[i].q               ),
+      .clk_shift_start_i ( reg2hw.tx_phy_clk_start[i].q             ),
+      .clk_shift_end_i   ( reg2hw.tx_phy_clk_end[i].q               ),
       .ddr_rcv_clk_i     ( ddr_rcv_clk_delayed[i]                   ),
       .ddr_rcv_clk_o     ( ddr_rcv_clk_o[i]                         ),
       .data_out_i        ( alloc2phy_data_out[i]                    ),
