@@ -11,13 +11,14 @@
 // channels. Its internal credit coutners are used to control the handshaking interfaces.
 // Therefore, it may be used to intercept an existing data line with valid/ready handshaking.
 module serial_link_credit_synchronization #(
-  parameter  type  credit_t          = logic,
-  // declare eighter the data_t type or alternatively assign the data-width directly. In the
-  // latter case the type will not be considered.
-  parameter  type  data_t            = logic,
-  parameter  int   DataWidth         = $bits(data_t),
-  // For credit-based control flow
+  // Data width of the data to be sent
+  parameter  int   DataWidth         = -1,
+  // Type of the data to be sent
+  parameter  type  data_t            = logic[$clog2(DataWidth)-1:0],
+  // Number of credits to be used
   parameter  int   NumCredits        = -1,
+  // Credits field type
+  parameter  type  credit_t          = logic[$clog2(NumCredits)-1:0],
   // Force send out credits belonging to the other side
   // after ForceSendThresh is reached
   parameter  int   ForceSendThresh   = NumCredits - 4,
@@ -35,12 +36,11 @@ module serial_link_credit_synchronization #(
   // mean time. However, in case the credits_to_send_o output port is allowed to change while
   // send_valid_o is HIGH, the below parameter might be set to 1, which will disable the internal
   // shadow_counter.
-  parameter  logic DontUseShadowCtnr = 0,
+  parameter  bit DontUseShadowCtnr = 1'b0,
   // If this parameter is enabled, a stream_register is inserted at the input of this module.
   // This can be useful to decouple existing IO paths between the handshake signals.
-  parameter  logic IsolateIO         = 0,
-
-  // dependant parameter: Do not change!
+  parameter  bit CutInput         = 1'b0,
+  // Dependent parameter: Do not change!
   localparam type credit_decrem_t = logic[$clog2(MaxCredPerPktOut+1)-1:0]
 ) (
   // clock signal
@@ -51,23 +51,30 @@ module serial_link_credit_synchronization #(
   // incremented by the amount signaled by credits_received_i. The port is therewith used to
   // receive credits which are being returned from the other sides credit_synchronization (via
   // credits_to_send_o).
-  input  credit_t              credits_received_i,
+  input  credit_t              credit_rcvd_i,
   // Whenever the local input buffer-fifo-queue releases an element, the amount of credits that
   // can be returned to the opposite credit counter module can be incremented. The resulting number
   // of credits is outputed via credits_to_send_o. For further infos see the description of the
   // buffer_queue_out_*_i ports.
-  output credit_t              credits_to_send_o,
+  output credit_t              credit_send_o,
   // Data which should be sent to the receiver side.
-  input  logic [DataWidth-1:0] data_to_send_i,
+  // The valid signal indicating if the data received on data_to_send_i is valid.
+  input  logic                 data_valid_i,
+  // Connect to the data source feeding data_to_send_i to signal that new data can be received.
+  output logic                 data_ready_o,
   // Data being sent to the receiver. In case of a force-send credit scenario the control logic of
   // this module may disconnect from the incoming data-stream and tie this value to zero instead.
   // The credits_only_packet_o signal below contains information on the type of data-packet
   // (valid-data packet or credits-only packet without valid data.)
-  output logic [DataWidth-1:0] data_to_send_o,
-  // The valid signal indicating if the data received on data_to_send_i is valid.
-  input  logic                 send_valid_i,
-  // Connect to the data source feeding data_to_send_i to signal that new data can be received.
-  output logic                 send_ready_o,
+  input  data_t                data_i,
+  // Asserted if the data_to_send_o port contains valid data. Alternatively, credits-only
+  // packets (credits_only_packet_o will be driven to high) might override this value and
+  // set the port to valid, even when no valid input data is available.
+  output logic                 data_valid_o,
+  // Signal coming from the receiver indicating whether or not the receiver is ready to receive
+  // data.
+  input  logic                 data_ready_i,
+  output data_t                data_o,
   // This signal indicates if the queue (to be provided externally & should be able to buffer
   // NumCredits amount of data) has valid data to be released. A handshake with
   // buffer_queue_out_rdy_i indicates that a data element has been released and new space is
@@ -76,16 +83,9 @@ module serial_link_credit_synchronization #(
   // The ready signal of the data sink, signaling to the queue that data can be consumed.
   // Works in combination with buffer_queue_out_val_i, acting as handshaking signals.
   input  logic                 buffer_queue_out_rdy_i,
-  // indicates if the number of credits provided via credits_received_i port can be restored
+  // indicates if the number of credits provided via `credit_rcvd_i` port can be restored
   // and added to available credits.
   input  logic                 receive_cred_i,
-  // Asserted if the data_to_send_o port contains valid data. Alternatively, credits-only
-  // packets (credits_only_packet_o will be driven to high) might override this value and
-  // set the port to valid, even when no valid input data is available.
-  output logic                 send_valid_o,
-  // Signal coming from the receiver indicating whether or not the receiver is ready to receive
-  // data.
-  input  logic                 send_ready_i,
   // This port is usually assigned to 1. If the parameter MaxCredPerPktOut is assigned a value
   // larger than 1, however, the pin can signal how many credits are required in order to buffer
   // the outgoing message. This feature is originally intended to be used in the
@@ -113,7 +113,7 @@ module serial_link_credit_synchronization #(
   import serial_link_pkg::*;
 
   credit_decrem_t req_credits_for_output_msg;
-  logic           send_normal_packet_d, send_normal_packet_q, send_valid_i_q;
+  logic           send_normal_packet_d, send_normal_packet_q;
   logic           cannot_send_data_but_credits_only;
 
   credit_t credits_available_q, credits_available_d;
@@ -128,15 +128,13 @@ module serial_link_credit_synchronization #(
   credit_t credits_available_increment, credits_to_send_offset, credits_to_send_decrement;
   credit_t credits_to_send_hidden_decrement;
 
-  logic allow_to_send_credit_only_packets, cannot_send_data_packet;
-  logic consume_last_credits_but_dont_return_any, enough_credits_for_cred_only_pack_to_send;
   logic return_credits;
 
   logic send_ready_out, send_valid_in;
-  logic [DataWidth-1:0] data_to_send_in;
+  data_t data_to_send_in;
 
-  assign send_ready_out        = send_ready_i & send_normal_packet_q & send_valid_o;
-  assign credits_to_send_o     = credits_to_send_q;
+  assign send_ready_out        = data_ready_i & send_normal_packet_q & data_valid_o;
+  assign credit_send_o     = credits_to_send_q;
   assign credits_only_packet_o = ~send_normal_packet_q;
 
 
@@ -144,25 +142,25 @@ module serial_link_credit_synchronization #(
   //  IO delay path cut (optional)  //
   ////////////////////////////////////
 
-  if (IsolateIO) begin : gen_IO_isolation
+  if (CutInput) begin : gen_input_cut
     stream_register #(
-      .T          ( logic [DataWidth-1:0] )
+      .T          ( data_t )
     ) i_IO_isolate (
       .clk_i      ( clk_i           ),
       .rst_ni     ( rst_ni          ),
       .clr_i      ( 1'b0            ),
       .testmode_i ( 1'b0            ),
-      .valid_i    ( send_valid_i    ),
-      .ready_o    ( send_ready_o    ),
-      .data_i     ( data_to_send_i  ),
+      .valid_i    ( data_valid_i    ),
+      .ready_o    ( data_ready_o    ),
+      .data_i     ( data_i          ),
       .valid_o    ( send_valid_in   ),
       .ready_i    ( send_ready_out  ),
       .data_o     ( data_to_send_in )
     );
-  end else begin : gen_IO_isolation
-    assign send_valid_in   = send_valid_i;
-    assign send_ready_o    = send_ready_out;
-    assign data_to_send_in = data_to_send_i;
+  end else begin : gen_input_cut
+    assign send_valid_in   = data_valid_i;
+    assign data_ready_o    = send_ready_out;
+    assign data_to_send_in = data_i;
   end
 
 
@@ -173,9 +171,9 @@ module serial_link_credit_synchronization #(
   // stabalize the output data if a credit_only packet needs to be sent
   always_comb begin : ouput_data_control
     if (credits_only_packet_o) begin
-      data_to_send_o = '0;
+      data_o = '0;
     end else begin
-      data_to_send_o = data_to_send_in;
+      data_o = data_to_send_in;
     end
   end
 
@@ -200,7 +198,7 @@ module serial_link_credit_synchronization #(
     // is available at the moment. If the ~send_valid_o is not added, it can happen that the
     // credit only mode is not exited correctly.
     if ((~send_valid_in | cannot_send_data_but_credits_only) &
-        force_send_credits & ~send_valid_o) begin
+        force_send_credits & ~data_valid_o) begin
       // When I don't have valid data at the input and I overstepped the ForceSendThreshold, I
       // switch to the credits_only mode.
       // EXCEPTION: When there is valid data at the input and I have force_send_credits=1, but I
@@ -208,7 +206,7 @@ module serial_link_credit_synchronization #(
       // packet mode in case such a packet can be forwarded instantly.
       send_normal_packet_d = 0;
     end else begin
-      if (send_valid_o & send_ready_i) begin
+      if (data_valid_o & data_ready_i) begin
         // When there is valid input data, or I don't have to force send credits anymore.
         // Meanwhile, I have a valid output handshake.If both of these conditions are met, the
         // normal_packet mode is entered (I don't need to force send credits_only packets)
@@ -230,11 +228,11 @@ module serial_link_credit_synchronization #(
     // To prevent this situation, the last credits are only consumed if credit is also sent back
     // => force the output valid signal to zero if no credits are available or I want to prevent
     // the deadlock situation from above
-    send_valid_o = '0;
+    data_valid_o = '0;
     if ((credits_available_q > req_credits_for_output_msg) ||
         (credits_available_q == req_credits_for_output_msg &&
         credits_to_send_q > 0 && allow_cred_consume_i)) begin
-      send_valid_o = (send_valid_in | credits_only_packet_o);
+      data_valid_o = (send_valid_in | credits_only_packet_o);
     end
   end
 
@@ -242,7 +240,7 @@ module serial_link_credit_synchronization #(
   always_comb begin : required_credits_for_msg
     req_credits_for_output_msg = req_cred_to_buffer_msg;
     if (credits_only_packet_o) begin
-      req_credits_for_output_msg = CredOnlyConsCred;
+      req_credits_for_output_msg = credit_decrem_t'(CredOnlyConsCred);
     end
   end
 
@@ -253,7 +251,7 @@ module serial_link_credit_synchronization #(
 
   always_comb begin : available_credit_counter  // => keeps track of the remaining credits
     credits_available_decrement = '0;
-    if (send_valid_o & send_ready_i) begin
+    if (data_valid_o & data_ready_i) begin
       // When a valid output handshake occurs, there are fewer credits available.
       // The decrement value is determined by the required number of credits to buffer the
       // outgoing message. This is signaled via "req_credits_for_output_msg".
@@ -263,7 +261,7 @@ module serial_link_credit_synchronization #(
     credits_available_increment = '0;
     if (receive_cred_i) begin
       // increment the available credits counter by the amount of credits received.
-      credits_available_increment = credits_received_i;
+      credits_available_increment = credit_rcvd_i;
     end
   end
 
@@ -279,7 +277,7 @@ module serial_link_credit_synchronization #(
     if (DontUseShadowCtnr) begin
       // Credits are only released if they are allowed to be consumed & I have a valid packet OR
       // force consume credits.
-      if ((send_valid_o & send_ready_i & allow_cred_consume_i) |
+      if ((data_valid_o & data_ready_i & allow_cred_consume_i) |
           (consume_cred_to_send_i & allow_cred_consume_i)) begin
         // The counter is decremented by the amount of credits being released
         credits_to_send_decrement = credits_to_send_q;
@@ -288,20 +286,20 @@ module serial_link_credit_synchronization #(
     end else begin
       // There is a valid output handshake or credits are force consumed, allowing the shadow
       // (hidden) counter to be transfered
-      if ((send_valid_o & send_ready_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+      if ((data_valid_o & data_ready_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
         // The hidden credits are transfered to the visible counter
         credits_to_send_offset = credits_to_send_hidden_q;
       end
       // Credits are only released if they are allowed to be consumed & I have a valid packet OR
       // force consume credits.
-      if ((send_valid_o & send_ready_i & allow_cred_consume_i) |
+      if ((data_valid_o & data_ready_i & allow_cred_consume_i) |
           (consume_cred_to_send_i & allow_cred_consume_i)) begin
         // The counter is decremented by the amount of credits being released
         credits_to_send_decrement = credits_to_send_q;
       end
       // potential increments are only ignored if (send_valid_o & ~send_ready_i) as in this case
       // the hidden counter is incremented instead.
-      if ((~send_valid_o | (send_valid_o & send_ready_i))) begin
+      if ((~data_valid_o | (data_valid_o & data_ready_i))) begin
         credits_to_send_increment = (buffer_queue_out_val_i & buffer_queue_out_rdy_i);
       end
     end
@@ -322,12 +320,12 @@ module serial_link_credit_synchronization #(
       // I don't have a handshake yet, but valid is set to high. Therefore, the hidden counter is
       // being increased instead such as not to change the credits_to_send_o while valid data is
       // being available.
-      if (send_valid_o & ~send_ready_i) begin
+      if (data_valid_o & ~data_ready_i) begin
         // increment if the buffer queue releases an element.
         credits_to_send_hidden_increment = (buffer_queue_out_val_i & buffer_queue_out_rdy_i);
       end
 
-      if ((send_valid_o & send_ready_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
+      if ((data_valid_o & data_ready_i) | (consume_cred_to_send_i & allow_cred_consume_i)) begin
         // In the case of a valid data-out handshake, the hidden counter
         // value will be assigned to the visible counter after releasing the packet. Therefore,
         // these assigned credits can be removed from the hidden counter.
@@ -345,7 +343,7 @@ module serial_link_credit_synchronization #(
   //    FLIP-FLOPS    //
   //////////////////////
 
-  `FF(credits_available_q, credits_available_d, NumCredits)
+  `FF(credits_available_q, credits_available_d, credit_t'(NumCredits))
   `FF(credits_to_send_q, credits_to_send_d, 0)
   `FF(credits_to_send_hidden_q, credits_to_send_hidden_d, 0)
   `FF(send_normal_packet_q, send_normal_packet_d, 1)
