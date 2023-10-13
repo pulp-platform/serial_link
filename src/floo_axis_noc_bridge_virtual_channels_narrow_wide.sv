@@ -17,7 +17,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   parameter  type axis_rsp_t           = logic,
   // Enable if timingpaths between the valid and ready signals of incoming messages is not allowed.
   // Attention: Enabling results in extra area since another register is inserted per channel.
-  parameter  bit  PreventIoTimingPaths = 1'b0,
+  parameter  bit  CutInput = 1'b0,
   // finde suitable ForceSendThresh margin (do not change line number or ordering!)
   parameter int ForceSendThreshNarrowReq = noc_bridge_narrow_wide_pkg::NumCredNocBridgeNarrowReq-1,
   parameter int ForceSendThreshNarrowRsp = noc_bridge_narrow_wide_pkg::NumCredNocBridgeNarrowRsp-1,
@@ -148,7 +148,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .ForceSendThresh        ( ForceSendThreshNarrowReq  ),
     .CredOnlyConsCred       ( 0                         ),
     .DontUseShadowCtnr      ( 1                         ),
-    .IsolateIO              ( PreventIoTimingPaths      )
+    .CutInput               ( CutInput      )
   ) i_credit_counter_req (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -187,7 +187,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .ForceSendThresh        ( ForceSendThreshNarrowRsp  ),
     .CredOnlyConsCred       ( 0                         ),
     .DontUseShadowCtnr      ( 1                         ),
-    .IsolateIO              ( PreventIoTimingPaths      )
+    .CutInput              ( CutInput      )
   ) i_credit_counter_rsp (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),
@@ -231,7 +231,7 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
     .ForceSendThresh        ( ForceSendThreshWideChan  ),
     .CredOnlyConsCred       ( 0                        ),
     .DontUseShadowCtnr      ( 1                        ),
-    .IsolateIO              ( PreventIoTimingPaths     )
+    .CutInput              ( CutInput     )
   ) i_credit_counter_wide (
     .clk_i                  ( clk_i                      ),
     .rst_ni                 ( rst_ni                     ),

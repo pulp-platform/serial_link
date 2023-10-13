@@ -134,7 +134,7 @@ module floo_serial_link_narrow_wide
       .floo_wide_t          ( floo_wide_t       ),
       .axis_req_t           ( axis_req_t        ),
       .axis_rsp_t           ( axis_rsp_t        ),
-      .PreventIoTimingPaths ( 1'b0              )
+      .CutInput     ( 1'b0        ),
     ) i_serial_link_network (
       .clk_i          ( clk_sl_i     ),
       .rst_ni         ( rst_sl_ni    ),
