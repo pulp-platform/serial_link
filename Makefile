@@ -65,7 +65,7 @@ update-regs: src/regs/*.hjson
 # TB_DUT ?= tb_floo_noc_bridge_narrow_wide
 TB_DUT ?= tb_floo_serial_link_narrow_wide
 # TB_DUT ?= tb_floo_narrow_wide_chimney
-WaveDo ?= $(TB_DUT)_wave.do
+WaveDo ?= $(TB_DUT).wave.tcl
 
 BENDER_FLAGS := -t test -t simulation
 
