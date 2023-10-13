@@ -7,80 +7,20 @@
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
 
-//////////////////////////////Explanation//////////////////////////////
-/*
-
-  This module can collect multiple smaller messages and wrap them
-  into one single physical transfer. The information on the size is
-  contained in the AXIS strobe signal, where each leading 1 indicates
-  an active/valid data byte.
-  The incoming messages are only collected and bundled together, as
-  long as no additional delay results from the performed operation.
-  The assumption is, that every output transaction requires ClkDiv
-  clock cycles to finish, leaving that many extra cycles for processing
-  incoming data, while waiting for the output to be ready again.
-
-  The output stream has control bits inserted. They are at the bit
-  position zero of each individual blocks. A value of one indicates
-  the start position of a message. This module is to be used in
-  combination with dequeue_shift_register.
-
-*/
-///////////////////////////////////////////////////////////////////////
-
-
-module find_req_blocks #(
-    parameter  bit  AllowVarAxisLen           = 1'b0,
-    parameter  int  ClkDiv                    = 1,
-    parameter  int  StrbSize                  = 1,
-    parameter  type block_cntr_t              = logic,
-    parameter  int  MaxPossibleTransferSplits = 1,
-    parameter  int  NumExternalBitsAdded      = 0,
-    parameter  int  NumExternalBitsAddedFirst = 0,
-
-    parameter  int  BlockSize                 = 2,
-    localparam int  TotalNumBlocks            = MaxPossibleTransferSplits*ClkDiv
-) (
-  input  logic use_first_externals_i,
-  input  logic [StrbSize-1:0] strb_i,
-  output block_cntr_t         required_blocks_o
-);
-
-  localparam int NumDataBits = $clog2(9*StrbSize+NumExternalBitsAdded+NumExternalBitsAddedFirst+1);
-  localparam int StrobeCounter = $clog2(StrbSize+1);
-
-  logic [NumDataBits-1:0]   required_bits;
-  logic [StrobeCounter-1:0] num_trailing_ones;
-
-  if (AllowVarAxisLen) begin : gen_split_determination
-    logic all_ones;
-
-    lzc #(
-      .WIDTH ( StrbSize ),
-      .MODE  ( 1'b0     )
-    ) i_trailing_ones_counter (
-      .in_i    ( ~strb_i           ),
-      .cnt_o   ( num_trailing_ones ),
-      .empty_o ( all_ones          )
-    );
-
-    // One set strobe bit corresponds to 8 bits (1 byte) of data.
-    assign required_bits = (use_first_externals_i) ?
-                         (8*num_trailing_ones + NumExternalBitsAdded + NumExternalBitsAddedFirst) :
-                         (8*num_trailing_ones + NumExternalBitsAdded);
-    // When input strobe is fully '1, all blocks are occupied. The condition is needed to ensure
-    // the max is not exceeded, which could happen when the front most data byte is not a full byte
-    // (not all bits are required). This would lead to a mismatch in the determined MaxNumSplits
-    // opposed to the optained number by comparing the block count.
-    assign required_blocks_o =
-           (all_ones) ? TotalNumBlocks : (required_bits+BlockSize-2)/(BlockSize-1);
-  end else begin : gen_split_determination
-    assign required_blocks_o = TotalNumBlocks;
-  end
-
-endmodule
-
-
+///  This module can collect multiple smaller messages and wrap them
+///  into one single physical transfer. The information on the size is
+///  contained in the AXIS strobe signal, where each leading 1 indicates
+///  an active/valid data byte.
+///  The incoming messages are only collected and bundled together, as
+///  long as no additional delay results from the performed operation.
+///  The assumption is, that every output transaction requires ClkDiv
+///  clock cycles to finish, leaving that many extra cycles for processing
+///  incoming data, while waiting for the output to be ready again.
+///
+///  The output stream has control bits inserted. They are at the bit
+///  position zero of each individual blocks. A value of one indicates
+///  the start position of a message. This module is to be used in
+///  combination with dequeue_shift_register.
 module enqueue_register
   import serial_link_pkg::*;
 #(
@@ -107,12 +47,7 @@ module enqueue_register
     // The minimal number of strobe bits to be set (smallest possible message). Will be used to
     // calculate the number of blocks which are required to process the smallest possible message.
     parameter  int  NarrowStrbCount           = 1,
-
-
-    ///////////////////////////////////////////
-    //  DEPENDANT PARAMETER - DO NOT CHANGE  //
-    ///////////////////////////////////////////
-
+    // Dependent parameters, do not change!
     // Represents the number of blocks for the whole data-stream.
     // However, only the first ClkDiv blocks are relevant for data-flow control.
     localparam int  NumDatBlocks = ClkDiv * MaxPossibleTransferSplits,
@@ -371,5 +306,57 @@ module enqueue_register
     .ready_i    (  ready_i                      ),
     .data_o     ( {data_o, num_splits_o}        )
   );
+
+endmodule
+
+
+module find_req_blocks #(
+  parameter  bit  AllowVarAxisLen           = 1'b0,
+  parameter  int  ClkDiv                    = 1,
+  parameter  int  StrbSize                  = 1,
+  parameter  type block_cntr_t              = logic,
+  parameter  int  MaxPossibleTransferSplits = 1,
+  parameter  int  NumExternalBitsAdded      = 0,
+  parameter  int  NumExternalBitsAddedFirst = 0,
+
+  parameter  int  BlockSize                 = 2,
+  localparam int  TotalNumBlocks            = MaxPossibleTransferSplits*ClkDiv
+) (
+input  logic use_first_externals_i,
+input  logic [StrbSize-1:0] strb_i,
+output block_cntr_t         required_blocks_o
+);
+
+localparam int NumDataBits = $clog2(9*StrbSize+NumExternalBitsAdded+NumExternalBitsAddedFirst+1);
+localparam int StrobeCounter = $clog2(StrbSize+1);
+
+logic [NumDataBits-1:0]   required_bits;
+logic [StrobeCounter-1:0] num_trailing_ones;
+
+if (AllowVarAxisLen) begin : gen_split_determination
+  logic all_ones;
+
+  lzc #(
+    .WIDTH ( StrbSize ),
+    .MODE  ( 1'b0     )
+  ) i_trailing_ones_counter (
+    .in_i    ( ~strb_i           ),
+    .cnt_o   ( num_trailing_ones ),
+    .empty_o ( all_ones          )
+  );
+
+  // One set strobe bit corresponds to 8 bits (1 byte) of data.
+  assign required_bits = (use_first_externals_i) ?
+                       (8*num_trailing_ones + NumExternalBitsAdded + NumExternalBitsAddedFirst) :
+                       (8*num_trailing_ones + NumExternalBitsAdded);
+  // When input strobe is fully '1, all blocks are occupied. The condition is needed to ensure
+  // the max is not exceeded, which could happen when the front most data byte is not a full byte
+  // (not all bits are required). This would lead to a mismatch in the determined MaxNumSplits
+  // opposed to the optained number by comparing the block count.
+  assign required_blocks_o =
+         (all_ones) ? block_cntr_t'(TotalNumBlocks) : (required_bits+BlockSize-2)/(BlockSize-1);
+end else begin : gen_split_determination
+  assign required_blocks_o = block_cntr_t'(TotalNumBlocks);
+end
 
 endmodule

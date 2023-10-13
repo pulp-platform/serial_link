@@ -7,22 +7,17 @@
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
 
-////////////////////////Input pattern example/////////////////////
-/*
-
-  |dddddd?|dddddd?|dddddd?|dddddd?|dddddd?|dddddd?|dddddd?|dddddd?|
-   block_1 block_2 block_3 block_4 block_5 block_6 block_7 block_8
-
-  d := data_bytes
-  ? := interleaved msg start bit (indicates the beginning of a msg)
-
-  NOTE: while the start bit (?) will be included in the input stream,
-         the output stream will remove the interleaved bits.
-
-*/
-/////////////////////////End of the example/////////////////////////
-
-
+// Input pattern example:
+//
+//  |dddddd?|dddddd?|dddddd?|dddddd?|dddddd?|dddddd?|dddddd?|dddddd?|
+//   block_1 block_2 block_3 block_4 block_5 block_6 block_7 block_8
+//
+//  d := data_bytes
+//  ? := interleaved msg start bit (indicates the beginning of a msg)
+//
+//  NOTE: while the start bit (?) will be included in the input stream,
+//         the output stream will remove the interleaved bits.
+//
 module dequeue_shift_register
 import serial_link_pkg::*;
 #(
