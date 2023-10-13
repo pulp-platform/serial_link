@@ -6,7 +6,7 @@
 `include "common_cells/assertions.svh"
 `include "common_cells/registers.svh"
 
-module floo_axis_noc_bridge_narrow_wide
+module serial_link_floo_nw_network
 #(
   // If the parameter is set to 1, all the assertion checks within this module will be ignored.
   parameter  bit  IgnoreAssert      = 1'b0,

@@ -41,17 +41,17 @@ sources:
     - src/channel_allocator/channel_spread_sfr.sv
     - src/channel_allocator/serial_link_channel_allocator.sv
     - src/serial_link_credit_synchronization.sv
-    - src/serial_link_axi_network.sv
     - src/dequeue_shift_register.sv
     - src/enqueue_register.sv
+    # Abstraction Layers
+    - src/serial_link_axi_network.sv
+    - src/serial_link_floo_network.sv
+    - src/serial_link_floo_nw_network.sv
+    - src/serial_link_floo_vc_network.sv
+    - src/serial_link_floo_nw_vc_network.sv
     - src/serial_link_data_link.sv
     - src/serial_link_physical.sv
 
-    # NoC-bridge versions
-    - src/floo_axis_noc_bridge.sv
-    - src/floo_axis_noc_bridge_narrow_wide.sv
-    - src/floo_axis_noc_bridge_virtual_channels.sv
-    - src/floo_axis_noc_bridge_virtual_channels_narrow_wide.sv
 
 
     # Serial Link Wrapper

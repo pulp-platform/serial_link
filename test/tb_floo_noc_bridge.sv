@@ -178,7 +178,7 @@ module tb_floo_noc_bridge;
   );
 
   if (BridgeVirtualChannels) begin : gen_bridge
-    floo_axis_noc_bridge_virtual_channels #(
+    serial_link_floo_vc_network #(
     	.IgnoreAssert     ( BridgeBypass     ),
       .floo_req_t       ( floo_req_t       ),
       .floo_rsp_t       ( floo_rsp_t       ),
@@ -198,7 +198,7 @@ module tb_floo_noc_bridge;
       .axis_out_rsp_i   ( bridge_rsp[1]    )
     );
 
-    floo_axis_noc_bridge_virtual_channels #(
+    serial_link_floo_vc_network #(
     	.IgnoreAssert     ( BridgeBypass     ),
       .floo_req_t       ( floo_req_t       ),
       .floo_rsp_t       ( floo_rsp_t       ),
@@ -218,7 +218,7 @@ module tb_floo_noc_bridge;
       .axis_out_rsp_i   ( bridge_rsp[0]    )
     );
   end else begin : gen_bridge
-    floo_axis_noc_bridge #(
+    serial_link_floo_network #(
     	.IgnoreAssert     ( BridgeBypass     ),
       .floo_req_t       ( floo_req_t       ),
       .floo_rsp_t       ( floo_rsp_t       ),
@@ -238,7 +238,7 @@ module tb_floo_noc_bridge;
       .axis_out_rsp_i   ( bridge_rsp[1]    )
     );
 
-    floo_axis_noc_bridge #(
+    serial_link_floo_network #(
     	.IgnoreAssert     ( BridgeBypass     ),
       .floo_req_t       ( floo_req_t       ),
       .floo_rsp_t       ( floo_rsp_t       ),

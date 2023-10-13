@@ -6,7 +6,7 @@
 //  - Yannick Baumann <baumanny@student.ethz.ch>
 `include "common_cells/assertions.svh"
 
-module floo_axis_noc_bridge_virtual_channels
+module serial_link_floo_vc_network
 #(
   // If the parameter is set to 1, all the assertion checks within this module will be ignored.
   parameter  bit  IgnoreAssert      = 1'b0,

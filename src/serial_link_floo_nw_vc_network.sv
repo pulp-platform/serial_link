@@ -8,7 +8,7 @@
 `include "common_cells/assertions.svh"
 `include "common_cells/registers.svh"
 
-module floo_axis_noc_bridge_virtual_channels_narrow_wide
+module serial_link_floo_nw_vc_network
 #(
   parameter  type floo_rsp_t    = logic,
   parameter  type floo_req_t    = logic,

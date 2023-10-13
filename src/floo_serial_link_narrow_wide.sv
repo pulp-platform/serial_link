@@ -128,7 +128,7 @@ module floo_serial_link_narrow_wide
   ////////////////////
 
   if (BridgeVirtualChannels) begin : gen_bridge
-    floo_axis_noc_bridge_virtual_channels_narrow_wide #(
+    serial_link_floo_nw_vc_network #(
       .CutInput     ( 1'b0        ),
       .floo_req_t   ( floo_req_t  ),
       .floo_rsp_t   ( floo_rsp_t  ),
@@ -150,7 +150,7 @@ module floo_serial_link_narrow_wide
       .axis_out_rsp_i ( axis_out_rsp  )
     );
   end else begin : gen_bridge
-    floo_axis_noc_bridge_narrow_wide #(
+    serial_link_floo_nw_network #(
       .floo_req_t   ( floo_req_t  ),
       .floo_rsp_t   ( floo_rsp_t  ),
       .floo_wide_t  ( floo_wide_t ),
