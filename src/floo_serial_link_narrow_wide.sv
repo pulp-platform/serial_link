@@ -129,46 +129,46 @@ module floo_serial_link_narrow_wide
 
   if (BridgeVirtualChannels) begin : gen_bridge
     floo_axis_noc_bridge_virtual_channels_narrow_wide #(
-      .floo_req_t    ( floo_req_t ),
-      .floo_rsp_t    ( floo_rsp_t ),
-      .floo_wide_t          ( floo_wide_t       ),
-      .axis_req_t           ( axis_req_t        ),
-      .axis_rsp_t           ( axis_rsp_t        ),
       .CutInput     ( 1'b0        ),
+      .floo_req_t   ( floo_req_t  ),
+      .floo_rsp_t   ( floo_rsp_t  ),
+      .floo_wide_t  ( floo_wide_t ),
+      .axis_req_t   ( axis_req_t  ),
+      .axis_rsp_t   ( axis_rsp_t  )
     ) i_serial_link_network (
-      .clk_i          ( clk_sl_i     ),
-      .rst_ni         ( rst_sl_ni    ),
-      .floo_req_o   ( floo_req_o ),
-      .floo_rsp_o   ( floo_rsp_o ),
-      .floo_req_i   ( floo_req_i ),
-      .floo_rsp_i   ( floo_rsp_i ),
-      .floo_wide_i         ( floo_wide_i       ),
-      .floo_wide_o         ( floo_wide_o       ),
-      .axis_out_req_o ( axis_out_req ),
-      .axis_in_rsp_o  ( axis_in_rsp  ),
-      .axis_in_req_i  ( axis_in_req  ),
-      .axis_out_rsp_i ( axis_out_rsp )
+      .clk_i          ( clk_sl_i      ),
+      .rst_ni         ( rst_sl_ni     ),
+      .floo_req_o     ( floo_req_o    ),
+      .floo_rsp_o     ( floo_rsp_o    ),
+      .floo_req_i     ( floo_req_i    ),
+      .floo_rsp_i     ( floo_rsp_i    ),
+      .floo_wide_i    ( floo_wide_i   ),
+      .floo_wide_o    ( floo_wide_o   ),
+      .axis_out_req_o ( axis_out_req  ),
+      .axis_in_rsp_o  ( axis_in_rsp   ),
+      .axis_in_req_i  ( axis_in_req   ),
+      .axis_out_rsp_i ( axis_out_rsp  )
     );
   end else begin : gen_bridge
     floo_axis_noc_bridge_narrow_wide #(
-      .floo_req_t ( floo_req_t ),
-      .floo_rsp_t ( floo_rsp_t ),
-      .floo_wide_t       ( floo_wide_t       ),
-      .axis_req_t        ( axis_req_t        ),
-      .axis_rsp_t        ( axis_rsp_t        )
+      .floo_req_t   ( floo_req_t  ),
+      .floo_rsp_t   ( floo_rsp_t  ),
+      .floo_wide_t  ( floo_wide_t ),
+      .axis_req_t   ( axis_req_t  ),
+      .axis_rsp_t   ( axis_rsp_t  )
     ) i_serial_link_network (
-      .clk_i          ( clk_sl_i     ),
-      .rst_ni         ( rst_sl_ni    ),
-      .floo_req_o   ( floo_req_o ),
-      .floo_rsp_o   ( floo_rsp_o ),
-      .floo_req_i   ( floo_req_i ),
-      .floo_rsp_i   ( floo_rsp_i ),
-      .floo_wide_i         ( floo_wide_i       ),
-      .floo_wide_o         ( floo_wide_o       ),
-      .axis_out_req_o ( axis_out_req ),
-      .axis_in_rsp_o  ( axis_in_rsp  ),
-      .axis_in_req_i  ( axis_in_req  ),
-      .axis_out_rsp_i ( axis_out_rsp )
+      .clk_i          ( clk_sl_i      ),
+      .rst_ni         ( rst_sl_ni     ),
+      .floo_req_o     ( floo_req_o    ),
+      .floo_rsp_o     ( floo_rsp_o    ),
+      .floo_req_i     ( floo_req_i    ),
+      .floo_rsp_i     ( floo_rsp_i    ),
+      .floo_wide_i    ( floo_wide_i   ),
+      .floo_wide_o    ( floo_wide_o   ),
+      .axis_out_req_o ( axis_out_req  ),
+      .axis_in_rsp_o  ( axis_in_rsp   ),
+      .axis_in_req_i  ( axis_in_req   ),
+      .axis_out_rsp_i ( axis_out_rsp  )
     );
   end
 
