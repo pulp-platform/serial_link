@@ -10,8 +10,6 @@
 
 module floo_axis_noc_bridge_virtual_channels_narrow_wide
 #(
-  // If the parameter is set to 1, all the assertion checks within this module will be ignored.
-  parameter  bit  IgnoreAssert         = 1'b0,
   parameter  type floo_rsp_t    = logic,
   parameter  type floo_req_t    = logic,
   parameter  type floo_wide_t          = logic,
@@ -463,13 +461,11 @@ module floo_axis_noc_bridge_virtual_channels_narrow_wide
   //  ASSERTIONS  //
   //////////////////
 
-if (~IgnoreAssert) begin : gen_assertion
   `ASSERT(AxisStable, axis_out_req_o.tvalid & !axis_out_rsp_i.tready |=> $stable(axis_out_req_o.t))
   // I need to always be able to receive any incoming axis messages, since the virtual-channel
   // credit counters ought to only send messages of a channel being ready to receive.
   `ASSERT(ChannelNotPermitted, axis_in_req_i.tvalid |-> axis_in_rsp_o.tready)
   // wide channel must be wider than the narrow channel
   `ASSERT(WideSmallerThanNarrow, $bits(axis_packet_t) >= $bits(narrow_axis_packet_t))
-end
 
 endmodule
