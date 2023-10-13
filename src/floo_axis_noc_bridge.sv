@@ -126,11 +126,12 @@ module floo_axis_noc_bridge
   ///////////////////////////////////////////////
 
   assign axis_in_payload      = axis_data_t'(axis_in_req_i.t.data);
-  assign axis_in_rsp_o.tready = (floo_req_i.ready & floo_req_o.valid) || (floo_rsp_i.ready & floo_rsp_o.valid);
-  assign floo_req_o.valid          = (axis_in_payload.hdr == request) ? axis_in_req_i.tvalid : 0;
-  assign floo_rsp_o.valid          = (axis_in_payload.hdr == response) ? axis_in_req_i.tvalid : 0;
-  assign floo_req_o.req           = axis_in_payload.flit_data;
-  assign floo_rsp_o.rsp           = axis_in_payload.flit_data;
+  assign axis_in_rsp_o.tready = (floo_req_i.ready & floo_req_o.valid) ||
+                                (floo_rsp_i.ready & floo_rsp_o.valid);
+  assign floo_req_o.valid = (axis_in_payload.hdr == request) ? axis_in_req_i.tvalid : 0;
+  assign floo_rsp_o.valid = (axis_in_payload.hdr == response) ? axis_in_req_i.tvalid : 0;
+  assign floo_req_o.req = axis_in_payload.flit_data;
+  assign floo_rsp_o.rsp = axis_in_payload.flit_data;
 
   // FOR THE TIME BEING THE SIGNALS BELOW ARE IGNORED...
   // assign ??? = axis_in_req_i.t.strb;

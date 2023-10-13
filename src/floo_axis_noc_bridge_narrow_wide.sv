@@ -166,16 +166,16 @@ module floo_axis_noc_bridge_narrow_wide
   //  CONNECT AXIS_IN WITH THE OUTGOING FLITS  //
   ///////////////////////////////////////////////
 
-  assign axis_in_payload      = wide_axis_data_t'(axis_in_req_i.t.data);
+  assign axis_in_payload = wide_axis_data_t'(axis_in_req_i.t.data);
   assign axis_in_rsp_o.tready = (floo_req_i.ready & floo_req_o.valid) ||
                                 (floo_rsp_i.ready & floo_rsp_o.valid) ||
                                 (floo_wide_i.ready & floo_wide_o.valid);
   assign floo_req_o.valid   = (axis_in_payload.hdr == narrow_request) ? axis_in_req_i.tvalid : 0;
   assign floo_rsp_o.valid   = (axis_in_payload.hdr == narrow_response)? axis_in_req_i.tvalid : 0;
-  assign floo_wide_o.valid         = (axis_in_payload.hdr == wide_channel) ? axis_in_req_i.tvalid : 0;
-  assign floo_req_o.req    = axis_in_payload.flit_data;
-  assign floo_rsp_o.rsp    = axis_in_payload.flit_data;
-  assign floo_wide_o.wide          = axis_in_payload.flit_data;
+  assign floo_wide_o.valid  = (axis_in_payload.hdr == wide_channel) ? axis_in_req_i.tvalid : 0;
+  assign floo_req_o.req   = axis_in_payload.flit_data;
+  assign floo_rsp_o.rsp   = axis_in_payload.flit_data;
+  assign floo_wide_o.wide = axis_in_payload.flit_data;
 
   // FOR THE TIME BEING THE SIGNALS BELOW ARE IGNORED...
   // assign ??? = axis_in_req_i.t.strb;
