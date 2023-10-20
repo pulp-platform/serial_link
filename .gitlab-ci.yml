@@ -7,8 +7,8 @@
 
 variables:
   VSIM: 'questa-2022.3 vsim'
-  VCS: 'vcs-2020.12 vcs'
-  VLOGAN: 'vcs-2020.12 vlogan'
+  VCS: 'vcs-2022.06 vcs'
+  VLOGAN: 'vcs-2022.06 vlogan'
 
 stages:
   - build
