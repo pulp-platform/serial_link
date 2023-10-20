@@ -220,15 +220,13 @@ module serial_link_floo_vc_network
     .data_o     ( req_rsp_axis_out      )
   );
 
-  assign axis_out_req_o.t.data = {req_rsp_axis_out.data_hdr, req_rsp_axis_out.data};
-  assign axis_out_req_o.t.strb = '1;
-  assign axis_out_req_o.t.keep = '0;
-  assign axis_out_req_o.t.last = '0;
-  assign axis_out_req_o.t.id   = '0;
-  assign axis_out_req_o.t.dest = '0;
-  assign axis_out_req_o.t.user =
-         {req_rsp_axis_out.data_validity, req_rsp_axis_out.credits_hdr, req_rsp_axis_out.credits};
-
+  always_comb begin
+    axis_out_req_o = '0;
+    axis_out_req_o.t.data = {req_rsp_axis_out.data_hdr, req_rsp_axis_out.data};
+    axis_out_req_o.t.strb = '1;
+    axis_out_req_o.t.user = {req_rsp_axis_out.data_validity, req_rsp_axis_out.credits_hdr,
+                             req_rsp_axis_out.credits};
+  end
 
   ///////////////////////////////////////////////
   //  CONNECT AXIS_IN WITH THE OUTGOING FLITS  //
