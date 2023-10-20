@@ -20,15 +20,3 @@ ucli.key
 vc_hdrs.h
 scripts/compile_vcs.log
 .dvt
-Some_personal_notes.md
-README_semesterThesisProject.md
-perfAnalysis.csv
-doNotUploadToGit
-perfAnalysis.tmp
-perfAnalysis.tmp2
-perfAnalysis.ods
-src/serial_link_data_link_fixed_div_and_mult.sv
-benchmarking/*
-set_credits.tcl
-*BACKUP*
-report/*
