@@ -8,8 +8,6 @@
 
 module serial_link_floo_vc_network
 #(
-  // If the parameter is set to 1, all the assertion checks within this module will be ignored.
-  parameter  bit  IgnoreAssert      = 1'b0,
   // If the parameter is set to 1, a set of debug messages will be printed upon arival of data
   // from the axis channel. This feature is temporary and is supposed to ease the developement.
   // It will be removed at a later stage...
@@ -314,8 +312,6 @@ module serial_link_floo_vc_network
   //  ASSERTIONS  //
   //////////////////
 
-if (~IgnoreAssert) begin : gen_assertion
   `ASSERT(AxisStable, axis_out_req_o.tvalid & !axis_out_rsp_i.tready |=> $stable(axis_out_req_o.t))
-end
 
 endmodule
