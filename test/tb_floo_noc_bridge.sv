@@ -16,9 +16,6 @@ module tb_floo_noc_bridge;
   import serial_link_pkg::*;
   import floo_axi_pkg::*;
 
-  // set to zero if the noc_bridge should be inserted. Assign to one if the bridge should be ignored/bypassede
-  localparam bit BridgeBypass = 1'b0;
-
   localparam time CyclTime = 10ns;
   localparam time ApplTime = 2ns;
   localparam time TestTime = 8ns;
@@ -35,13 +32,8 @@ module tb_floo_noc_bridge;
   localparam int unsigned ReorderBufferSize = 64;
   localparam int unsigned MaxTxns           = 32;
   localparam int unsigned MaxTxnsPerId      = 32;
-  // signals for debugging (no functional use)
-  logic Bridge_0_req_o, Bridge_0_req_i, Bridge_1_req_o, Bridge_1_req_i;
-  logic Bridge_0_rsp_o, Bridge_0_rsp_i, Bridge_1_rsp_o, Bridge_1_rsp_i;
 
-  localparam bit BridgeVirtualChannels = (NumCredNocBridge>0);
-  // Stop the simulation if this simulation time (ns) is exceeded.
-  localparam int stopSimAfter   = 1000000;
+  localparam bit BridgeVirtualChannels = (NumCredNocBridge > 0);
 
   // minimal AXIS data size (also contain the hdr-bit, thus + 1)
   localparam int axis_data_size = FlitDataSize + 1;
@@ -169,7 +161,7 @@ module tb_floo_noc_bridge;
     .axi_in_rsp_o  ( node_man_rsp[0]  ),
     .axi_out_req_o ( node_sub_req[0]  ),
     .axi_out_rsp_i ( node_sub_rsp[0]  ),
-    .xy_id_i       (                  ),
+    .xy_id_i       ( '0               ),
     .id_i          ( '0               ),
     .floo_req_o    ( chimney_0_req[0] ),
     .floo_rsp_o    ( chimney_0_rsp[0] ),
@@ -177,9 +169,8 @@ module tb_floo_noc_bridge;
     .floo_rsp_i    ( chimney_0_rsp[1] )
   );
 
-  if (BridgeVirtualChannels) begin : gen_bridge
+  if (BridgeVirtualChannels) begin : gen_vc_bridge
     serial_link_floo_vc_network #(
-    	.IgnoreAssert     ( BridgeBypass     ),
       .floo_req_t       ( floo_req_t       ),
       .floo_rsp_t       ( floo_rsp_t       ),
       .axis_req_t       ( axis_req_t       ),
@@ -342,28 +333,17 @@ module tb_floo_noc_bridge;
     .end_of_sim     ( end_of_sim[1]      )
   );
 
+  task automatic stop_sim();
+    repeat(50) begin
+      @(posedge clk);
+    end
+    $display("[SYS] Simulation Stopped (%d ns)", $time);
+    $stop();
+  endtask
+
   initial begin
-    if (BridgeBypass) begin
-      $display("INFO: The NoC-bridge is not inserted in the test chain and will be ignored!");
-    end else begin
-      $display("INFO: The NoC-bridge is actively connected!");
-      if (BridgeVirtualChannels) begin
-        $display("INFO: The NoC-bridge uses virtual channels (credit-based non-blocking channels).");
-      end else begin
-        $display("INFO: The NoC-bridge uses a shared physical channel (no credit-based virtual channel abstraction).");
-      end
-    end
-    while (1'b1) begin
-    	@(posedge clk);
-    	if (&end_of_sim) begin
-    		$stop;
-    	end
-			if ($time >= stopSimAfter) begin
-        $error("Simulation terminated");
-        $display("INFO: Simulation timed out after %1d ns. => You may change the stop time in the tb_floo_noc_bridge testbench (localparam).", $time);
-        $stop;
-      end
-    end
+    wait(&end_of_sim);
+    stop_sim();
   end
 
 endmodule
