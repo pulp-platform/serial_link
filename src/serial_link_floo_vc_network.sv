@@ -165,6 +165,7 @@ module serial_link_floo_vc_network
   ) i_rr_arb_tree (
     .clk_i      ( clk_i                                        ),
     .rst_ni     ( rst_ni                                       ),
+    .rr_i       ( '0                                           ),
     // Clears the arbiter state. Only used if `ExtPrio` is `1'b0` or `LockIn` is `1'b1`.
     .flush_i    ( 1'b0                                         ),
     // Input requests arbitration.
