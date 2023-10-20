@@ -245,7 +245,7 @@ import serial_link_pkg::*;
       .NumExternalBitsAdded      ( $bits(send_hdr) + NumUserBits ),
       .BlockSize                 ( BandWidth                     )
     ) i_find_splits (
-      .use_first_externals_i ( 0                       ),
+      .use_first_externals_i ( 1'b0                    ),
       .strb_i                ( axis_in_req_i.t.strb    ),
       .required_blocks_o     ( required_splits_reg_out )
     );
