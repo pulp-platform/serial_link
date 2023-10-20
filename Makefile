@@ -2,15 +2,15 @@
 # Solderpad Hardware License, Version 0.51, see LICENSE for details.
 # SPDX-License-Identifier: SHL-0.51
 
-# Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
-# Modified: Yannick Baumann <baumanny@student.ethz.ch>
+# Authors:
+# - Tim Fischer <fischeti@iis.ee.ethz.ch>
+# - Yannick Baumann <baumanny@student.ethz.ch>
 
-GIT 		?= git
-BENDER 		?= bender
-# VSIM 		?= vsim
-VSIM 		?= questa-2022.3 vsim
-REGGEN 		?= $(shell ${BENDER} path register_interface)/vendor/lowrisc_opentitan/util/regtool.py
-WORK 		?= work
+GIT     ?= git
+BENDER  ?= bender
+VSIM    ?= vsim
+REGGEN  ?= $(shell ${BENDER} path register_interface)/vendor/lowrisc_opentitan/util/regtool.py
+WORK    ?= work
 
 .PHONY: sim sim_c sim_clean sim_compile rebuild
 sim: compile_questa	run_questa_gui
@@ -59,12 +59,7 @@ update-regs: src/regs/*.hjson
 # QuestaSim
 # --------------
 
-# TB_DUT ?= tb_axi_serial_link
-# TB_DUT ?= tb_ch_calib_serial_link
-# TB_DUT ?= tb_floo_serial_link
-# TB_DUT ?= tb_floo_noc_bridge_narrow_wide
-TB_DUT ?= tb_floo_serial_link_narrow_wide
-# TB_DUT ?= tb_floo_narrow_wide_chimney
+TB_DUT ?= tb_axi_serial_link
 WaveDo ?= $(TB_DUT).wave.tcl
 
 BENDER_FLAGS := -t test -t simulation
@@ -74,18 +69,6 @@ VLOG_FLAGS += -suppress vlog-13314
 VLOG_FLAGS += -suppress vlog-13233
 VLOG_FLAGS += -timescale 1ns/1ps
 VLOG_FLAGS += -work $(WORK)
-
-ifeq ($(TB_DUT),tb_floo_noc_bridge)
-	StopTime := "399,190"
-# 	StopTime := "380,400"
-else ifeq ($(TB_DUT),tb_axi_serial_link)
-	StopTime := "25,159,350"
-# 	StopTime := "26,389,950"
-else ifeq ($(TB_DUT),tb_floo_serial_link)
-	StopTime := "30,183,400"
-else
-	StopTime := "???"
-endif
 
 .PHONY: compile_questa clean_questa run_questa run_questa_gui
 
@@ -98,15 +81,12 @@ scripts/compile_vsim.tcl: Bender.lock
 compile_questa: scripts/compile_vsim.tcl
 ifeq ($(SINGLE_CHANNEL),1)
 	@sed 's/NumChannels = [0-9]*/NumChannels = 1/' src/serial_link_pkg.sv -i.prev
-	$(VSIM) -64 -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log | grep --color -P "Error|"
+	$(VSIM) -64 -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log
 	@mv src/serial_link_pkg.sv.prev src/serial_link_pkg.sv
 else
-	$(VSIM) -64 -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log | grep --color -P "Error|"
+	$(VSIM) -64 -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log
 endif
 	@! grep -P "Errors: [1-9]*," $(dir $<)vsim.log
-	@echo -e "\033[1;32m______________________________CompilationSummary______________________________\033[0m"
-	@cat $(dir $<)vsim.log | grep --color -e Error -e Warning || true
-	@echo -e "\033[1;32m________________________________CompilationEnd________________________________\033[0m"
 
 clean_questa:
 	@rm -rf scripts/compile_vsim.tcl
@@ -119,17 +99,7 @@ clean_questa:
 	@rm -rf scripts/vsim_consoleSimulation.log
 
 run_questa:
-	@echo -e "\033[0;34mRunning the testbench: \033[1m$(TB_DUT)\033[0m"
-	@echo -e "\033[0;34mExpected stop time is \033[1m$(StopTime) ns\033[0m"
 	$(VSIM) $(TB_DUT) -work $(WORK) $(RUN_ARGS) -c -do "run -all; exit" | tee $(dir $<)vsim_consoleSimulation.log | grep --color -P "Error|"
-	@echo -e "\033[0;34mTestbench: \033[1m$(TB_DUT)\033[0m"
-	@echo -e "\033[0;34mStop time of the original design was: \033[1m$(StopTime) ns\033[0m"
-	@echo -e "\033[1;32m______________________________Simulation-Summary______________________________\033[0m"
-	@cat $(dir $<)vsim_consoleSimulation.log | grep --color -e Error -e Warning -e "AW queue is empty!" -e "AW mismatch!" -e "W queue is empty!" -e "W mismatch!" -e "AR queue is empty!" -e "AR mismatch!" -e "B queue is empty!" -e "B mismatch!" -e "R queue is empty!" -e "R mismatch!" -e "ASSERT FAILED" || true
-	@cat $(dir $<)vsim_consoleSimulation.log | grep --color "INFO: " | sed "s/INFO/`printf '\033[1;35mINFO\033[0m'`/g" || true
-	@cat $(dir $<)vsim_consoleSimulation.log | grep -o -e "# Errors\: [0-9]*," | tr -d "#,:Erso " | sed -e "s/\(.*\)/'\1'/" | sed "s/'0'/good/g" | sed -e "s/'\([0-9]\+\)'/error/g" | sed "s/good/`printf '\033[1;37;42mStatus: It all looks good!\033[0m'`/g" | sed "s/error/`printf '\033[1;37;41mStatus: There are errors!\033[0m'`/g" || true
-	@cat $(dir $<)vsim_consoleSimulation.log | grep --color "Loop found at time" || true
-	@echo -e "\033[1;32m________________________________Simulation-End________________________________\033[0m"
 
 run_questa_gui:
 	$(VSIM) $(TB_DUT) -work $(WORK) $(RUN_ARGS) -voptargs=+acc -do "log -r /*; do util/$(WaveDo); echo \"Running the testbench: $(TB_DUT)\"; echo \"Stop time of the original design was: $(StopTime) ns\"; run -all"
