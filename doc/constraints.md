@@ -4,7 +4,7 @@ The Serial Link has Double-Data-Rate (DDR) and a source-synchronous interface wi
 ### Generated and Virtual Clocks
 The data is synchronous to a zero phase shifted clock. This clock needs to be defined as virtual since it does not exist at the receiver side. The actual clock is shifted with respect to the virtual clock by -90 or +270 degrees (resp. shifted by +90 degrees and then inverted). The clocks on RX side are generated the following way:
 
-```
+```sdc
 # Rising edge is at 270 degree, falling edge at 450 (resp. 60) degrees
 set edge_list [list [expr $T_FWD_CLK / 4 * 3] [expr $T_FWD_CLK / 4 * 5]]
 create_clock -name vir_clk_ddr_in -period $T_FWD_CLK
@@ -13,7 +13,7 @@ create_clock -name clk_ddr_in -period $T_FWD_CLK -waveform $edge_list [get_ports
 
 The clocks on TX side are generated the following way:
 
-```
+```sdc
 # The data launching clock with 0 degree clock phase
 create_generated_clock -name clk_slow -source clk_i -divide_by $FWD_CLK_DIV \
     [get_pins -hierarchical clk_slow_reg/Q]
@@ -31,7 +31,7 @@ DDR has some timing arcs that needs to be removed. See an illustration below
 There is no conventional setup relationship (rise to rise and fall to fall).
 We leave only the inter-clock launching edge to capturing edge timing arcs (rise to fall and fall to rise)
 
-```
+```sdc
 # Input
 set_false_path -setup -rise_from [get_clocks vir_clk_ddr_in] -rise_to [get_clocks clk_ddr_in]
 set_false_path -setup -fall_from [get_clocks vir_clk_ddr_in] -fall_to [get_clocks clk_ddr_in]
@@ -41,7 +41,7 @@ set_false_path -setup -fall_from [get_clocks clk_slow] -fall_to [get_clocks clk_
 ```
 
 There is no actual hold relationship from non consecutive launching to capturing edges; data change at every edge, therefore we can remove the timing arcs that do not go from the current edge to the previous one (rise to fall and fall to rise). We leave only inter-clocks hold relationship (fall to fall and rise to rise)
-```
+```sdc
 # Input
 set_false_path -hold  -rise_from [get_clocks vir_clk_ddr_in] -fall_to [get_clocks clk_ddr_in]
 set_false_path -hold  -fall_from [get_clocks vir_clk_ddr_in] -rise_to [get_clocks clk_ddr_in]
@@ -53,7 +53,7 @@ set_false_path -hold  -fall_from [get_clocks clk_slow] -rise_to [get_clocks clk_
 ### I/O Delays
 The input and ouput delay is constrained in a way that it arrives in between a window around the clock edge of the virtual (0 degree) clock for the input side resp. the forwarded clock (90 degree) for the output side.
 
-```
+```sdc
 # Window has a margin on both side of 5% of a quarter of the clock period
 set MARGIN              [expr $T_FWD_CLK / 4 * 0.05]
 
