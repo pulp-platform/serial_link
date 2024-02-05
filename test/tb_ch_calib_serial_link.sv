@@ -305,27 +305,19 @@ module tb_ch_calib_serial_link();
 
   initial begin
     mst_done[0] = 0;
-    $info("[SYNCH1] --------------------> prepare reset of rand master =---");
     axi_rand_master_1.reset();
     wait_for_reset_1();
-    $info("[SYNCH1] --------------------> finished reset of rand master -=--");
     wait_for_config_1();
-    $info("[SYNCH1] --------------------> finished configuration of rand master --=-");
-    axi_rand_master_1.run(TestDuration, TestDuration);
-    $info("[SYNCH1] --------------------> finished stimuli application of rand master ---=");
+    axi_rand_master_1.run(1, 0);
     mst_done[0] = 1;
   end
 
   initial begin
     mst_done[1] = 0;
-    $info("[SYNCH2] --------------------> prepare reset of rand master =---");
     axi_rand_master_2.reset();
     wait_for_reset_2();
-    $info("[SYNCH2] --------------------> finished reset of rand master -=--");
     wait_for_config_2();
-    $info("[SYNCH2] --------------------> finished configuration of rand master --=-");
-    axi_rand_master_2.run(TestDuration, TestDuration);
-    $info("[SYNCH2] --------------------> finished stimuli application of rand master ---=");
+    axi_rand_master_2.run(0, 0);
     mst_done[1] = 1;
   end
 
