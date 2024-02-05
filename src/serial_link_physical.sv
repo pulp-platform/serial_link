@@ -30,6 +30,7 @@ module serial_link_physical_tx #(
   logic clk_enable;
   logic clk_toggle, clk_slow_toggle;
   logic clk_slow;
+  logic ddr_sel;
 
   // Valid is always set, but
   // src_clk is clock gated
@@ -65,8 +66,9 @@ module serial_link_physical_tx #(
 
   always_ff @(posedge clk_i, negedge rst_ni) begin
     if (~rst_ni) begin
-      ddr_rcv_clk_o = '1;
-      clk_slow <= '0;
+      ddr_rcv_clk_o = 1'b1;
+      clk_slow <= 1'b0;
+      ddr_sel <= 1'b0;
     end else begin
       if (clk_enable) begin
         if (clk_toggle) begin
@@ -74,10 +76,12 @@ module serial_link_physical_tx #(
         end
         if (clk_slow_toggle) begin
           clk_slow <= !clk_slow;
+          ddr_sel <= !ddr_sel;
         end
       end else begin
-        ddr_rcv_clk_o = '1;
-        clk_slow <= '0;
+        ddr_rcv_clk_o = 1'b1;
+        clk_slow <= 1'b0;
+        ddr_sel <= 1'b0;
       end
     end
   end
@@ -86,7 +90,7 @@ module serial_link_physical_tx #(
   //   DDR OUT   //
   /////////////////
   `FF(data_out_q, data_out_i, '0, clk_slow, rst_ni)
-  assign ddr_o = (clk_slow)? data_out_q[NumLanes-1:0] : data_out_q[NumLanes*2-1:NumLanes];
+  assign ddr_o = (ddr_sel)? data_out_q[NumLanes-1:0] : data_out_q[NumLanes*2-1:NumLanes];
 
 endmodule
 
