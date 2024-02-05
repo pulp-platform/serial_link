@@ -6,10 +6,9 @@
 # - Tim Fischer <fischeti@iis.ee.ethz.ch>
 # - Yannick Baumann <baumanny@student.ethz.ch>
 
-GIT     ?= git
 BENDER  ?= bender
-VSIM    ?= vsim
-REGGEN  ?= $(shell ${BENDER} path register_interface)/vendor/lowrisc_opentitan/util/regtool.py
+VSIM    ?= questa-2022.3 vsim
+REGGEN  ?= $(shell $(BENDER) path register_interface)/vendor/lowrisc_opentitan/util/regtool.py
 WORK    ?= work
 
 .PHONY: sim sim_c sim_clean sim_compile rebuild
@@ -60,7 +59,6 @@ update-regs: src/regs/*.hjson
 # --------------
 
 TB_DUT ?= tb_axi_serial_link
-WaveDo ?= $(TB_DUT).wave.tcl
 
 BENDER_FLAGS := -t test -t simulation
 
@@ -69,6 +67,13 @@ VLOG_FLAGS += -suppress vlog-13314
 VLOG_FLAGS += -suppress vlog-13233
 VLOG_FLAGS += -timescale 1ns/1ps
 VLOG_FLAGS += -work $(WORK)
+
+VSIM_FLAGS += -64
+VSIM_FLAGS += -t 1ps
+VSIM_FLAGS += -sv_seed 0
+VSIM_FLAGS_GUI += -voptargs=+acc
+VSIM_FLAGS_GUI += -do "log -r /*"
+VSIM_FLAGS_GUI += -do "source util/wave.tcl; display_waves $(TB_DUT)"
 
 .PHONY: compile_questa clean_questa run_questa run_questa_gui
 
@@ -99,10 +104,10 @@ clean_questa:
 	@rm -rf scripts/vsim_consoleSimulation.log
 
 run_questa:
-	$(VSIM) $(TB_DUT) -work $(WORK) $(RUN_ARGS) -c -do "run -all; exit" | tee $(dir $<)vsim_consoleSimulation.log | grep --color -P "Error|"
+	$(VSIM) $(TB_DUT) -work $(WORK) $(VSIM_FLAGS) $(RUN_ARGS) -c -do "run -all; exit"
 
 run_questa_gui:
-	$(VSIM) $(TB_DUT) -work $(WORK) $(RUN_ARGS) -voptargs=+acc -do "log -r /*; do util/$(WaveDo); echo \"Running the testbench: $(TB_DUT)\"; echo \"Stop time of the original design was: $(StopTime) ns\"; run -all"
+	$(VSIM) $(TB_DUT) -work $(WORK) $(VSIM_FLAGS) $(VSIM_FLAGS_GUI) $(RUN_ARGS) -do "run -all"
 
 # --------------
 # VCS
