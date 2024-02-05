@@ -122,8 +122,6 @@ module floo_serial_link
 
   if (BridgeVirtualChannels) begin : gen_bridge
     serial_link_floo_vc_network #(
-      .IgnoreAssert      ( 1'b0            ),
-      // .AllowDebugMsg   ( 1'b1            ),
       .floo_req_t        ( floo_req_t      ),
       .floo_rsp_t        ( floo_rsp_t      ),
       .axis_req_t        ( axis_req_t      ),
@@ -143,7 +141,6 @@ module floo_serial_link
     );
   end else begin : gen_bridge
     serial_link_floo_network #(
-      .IgnoreAssert      ( 1'b0         ),
       .req_flit_t        ( floo_req_t   ),
       .rsp_flit_t        ( floo_rsp_t   ),
       .axis_req_t        ( axis_req_t   ),
