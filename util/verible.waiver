@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: SHL-0.51
 
 # This rule does not apply to flip-flops that drive other FF's clock pin. There non-blocking assingments can cause race conditions!
-waive --rule=always-ff-non-blocking --line=68 --location="src/serial_link_physical.sv"
-waive --rule=always-ff-non-blocking --line=73 --location="src/serial_link_physical.sv"
-waive --rule=always-ff-non-blocking --line=79 --location="src/serial_link_physical.sv"
+waive --rule=always-ff-non-blocking --line=69 --location="src/serial_link_physical.sv"
+waive --rule=always-ff-non-blocking --line=75 --location="src/serial_link_physical.sv"
+waive --rule=always-ff-non-blocking --line=82 --location="src/serial_link_physical.sv"
 # The AXIS package is waived to stay compatible with other AXIS IPs
 waive --rule=parameter-name-style --location="src/axis/*"
 waive --rule=interface-name-style --location="src/axis/*"
