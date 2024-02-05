@@ -79,9 +79,7 @@ import serial_link_pkg::*;
   // 1) AXI Beat
   // 2) B Channel (which is always transmitted)
   // 3) Header
-  // TODO: remove redundantDataField as it is only used temporarily to ease developement of the data_link layer.
   typedef struct packed {
-    // logic [600:1] redundantData;
     logic [MaxAxiChannelBits-1:0] axi_ch;
     logic b_valid;
     b_chan_t b;
