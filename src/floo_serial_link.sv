@@ -163,20 +163,6 @@ module floo_serial_link
     );
   end
 
-  /////////////////////////////////////////////////////////
-  //   CONSOLE FEEDBACK ON THE SELECTED BRIDGE VERSION   //
-  /////////////////////////////////////////////////////////
-
-  initial begin
-    if (PrintFeedback) begin
-      if (BridgeVirtualChannels) begin
-        $display("INFO: The virtual channel NoC bridge is being used");
-      end else begin
-        $display("INFO: The simple NoC bridge version without virtual channels is being used");
-      end
-    end
-  end
-
   /////////////////////////
   //   DATA LINK LAYER   //
   /////////////////////////
