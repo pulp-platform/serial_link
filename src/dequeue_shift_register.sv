@@ -159,7 +159,7 @@ import serial_link_pkg::*;
     `FF(first_outstanding_q, first_outstanding_d, 1)
 
     if (UseHeader) begin : gen_use_hdr
-      `FFL(header_o, data_i, load_new_data, 1'b0, clk_i, rst_ni)
+      `FFL(header_o, data_i, load_new_data, '0, clk_i, rst_ni)
     end else begin : gen_use_hdr
       assign header_o = '0;
     end
