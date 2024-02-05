@@ -25,7 +25,6 @@ import serial_link_pkg::*;
   // For credit-based control flow
   parameter type credit_t        = logic,
   parameter int  NumCredits      = -1,
-  parameter int  ForceSendThresh = NumCredits - 4,
   // Enable (assign to 1) to support valiable data sizes (of the AXIS). If enabled, the AXIS input
   // should contain clearly defined strobe bits (x values are not allowed)!
   // The size of the AXIS beat that is transmitted depends on the strobe. Leading zeros indicate
@@ -37,12 +36,7 @@ import serial_link_pkg::*;
   // NOTE: If the physical link is too narrow, this feature is not supported and will be
   // automatically disabled. A warning will be printed to the console, should that be the case.
   parameter bit  PackMultipleMsg = AllowVarAxisLen,
-
-
-  //////////////////////////
-  // Dependant parameters //
-  //////////////////////////
-
+  // Dependent parameters, do not change!
   localparam int Log2NumChannels  = (NumChannels > 1)? $clog2(NumChannels) : 1,
   localparam int RawModeFifoDepth = serial_link_pkg::RawModeFifoDepth,
   localparam int BandWidth        = NumChannels * NumLanes * 2,
@@ -144,19 +138,6 @@ import serial_link_pkg::*;
   // The same as axis_packet_t but with inserted block control bits.
   typedef logic [$bits(axis_packet_t)+AdditionalBits-1:0] aligned_axis_t;
 
-  // Software: Print warning if parameter value had to be changed.
-  initial begin
-    if (PackMultipleMsg & ($bits(data_block_t)<=$bits(data_hdr_info_t))) begin
-      $display("INFO: WARNING: PackMultipleMsg was enabled, but got disabled due to the",
-               "dimensions of the physical link.");
-    end
-    $display("INFO: PackSmallerMsgIntoSingleTransfer=%0d (%m)", PackSmallerMsgIntoSingleTransfer);
-    // $error("Simulation was terminated by debug code section in %m");
-    // $stop();
-  end
-
-  data_hdr_info_t received_hdr, send_hdr, pre_received_hdr, incoming_hdr;
-
   // These unfiltered axis_out signals will have to be analyzed for credits_only packets
   // which will not be allowed to propagate to the axis output.
   axis_req_t axis_out_req_unfiltered;
@@ -165,7 +146,7 @@ import serial_link_pkg::*;
   // credit-based-flow-control related signals
   // (The axis user-bits are now also packed and transfered)
   axis_packet_t axis_packet_out;
-  aligned_axis_t axis_packet_in_synch_out, axis_packet_in_synch_in, axis_packet_in_enqueue_out;
+  aligned_axis_t axis_packet_in_synch_out, axis_packet_in_synch_in;
   logic axis_in_req_tvalid_afterFlowControl;
   logic axis_in_rsp_tready_afterFlowControl;
   logic credits_only_packet_in;
