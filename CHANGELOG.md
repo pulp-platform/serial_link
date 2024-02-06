@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Changed
+
+- The DDR output data is now muxed by a normal signal instead of a clock signal. Some tools infer a clock gate when a clock signal is used as a mux select signal.
+
 ## 1.1.0 - 2023-07-03
 
 ### Changed

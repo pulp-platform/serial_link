@@ -1,5 +1,5 @@
 ## Constraints
-The Serial Link has Double-Data-Rate (DDR) and a source-synchronous interface with generated clocks which makes the constraints quite involved.
+The Serial Link has Double-Data-Rate (DDR) and a source-synchronous interface with generated clocks which makes the constraints quite involved. The constraints were by the *Source-Synchronous DDR IO Timing Constraints Cookbook* by David Olsen, Altera Corporation, 2010.
 
 ### Generated and Virtual Clocks
 The data is synchronous to a zero phase shifted clock. This clock needs to be defined as virtual since it does not exist at the receiver side. The actual clock is shifted with respect to the virtual clock by -90 or +270 degrees (resp. shifted by +90 degrees and then inverted). The clocks on RX side are generated the following way:
@@ -48,6 +48,11 @@ set_false_path -hold  -fall_from [get_clocks vir_clk_ddr_in] -rise_to [get_clock
 # Output
 set_false_path -hold  -rise_from [get_clocks clk_slow] -fall_to [get_clocks clk_ddr_out]
 set_false_path -hold  -fall_from [get_clocks clk_slow] -rise_to [get_clocks clk_ddr_out]
+```
+
+There is on last false path from the system/fll clock to the forwarded clock
+```sdc
+set_false_path -from [get_pins my_system_clock_pin] -to [get_ports my_clk_ddr_out_port]
 ```
 
 ### I/O Delays
