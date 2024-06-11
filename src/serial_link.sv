@@ -29,6 +29,7 @@ import serial_link_pkg::*;
   parameter int NumLanes = serial_link_pkg::NumLanes,
   parameter int MaxClkDiv = serial_link_pkg::MaxClkDiv,
   parameter bit NoRegCdc = 1'b0,
+  parameter int ddr_sdr_selector = 1,
   localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1
 ) (
   // There are 3 different clock/resets:
@@ -289,7 +290,8 @@ import serial_link_pkg::*;
       .phy_data_t       ( phy_data_t        ),
       .NumLanes         ( NumLanes          ),
       .FifoDepth        ( RawModeFifoDepth  ),
-      .MaxClkDiv        ( MaxClkDiv         )
+      .MaxClkDiv        ( MaxClkDiv         ),
+      .ddr_sdr_selector ( ddr_sdr_selector  ),
     ) i_serial_link_physical (
       .clk_i             ( clk_sl_i                     ),
       .rst_ni            ( rst_sl_ni                    ),
