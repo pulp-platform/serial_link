@@ -121,7 +121,7 @@ module tb_axi_serial_link();
     .NumChannels      ( NumChannels     ),
     .NumLanes         ( NumLanes        ),
     .MaxClkDiv        ( MaxClkDiv       ),
-    .ddr_sdr_selector ( ddr_sdr_selector),
+    .ddr_sdr_selector ( ddr_sdr_selector)
   ) i_serial_link_1 (
       .clk_i          ( clk_1           ),
       .rst_ni         ( rst_1_n         ),

@@ -291,7 +291,7 @@ import serial_link_pkg::*;
       .NumLanes         ( NumLanes          ),
       .FifoDepth        ( RawModeFifoDepth  ),
       .MaxClkDiv        ( MaxClkDiv         ),
-      .ddr_sdr_selector ( ddr_sdr_selector  ),
+      .ddr_sdr_selector ( ddr_sdr_selector  )
     ) i_serial_link_physical (
       .clk_i             ( clk_sl_i                     ),
       .rst_ni            ( rst_sl_ni                    ),
