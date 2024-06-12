@@ -269,23 +269,23 @@ module serial_link_physical #(
   parameter int FifoDepth  = 8,
   // Maximum factor of ClkDiv
   parameter int MaxClkDiv  = 32,
-  parameter int ddr_sdr_selector = 0
+  parameter int ddr_sdr_selector = 1
 ) (
-  input  logic                          clk_i,
-  input  logic                          rst_ni,
-  input  logic [$clog2(MaxClkDiv):0]    clk_div_i,
-  input  logic [$clog2(MaxClkDiv):0]    clk_shift_start_i,
-  input  logic [$clog2(MaxClkDiv):0]    clk_shift_end_i,
-  input  logic                          ddr_rcv_clk_i,
-  output logic                          ddr_rcv_clk_o,
-  input  logic [NumLanes*2-1:0]         data_out_i,
-  input  logic                          data_out_valid_i,
-  output logic                          data_out_ready_o,
-  output logic [NumLanes*2-1:0]         data_in_o,
-  output logic                          data_in_valid_o,
-  input  logic                          data_in_ready_i,
-  input  logic [NumLanes-1:0]           ddr_i,
-  output logic [NumLanes-1:0]           ddr_o
+  input  logic                                          clk_i,
+  input  logic                                          rst_ni,
+  input  logic [$clog2(MaxClkDiv):0]                    clk_div_i,
+  input  logic [$clog2(MaxClkDiv):0]                    clk_shift_start_i,
+  input  logic [$clog2(MaxClkDiv):0]                    clk_shift_end_i,
+  input  logic                                          ddr_rcv_clk_i,
+  output logic                                          ddr_rcv_clk_o,
+  input  logic [NumLanes*(2-(1-ddr_sdr_selector))-1:0]  data_out_i,
+  input  logic                                          data_out_valid_i,
+  output logic                                          data_out_ready_o,
+  output logic [NumLanes*(2-(1-ddr_sdr_selector))-1:0]  data_in_o,
+  output logic                                          data_in_valid_o,
+  input  logic                                          data_in_ready_i,
+  input  logic [NumLanes-1:0]                           ddr_i,
+  output logic [NumLanes-1:0]                           ddr_o
 );
 
   ////////////////
