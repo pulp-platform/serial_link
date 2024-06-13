@@ -25,6 +25,7 @@ import serial_link_pkg::*;
   parameter type cfg_rsp_t  = logic,
   parameter type hw2reg_t  = logic,
   parameter type reg2hw_t  = logic,
+  parameter type phy_data_t = serial_link_pkg::phy_data_t,
   parameter int NumChannels = serial_link_pkg::NumChannels,
   parameter int NumLanes = serial_link_pkg::NumLanes,
   parameter int MaxClkDiv = serial_link_pkg::MaxClkDiv,
@@ -107,8 +108,10 @@ import serial_link_pkg::*;
   typedef logic tready_t;
   `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, tuser_t, tready_t)
 
+  //given by serial_link_pkg.sv, imported above
   //typedefs for physical layer
-  typedef logic [NumLanes*2-1:0] phy_data_t;
+  //typedef logic [NumLanes*2-1:0] phy_data_t;
+
 
   cfg_req_t cfg_req;
   cfg_rsp_t cfg_rsp;
