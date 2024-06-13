@@ -5,6 +5,8 @@
 // Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
 /// A simple serial link package
+
+
 package serial_link_pkg;
 
   // Physical Layer parameters
@@ -23,7 +25,10 @@ package serial_link_pkg;
   // Maximum Clock division
   localparam int MaxClkDiv = 1024;
 
-  typedef logic [NumLanes*2-1:0] phy_data_t;
+
+
+  // typedef logic [NumLanes*2-1:0] phy_data_t;
+  typedef logic [NumLanes-1:0] phy_data_t;
   typedef logic [NumLanes-1:0] phy_ddr_data_t;
 
   typedef enum logic [1:0] {LinkSendIdle, LinkSendBusy} link_state_e;
