@@ -61,7 +61,7 @@ import serial_link_pkg::*;
   logic [$clog2(PayloadSplits)-1:0] recv_reg_index_q, recv_reg_index_d;
 
   link_state_e link_state_q, link_state_d;
-  logic [$clog2(PayloadSplits*NumChannels*NumLanes*2):0] link_out_index_q, link_out_index_d;
+  logic [$clog2(PayloadSplits*NumChannels*NumLanes*2):0] link_out_index_q, link_out_index_d; // INVESTIGATE
 
   logic raw_mode_fifo_full, raw_mode_fifo_empty;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
@@ -187,7 +187,7 @@ import serial_link_pkg::*;
       unique case (link_state_q)
         LinkSendIdle: begin
           if (axis_in_req_i.tvalid) begin
-            link_out_index_d = NumChannels * NumLanes * 2;
+            link_out_index_d = NumChannels * NumLanes * 2; //INVESTIGATE
             data_out_valid_o = '1;
             data_out_o = axis_in_req_i.t.data;
             if (data_out_ready_i) begin

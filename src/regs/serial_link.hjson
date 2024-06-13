@@ -26,9 +26,9 @@
       local: "true"
     },
     { name: "NumBits",
-      desc: "Number of bits transfered in one clock cycle (2 * NumLanes)",
+      desc: "Number of bits transfered in one clock cycle (2 * NumLanes) for DDR, (1*NumLanes) for SDR",
       type: "int",
-      default: "16",
+      default: "8", //16 for DDR, 8 for SDR
       local: "true"
     },
     { name: "Log2MaxClkDiv",
