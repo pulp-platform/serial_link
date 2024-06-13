@@ -89,7 +89,7 @@ import serial_link_pkg::*;
     credit_t credit;
   } payload_t;
 
-  localparam int BandWidth = NumChannels * NumLanes * 2;
+  localparam int BandWidth = NumChannels * NumLanes * (1+ddr_sdr_selector); // doubled BW if DDR enabled
   localparam int PayloadSplits = ($bits(payload_t) + BandWidth - 1) / BandWidth;
   localparam int RecvFifoDepth = NumCredits * PayloadSplits;
 

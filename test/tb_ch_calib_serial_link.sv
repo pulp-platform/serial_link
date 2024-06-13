@@ -25,6 +25,8 @@ module tb_ch_calib_serial_link();
   localparam int unsigned NumLanes        = serial_link_pkg::NumLanes;
   localparam int unsigned NumChannels     = serial_link_pkg::NumChannels;
   localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;
+  localparam int unsigned ddr_sdr_selector= 0;
+  localparam type         phy_data_t      = serial_link_pkg::phy_data_t;
 
   localparam time         TckSys1         = 50ns;
   localparam time         TckSys2         = 54ns;
@@ -41,7 +43,7 @@ module tb_ch_calib_serial_link();
   localparam int unsigned RegDataWidth    = 32;
   localparam int unsigned RegStrbWidth    = RegDataWidth / 8;
 
-  localparam logic [NumLanes*2-1:0] CalibrationPattern = {{NumLanes/4}{4'b1010, 4'b0101}};
+  localparam logic [NumLanes*(1+ddr_sdr_selector)-1:0] CalibrationPattern = {{NumLanes/4}{4'b1010, 4'b0101}};
 
   // ==============
   //    DDR Link
