@@ -9,7 +9,7 @@ set tb_name tb_axi_serial_link
 
 for {set i 1} {$i < 3} {incr i} {
     set group_name "DDR $i"
-    set num_channels [expr {[llength [find instances -bydu serial_link_physical -recursive]] / 2}]
+    set num_channels [expr {[llength [find instances -bydu serial_link_physical -recursive]] / 2}] # // INVESTIGATE division by two
     if {$num_channels == 1} {
         set gen_block_name gen_single_channel_serial_link
     } else {
