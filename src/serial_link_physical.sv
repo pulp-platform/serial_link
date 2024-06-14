@@ -5,7 +5,7 @@
 // Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
 
-// each module has a generate block, where the DDR part is followed by the SDR part. This file runs as a replacement for serial_link_physical.sv 
+// each module has a generate block, where the DDR part is followed by the SDR part. This file runs as a replacement for serial_link_physical.sv
 // data_out_i half the size
 
 `include "common_cells/registers.svh"
@@ -19,7 +19,7 @@ module serial_link_physical_tx #(
 ) (
   input  logic                          clk_i, // system clock coming from the SoC domain for config reg only
   input  logic                          rst_ni, // global active-low reset for config reg only
-  input  logic [$clog2(MaxClkDiv):0]    clk_div_i, 
+  input  logic [$clog2(MaxClkDiv):0]    clk_div_i,
   input  logic [$clog2(MaxClkDiv):0]    clk_shift_start_i,
   input  logic [$clog2(MaxClkDiv):0]    clk_shift_end_i,
   input  logic [NumLanes*(2-(1-ddr_sdr_selector))-1:0]         data_out_i,
@@ -97,7 +97,7 @@ module serial_link_physical_tx #(
       //   DDR OUT   //
       /////////////////
       `FF(data_out_q, data_out_i, '0, clk_slow, rst_ni)
-      assign ddr_o = (ddr_sel)? data_out_q[NumLanes-1:0] : data_out_q[NumLanes*2-1:NumLanes];  
+      assign ddr_o = (ddr_sel)? data_out_q[NumLanes-1:0] : data_out_q[NumLanes*2-1:NumLanes];
 
     end else begin
       logic [NumLanes-1:0]      data_out_q;
@@ -124,8 +124,8 @@ module serial_link_physical_tx #(
         end
 
         clk_enable = data_out_valid_i;
-        clk_toggle = (clk_cnt_q == clk_shift_start_i);
-        clk_slow_toggle = (clk_cnt_q == 0);
+        clk_toggle = (clk_cnt_q == clk_shift_start_i) | (clk_cnt_q == clk_shift_end_i);
+        clk_slow_toggle = (clk_cnt_q == 0) | (clk_cnt_q == clk_div_i/2);
       end
 
       `FF(clk_cnt_q, clk_cnt_d, '0)
@@ -141,7 +141,7 @@ module serial_link_physical_tx #(
 
       always_ff @(posedge clk_i, negedge rst_ni) begin
         if (~rst_ni) begin
-          ddr_rcv_clk_o = 1'b1;
+          ddr_rcv_clk_o = 1'b0;
           clk_slow <= 1'b0;
         end else begin
           if (clk_enable) begin
@@ -152,7 +152,7 @@ module serial_link_physical_tx #(
               clk_slow <= !clk_slow;
             end
           end else begin
-            ddr_rcv_clk_o = 1'b1;
+            ddr_rcv_clk_o = 1'b0;
             clk_slow <= 1'b0;
           end
         end
@@ -162,10 +162,10 @@ module serial_link_physical_tx #(
       //   DDR OUT   //
       /////////////////
       `FF(data_out_q, data_out_i, '0, clk_slow, rst_ni)
-      assign ddr_o = data_out_q[NumLanes-1:0];  
+      assign ddr_o = data_out_q[NumLanes-1:0];
     end
   endgenerate
-  
+
 endmodule
 
 // Impelements a single RX channel which samples the data with the received clock
@@ -219,7 +219,7 @@ module serial_link_physical_rx #(
       //   DDR IN   //
       ////////////////
       always_ff @(negedge ddr_rcv_clk_i, negedge rst_ni) ddr_q <= !rst_ni ? '0 : ddr_i;
-      assign data_in = {ddr_i, ddr_q};    
+      assign data_in = {ddr_i, ddr_q};
     end else begin
       logic [NumLanes-1:0]      data_in;
 
@@ -234,7 +234,7 @@ module serial_link_physical_rx #(
       ) i_cdc_in (
         .src_clk_i   ( ddr_rcv_clk_i    ),
         .src_rst_ni  ( rst_ni           ),
-        .src_data_i  ( data_in          ),
+        .src_data_i  ( ddr_i            ),
         .src_valid_i ( 1'b1             ),
         .src_ready_o (                  ),
 
@@ -251,10 +251,10 @@ module serial_link_physical_rx #(
       ////////////////
       //   DDR IN   //
       ////////////////
-      assign data_in = ddr_i;        
+      // assign data_in = ddr_i;
     end
   endgenerate
-  
+
 
 endmodule
 
@@ -326,7 +326,7 @@ module serial_link_physical #(
         .data_in_valid_o,
         .data_in_ready_i,
         .ddr_i
-      );    
+      );
     end else begin
       serial_link_physical_rx #(
         .phy_data_t ( logic [NumLanes-1:0] ),
@@ -341,9 +341,9 @@ module serial_link_physical #(
         .data_in_valid_o,
         .data_in_ready_i,
         .ddr_i
-      );   
+      );
     end
   endgenerate
-  
+
 
 endmodule
