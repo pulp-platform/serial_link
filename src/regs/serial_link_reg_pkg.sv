@@ -9,7 +9,7 @@ package serial_link_reg_pkg;
   // Param list
   parameter int NumChannels = 38;
   parameter int Log2NumChannels = 6;
-  parameter int NumBits = 8;
+  parameter int NumBits = 16;
   parameter int Log2MaxClkDiv = 10;
   parameter int FlushCounterWidth = 8;
   parameter int Log2RawModeTXFifoDepth = 3;
@@ -57,7 +57,7 @@ package serial_link_reg_pkg;
   } serial_link_reg2hw_raw_mode_in_ch_sel_reg_t;
 
   typedef struct packed {
-    logic [7:0]  q;
+    logic [15:0] q;
     logic        re;
   } serial_link_reg2hw_raw_mode_in_data_reg_t;
 
@@ -66,7 +66,7 @@ package serial_link_reg_pkg;
   } serial_link_reg2hw_raw_mode_out_ch_mask_mreg_t;
 
   typedef struct packed {
-    logic [7:0]  q;
+    logic [15:0] q;
     logic        qe;
   } serial_link_reg2hw_raw_mode_out_data_fifo_reg_t;
 
@@ -151,7 +151,7 @@ package serial_link_reg_pkg;
   } serial_link_hw2reg_raw_mode_in_data_valid_mreg_t;
 
   typedef struct packed {
-    logic [7:0]  d;
+    logic [15:0] d;
   } serial_link_hw2reg_raw_mode_in_data_reg_t;
 
   typedef struct packed {
@@ -165,15 +165,15 @@ package serial_link_reg_pkg;
 
   // Register -> HW type
   typedef struct packed {
-    serial_link_reg2hw_ctrl_reg_t ctrl; // [1428:1425]
-    serial_link_reg2hw_tx_phy_clk_div_mreg_t [37:0] tx_phy_clk_div; // [1424:1007]
-    serial_link_reg2hw_tx_phy_clk_start_mreg_t [37:0] tx_phy_clk_start; // [1006:589]
-    serial_link_reg2hw_tx_phy_clk_end_mreg_t [37:0] tx_phy_clk_end; // [588:171]
-    serial_link_reg2hw_raw_mode_en_reg_t raw_mode_en; // [170:170]
-    serial_link_reg2hw_raw_mode_in_ch_sel_reg_t raw_mode_in_ch_sel; // [169:164]
-    serial_link_reg2hw_raw_mode_in_data_reg_t raw_mode_in_data; // [163:155]
-    serial_link_reg2hw_raw_mode_out_ch_mask_mreg_t [37:0] raw_mode_out_ch_mask; // [154:117]
-    serial_link_reg2hw_raw_mode_out_data_fifo_reg_t raw_mode_out_data_fifo; // [116:108]
+    serial_link_reg2hw_ctrl_reg_t ctrl; // [1444:1441]
+    serial_link_reg2hw_tx_phy_clk_div_mreg_t [37:0] tx_phy_clk_div; // [1440:1023]
+    serial_link_reg2hw_tx_phy_clk_start_mreg_t [37:0] tx_phy_clk_start; // [1022:605]
+    serial_link_reg2hw_tx_phy_clk_end_mreg_t [37:0] tx_phy_clk_end; // [604:187]
+    serial_link_reg2hw_raw_mode_en_reg_t raw_mode_en; // [186:186]
+    serial_link_reg2hw_raw_mode_in_ch_sel_reg_t raw_mode_in_ch_sel; // [185:180]
+    serial_link_reg2hw_raw_mode_in_data_reg_t raw_mode_in_data; // [179:163]
+    serial_link_reg2hw_raw_mode_out_ch_mask_mreg_t [37:0] raw_mode_out_ch_mask; // [162:125]
+    serial_link_reg2hw_raw_mode_out_data_fifo_reg_t raw_mode_out_data_fifo; // [124:108]
     serial_link_reg2hw_raw_mode_out_data_fifo_ctrl_reg_t raw_mode_out_data_fifo_ctrl; // [107:106]
     serial_link_reg2hw_raw_mode_out_en_reg_t raw_mode_out_en; // [105:105]
     serial_link_reg2hw_flow_control_fifo_clear_reg_t flow_control_fifo_clear; // [104:103]
@@ -187,9 +187,9 @@ package serial_link_reg_pkg;
 
   // HW -> register type
   typedef struct packed {
-    serial_link_hw2reg_isolated_reg_t isolated; // [51:50]
-    serial_link_hw2reg_raw_mode_in_data_valid_mreg_t [37:0] raw_mode_in_data_valid; // [49:12]
-    serial_link_hw2reg_raw_mode_in_data_reg_t raw_mode_in_data; // [11:4]
+    serial_link_hw2reg_isolated_reg_t isolated; // [59:58]
+    serial_link_hw2reg_raw_mode_in_data_valid_mreg_t [37:0] raw_mode_in_data_valid; // [57:20]
+    serial_link_hw2reg_raw_mode_in_data_reg_t raw_mode_in_data; // [19:4]
     serial_link_hw2reg_raw_mode_out_data_fifo_ctrl_reg_t raw_mode_out_data_fifo_ctrl; // [3:0]
   } serial_link_hw2reg_t;
 
@@ -336,7 +336,7 @@ package serial_link_reg_pkg;
   parameter logic [0:0] SERIAL_LINK_ISOLATED_AXI_OUT_RESVAL = 1'h 1;
   parameter logic [31:0] SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_RESVAL = 32'h 0;
   parameter logic [5:0] SERIAL_LINK_RAW_MODE_IN_DATA_VALID_1_RESVAL = 6'h 0;
-  parameter logic [7:0] SERIAL_LINK_RAW_MODE_IN_DATA_RESVAL = 8'h 0;
+  parameter logic [15:0] SERIAL_LINK_RAW_MODE_IN_DATA_RESVAL = 16'h 0;
   parameter logic [31:0] SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_CTRL_RESVAL = 32'h 0;
   parameter logic [2:0] SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_CTRL_FILL_STATE_RESVAL = 3'h 0;
   parameter logic [0:0] SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_CTRL_IS_FULL_RESVAL = 1'h 0;
@@ -606,10 +606,10 @@ package serial_link_reg_pkg;
     4'b 0001, // index[117] SERIAL_LINK_RAW_MODE_IN_CH_SEL
     4'b 1111, // index[118] SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0
     4'b 0001, // index[119] SERIAL_LINK_RAW_MODE_IN_DATA_VALID_1
-    4'b 0001, // index[120] SERIAL_LINK_RAW_MODE_IN_DATA
+    4'b 0011, // index[120] SERIAL_LINK_RAW_MODE_IN_DATA
     4'b 1111, // index[121] SERIAL_LINK_RAW_MODE_OUT_CH_MASK_0
     4'b 0001, // index[122] SERIAL_LINK_RAW_MODE_OUT_CH_MASK_1
-    4'b 0001, // index[123] SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO
+    4'b 0011, // index[123] SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO
     4'b 1111, // index[124] SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_CTRL
     4'b 0001, // index[125] SERIAL_LINK_RAW_MODE_OUT_EN
     4'b 0001, // index[126] SERIAL_LINK_FLOW_CONTROL_FIFO_CLEAR
