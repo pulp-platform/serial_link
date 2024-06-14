@@ -11,7 +11,7 @@
   bus_interfaces: [
       { protocol: "reg_iface", direction: "device"}
   ]
-  regwidth: "32",
+  regwidth: "32", // INVESTIGATE
   param_list: [
     { name: "NumChannels",
       desc: "Number of channels",

@@ -506,7 +506,7 @@ module serial_link_reg_top #(
   logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_36_re;
   logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_37_qs;
   logic raw_mode_in_data_valid_1_raw_mode_in_data_valid_37_re;
-  logic [15:0] raw_mode_in_data_qs;
+  logic [7:0] raw_mode_in_data_qs;
   logic raw_mode_in_data_re;
   logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_0_wd;
   logic raw_mode_out_ch_mask_0_raw_mode_out_ch_mask_0_we;
@@ -584,7 +584,7 @@ module serial_link_reg_top #(
   logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_36_we;
   logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_37_wd;
   logic raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_37_we;
-  logic [15:0] raw_mode_out_data_fifo_wd;
+  logic [7:0] raw_mode_out_data_fifo_wd;
   logic raw_mode_out_data_fifo_we;
   logic raw_mode_out_data_fifo_ctrl_clear_wd;
   logic raw_mode_out_data_fifo_ctrl_clear_we;
@@ -4709,7 +4709,7 @@ module serial_link_reg_top #(
   // R[raw_mode_in_data]: V(True)
 
   prim_subreg_ext #(
-    .DW    (16)
+    .DW    (8)
   ) u_raw_mode_in_data (
     .re     (raw_mode_in_data_re),
     .we     (1'b0),
@@ -5683,9 +5683,9 @@ module serial_link_reg_top #(
   // R[raw_mode_out_data_fifo]: V(False)
 
   prim_subreg #(
-    .DW      (16),
+    .DW      (8),
     .SWACCESS("WO"),
-    .RESVAL  (16'h0)
+    .RESVAL  (8'h0)
   ) u_raw_mode_out_data_fifo (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -8863,7 +8863,7 @@ module serial_link_reg_top #(
   assign raw_mode_out_ch_mask_1_raw_mode_out_ch_mask_37_wd = reg_wdata[5];
 
   assign raw_mode_out_data_fifo_we = addr_hit[123] & reg_we & !reg_error;
-  assign raw_mode_out_data_fifo_wd = reg_wdata[15:0];
+  assign raw_mode_out_data_fifo_wd = reg_wdata[7:0];
 
   assign raw_mode_out_data_fifo_ctrl_clear_we = addr_hit[124] & reg_we & !reg_error;
   assign raw_mode_out_data_fifo_ctrl_clear_wd = reg_wdata[0];
@@ -9661,7 +9661,7 @@ module serial_link_reg_top #(
       end
 
       addr_hit[120]: begin
-        reg_rdata_next[15:0] = raw_mode_in_data_qs;
+        reg_rdata_next[7:0] = raw_mode_in_data_qs;
       end
 
       addr_hit[121]: begin
@@ -9709,7 +9709,7 @@ module serial_link_reg_top #(
       end
 
       addr_hit[123]: begin
-        reg_rdata_next[15:0] = '0;
+        reg_rdata_next[7:0] = '0;
       end
 
       addr_hit[124]: begin
