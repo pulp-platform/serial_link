@@ -124,7 +124,8 @@ module serial_link_physical_tx #(
         end
 
         clk_enable = data_out_valid_i;
-        clk_toggle = (clk_cnt_q == clk_shift_start_i) | (clk_cnt_q == clk_shift_end_i);
+        //clk_toggle = (clk_cnt_q == clk_shift_start_i) | (clk_cnt_q == clk_shift_end_i)
+        clk_toggle = (clk_cnt_q == clk_shift_start_i) | (clk_cnt_q == clk_shift_start_i + clk_div_i/2);
         clk_slow_toggle = (clk_cnt_q == 0) | (clk_cnt_q == clk_div_i/2);
       end
 
