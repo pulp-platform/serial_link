@@ -132,7 +132,7 @@
           { bits: "Log2MaxClkDiv:0",
             name: "clk_shift_start",
             desc: "Positive Edge of divided, shifted clock",
-            resval: 4 // for DDR 2, for SDR 4
+            resval: 2 // for DDR 2, for SDR 4
           }
         ]
       }
@@ -150,7 +150,7 @@
           { bits: "Log2MaxClkDiv:0",
             name: "clk_shift_end",
             desc: "Negative Edge of divided, shifted clock",
-            resval: 8 // for DDR 6, for SDR 8
+            resval: 6 // for DDR 6, for SDR 8
           }
         ]
       }

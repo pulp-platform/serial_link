@@ -292,7 +292,7 @@ module serial_link_single_channel_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -321,7 +321,7 @@ module serial_link_single_channel_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),

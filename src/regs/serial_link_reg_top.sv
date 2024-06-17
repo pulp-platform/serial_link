@@ -2027,7 +2027,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_0 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2054,7 +2054,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_1 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2081,7 +2081,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_2 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2108,7 +2108,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_3 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2135,7 +2135,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_4 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2162,7 +2162,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_5 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2189,7 +2189,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_6 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2216,7 +2216,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_7 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2243,7 +2243,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_8 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2270,7 +2270,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_9 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2297,7 +2297,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_10 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2324,7 +2324,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_11 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2351,7 +2351,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_12 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2378,7 +2378,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_13 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2405,7 +2405,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_14 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2432,7 +2432,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_15 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2459,7 +2459,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_16 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2486,7 +2486,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_17 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2513,7 +2513,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_18 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2540,7 +2540,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_19 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2567,7 +2567,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_20 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2594,7 +2594,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_21 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2621,7 +2621,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_22 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2648,7 +2648,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_23 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2675,7 +2675,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_24 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2702,7 +2702,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_25 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2729,7 +2729,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_26 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2756,7 +2756,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_27 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2783,7 +2783,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_28 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2810,7 +2810,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_29 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2837,7 +2837,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_30 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2864,7 +2864,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_31 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2891,7 +2891,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_32 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2918,7 +2918,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_33 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2945,7 +2945,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_34 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2972,7 +2972,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_35 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -2999,7 +2999,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_36 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3026,7 +3026,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h4)
+    .RESVAL  (11'h2)
   ) u_tx_phy_clk_start_37 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3055,7 +3055,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_0 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3082,7 +3082,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_1 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3109,7 +3109,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_2 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3136,7 +3136,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_3 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3163,7 +3163,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_4 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3190,7 +3190,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_5 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3217,7 +3217,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_6 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3244,7 +3244,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_7 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3271,7 +3271,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_8 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3298,7 +3298,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_9 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3325,7 +3325,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_10 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3352,7 +3352,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_11 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3379,7 +3379,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_12 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3406,7 +3406,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_13 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3433,7 +3433,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_14 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3460,7 +3460,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_15 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3487,7 +3487,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_16 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3514,7 +3514,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_17 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3541,7 +3541,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_18 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3568,7 +3568,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_19 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3595,7 +3595,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_20 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3622,7 +3622,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_21 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3649,7 +3649,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_22 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3676,7 +3676,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_23 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3703,7 +3703,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_24 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3730,7 +3730,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_25 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3757,7 +3757,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_26 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3784,7 +3784,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_27 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3811,7 +3811,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_28 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3838,7 +3838,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_29 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3865,7 +3865,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_30 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3892,7 +3892,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_31 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3919,7 +3919,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_32 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3946,7 +3946,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_33 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -3973,7 +3973,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_34 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -4000,7 +4000,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_35 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -4027,7 +4027,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_36 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -4054,7 +4054,7 @@ module serial_link_reg_top #(
   prim_subreg #(
     .DW      (11),
     .SWACCESS("RW"),
-    .RESVAL  (11'h8)
+    .RESVAL  (11'h6)
   ) u_tx_phy_clk_end_37 (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
