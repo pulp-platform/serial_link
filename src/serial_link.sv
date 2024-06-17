@@ -189,7 +189,8 @@ import serial_link_pkg::*;
     .NumLanes         ( NumLanes          ),
     .RecvFifoDepth    ( RecvFifoDepth     ),
     .RawModeFifoDepth ( RawModeFifoDepth  ),
-    .PayloadSplits    ( PayloadSplits     )
+    .PayloadSplits    ( PayloadSplits     ),
+    .ddr_sdr_selector ( ddr_sdr_selector  )
   ) i_serial_link_data_link (
     .clk_i                                   ( clk_sl_i                                         ),
     .rst_ni                                  ( rst_sl_ni                                        ),
