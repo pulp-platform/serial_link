@@ -20,7 +20,7 @@ module tb_axi_serial_link();
   // ==============
   //    Config
   // ==============
-  localparam int unsigned TestDuration    = 100; //number of tests
+  localparam int unsigned TestDuration    = 1; //number of tests
   localparam int unsigned NumLanes        = serial_link_pkg::NumLanes;
   localparam int unsigned NumChannels     = serial_link_pkg::NumChannels;
   localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;

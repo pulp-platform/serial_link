@@ -150,7 +150,7 @@
           { bits: "Log2MaxClkDiv:0",
             name: "clk_shift_end",
             desc: "Negative Edge of divided, shifted clock",
-            resval: 6 // for DDR 6, for SDR 8
+            resval: 6 // for DDR 6, for SDR ignored
           }
         ]
       }
