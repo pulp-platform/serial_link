@@ -102,14 +102,14 @@ module serial_link_physical_tx #(
     end else begin
       logic [NumLanes-1:0]      data_out_q;
 
-      logic [$clog2(MaxClkDiv):0] clk_cnt_q, clk_cnt_d;
+      logic [$clog2(MaxClkDiv)+1:0] clk_cnt_q, clk_cnt_d;
       logic clk_enable;
       logic clk_toggle, clk_slow_toggle;
       logic clk_slow;
 
       // Valid is always set, but
       // src_clk is clock gated
-      assign data_out_ready_o = data_out_valid_i & (clk_cnt_q == clk_div_i - 1);
+      assign data_out_ready_o = data_out_valid_i & (clk_cnt_q == 2*clk_div_i - 1);
 
       ///////////////////////////////////////
       //   CLOCK DIVIDER + PHASE SHIFTER   //
@@ -120,7 +120,7 @@ module serial_link_physical_tx #(
         clk_cnt_d = 0;
 
         if (data_out_valid_i) begin
-          clk_cnt_d = (clk_cnt_q == clk_div_i - 1)? '0 : clk_cnt_q + 1;
+          clk_cnt_d = (clk_cnt_q == 2*clk_div_i - 1)? '0 : clk_cnt_q + 1;
         end
 
         clk_enable = data_out_valid_i;
