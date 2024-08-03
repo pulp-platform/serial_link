@@ -25,10 +25,13 @@ package serial_link_pkg;
   // Maximum Clock division
   localparam int MaxClkDiv = 1024;
 
+  // DDR (1) SDR (0) mode selection 
+  // Also modify the NumBit parameter accordingly in serial_link.hjson!
+  localparam int ddr_sdr_selector = 0;
 
-
-  // typedef logic [NumLanes*2-1:0] phy_data_t; //for DDR
-  typedef logic [NumLanes-1:0] phy_data_t; // for SDR
+  typedef logic [NumLanes*(1+ddr_sdr_selector)-1:0] phy_data_t; 
+  //typedef logic [NumLanes*2-1:0] phy_data_t; //for DDR
+  //typedef logic [NumLanes-1:0] phy_data_t; // for SDR
   typedef logic [NumLanes-1:0] phy_ddr_data_t;
 
   typedef enum logic [1:0] {LinkSendIdle, LinkSendBusy} link_state_e;

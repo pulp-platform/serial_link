@@ -11,7 +11,7 @@
   bus_interfaces: [
       { protocol: "reg_iface", direction: "device"}
   ]
-  regwidth: "32", // INVESTIGATE
+  regwidth: "32",
   param_list: [
     { name: "NumChannels",
       desc: "Number of channels",
@@ -26,9 +26,9 @@
       local: "true"
     },
     { name: "NumBits",
-      desc: "Number of bits transfered in one clock cycle (2 * NumLanes) for DDR, (1*NumLanes) for SDR",
+      desc: "Number of bits transfered in one clock cycle (2*NumLanes for DDR, NumLanes for SDR)",
       type: "int",
-      default: "8", //16 for DDR, NumLanes for SDR
+      default: "8",
       local: "true"
     },
     { name: "Log2MaxClkDiv",
@@ -132,7 +132,7 @@
           { bits: "Log2MaxClkDiv:0",
             name: "clk_shift_start",
             desc: "Positive Edge of divided, shifted clock",
-            resval: 4 // for DDR 2, for SDR 4
+            resval: 2 // for DDR 2, for SDR 4
           }
         ]
       }
