@@ -26,8 +26,8 @@ package serial_link_pkg;
   localparam int MaxClkDiv = 1024;
 
   // DDR (1) SDR (0) mode selection 
-  // Also modify the NumBit parameter accordingly in serial_link.hjson!
-  localparam int ddr_sdr_selector = 0;
+  // Also modify the "NumBit" parameter accordingly in serial_link.hjson!
+  localparam int ddr_sdr_selector = 1;
 
   typedef logic [NumLanes*(1+ddr_sdr_selector)-1:0] phy_data_t; 
   //typedef logic [NumLanes*2-1:0] phy_data_t; //for DDR
