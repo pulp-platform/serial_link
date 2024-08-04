@@ -5,8 +5,8 @@
 // Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
 
-// each module has a generate block, where the DDR part is followed by the SDR part. This file runs as a replacement for serial_link_physical.sv 
-// data_out_i has same dimensions for both ddr and sdr
+// each module has a generate block, where the DDR part is followed by the SDR part. This file runs as a replacement for serial_link_physical.sv
+// data_out_i half the size
 
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
@@ -19,10 +19,10 @@ module serial_link_physical_tx #(
 ) (
   input  logic                          clk_i, // system clock coming from the SoC domain for config reg only
   input  logic                          rst_ni, // global active-low reset for config reg only
-  input  logic [$clog2(MaxClkDiv):0]    clk_div_i, 
+  input  logic [$clog2(MaxClkDiv):0]    clk_div_i,
   input  logic [$clog2(MaxClkDiv):0]    clk_shift_start_i,
   input  logic [$clog2(MaxClkDiv):0]    clk_shift_end_i,
-  input  logic [NumLanes*2-1:0]         data_out_i,
+  input  logic [NumLanes*(2-(1-ddr_sdr_selector))-1:0]         data_out_i,
   input  logic                          data_out_valid_i,
 
   output logic                          data_out_ready_o,
@@ -100,18 +100,16 @@ module serial_link_physical_tx #(
       assign ddr_o = (ddr_sel)? data_out_q[NumLanes-1:0] : data_out_q[NumLanes*2-1:NumLanes];
 
     end else begin
-
       logic [NumLanes-1:0]      data_out_q;
 
-      logic [$clog2(MaxClkDiv):0] clk_cnt_q, clk_cnt_d;
+      logic [$clog2(MaxClkDiv)+1:0] clk_cnt_q, clk_cnt_d;
       logic clk_enable;
       logic clk_toggle, clk_slow_toggle;
       logic clk_slow;
-      logic ddr_sel;
 
       // Valid is always set, but
       // src_clk is clock gated
-      assign data_out_ready_o = data_out_valid_i & (clk_cnt_q == clk_div_i - 1);
+      assign data_out_ready_o = data_out_valid_i & (clk_cnt_q == 2*clk_div_i - 1);
 
       ///////////////////////////////////////
       //   CLOCK DIVIDER + PHASE SHIFTER   //
@@ -122,12 +120,13 @@ module serial_link_physical_tx #(
         clk_cnt_d = 0;
 
         if (data_out_valid_i) begin
-          clk_cnt_d = (clk_cnt_q == clk_div_i - 1)? '0 : clk_cnt_q + 1;
+          clk_cnt_d = (clk_cnt_q == 2*clk_div_i - 1)? '0 : clk_cnt_q + 1;
         end
 
         clk_enable = data_out_valid_i;
-        clk_toggle = (clk_cnt_q == clk_shift_start_i);
-        clk_slow_toggle = (clk_cnt_q == 0);
+        //clk_toggle = (clk_cnt_q == clk_shift_start_i) | (clk_cnt_q == clk_shift_end_i)
+        clk_toggle = (clk_cnt_q == clk_shift_start_i) | (clk_cnt_q == clk_shift_start_i + clk_div_i/2);
+        clk_slow_toggle = (clk_cnt_q == 0) | (clk_cnt_q == clk_div_i/2);
       end
 
       `FF(clk_cnt_q, clk_cnt_d, '0)
@@ -143,9 +142,8 @@ module serial_link_physical_tx #(
 
       always_ff @(posedge clk_i, negedge rst_ni) begin
         if (~rst_ni) begin
-          ddr_rcv_clk_o = 1'b1;
+          ddr_rcv_clk_o = 1'b0;
           clk_slow <= 1'b0;
-          ddr_sel <= 1'b0;
         end else begin
           if (clk_enable) begin
             if (clk_toggle) begin
@@ -155,7 +153,7 @@ module serial_link_physical_tx #(
               clk_slow <= !clk_slow;
             end
           end else begin
-            ddr_rcv_clk_o = 1'b1;
+            ddr_rcv_clk_o = 1'b0;
             clk_slow <= 1'b0;
           end
         end
@@ -165,10 +163,10 @@ module serial_link_physical_tx #(
       //   DDR OUT   //
       /////////////////
       `FF(data_out_q, data_out_i, '0, clk_slow, rst_ni)
-      assign ddr_o = data_out_q[NumLanes-1:0];  
+      assign ddr_o = data_out_q[NumLanes-1:0];
     end
   endgenerate
-  
+
 endmodule
 
 // Impelements a single RX channel which samples the data with the received clock
@@ -222,7 +220,7 @@ module serial_link_physical_rx #(
       //   DDR IN   //
       ////////////////
       always_ff @(negedge ddr_rcv_clk_i, negedge rst_ni) ddr_q <= !rst_ni ? '0 : ddr_i;
-      assign data_in = {ddr_i, ddr_q};    
+      assign data_in = {ddr_i, ddr_q};
     end else begin
       logic [NumLanes-1:0]      data_in;
 
@@ -237,7 +235,7 @@ module serial_link_physical_rx #(
       ) i_cdc_in (
         .src_clk_i   ( ddr_rcv_clk_i    ),
         .src_rst_ni  ( rst_ni           ),
-        .src_data_i  ( data_in          ),
+        .src_data_i  ( ddr_i            ),
         .src_valid_i ( 1'b1             ),
         .src_ready_o (                  ),
 
@@ -254,10 +252,10 @@ module serial_link_physical_rx #(
       ////////////////
       //   DDR IN   //
       ////////////////
-      assign data_in = ddr_i;        
+      // assign data_in = ddr_i;
     end
   endgenerate
-  
+
 
 endmodule
 
@@ -272,23 +270,23 @@ module serial_link_physical #(
   parameter int FifoDepth  = 8,
   // Maximum factor of ClkDiv
   parameter int MaxClkDiv  = 32,
-  parameter int ddr_sdr_selector = 0
+  parameter int ddr_sdr_selector = 1
 ) (
-  input  logic                          clk_i,
-  input  logic                          rst_ni,
-  input  logic [$clog2(MaxClkDiv):0]    clk_div_i,
-  input  logic [$clog2(MaxClkDiv):0]    clk_shift_start_i,
-  input  logic [$clog2(MaxClkDiv):0]    clk_shift_end_i,
-  input  logic                          ddr_rcv_clk_i,
-  output logic                          ddr_rcv_clk_o,
-  input  logic [NumLanes*2-1:0]         data_out_i,
-  input  logic                          data_out_valid_i,
-  output logic                          data_out_ready_o,
-  output logic [NumLanes*2-1:0]         data_in_o,
-  output logic                          data_in_valid_o,
-  input  logic                          data_in_ready_i,
-  input  logic [NumLanes-1:0]           ddr_i,
-  output logic [NumLanes-1:0]           ddr_o
+  input  logic                                          clk_i,
+  input  logic                                          rst_ni,
+  input  logic [$clog2(MaxClkDiv):0]                    clk_div_i,
+  input  logic [$clog2(MaxClkDiv):0]                    clk_shift_start_i,
+  input  logic [$clog2(MaxClkDiv):0]                    clk_shift_end_i,
+  input  logic                                          ddr_rcv_clk_i,
+  output logic                                          ddr_rcv_clk_o,
+  input  logic [NumLanes*(2-(1-ddr_sdr_selector))-1:0]  data_out_i,
+  input  logic                                          data_out_valid_i,
+  output logic                                          data_out_ready_o,
+  output logic [NumLanes*(2-(1-ddr_sdr_selector))-1:0]  data_in_o,
+  output logic                                          data_in_valid_o,
+  input  logic                                          data_in_ready_i,
+  input  logic [NumLanes-1:0]                           ddr_i,
+  output logic [NumLanes-1:0]                           ddr_o
 );
 
   ////////////////
@@ -314,19 +312,39 @@ module serial_link_physical #(
   ////////////////
   //   PHY RX   //
   ////////////////
-  serial_link_physical_rx #(
-    .phy_data_t ( phy_data_t  ),
-    .NumLanes   ( NumLanes    ),
-    .FifoDepth  ( FifoDepth   ),
-    .ddr_sdr_selector  ( ddr_sdr_selector)
-  ) i_serial_link_physical_rx (
-    .clk_i,
-    .rst_ni,
-    .ddr_rcv_clk_i,
-    .data_in_o,
-    .data_in_valid_o,
-    .data_in_ready_i,
-    .ddr_i
-  );
+  generate
+    if (ddr_sdr_selector) begin
+      serial_link_physical_rx #(
+        .phy_data_t ( phy_data_t  ),
+        .NumLanes   ( NumLanes    ),
+        .FifoDepth  ( FifoDepth   ),
+        .ddr_sdr_selector  ( ddr_sdr_selector)
+      ) i_serial_link_physical_rx (
+        .clk_i,
+        .rst_ni,
+        .ddr_rcv_clk_i,
+        .data_in_o,
+        .data_in_valid_o,
+        .data_in_ready_i,
+        .ddr_i
+      );
+    end else begin
+      serial_link_physical_rx #(
+        .phy_data_t ( logic [NumLanes-1:0] ),
+        .NumLanes   ( NumLanes    ),
+        .FifoDepth  ( FifoDepth   ),
+        .ddr_sdr_selector  ( ddr_sdr_selector)
+      ) i_serial_link_physical_rx (
+        .clk_i,
+        .rst_ni,
+        .ddr_rcv_clk_i,
+        .data_in_o,
+        .data_in_valid_o,
+        .data_in_ready_i,
+        .ddr_i
+      );
+    end
+  endgenerate
+
 
 endmodule
