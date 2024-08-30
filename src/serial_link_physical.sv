@@ -142,7 +142,13 @@ module serial_link_physical_rx #(
   ////////////////
   //   DDR IN   //
   ////////////////
-  always_ff @(negedge ddr_rcv_clk_i, negedge rst_ni) ddr_q <= !rst_ni ? '0 : ddr_i;
+  always_ff @(negedge ddr_rcv_clk_i, negedge rst_ni) begin
+    if (~rst_ni) begin
+      ddr_q <= '0;
+    end else begin
+      ddr_q <= ddr_i;
+    end
+  end
   assign data_in = {ddr_i, ddr_q};
 
 endmodule
