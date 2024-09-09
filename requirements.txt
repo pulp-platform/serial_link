@@ -3,3 +3,5 @@ mistletoe
 mako
 pyyaml
 tabulate
+mkdocs
+mkdocs-material
