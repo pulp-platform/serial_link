@@ -5,12 +5,14 @@
 // Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
 /// A simple serial link package
+
+
 package serial_link_pkg;
 
   // Physical Layer parameters
   // Also modify in serial_link.hjson!
-  localparam int NumChannels = 38;
-  localparam int NumLanes = 8;
+  localparam int NumChannels = 38; //by default 38
+  localparam int NumLanes = 8; //by default 8
 
   // Number of outstanding transactions for flow control
   // FIFO depths depend on it -> expensive to increase!
@@ -23,7 +25,14 @@ package serial_link_pkg;
   // Maximum Clock division
   localparam int MaxClkDiv = 1024;
 
-  typedef logic [NumLanes*2-1:0] phy_data_t;
+  // DDR (1) SDR (0) selection 
+  // Also modify the "NumBit", "TX_PHY_CLK_START" and "TX_PHY_CLK_END parameter 
+  //accordingly in serial_link.hjson 
+  localparam int DdrSdrSelector = 1;
+
+  typedef logic [NumLanes*(1+DdrSdrSelector)-1:0] phy_data_t; 
+  //typedef logic [NumLanes*2-1:0] phy_data_t; //for DDR
+  //typedef logic [NumLanes-1:0] phy_data_t; // for SDR
   typedef logic [NumLanes-1:0] phy_ddr_data_t;
 
   typedef enum logic [1:0] {LinkSendIdle, LinkSendBusy} link_state_e;

@@ -20,10 +20,12 @@ module tb_axi_serial_link();
   // ==============
   //    Config
   // ==============
-  localparam int unsigned TestDuration    = 100;
+  localparam int unsigned TestDuration    = 100; //number of tests
   localparam int unsigned NumLanes        = serial_link_pkg::NumLanes;
   localparam int unsigned NumChannels     = serial_link_pkg::NumChannels;
   localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;
+  
+  localparam int unsigned DdrSdrSelector = serial_link_pkg::DdrSdrSelector;
 
   localparam time         TckSys1         = 50ns;
   localparam time         TckSys2         = 54ns;
@@ -40,7 +42,7 @@ module tb_axi_serial_link();
   localparam int unsigned RegDataWidth    = 32;
   localparam int unsigned RegStrbWidth    = RegDataWidth / 8;
 
-  localparam logic [NumLanes*2-1:0] CalibrationPattern = {{NumLanes/4}{4'b1010, 4'b0101}};
+  localparam logic [NumLanes*(DdrSdrSelector+1)-1:0] CalibrationPattern = {{NumLanes/(4*(DdrSdrSelector+1))}{4'b1010, 4'b0101}}; //Investigate, not used??
 
   // ==============
   //    DDR Link
@@ -119,7 +121,8 @@ module tb_axi_serial_link();
     .cfg_rsp_t        ( cfg_rsp_t       ),
     .NumChannels      ( NumChannels     ),
     .NumLanes         ( NumLanes        ),
-    .MaxClkDiv        ( MaxClkDiv       )
+    .MaxClkDiv        ( MaxClkDiv       ),
+    .DdrSdrSelector ( DdrSdrSelector)
   ) i_serial_link_1 (
       .clk_i          ( clk_1           ),
       .rst_ni         ( rst_1_n         ),
@@ -151,7 +154,8 @@ module tb_axi_serial_link();
     .cfg_rsp_t        ( cfg_rsp_t       ),
     .NumChannels      ( NumChannels     ),
     .NumLanes         ( NumLanes        ),
-    .MaxClkDiv        ( MaxClkDiv       )
+    .MaxClkDiv        ( MaxClkDiv       ),
+    .DdrSdrSelector ( DdrSdrSelector)
   ) i_serial_link_2 (
       .clk_i          ( clk_2           ),
       .rst_ni         ( rst_2_n         ),

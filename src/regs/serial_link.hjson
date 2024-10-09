@@ -26,9 +26,9 @@
       local: "true"
     },
     { name: "NumBits",
-      desc: "Number of bits transfered in one clock cycle (2 * NumLanes)",
+      desc: "Number of bits transfered in one clock cycle (2*NumLanes for DDR, NumLanes for SDR)",
       type: "int",
-      default: "16",
+      default: "8",
       local: "true"
     },
     { name: "Log2MaxClkDiv",
@@ -132,7 +132,7 @@
           { bits: "Log2MaxClkDiv:0",
             name: "clk_shift_start",
             desc: "Positive Edge of divided, shifted clock",
-            resval: 2
+            resval: 2 // for DDR 2, for SDR 4
           }
         ]
       }
@@ -150,7 +150,7 @@
           { bits: "Log2MaxClkDiv:0",
             name: "clk_shift_end",
             desc: "Negative Edge of divided, shifted clock",
-            resval: 6
+            resval: 6 // for DDR 6, for SDR 0
           }
         ]
       }

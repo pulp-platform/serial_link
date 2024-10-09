@@ -21,6 +21,7 @@ import serial_link_pkg::*;
   parameter int RecvFifoDepth = -1,
   parameter int RawModeFifoDepth = 8,
   parameter int PayloadSplits = -1,
+  parameter int DdrSdrSelector = 1,
   localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1,
   localparam int unsigned Log2RawModeFifoDepth = $clog2(RawModeFifoDepth)
 ) (
@@ -61,7 +62,7 @@ import serial_link_pkg::*;
   logic [$clog2(PayloadSplits)-1:0] recv_reg_index_q, recv_reg_index_d;
 
   link_state_e link_state_q, link_state_d;
-  logic [$clog2(PayloadSplits*NumChannels*NumLanes*2):0] link_out_index_q, link_out_index_d;
+  logic [$clog2(PayloadSplits*NumChannels*NumLanes*2):0] link_out_index_q, link_out_index_d; // INVESTIGATE
 
   logic raw_mode_fifo_full, raw_mode_fifo_empty;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
@@ -187,7 +188,7 @@ import serial_link_pkg::*;
       unique case (link_state_q)
         LinkSendIdle: begin
           if (axis_in_req_i.tvalid) begin
-            link_out_index_d = NumChannels * NumLanes * 2;
+            link_out_index_d = NumChannels * NumLanes * (1 + DdrSdrSelector); //INVESTIGATE
             data_out_valid_o = '1;
             data_out_o = axis_in_req_i.t.data;
             if (data_out_ready_i) begin
@@ -204,7 +205,7 @@ import serial_link_pkg::*;
           data_out_valid_o = '1;
           data_out_o = axis_in_req_i.t.data >> link_out_index_q;
           if (data_out_ready_i) begin
-            link_out_index_d = link_out_index_q + NumChannels * NumLanes * 2;
+            link_out_index_d = link_out_index_q + NumChannels * NumLanes * (1 + DdrSdrSelector); //INVESTIGATE
             if (link_out_index_d >= $bits(axis_in_req_i.t.data)) begin
               link_state_d = LinkSendIdle;
               axis_in_rsp_o.tready = 1'b1;

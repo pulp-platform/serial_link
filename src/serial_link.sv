@@ -25,10 +25,12 @@ import serial_link_pkg::*;
   parameter type cfg_rsp_t  = logic,
   parameter type hw2reg_t  = logic,
   parameter type reg2hw_t  = logic,
+  parameter type phy_data_t = serial_link_pkg::phy_data_t,
   parameter int NumChannels = serial_link_pkg::NumChannels,
   parameter int NumLanes = serial_link_pkg::NumLanes,
   parameter int MaxClkDiv = serial_link_pkg::MaxClkDiv,
   parameter bit NoRegCdc = 1'b0,
+  parameter int DdrSdrSelector = 1,
   localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1
 ) (
   // There are 3 different clock/resets:
@@ -87,7 +89,7 @@ import serial_link_pkg::*;
     credit_t credit;
   } payload_t;
 
-  localparam int BandWidth = NumChannels * NumLanes * 2;
+  localparam int BandWidth = NumChannels * NumLanes * (1+DdrSdrSelector); // doubled BW if DDR enabled
   localparam int PayloadSplits = ($bits(payload_t) + BandWidth - 1) / BandWidth;
   localparam int RecvFifoDepth = NumCredits * PayloadSplits;
 
@@ -106,8 +108,10 @@ import serial_link_pkg::*;
   typedef logic tready_t;
   `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, tuser_t, tready_t)
 
+  //given by serial_link_pkg.sv, imported above
   //typedefs for physical layer
-  typedef logic [NumLanes*2-1:0] phy_data_t;
+  //typedef logic [NumLanes*2-1:0] phy_data_t;
+
 
   cfg_req_t cfg_req;
   cfg_rsp_t cfg_rsp;
@@ -185,7 +189,8 @@ import serial_link_pkg::*;
     .NumLanes         ( NumLanes          ),
     .RecvFifoDepth    ( RecvFifoDepth     ),
     .RawModeFifoDepth ( RawModeFifoDepth  ),
-    .PayloadSplits    ( PayloadSplits     )
+    .PayloadSplits    ( PayloadSplits     ),
+    .DdrSdrSelector ( DdrSdrSelector  )
   ) i_serial_link_data_link (
     .clk_i                                   ( clk_sl_i                                         ),
     .rst_ni                                  ( rst_sl_ni                                        ),
@@ -289,7 +294,8 @@ import serial_link_pkg::*;
       .phy_data_t       ( phy_data_t        ),
       .NumLanes         ( NumLanes          ),
       .FifoDepth        ( RawModeFifoDepth  ),
-      .MaxClkDiv        ( MaxClkDiv         )
+      .MaxClkDiv        ( MaxClkDiv         ),
+      .DdrSdrSelector ( DdrSdrSelector  )
     ) i_serial_link_physical (
       .clk_i             ( clk_sl_i                     ),
       .rst_ni            ( rst_sl_ni                    ),

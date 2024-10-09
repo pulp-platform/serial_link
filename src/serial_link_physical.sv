@@ -3,94 +3,131 @@
 // SPDX-License-Identifier: SHL-0.51
 
 // Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
+// Contributor: Chandra de Viragh <devirac@ethz.ch>
+
 
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
 
 // Implements a single TX channel which forwards the source-synchronous clock
 module serial_link_physical_tx #(
+  parameter type phy_data_t   = serial_link_pkg::phy_data_t,
   parameter int NumLanes   = 8,
-  parameter int MaxClkDiv  = 32
+  parameter int MaxClkDiv  = 32,
+  parameter int DdrSdrSelector = 1
 ) (
-  input  logic                          clk_i,
-  input  logic                          rst_ni,
+  input  logic                          clk_i, // system clock coming from the SoC domain for config reg only
+  input  logic                          rst_ni, // global active-low reset for config reg only
   input  logic [$clog2(MaxClkDiv):0]    clk_div_i,
   input  logic [$clog2(MaxClkDiv):0]    clk_shift_start_i,
   input  logic [$clog2(MaxClkDiv):0]    clk_shift_end_i,
-  input  logic [NumLanes*2-1:0]         data_out_i,
+  input  phy_data_t                     data_out_i,
   input  logic                          data_out_valid_i,
+
   output logic                          data_out_ready_o,
-  output logic                          ddr_rcv_clk_o,
-  output logic [NumLanes-1:0]           ddr_o
+  output logic                          ddr_rcv_clk_o, //source-sync rcv clock
+  output logic [NumLanes-1:0]           ddr_o // output data
 );
+      phy_data_t  data_out_q;
+      
+      logic [$clog2(MaxClkDiv):0] clk_cnt_q, clk_cnt_d;
+      logic clk_enable;
+      logic clk_toggle, clk_slow_toggle;
+      logic clk_slow;
+      logic ddr_sel;
 
-  logic [NumLanes*2-1:0]      data_out_q;
+       // Valid is always set, but
+      // src_clk is clock gated
+      assign data_out_ready_o = data_out_valid_i & (clk_cnt_q == clk_div_i - 1);
+      //assign data_out_ready_o = data_out_valid_i & (clk_cnt_q == clk_div_i - 1);
 
-  logic [$clog2(MaxClkDiv):0] clk_cnt_q, clk_cnt_d;
-  logic clk_enable;
-  logic clk_toggle, clk_slow_toggle;
-  logic clk_slow;
-  logic ddr_sel;
 
-  // Valid is always set, but
-  // src_clk is clock gated
-  assign data_out_ready_o = data_out_valid_i & (clk_cnt_q == clk_div_i - 1);
+      ///////////////////////////////////////
+      //   CLOCK DIVIDER + PHASE SHIFTER   //
+      ///////////////////////////////////////
 
-  ///////////////////////////////////////
-  //   CLOCK DIVIDER + PHASE SHIFTER   //
-  ///////////////////////////////////////
+      always_comb begin
 
-  always_comb begin
+        clk_cnt_d = 0;
 
-    clk_cnt_d = 0;
-
-    if (data_out_valid_i) begin
-      clk_cnt_d = (clk_cnt_q == clk_div_i - 1)? '0 : clk_cnt_q + 1;
-    end
-
-    clk_enable = data_out_valid_i;
-    clk_toggle = (clk_cnt_q == clk_shift_start_i) | (clk_cnt_q == clk_shift_end_i);
-    clk_slow_toggle = (clk_cnt_q == 0) | (clk_cnt_q == clk_div_i/2);
-  end
-
-  `FF(clk_cnt_q, clk_cnt_d, '0)
-
-  // The ddr_rcv_clk_o T-Flip-Flop intentionally uses blocking assignments! If we were to use
-  // non-blocking assignment like we normally do for flip-flops, we would create
-  // a race condition when sampling data from the fast clock domain into
-  // flip-flops clocked by ddr_rcv_clk_o. To avoid this, we use blocking assignments
-  // which is the reccomended method acording to:
-  // S. Sutherland and D. Mills,
-  // Verilog and System Verilog gotchas: 101 common coding errors and how to
-  // avoid them. New York: Springer, 2007. page 64.
-
-  always_ff @(posedge clk_i, negedge rst_ni) begin
-    if (~rst_ni) begin
-      ddr_rcv_clk_o = 1'b1;
-      clk_slow <= 1'b0;
-      ddr_sel <= 1'b0;
-    end else begin
-      if (clk_enable) begin
-        if (clk_toggle) begin
-          ddr_rcv_clk_o = !ddr_rcv_clk_o;
+        if (data_out_valid_i) begin
+          clk_cnt_d = (clk_cnt_q == clk_div_i - 1)? '0 : clk_cnt_q + 1;
         end
-        if (clk_slow_toggle) begin
-          clk_slow <= !clk_slow;
-          ddr_sel <= !ddr_sel;
-        end
-      end else begin
-        ddr_rcv_clk_o = 1'b1;
-        clk_slow <= 1'b0;
-        ddr_sel <= 1'b0;
+
+        clk_enable = data_out_valid_i;
+        //clk_toggle = (clk_cnt_q == clk_shift_start_i) | (clk_cnt_q == clk_shift_end_i + (1-DdrSdrSelector)*clk_div_i);
+        clk_toggle = (clk_cnt_q == clk_shift_start_i) | (clk_cnt_q == clk_shift_end_i);
+        clk_slow_toggle = (clk_cnt_q == 0) | (clk_cnt_q == clk_div_i/2);
       end
-    end
-  end
+        
+      `FF(clk_cnt_q, clk_cnt_d, '0)
 
-  /////////////////
-  //   DDR OUT   //
-  /////////////////
-  `FF(data_out_q, data_out_i, '0, clk_slow, rst_ni)
-  assign ddr_o = (ddr_sel)? data_out_q[NumLanes-1:0] : data_out_q[NumLanes*2-1:NumLanes];
+      // The ddr_rcv_clk_o T-Flip-Flop intentionally uses blocking assignments! If we were to use
+      // non-blocking assignment like we normally do for flip-flops, we would create
+      // a race condition when sampling data from the fast clock domain into
+      // flip-flops clocked by ddr_rcv_clk_o. To avoid this, we use blocking assignments
+      // which is the reccomended method acording to:
+      // S. Sutherland and D. Mills,
+      // Verilog and System Verilog gotchas: 101 common coding errors and how to
+      // avoid them. New York: Springer, 2007. page 64.
+
+      generate 
+        if (DdrSdrSelector) begin  
+            always_ff @(posedge clk_i, negedge rst_ni) begin
+              if (~rst_ni) begin
+              ddr_rcv_clk_o = 1'b1;
+              clk_slow <= 1'b0;
+              ddr_sel <= 1'b0;
+              end else begin
+                if (clk_enable) begin
+                  if (clk_toggle) begin
+                    ddr_rcv_clk_o = !ddr_rcv_clk_o;
+                  end
+                  if (clk_slow_toggle) begin
+                    clk_slow <= !clk_slow;
+                    ddr_sel <= !ddr_sel;
+                  end
+                end else begin
+                  ddr_rcv_clk_o = 1'b1;
+                  clk_slow <= 1'b0;
+                  ddr_sel <= 1'b0;
+                end
+              end
+            end
+        end else begin
+          always_ff @(posedge clk_i, negedge rst_ni) begin
+            if (~rst_ni) begin
+              ddr_rcv_clk_o = 1'b1;
+              clk_slow <= 1'b0;
+            end else begin
+              if (clk_enable) begin
+                if (clk_toggle) begin
+                  ddr_rcv_clk_o = !ddr_rcv_clk_o;
+                end
+                if (clk_slow_toggle) begin
+                  clk_slow <= !clk_slow;
+                end
+              end else begin
+                ddr_rcv_clk_o = 1'b1;
+                clk_slow <= 1'b0;
+              end
+            end
+          end
+        end
+      endgenerate
+
+      /////////////////
+      //   DDR OUT   //
+      /////////////////
+      `FF(data_out_q, data_out_i, '0, clk_slow, rst_ni)
+      
+      generate
+        if (DdrSdrSelector)
+          assign ddr_o = (ddr_sel)? data_out_q[NumLanes-1:0] : data_out_q[NumLanes*2-1:NumLanes];
+        else
+          assign ddr_o = data_out_q;
+      endgenerate
+    
 
 endmodule
 
@@ -100,17 +137,17 @@ module serial_link_physical_rx #(
   parameter type phy_data_t   = serial_link_pkg::phy_data_t,
   parameter int NumLanes      = 8,
   parameter int FifoDepth     = 8,
-  parameter int CdcSyncStages = 2
+  parameter int CdcSyncStages = 2,
+  parameter int DdrSdrSelector = 1 // 1 for ddr, 0 for sdr
 ) (
   input  logic                  clk_i,
   input  logic                  rst_ni,
   input  logic                  ddr_rcv_clk_i,
-  output logic [NumLanes*2-1:0] data_in_o,
+  output phy_data_t             data_in_o,
   output logic                  data_in_valid_o,
   input  logic                  data_in_ready_i,
   input  logic [NumLanes-1:0]   ddr_i
 );
-
   phy_data_t            data_in;
   logic [NumLanes-1:0]  ddr_q;
 
@@ -142,15 +179,14 @@ module serial_link_physical_rx #(
   ////////////////
   //   DDR IN   //
   ////////////////
-  always_ff @(negedge ddr_rcv_clk_i, negedge rst_ni) begin
-    if (~rst_ni) begin
-      ddr_q <= '0;
+  generate
+    if (DdrSdrSelector) begin
+      always_ff @(negedge ddr_rcv_clk_i, negedge rst_ni) ddr_q <= !rst_ni ? '0 : ddr_i;
+      assign data_in = {ddr_i, ddr_q};
     end else begin
-      ddr_q <= ddr_i;
+      assign data_in = ddr_i;
     end
-  end
-  assign data_in = {ddr_i, ddr_q};
-
+  endgenerate
 endmodule
 
 // Implements the Physical Layer of the Serial Link
@@ -163,23 +199,24 @@ module serial_link_physical #(
   // Num Credit for Flow control
   parameter int FifoDepth  = 8,
   // Maximum factor of ClkDiv
-  parameter int MaxClkDiv  = 32
+  parameter int MaxClkDiv  = 32,
+  parameter int DdrSdrSelector = 1
 ) (
-  input  logic                          clk_i,
-  input  logic                          rst_ni,
-  input  logic [$clog2(MaxClkDiv):0]    clk_div_i,
-  input  logic [$clog2(MaxClkDiv):0]    clk_shift_start_i,
-  input  logic [$clog2(MaxClkDiv):0]    clk_shift_end_i,
-  input  logic                          ddr_rcv_clk_i,
-  output logic                          ddr_rcv_clk_o,
-  input  logic [NumLanes*2-1:0]         data_out_i,
-  input  logic                          data_out_valid_i,
-  output logic                          data_out_ready_o,
-  output logic [NumLanes*2-1:0]         data_in_o,
-  output logic                          data_in_valid_o,
-  input  logic                          data_in_ready_i,
-  input  logic [NumLanes-1:0]           ddr_i,
-  output logic [NumLanes-1:0]           ddr_o
+  input  logic                                          clk_i,
+  input  logic                                          rst_ni,
+  input  logic [$clog2(MaxClkDiv):0]                    clk_div_i,
+  input  logic [$clog2(MaxClkDiv):0]                    clk_shift_start_i,
+  input  logic [$clog2(MaxClkDiv):0]                    clk_shift_end_i,
+  input  logic                                          ddr_rcv_clk_i,
+  output logic                                          ddr_rcv_clk_o,
+  input  logic [NumLanes*(2-(1-DdrSdrSelector))-1:0]  data_out_i,
+  input  logic                                          data_out_valid_i,
+  output logic                                          data_out_ready_o,
+  output logic [NumLanes*(2-(1-DdrSdrSelector))-1:0]  data_in_o,
+  output logic                                          data_in_valid_o,
+  input  logic                                          data_in_ready_i,
+  input  logic [NumLanes-1:0]                           ddr_i,
+  output logic [NumLanes-1:0]                           ddr_o
 );
 
   ////////////////
@@ -187,7 +224,8 @@ module serial_link_physical #(
   ////////////////
   serial_link_physical_tx #(
     .NumLanes   ( NumLanes  ),
-    .MaxClkDiv  ( MaxClkDiv )
+    .MaxClkDiv  ( MaxClkDiv ),
+    .DdrSdrSelector  ( DdrSdrSelector)
   ) i_serial_link_physical_tx (
     .rst_ni,
     .clk_i,
@@ -207,7 +245,8 @@ module serial_link_physical #(
   serial_link_physical_rx #(
     .phy_data_t ( phy_data_t  ),
     .NumLanes   ( NumLanes    ),
-    .FifoDepth  ( FifoDepth   )
+    .FifoDepth  ( FifoDepth   ),
+    .DdrSdrSelector  ( DdrSdrSelector)
   ) i_serial_link_physical_rx (
     .clk_i,
     .rst_ni,
@@ -217,5 +256,6 @@ module serial_link_physical #(
     .data_in_ready_i,
     .ddr_i
   );
+
 
 endmodule

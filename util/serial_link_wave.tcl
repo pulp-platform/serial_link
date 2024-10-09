@@ -28,14 +28,26 @@ for {set i 1} {$i < 3} {incr i} {
 
     for {set c 0} {$c < $num_channels} {incr c} {
         add wave -noupdate -group $group_name -group PHY -group TX -group CH$c /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/gen_phy_channels[$c]/i_serial_link_physical/i_serial_link_physical_tx/*
-        add wave -noupdate -group $group_name -group PHY -group RX -group CH$c /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/gen_phy_channels[0]/i_serial_link_physical/i_serial_link_physical_rx/*
+        add wave -noupdate -group $group_name -group PHY -group RX -group CH$c /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/gen_phy_channels[$c]/i_serial_link_physical/i_serial_link_physical_rx/*
     }
+
+
+    
+
+
+    
 
     add wave -noupdate -group $group_name -group {CONFIG} /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/reg2hw
     add wave -noupdate -group $group_name -group {CONFIG} /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/hw2reg
     add wave -noupdate -group $group_name -group {CONFIG} /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/cfg_req
     add wave -noupdate -group $group_name -group {CONFIG} /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/cfg_rsp
 }
+
+#for debugging, DDR1 TX combined with DDR2 RX
+#add wave -noupdate -group "DebugSDR" -group PHY -group TXCH0 /$tb_name/i_serial_link_1/gen_multi_channel_serial_link/i_serial_link/gen_phy_channels[0]/i_serial_link_physical/i_serial_link_physical_tx/genblk1/*
+add wave -noupdate -expand -group "DebugSDR" -group PHY -group TXCH0 /$tb_name/i_serial_link_1/gen_multi_channel_serial_link/i_serial_link/gen_phy_channels[0]/i_serial_link_physical/i_serial_link_physical_tx/*
+add wave -noupdate -expand -group "DebugSDR" -group PHY -group RXCH0 /$tb_name/i_serial_link_2/gen_multi_channel_serial_link/i_serial_link/gen_phy_channels[0]/i_serial_link_physical/i_serial_link_physical_rx/*
+
 
 TreeUpdate [SetDefaultTree]
 quietly wave cursor active 1

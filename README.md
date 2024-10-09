@@ -2,7 +2,7 @@
 # Serial Link
 [![SHL-0.51 license](https://img.shields.io/badge/license-SHL--0.51-green)](LICENSE)
 
-The serial link is a simple all-digital Double-Data-Rate (DDR) link with a source-synchronous interface. The link is scalable and can be used for high-bandwidth low latency applications like Die2Die communication as well as lower demanding tasks like binary preloading. The link has an AXI4 interface and implements Network, Data Link and Physical layer. The serial link is part of the [PULP (Parallel Ultra-Low Power) Platform](https://pulp-platform.org/) and is being used in various chip tapeouts e.g. [Snitch based Systems](https://github.com/pulp-platform/snitch)
+The serial link is a simple all-digital Double-Data-Rate (DDR) or Single-Data-Rate (SDR) link with a source-synchronous interface. The link is scalable and can be used for high-bandwidth low latency applications like Die2Die communication as well as lower demanding tasks like binary preloading. The link has an AXI4 interface and implements Network, Data Link and Physical layer. The serial link is part of the [PULP (Parallel Ultra-Low Power) Platform](https://pulp-platform.org/) and is being used in various chip tapeouts e.g. [Snitch based Systems](https://github.com/pulp-platform/snitch)
 
 ## Architecture Overview
 The serial link implements the 3 lowest layers of the OSI reference model:
@@ -33,13 +33,13 @@ make run GUI=true
 The link can be parametrized with arbitrary AXI interfaces resp. structs (`axi_req_t`, `axi_rsp_t`). Further, the number of Channels number of Lanes per Channel is configurable in `serial_link_pkg.sv`.
 
 ### Single-Channel
-For simple use cases with lower low bandwidth requirements (e.g. binary preloading), it is recommended to use a single-channel configuration. Single-channel configurations come with less overhead for channel synchronization and fault detection.
+For simple use cases with lower low bandwidth requirements (e.g. binary preloading), it is recommended to use a single-channel configuration, possibly with Single-Data-Rate. Single-channel configurations come with less overhead for channel synchronization and fault detection.
 
 ### Multi-Channel
 For use cases that require a higher bandwidth (e.g. Die2Die communication), a multi-channel configuration is recommended. In multi-channel configurations, each channel has its own source-synchronous forwarded clock and the channels are synchronized on the receiver side again. Further, a channel allocator handles faulty channels by redistributing the packets to functional channels. The detection of faulty channels can be done entirely in SW with a special _Raw Mode_ that decouples the link from the AXI interface and allows full controllability and observability of independent channels.
 
 ### Configuration Registers
-Single-channel and Multi-channels currently use different configuration register files because the multi-channel configuration requires additional registers for the channel allocator etc. The registers are generated with the [reggen](https://opentitan.org/book/util/reggen/index.html). The config files for single-channel (`serial_link_single_channel.hjson`) and multi-channel (`serial_link.hjson`) can be found in the `src/regs` folder and can be regenerated with the following command:
+Single-channel and Multi-channels currently use different configuration register files because the multi-channel configuration requires additional registers for the channel allocator etc. The registers are generated with the [reggen](https://docs.opentitan.org/doc/rm/register_tool/). The config files for single-channel (`serial_link_single_channel.hjson`) and multi-channel (`serial_link.hjson`) can be found in the `src/regs` folder and can be regenerated with the following command:
 
 ```
 make update-regs
