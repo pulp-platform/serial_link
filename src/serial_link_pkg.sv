@@ -25,9 +25,9 @@ package serial_link_pkg;
   // Maximum Clock division
   localparam int MaxClkDiv = 1024;
 
-  // DDR (1) SDR (0) selection 
+  // DDR (1) SDR (0) mode selection 
   // Also modify the "NumBit", "TX_PHY_CLK_START" and "TX_PHY_CLK_END parameter 
-  //accordingly in serial_link.hjson 
+  //accordingly in serial_link.hjson or serial_link_single_channel.hjson, respectively
   localparam int DdrSdrSelector = 1;
 
   typedef logic [NumLanes*(1+DdrSdrSelector)-1:0] phy_data_t; 
