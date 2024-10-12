@@ -19,7 +19,7 @@ module serial_link_occamy_wrapper #(
   parameter int NumChannels = 1,
   parameter int NumLanes = 4,
   parameter int MaxClkDiv = 32,
-  parameter int DdrSdrSelector = 1
+  parameter int EnDdr = 1
 ) (
   input  logic                      clk_i,
   input  logic                      rst_ni,
@@ -124,7 +124,7 @@ module serial_link_occamy_wrapper #(
       .NumChannels      ( NumChannels ),
       .NumLanes         ( NumLanes    ),
       .MaxClkDiv        ( MaxClkDiv   ),
-      .DdrSdrSelector ( DdrSdrSelector)
+      .EnDdr ( EnDdr)
     ) i_serial_link (
       .clk_i          ( clk_i             ),
       .rst_ni         ( rst_ni            ),
@@ -164,7 +164,7 @@ module serial_link_occamy_wrapper #(
       .NumChannels      ( NumChannels ),
       .NumLanes         ( NumLanes    ),
       .MaxClkDiv        ( MaxClkDiv   ),
-      .DdrSdrSelector ( DdrSdrSelector)
+      .EnDdr ( EnDdr)
     ) i_serial_link (
       .clk_i          ( clk_i             ),
       .rst_ni         ( rst_ni            ),

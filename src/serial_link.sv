@@ -30,7 +30,7 @@ import serial_link_pkg::*;
   parameter int NumLanes = serial_link_pkg::NumLanes,
   parameter int MaxClkDiv = serial_link_pkg::MaxClkDiv,
   parameter bit NoRegCdc = 1'b0,
-  parameter int DdrSdrSelector = 1,
+  parameter int EnDdr = 1,
   localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1
 ) (
   // There are 3 different clock/resets:
@@ -89,7 +89,7 @@ import serial_link_pkg::*;
     credit_t credit;
   } payload_t;
 
-  localparam int BandWidth = NumChannels * NumLanes * (1+DdrSdrSelector); // doubled BW if DDR enabled
+  localparam int BandWidth = NumChannels * NumLanes * (1+EnDdr); // doubled BW if DDR enabled
   localparam int PayloadSplits = ($bits(payload_t) + BandWidth - 1) / BandWidth;
   localparam int RecvFifoDepth = NumCredits * PayloadSplits;
 
@@ -107,11 +107,6 @@ import serial_link_pkg::*;
   typedef logic tuser_t;
   typedef logic tready_t;
   `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, tuser_t, tready_t)
-
-  //given by serial_link_pkg.sv, imported above
-  //typedefs for physical layer
-  //typedef logic [NumLanes*2-1:0] phy_data_t;
-
 
   cfg_req_t cfg_req;
   cfg_rsp_t cfg_rsp;
@@ -190,7 +185,7 @@ import serial_link_pkg::*;
     .RecvFifoDepth    ( RecvFifoDepth     ),
     .RawModeFifoDepth ( RawModeFifoDepth  ),
     .PayloadSplits    ( PayloadSplits     ),
-    .DdrSdrSelector ( DdrSdrSelector  )
+    .EnDdr ( EnDdr  )
   ) i_serial_link_data_link (
     .clk_i                                   ( clk_sl_i                                         ),
     .rst_ni                                  ( rst_sl_ni                                        ),
@@ -295,7 +290,7 @@ import serial_link_pkg::*;
       .NumLanes         ( NumLanes          ),
       .FifoDepth        ( RawModeFifoDepth  ),
       .MaxClkDiv        ( MaxClkDiv         ),
-      .DdrSdrSelector ( DdrSdrSelector  )
+      .EnDdr ( EnDdr  )
     ) i_serial_link_physical (
       .clk_i             ( clk_sl_i                     ),
       .rst_ni            ( rst_sl_ni                    ),
