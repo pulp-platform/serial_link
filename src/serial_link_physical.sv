@@ -16,7 +16,7 @@ module serial_link_physical_tx #(
   parameter int MaxClkDiv  = 32,
   parameter int EnDdr = 1
 ) (
-  input  logic                          clk_i, // system clock coming from the SoC domain for config reg only
+  input  logic  clk_i, // system clock coming from the SoC domain for config reg only
   input  logic                          rst_ni, // global active-low reset for config reg only
   input  logic [$clog2(MaxClkDiv):0]    clk_div_i,
   input  logic [$clog2(MaxClkDiv):0]    clk_shift_start_i,
@@ -153,13 +153,13 @@ module serial_link_physical_rx #(
   ////////////////
   //   DDR IN   //
   ////////////////
-  if (EnDdr) begin : ddr_mode
+  if (EnDdr) begin : g_ddr_mode
       always_ff @(negedge ddr_rcv_clk_i, negedge rst_ni) begin
         if (!rst_ni) ddr_q <= 0;
         else ddr_q <= ddr_i;
       end
       assign data_in = {ddr_i, ddr_q};
-  end else begin : sdr_mode
+  end else begin : g_sdr_mode
     assign data_in = ddr_i;
   end
 endmodule
