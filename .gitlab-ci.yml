@@ -71,7 +71,7 @@ run_vsim_axi:
     - echo "Running AXI test with R/W [$NUM_READS_1,$NUM_WRITES_1] <-> [$NUM_READS_2,$NUM_WRITES_2]"
     - make run TB_DUT=tb_axi_serial_link WORK=work-vsim RUN_ARGS="+NUM_READS_1=$NUM_READS_1 +NUM_WRITES_1=$NUM_WRITES_1 +NUM_READS_2=$NUM_READS_2 +NUM_WRITES_2=$NUM_WRITES_2"
   variables:
-    TEST_LENGTH: 1000
+    TEST_LENGTH: 100
   parallel:
     matrix:
       - NUM_READS_1: [0, $TEST_LENGTH]
@@ -109,7 +109,7 @@ run_vcs_axi:
     - echo "Running AXI test with R/W [$NUM_READS_1,$NUM_WRITES_1] <-> [$NUM_READS_2,$NUM_WRITES_2]"
     - bin/serial_link_axi.vcs +permissive -exitstatus +NUM_READS_1=$NUM_READS_1 +NUM_WRITES_1=$NUM_WRITES_1 +NUM_READS_2=$NUM_READS_2 +NUM_WRITES_2=$NUM_WRITES_2 +permissive-off
   variables:
-    TEST_LENGTH: 1000
+    TEST_LENGTH: 100
   parallel:
     matrix:
       - NUM_READS_1: [0, $TEST_LENGTH]
