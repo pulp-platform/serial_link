@@ -200,7 +200,7 @@ module serial_link_physical #(
   serial_link_physical_tx #(
     .NumLanes   ( NumLanes  ),
     .MaxClkDiv  ( MaxClkDiv ),
-    .EnDdr  ( EnDdr)
+    .EnDdr      ( EnDdr     )
   ) i_serial_link_physical_tx (
     .rst_ni,
     .clk_i,
@@ -221,7 +221,7 @@ module serial_link_physical #(
     .phy_data_t ( phy_data_t  ),
     .NumLanes   ( NumLanes    ),
     .FifoDepth  ( FifoDepth   ),
-    .EnDdr  ( EnDdr)
+    .EnDdr      ( EnDdr       )
   ) i_serial_link_physical_rx (
     .clk_i,
     .rst_ni,

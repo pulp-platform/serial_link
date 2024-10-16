@@ -185,7 +185,7 @@ import serial_link_pkg::*;
     .RecvFifoDepth    ( RecvFifoDepth     ),
     .RawModeFifoDepth ( RawModeFifoDepth  ),
     .PayloadSplits    ( PayloadSplits     ),
-    .EnDdr ( EnDdr  )
+    .EnDdr            ( EnDdr             )
   ) i_serial_link_data_link (
     .clk_i                                   ( clk_sl_i                                         ),
     .rst_ni                                  ( rst_sl_ni                                        ),
@@ -290,7 +290,7 @@ import serial_link_pkg::*;
       .NumLanes         ( NumLanes          ),
       .FifoDepth        ( RawModeFifoDepth  ),
       .MaxClkDiv        ( MaxClkDiv         ),
-      .EnDdr ( EnDdr  )
+      .EnDdr            ( EnDdr             )
     ) i_serial_link_physical (
       .clk_i             ( clk_sl_i                     ),
       .rst_ni            ( rst_sl_ni                    ),

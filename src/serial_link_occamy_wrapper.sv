@@ -124,7 +124,7 @@ module serial_link_occamy_wrapper #(
       .NumChannels      ( NumChannels ),
       .NumLanes         ( NumLanes    ),
       .MaxClkDiv        ( MaxClkDiv   ),
-      .EnDdr ( EnDdr)
+      .EnDdr            ( EnDdr       )
     ) i_serial_link (
       .clk_i          ( clk_i             ),
       .rst_ni         ( rst_ni            ),
@@ -164,7 +164,7 @@ module serial_link_occamy_wrapper #(
       .NumChannels      ( NumChannels ),
       .NumLanes         ( NumLanes    ),
       .MaxClkDiv        ( MaxClkDiv   ),
-      .EnDdr ( EnDdr)
+      .EnDdr            ( EnDdr       )
     ) i_serial_link (
       .clk_i          ( clk_i             ),
       .rst_ni         ( rst_ni            ),
