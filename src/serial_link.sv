@@ -36,9 +36,7 @@ module serial_link #(
   parameter type cfg_req_t  = logic,
   parameter type cfg_rsp_t  = logic,
   parameter type hw2reg_t   = logic,
-  parameter type reg2hw_t   = logic,
-  // Derived parameters
-  localparam int Log2NumChannels = cf_math_pkg::idx_width(NumChannels)
+  parameter type reg2hw_t   = logic
 ) (
   // There are 3 different clock/resets:
   // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock

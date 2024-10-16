@@ -38,8 +38,6 @@ module tb_axi_serial_link #(
   localparam int unsigned RegDataWidth    = 32;
   localparam int unsigned RegStrbWidth    = RegDataWidth / 8;
 
-  localparam logic [NumLanes*(EnDdr+1)-1:0] CalibrationPattern = {{NumLanes/(4*(EnDdr+1))}{4'b1010, 4'b0101}};
-
   // ==============
   //    DDR Link
   // ==============
