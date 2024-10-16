@@ -29,7 +29,7 @@ package serial_link_pkg;
   //accordingly in serial_link.hjson or serial_link_single_channel.hjson, respectively
   localparam int EnDdr = 1; //by default 1, set to 0 for SDR
 
-  typedef logic [NumLanes*(1+EnDdr)-1:0] phy_data_t; 
+  typedef logic [NumLanes*(1+EnDdr)-1:0] phy_data_t;
   typedef logic [NumLanes-1:0] phy_ddr_data_t;
 
   typedef enum logic [1:0] {LinkSendIdle, LinkSendBusy} link_state_e;
