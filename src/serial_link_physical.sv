@@ -158,6 +158,7 @@ module serial_link_physical_rx #(
         if (!rst_ni) ddr_q <= 0;
         else ddr_q <= ddr_i;
       end
+      assign data_in = {ddr_i, ddr_q};
   end else begin : sdr_mode
     assign data_in = ddr_i;
   end
