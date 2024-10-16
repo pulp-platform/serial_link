@@ -153,15 +153,14 @@ module serial_link_physical_rx #(
   ////////////////
   //   DDR IN   //
   ////////////////
-  if (EnDdr) begin
+  if (EnDdr) begin : ddr_mode
     if (!rst_ni) begin
       always_ff @(negedge ddr_rcv_clk_i, negedge rst_ni) ddr_q <= 0;
-    end
-    else begin
+    end else begin
       always_ff @(negedge ddr_rcv_clk_i, negedge rst_ni) ddr_q <= ddr_i;
     end
     assign data_in = {ddr_i, ddr_q};
-  end else begin
+  end else begin : sdr_mode
     assign data_in = ddr_i;
   end
 endmodule
