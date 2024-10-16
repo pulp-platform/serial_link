@@ -99,9 +99,9 @@ module serial_link_physical_tx #(
   /////////////////
   `FF(data_out_q, data_out_i, '0, clk_slow, rst_ni)
 
-  if (EnDdr) begin
+  if (EnDdr) begin : gen_ddr_mode
     assign ddr_o = (ddr_sel)? data_out_q[NumLanes-1:0] : data_out_q[NumLanes*2-1:NumLanes];
-  end else begin
+  end else begin : gen_sdr_mode
     assign ddr_o = data_out_q;
   end
 
