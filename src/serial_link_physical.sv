@@ -11,16 +11,17 @@
 
 // Implements a single TX channel which forwards the source-synchronous clock
 module serial_link_physical_tx #(
-  parameter type phy_data_t   = serial_link_pkg::phy_data_t,
   parameter int NumLanes   = 8,
   parameter int MaxClkDiv  = 32,
-  parameter bit EnDdr = 1'b1
+  parameter bit EnDdr = 1'b1,
+  parameter type phy_data_t = logic,
+  parameter type clk_div_t = logic [$clog2(MaxClkDiv):0]
 ) (
   input  logic  clk_i, // system clock coming from the SoC domain for config reg only
   input  logic                          rst_ni, // global active-low reset for config reg only
-  input  logic [$clog2(MaxClkDiv):0]    clk_div_i,
-  input  logic [$clog2(MaxClkDiv):0]    clk_shift_start_i,
-  input  logic [$clog2(MaxClkDiv):0]    clk_shift_end_i,
+  input  clk_div_t    clk_div_i,
+  input  clk_div_t    clk_shift_start_i,
+  input  clk_div_t    clk_shift_end_i,
   input  phy_data_t                     data_out_i,
   input  logic                          data_out_valid_i,
 
@@ -30,7 +31,7 @@ module serial_link_physical_tx #(
 );
       phy_data_t  data_out_q;
 
-      logic [$clog2(MaxClkDiv):0] clk_cnt_q, clk_cnt_d;
+      clk_div_t clk_cnt_q, clk_cnt_d;
       logic clk_enable;
       logic clk_toggle, clk_slow_toggle;
       logic clk_slow;
@@ -108,11 +109,11 @@ endmodule
 // Impelements a single RX channel which samples the data with the received clock
 // Synchronizes the data with the System clock with a CDC
 module serial_link_physical_rx #(
-  parameter type phy_data_t   = serial_link_pkg::phy_data_t,
   parameter int NumLanes      = 8,
   parameter int FifoDepth     = 8,
   parameter int CdcSyncStages = 2,
-  parameter bit EnDdr         = 1'b1
+  parameter bit EnDdr         = 1'b1,
+  parameter type phy_data_t   = logic
 ) (
   input  logic                  clk_i,
   input  logic                  rst_ni,
@@ -167,7 +168,6 @@ endmodule
 // Implements the Physical Layer of the Serial Link
 // The number of Channels and Lanes per Channel is parametrizable
 module serial_link_physical #(
-  parameter type phy_data_t = serial_link_pkg::phy_data_t,
   // Number of Wires in one channel
   parameter int NumLanes   = 8,
   // Fifo Depth of CDC, dependent on
@@ -175,32 +175,38 @@ module serial_link_physical #(
   parameter int FifoDepth  = 8,
   // Maximum factor of ClkDiv
   parameter int MaxClkDiv  = 32,
-  parameter bit EnDdr = 1'b1
+  // Enable DDR mode
+  parameter bit EnDdr = 1'b1,
+  // Data input type of the PHY
+  parameter type phy_data_t = logic,
+  // Clock division type
+  parameter type clk_div_t = logic [$clog2(MaxClkDiv):0]
 ) (
-  input  logic                                          clk_i,
-  input  logic                                          rst_ni,
-  input  logic [$clog2(MaxClkDiv):0]                    clk_div_i,
-  input  logic [$clog2(MaxClkDiv):0]                    clk_shift_start_i,
-  input  logic [$clog2(MaxClkDiv):0]                    clk_shift_end_i,
-  input  logic                                          ddr_rcv_clk_i,
-  output logic                                          ddr_rcv_clk_o,
-  input  logic [NumLanes*(1+EnDdr)-1:0]                 data_out_i,
-  input  logic                                          data_out_valid_i,
-  output logic                                          data_out_ready_o,
-  output logic [NumLanes*(1+EnDdr)-1:0]                 data_in_o,
-  output logic                                          data_in_valid_o,
-  input  logic                                          data_in_ready_i,
-  input  logic [NumLanes-1:0]                           ddr_i,
-  output logic [NumLanes-1:0]                           ddr_o
+  input  logic                clk_i,
+  input  logic                rst_ni,
+  input  clk_div_t            clk_div_i,
+  input  clk_div_t            clk_shift_start_i,
+  input  clk_div_t            clk_shift_end_i,
+  input  logic                ddr_rcv_clk_i,
+  output logic                ddr_rcv_clk_o,
+  input  phy_data_t           data_out_i,
+  input  logic                data_out_valid_i,
+  output logic                data_out_ready_o,
+  output phy_data_t           data_in_o,
+  output logic                data_in_valid_o,
+  input  logic                data_in_ready_i,
+  input  logic [NumLanes-1:0] ddr_i,
+  output logic [NumLanes-1:0] ddr_o
 );
 
   ////////////////
   //   PHY TX   //
   ////////////////
   serial_link_physical_tx #(
-    .NumLanes   ( NumLanes  ),
-    .MaxClkDiv  ( MaxClkDiv ),
-    .EnDdr      ( EnDdr     )
+    .NumLanes   ( NumLanes    ),
+    .EnDdr      ( EnDdr       ),
+    .phy_data_t ( phy_data_t  ),
+    .clk_div_t  ( clk_div_t   )
   ) i_serial_link_physical_tx (
     .rst_ni,
     .clk_i,
@@ -218,10 +224,10 @@ module serial_link_physical #(
   //   PHY RX   //
   ////////////////
   serial_link_physical_rx #(
-    .phy_data_t ( phy_data_t  ),
     .NumLanes   ( NumLanes    ),
     .FifoDepth  ( FifoDepth   ),
-    .EnDdr      ( EnDdr       )
+    .EnDdr      ( EnDdr       ),
+    .phy_data_t ( phy_data_t  )
   ) i_serial_link_physical_rx (
     .clk_i,
     .rst_ni,

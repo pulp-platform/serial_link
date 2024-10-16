@@ -14,6 +14,20 @@
 module serial_link
 import serial_link_pkg::*;
 #(
+  // The number of physical chnannels
+  parameter int NumChannels       = 1,
+  // The number of lanes per channel
+  parameter int NumLanes          = 8,
+  // Whether to enable DDR mode
+  parameter bit EnDdr             = 1'b1,
+  // Number of credits for flow control
+  parameter int NumCredits        = 8,
+  // The maximum clock division factor
+  parameter int MaxClkDiv         = 1024,
+  // Whether to use a register CDC for the configuration registers
+  parameter bit NoRegCdc          = 1'b0,
+  // The depth of the raw mode FIFO
+  parameter int RawModeFifoDepth  = 8,
   parameter type axi_req_t  = logic,
   parameter type axi_rsp_t  = logic,
   parameter type aw_chan_t  = logic,
@@ -23,15 +37,10 @@ import serial_link_pkg::*;
   parameter type b_chan_t   = logic,
   parameter type cfg_req_t  = logic,
   parameter type cfg_rsp_t  = logic,
-  parameter type hw2reg_t  = logic,
-  parameter type reg2hw_t  = logic,
-  parameter type phy_data_t = serial_link_pkg::phy_data_t,
-  parameter int NumChannels = serial_link_pkg::NumChannels,
-  parameter int NumLanes = serial_link_pkg::NumLanes,
-  parameter int MaxClkDiv = serial_link_pkg::MaxClkDiv,
-  parameter bit NoRegCdc = 1'b0,
-  parameter bit EnDdr = 1'b1,
-  localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1
+  parameter type hw2reg_t   = logic,
+  parameter type reg2hw_t   = logic,
+  // Derived parameters
+  localparam int Log2NumChannels = cf_math_pkg::idx_width(NumChannels)
 ) (
   // There are 3 different clock/resets:
   // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
@@ -178,7 +187,6 @@ import serial_link_pkg::*;
   serial_link_data_link #(
     .axis_req_t       ( axis_req_t        ),
     .axis_rsp_t       ( axis_rsp_t        ),
-    .payload_t        ( payload_t         ),
     .phy_data_t       ( phy_data_t        ),
     .NumChannels      ( NumChannels       ),
     .NumLanes         ( NumLanes          ),
@@ -286,11 +294,11 @@ import serial_link_pkg::*;
 
   for (genvar i = 0; i < NumChannels; i++) begin : gen_phy_channels
     serial_link_physical #(
-      .phy_data_t       ( phy_data_t        ),
       .NumLanes         ( NumLanes          ),
       .FifoDepth        ( RawModeFifoDepth  ),
       .MaxClkDiv        ( MaxClkDiv         ),
-      .EnDdr            ( EnDdr             )
+      .EnDdr            ( EnDdr             ),
+      .phy_data_t       ( phy_data_t        )
     ) i_serial_link_physical (
       .clk_i             ( clk_sl_i                     ),
       .rst_ni            ( rst_sl_ni                    ),

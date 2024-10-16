@@ -14,10 +14,9 @@ import serial_link_pkg::*;
 #(
   parameter type axis_req_t = logic,
   parameter type axis_rsp_t = logic,
-  parameter type payload_t  = logic,
-  parameter type phy_data_t = serial_link_pkg::phy_data_t,
-  parameter int NumChannels = serial_link_pkg::NumChannels,
-  parameter int NumLanes    = serial_link_pkg::NumLanes,
+  parameter type phy_data_t = logic,
+  parameter int NumChannels = 1,
+  parameter int NumLanes    = 8,
   parameter int RecvFifoDepth = -1,
   parameter int RawModeFifoDepth = 8,
   parameter int PayloadSplits = -1,
