@@ -20,7 +20,7 @@ module tb_axi_serial_link #(
   // ==============
   //    Config
   // ==============
-  localparam int unsigned TestDuration    = 100; //number of tests
+  localparam int unsigned TestDuration    = 100;
   localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;
 
   localparam time         TckSys1         = 50ns;

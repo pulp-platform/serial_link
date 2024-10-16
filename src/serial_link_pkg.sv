@@ -5,14 +5,12 @@
 // Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
 /// A simple serial link package
-
-
 package serial_link_pkg;
 
   // Physical Layer parameters
   // Also modify in serial_link.hjson!
-  localparam int NumChannels = 38; //by default 38
-  localparam int NumLanes = 8; //by default 8
+  localparam int NumChannels = 38;
+  localparam int NumLanes = 8;
 
   // Number of outstanding transactions for flow control
   // FIFO depths depend on it -> expensive to increase!

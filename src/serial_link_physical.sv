@@ -17,17 +17,16 @@ module serial_link_physical_tx #(
   parameter type phy_data_t = logic,
   parameter type clk_div_t = logic [$clog2(MaxClkDiv):0]
 ) (
-  input  logic  clk_i, // system clock coming from the SoC domain for config reg only
-  input  logic                          rst_ni, // global active-low reset for config reg only
-  input  clk_div_t    clk_div_i,
-  input  clk_div_t    clk_shift_start_i,
-  input  clk_div_t    clk_shift_end_i,
-  input  phy_data_t                     data_out_i,
-  input  logic                          data_out_valid_i,
-
-  output logic                          data_out_ready_o,
-  output logic                          ddr_rcv_clk_o, //source-sync rcv clock
-  output logic [NumLanes-1:0]           ddr_o // output data
+  input  logic                clk_i,
+  input  logic                rst_ni,
+  input  clk_div_t            clk_div_i,
+  input  clk_div_t            clk_shift_start_i,
+  input  clk_div_t            clk_shift_end_i,
+  input  phy_data_t           data_out_i,
+  input  logic                data_out_valid_i,
+  output logic                data_out_ready_o,
+  output logic                ddr_rcv_clk_o,
+  output logic [NumLanes-1:0] ddr_o
 );
   phy_data_t  data_out_q;
 
@@ -40,8 +39,6 @@ module serial_link_physical_tx #(
   // Valid is always set, but
   // src_clk is clock gated
   assign data_out_ready_o = data_out_valid_i & (clk_cnt_q == clk_div_i - 1);
-  //assign data_out_ready_o = data_out_valid_i & (clk_cnt_q == clk_div_i - 1);
-
 
   ///////////////////////////////////////
   //   CLOCK DIVIDER + PHASE SHIFTER   //
@@ -56,7 +53,6 @@ module serial_link_physical_tx #(
     end
 
     clk_enable = data_out_valid_i;
-    //clk_toggle = (clk_cnt_q == clk_shift_start_i) | (clk_cnt_q == clk_shift_end_i + (1-EnDdr)*clk_div_i);
     clk_toggle = (clk_cnt_q == clk_shift_start_i) | (clk_cnt_q == clk_shift_end_i);
     clk_slow_toggle = (clk_cnt_q == 0) | (clk_cnt_q == clk_div_i/2);
   end
