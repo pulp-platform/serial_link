@@ -154,7 +154,7 @@ module serial_link_physical_rx #(
   //   DDR IN   //
   ////////////////
   if (EnDdr) begin
-    if !rst_ni begin
+    if (!rst_ni) begin
       always_ff @(negedge ddr_rcv_clk_i, negedge rst_ni) ddr_q <= 0;
     end
     else begin
