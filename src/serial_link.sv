@@ -70,8 +70,10 @@ module serial_link #(
   output logic                      reset_no
 );
 
+  localparam int unsigned NumBitsPerCycle = NumLanes * (1 + EnDdr);
+
   typedef logic [$clog2(NumCredits):0] credit_t;
-  typedef logic [NumLanes*(1+EnDdr)-1:0] phy_data_t;
+  typedef logic [NumBitsPerCycle-1:0] phy_data_t;
 
   // Determine the largest sized AXI channel
   localparam int AxiChannels[5] = {$bits(b_chan_t),
@@ -95,7 +97,7 @@ module serial_link #(
     credit_t credit;
   } payload_t;
 
-  localparam int BandWidth = NumChannels * NumLanes * (1+EnDdr); // doubled BW if DDR enabled
+  localparam int BandWidth = NumChannels * NumBitsPerCycle; // doubled BW if DDR enabled
   localparam int PayloadSplits = ($bits(payload_t) + BandWidth - 1) / BandWidth;
   localparam int RecvFifoDepth = NumCredits * PayloadSplits;
 
@@ -207,11 +209,11 @@ module serial_link #(
     .cfg_flow_control_fifo_clear_i           ( cfg_flow_control_fifo_clear                      ),
     .cfg_raw_mode_en_i                       ( reg2hw.raw_mode_en                               ),
     .cfg_raw_mode_in_ch_sel_i                ( reg2hw.raw_mode_in_ch_sel                        ),
-    .cfg_raw_mode_in_data_o                  ( hw2reg.raw_mode_in_data                          ),
+    .cfg_raw_mode_in_data_o                  ( hw2reg.raw_mode_in_data[NumBitsPerCycle-1:0]     ),
     .cfg_raw_mode_in_data_valid_o            ( hw2reg.raw_mode_in_data_valid                    ),
     .cfg_raw_mode_in_data_ready_i            ( reg2hw.raw_mode_in_data.re                       ),
     .cfg_raw_mode_out_ch_mask_i              ( reg2hw.raw_mode_out_ch_mask                      ),
-    .cfg_raw_mode_out_data_i                 ( reg2hw.raw_mode_out_data_fifo.q                  ),
+    .cfg_raw_mode_out_data_i                 ( phy_data_t'(reg2hw.raw_mode_out_data_fifo.q)     ),
     .cfg_raw_mode_out_data_valid_i           ( reg2hw.raw_mode_out_data_fifo.qe                 ),
     .cfg_raw_mode_out_en_i                   ( reg2hw.raw_mode_out_en                           ),
     .cfg_raw_mode_out_data_fifo_clear_i      ( cfg_raw_mode_out_data_fifo_clear                 ),
