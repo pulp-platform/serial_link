@@ -25,7 +25,7 @@ The Serial Link has the following configuration Parameters:
 | `NumLanes`    | `int unsigned` | Number of Lanes per Channel. Higher numbers reduce the wire overhead for the clocks for the source-synchronous interface but increase the timing complexity and defect probability. Recommended number of lanes are `8` |
 | `NumCredits`  | `int unsigned` | Number of outstanding payloads in flight that have not been processed yet by the other side. Be careful with increasing this parameter as it will increase the FIFOs inside the Serial Link.                            |
 | `MaxClkDiv`   | `int unsigned` | Maximum clock division factor. Mainly used to dimension the counter for the clock division generator                                                                                                                    |
-| `EnDdr` | `int unsigned` | Sets the transmission mode. By default DDR is enabled.
+| `EnDdr` | `bit` | Sets the transmission mode. By default DDR is enabled.
 
 ## Ports
 | Name            | Type                           | Description                                                                                                                                                                                                      |

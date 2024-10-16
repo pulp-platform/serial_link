@@ -21,7 +21,7 @@ import serial_link_pkg::*;
   parameter int RecvFifoDepth = -1,
   parameter int RawModeFifoDepth = 8,
   parameter int PayloadSplits = -1,
-  parameter int EnDdr = 1,
+  parameter bit EnDdr = 1'b1,
   localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1,
   localparam int unsigned Log2RawModeFifoDepth = $clog2(RawModeFifoDepth)
 ) (

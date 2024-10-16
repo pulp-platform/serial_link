@@ -14,7 +14,7 @@ module serial_link_physical_tx #(
   parameter type phy_data_t   = serial_link_pkg::phy_data_t,
   parameter int NumLanes   = 8,
   parameter int MaxClkDiv  = 32,
-  parameter int EnDdr = 1
+  parameter bit EnDdr = 1'b1
 ) (
   input  logic  clk_i, // system clock coming from the SoC domain for config reg only
   input  logic                          rst_ni, // global active-low reset for config reg only
@@ -112,7 +112,7 @@ module serial_link_physical_rx #(
   parameter int NumLanes      = 8,
   parameter int FifoDepth     = 8,
   parameter int CdcSyncStages = 2,
-  parameter int EnDdr = 1
+  parameter bit EnDdr         = 1'b1
 ) (
   input  logic                  clk_i,
   input  logic                  rst_ni,
@@ -175,7 +175,7 @@ module serial_link_physical #(
   parameter int FifoDepth  = 8,
   // Maximum factor of ClkDiv
   parameter int MaxClkDiv  = 32,
-  parameter int EnDdr = 1
+  parameter bit EnDdr = 1'b1
 ) (
   input  logic                                          clk_i,
   input  logic                                          rst_ni,

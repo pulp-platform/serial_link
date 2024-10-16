@@ -30,7 +30,7 @@ import serial_link_pkg::*;
   parameter int NumLanes = serial_link_pkg::NumLanes,
   parameter int MaxClkDiv = serial_link_pkg::MaxClkDiv,
   parameter bit NoRegCdc = 1'b0,
-  parameter int EnDdr = 1,
+  parameter bit EnDdr = 1'b1,
   localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1
 ) (
   // There are 3 different clock/resets:

@@ -19,7 +19,7 @@ module serial_link_occamy_wrapper #(
   parameter int NumChannels = 1,
   parameter int NumLanes = 4,
   parameter int MaxClkDiv = 32,
-  parameter int EnDdr = 1
+  parameter bit EnDdr = 1'b1
 ) (
   input  logic                      clk_i,
   input  logic                      rst_ni,
