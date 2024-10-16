@@ -225,7 +225,7 @@ module serial_link #(
   // CHANNEL ALLOCATOR //
   ///////////////////////
 
-  if (NumChannels == 1) begin :gen_no_channel_alloc
+  if (NumChannels == 1) begin : gen_no_channel_alloc
     // Don't instantiate the channel allocator for the single channel serial
     // link variant. We just feedthrough all the connections
 

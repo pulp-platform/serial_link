@@ -99,10 +99,11 @@ module serial_link_physical_tx #(
       /////////////////
       `FF(data_out_q, data_out_i, '0, clk_slow, rst_ni)
 
-      if (EnDdr)
+      if (EnDdr) begin
         assign ddr_o = (ddr_sel)? data_out_q[NumLanes-1:0] : data_out_q[NumLanes*2-1:NumLanes];
-      else
+      end else begin
         assign ddr_o = data_out_q;
+      end
 
 endmodule
 
@@ -154,13 +155,16 @@ module serial_link_physical_rx #(
   ////////////////
   //   DDR IN   //
   ////////////////
-  if (EnDdr) begin : g_ddr_mode
+  if (EnDdr) begin : gen_ddr_mode
       always_ff @(negedge ddr_rcv_clk_i, negedge rst_ni) begin
-        if (!rst_ni) ddr_q <= 0;
-        else ddr_q <= ddr_i;
+        if (!rst_ni) begin
+          ddr_q <= 0;
+        end else begin
+          ddr_q <= ddr_i;
+        end
       end
       assign data_in = {ddr_i, ddr_q};
-  end else begin : g_sdr_mode
+  end else begin : gen_sdr_mode
     assign data_in = ddr_i;
   end
 endmodule
