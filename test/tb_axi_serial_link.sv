@@ -5,7 +5,11 @@
 // Authors:
 //  - Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-module tb_axi_serial_link();
+module tb_axi_serial_link #(
+  parameter int unsigned NumChannels = 1,
+  parameter int unsigned NumLanes = 8,
+  parameter bit EnDdr = 1'b1
+);
 
   `include "axi/assign.svh"
   `include "axi/typedef.svh"
@@ -17,11 +21,7 @@ module tb_axi_serial_link();
   //    Config
   // ==============
   localparam int unsigned TestDuration    = 100; //number of tests
-  localparam int unsigned NumLanes        = serial_link_pkg::NumLanes;
-  localparam int unsigned NumChannels     = serial_link_pkg::NumChannels;
   localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;
-
-  localparam bit EnDdr = serial_link_pkg::EnDdr;
 
   localparam time         TckSys1         = 50ns;
   localparam time         TckSys2         = 54ns;

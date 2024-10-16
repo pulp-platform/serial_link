@@ -5,7 +5,11 @@
 // Authors:
 //  - Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-module tb_ch_calib_serial_link();
+module tb_ch_calib_serial_link #(
+  parameter int unsigned NumChannels = 38,
+  parameter int unsigned NumLanes = 8,
+  parameter bit EnDdr = 1'b1
+);
 
   `include "axi/assign.svh"
   `include "axi/typedef.svh"
@@ -18,10 +22,7 @@ module tb_ch_calib_serial_link();
   // ==============
   localparam int unsigned TestDuration    = 1000;
   localparam int unsigned FaultyChannels  = 3;
-  localparam int unsigned NumLanes        = serial_link_pkg::NumLanes;
-  localparam int unsigned NumChannels     = serial_link_pkg::NumChannels;
   localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;
-  localparam bit EnDdr = 1'b0;
 
   localparam time         TckSys1         = 50ns;
   localparam time         TckSys2         = 54ns;
