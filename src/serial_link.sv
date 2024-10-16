@@ -11,9 +11,7 @@
 `include "axis/typedef.svh"
 
 /// A simple serial link to go off-chip
-module serial_link
-import serial_link_pkg::*;
-#(
+module serial_link #(
   // The number of physical chnannels
   parameter int NumChannels       = 1,
   // The number of lanes per channel
@@ -74,7 +72,8 @@ import serial_link_pkg::*;
   output logic                      reset_no
 );
 
-  import serial_link_pkg::*;
+  typedef logic [$clog2(NumCredits):0] credit_t;
+  typedef logic [NumLanes*(1+EnDdr)-1:0] phy_data_t;
 
   // Determine the largest sized AXI channel
   localparam int AxiChannels[5] = {$bits(b_chan_t),
@@ -94,7 +93,7 @@ import serial_link_pkg::*;
     logic [MaxAxiChannelBits-1:0] axi_ch;
     logic b_valid;
     b_chan_t b;
-    tag_e hdr;
+    serial_link_pkg::tag_e hdr;
     credit_t credit;
   } payload_t;
 
