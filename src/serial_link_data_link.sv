@@ -63,8 +63,7 @@ module serial_link_data_link #(
   logic [$clog2(PayloadSplits)-1:0] recv_reg_index_q, recv_reg_index_d;
 
   link_state_e link_state_q, link_state_d;
-  // TODO: Investigate NumLanes*2 (whether 2 factor should be replaced by (EnDdr+1))
-  logic [$clog2(PayloadSplits*NumChannels*NumLanes*2):0] link_out_index_q, link_out_index_d;
+  logic [$clog2(PayloadSplits*NumChannels*NumLanes*(1+EnDdr)):0] link_out_index_q, link_out_index_d;
 
   logic raw_mode_fifo_full, raw_mode_fifo_empty;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
