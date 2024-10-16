@@ -18,7 +18,8 @@ module serial_link_occamy_wrapper #(
   parameter type cfg_rsp_t  = logic,
   parameter int NumChannels = 1,
   parameter int NumLanes = 4,
-  parameter int MaxClkDiv = 32
+  parameter int MaxClkDiv = 32,
+  parameter bit EnDdr = 1'b1
 ) (
   input  logic                      clk_i,
   input  logic                      rst_ni,
@@ -122,7 +123,8 @@ module serial_link_occamy_wrapper #(
       .reg2hw_t         ( serial_link_reg_pkg::serial_link_reg2hw_t ),
       .NumChannels      ( NumChannels ),
       .NumLanes         ( NumLanes    ),
-      .MaxClkDiv        ( MaxClkDiv   )
+      .MaxClkDiv        ( MaxClkDiv   ),
+      .EnDdr            ( EnDdr       )
     ) i_serial_link (
       .clk_i          ( clk_i             ),
       .rst_ni         ( rst_ni            ),
@@ -161,7 +163,8 @@ module serial_link_occamy_wrapper #(
       .reg2hw_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg2hw_t ),
       .NumChannels      ( NumChannels ),
       .NumLanes         ( NumLanes    ),
-      .MaxClkDiv        ( MaxClkDiv   )
+      .MaxClkDiv        ( MaxClkDiv   ),
+      .EnDdr            ( EnDdr       )
     ) i_serial_link (
       .clk_i          ( clk_i             ),
       .rst_ni         ( rst_ni            ),
