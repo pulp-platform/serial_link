@@ -5,7 +5,7 @@
 // Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
 {
-  name: "serial_link",
+  name: "serial_link_single_channel",
   clock_primary: "clk_i"
   reset_primary: "rst_ni"
   bus_interfaces: [
@@ -16,31 +16,25 @@
     { name: "NumChannels",
       desc: "Number of channels",
       type: "int",
-      default: "38",
+      default: "1",
       local: "true"
     },
     { name: "Log2NumChannels",
       desc: "Number of channels",
       type: "int",
-      default: "6",
+      default: "1",
       local: "true"
     },
     { name: "NumBits",
-      desc: "Number of bits transfered in one clock cycle (2*NumLanes for DDR, NumLanes for SDR)",
+      desc: "Number of bits transfered in one clock cycle (2 * NumLanes)",
       type: "int",
-      default: "16",
+      default: "8", //16 for DDR, 8 for SDR
       local: "true"
     },
     { name: "Log2MaxClkDiv",
       desc: "Number of bits for clock divider counter",
       type: "int",
       default: "10",
-      local: "true"
-    },
-    { name: "FlushCounterWidth",
-      desc: "The number of bits used for the auto-flush counters in the channel allocator"
-      type: "int",
-      default: "8",
       local: "true"
     },
     { name: "Log2RawModeTXFifoDepth",
@@ -70,7 +64,7 @@
           name: "reset_n",
           resval: 1,
           // *Not* held in reset (i.e. signal high) by default.
-          // Since clock is gated on reset, inner serial link state should *not* change until ungate.
+          // Since clock is gated on reset, inner serial link state should *not* change until ungate
           desc: "SW controlled synchronous reset. (active-low)"
         },
         // All channels isolated by default
@@ -132,7 +126,7 @@
           { bits: "Log2MaxClkDiv:0",
             name: "clk_shift_start",
             desc: "Positive Edge of divided, shifted clock",
-            resval: 2 // for DDR 2, for SDR 4
+            resval: 0
           }
         ]
       }
@@ -150,7 +144,7 @@
           { bits: "Log2MaxClkDiv:0",
             name: "clk_shift_end",
             desc: "Negative Edge of divided, shifted clock",
-            resval: 6 // for DDR 6, for SDR 0
+            resval: 4
           }
         ]
       }
@@ -175,22 +169,16 @@
         }
       ]
     },
-    {multireg:
-      {
-        name: "RAW_MODE_IN_DATA_VALID"
-        cname: "RAW_MODE_IN_DATA_VALID"
-        count: "NumChannels",
-        compact: "true",
-        desc: "Mask for valid data in RX FIFOs during RAW mode."
-        swaccess: "ro",
-        hwaccess: "hwo",
-        hwext: "true",
-        fields: [
-          {
-            bits: "0"
-          },
-        ]
-      }
+    {
+      name: "RAW_MODE_IN_DATA_VALID",
+      desc: "Mask for valid data in RX FIFOs during RAW mode.",
+      swaccess: "ro",
+      hwaccess: "hwo",
+      hwext: "true",
+      fields: [
+        { bits: "NumChannels-1:0",
+        }
+      ]
     },
     {
       name: "RAW_MODE_IN_DATA",
@@ -204,22 +192,16 @@
         }
       ]
     },
-    {multireg:
-      {
-        name: "RAW_MODE_OUT_CH_MASK"
-        cname: "RAW_MODE_OUT_CH_MASK"
-        count: "NumChannels",
-        compact: "true",
-        desc: "Selects channels to send out data in RAW mode, '1 corresponds to broadcasting"
-        swaccess: "wo",
-        hwaccess: "hro",
-        fields: [
-          {
-            bits: "0",
-            resval: 0
-          },
-        ]
-      }
+    {
+      name: "RAW_MODE_OUT_CH_MASK",
+      desc: "Selects channels to send out data in RAW mode, '1 corresponds to broadcasting",
+      swaccess: "wo",
+      hwaccess: "hro",
+      fields: [
+        { bits: "NumChannels-1:0",
+          resval: 0
+        }
+      ]
     },
     {
       name: "RAW_MODE_OUT_DATA_FIFO",
@@ -289,133 +271,6 @@
           resval: 0
         }
       ]
-    },
-    {
-      name: "CHANNEL_ALLOC_TX_CFG"
-      desc: "Configuration settings for the TX side in the channel allocator"
-      swaccess: "rw",
-      hwaccess: "hro",
-      fields: [
-        {
-          bits: "0",
-          name: "bypass_en",
-          desc: "Enable bypassing the TX channel allocator"
-          resval: 1
-        },
-        {
-          bits: "1",
-          name: "auto_flush_en",
-          desc: "Enable the auto-flush feature of the TX side in the channel allocator"
-          resval: 1
-        },
-        {
-          bits: "15:8",
-          name: "auto_flush_count",
-          desc: "The number of cycles to wait before auto flushing (sending) packets in the channel allocator",
-          resval: 2
-        }
-      ]
-    },
-    {multireg:
-      {
-        name: "CHANNEL_ALLOC_TX_CH_EN"
-        cname: "CHANNEL_ALLOC_TX_CH_EN"
-        count: "NumChannels",
-        compact: "true",
-        desc: "Channel enable mask for the TX side."
-        swaccess: "rw",
-        hwaccess: "hro",
-        fields: [
-          {
-            bits: "0",
-            resval: 1
-          },
-        ]
-      }
-    },
-    {
-      name: "CHANNEL_ALLOC_TX_CTRL",
-      desc: "Soft clear or force flush the TX side of the channel allocator",
-      swaccess: "wo",
-      hwaccess: "hro",
-      hwext: "true",
-      hwqe: "true",
-      fields: [
-        {
-          bits: "0",
-          name: "clear",
-          desc: "Software clear the TX side of the channel allocator",
-        },
-        {
-          bits: "1",
-          name: "flush",
-          desc: "Flush (transmit remaining data) in the TX side of the channel allocator.",
-        }
-      ]
-    },
-    {
-      name: "CHANNEL_ALLOC_RX_CFG"
-      desc: "Configuration settings for the RX side in the channel allocator"
-      swaccess: "rw",
-      hwaccess: "hro",
-      fields: [
-        {
-          bits: "0",
-          name: "bypass_en",
-          desc: "Enable bypassing the RX channel allocator"
-          resval: 1
-        },
-        {
-          bits: "1",
-          name: "auto_flush_en",
-          desc: "Enable the auto-flush feature of the RX side in the channel allocator"
-          resval: 1
-        },
-        {
-          bits: "15:8",
-          name: "auto_flush_count",
-          desc: "The number of cycles to wait before synchronizing on partial packets on the RX side",
-          resval: 2
-        },
-        {
-          bits: "16",
-          name: "sync_en",
-          desc: "Enable (1) or disable (0) the synchronization barrier between the channels (needs to be disabled in raw mode).",
-          resval: 1
-        }
-      ]
-    },
-    {
-      name: "CHANNEL_ALLOC_RX_CTRL",
-      desc: "Soft clear the RX side of the channel allocator",
-      swaccess: "wo",
-      hwaccess: "hro",
-      hwext: "true",
-      hwqe: "true",
-      fields: [
-        {
-          bits: "0",
-          name: "clear",
-          desc: "Software clear the TX side of the channel allocator",
-        }
-      ]
-    },
-    {multireg:
-      {
-        name: "CHANNEL_ALLOC_RX_CH_EN"
-        cname: "CHANNEL_ALLOC_RX_CH_EN"
-        count: "NumChannels",
-        compact: "true",
-        desc: "Channel enable mask for the RX side."
-        swaccess: "rw",
-        hwaccess: "hro",
-        fields: [
-          {
-            bits: "0",
-            resval: 1
-          },
-        ]
-      }
     },
   ]
 }

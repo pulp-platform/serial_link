@@ -11,9 +11,21 @@
 `include "axis/typedef.svh"
 
 /// A simple serial link to go off-chip
-module serial_link
-import serial_link_pkg::*;
-#(
+module serial_link #(
+  // The number of physical chnannels
+  parameter int NumChannels       = 1,
+  // The number of lanes per channel
+  parameter int NumLanes          = 8,
+  // Whether to enable DDR mode
+  parameter bit EnDdr             = 1'b1,
+  // Number of credits for flow control
+  parameter int NumCredits        = 8,
+  // The maximum clock division factor
+  parameter int MaxClkDiv         = 1024,
+  // Whether to use a register CDC for the configuration registers
+  parameter bit NoRegCdc          = 1'b0,
+  // The depth of the raw mode FIFO
+  parameter int RawModeFifoDepth  = 8,
   parameter type axi_req_t  = logic,
   parameter type axi_rsp_t  = logic,
   parameter type aw_chan_t  = logic,
@@ -23,13 +35,8 @@ import serial_link_pkg::*;
   parameter type b_chan_t   = logic,
   parameter type cfg_req_t  = logic,
   parameter type cfg_rsp_t  = logic,
-  parameter type hw2reg_t  = logic,
-  parameter type reg2hw_t  = logic,
-  parameter int NumChannels = serial_link_pkg::NumChannels,
-  parameter int NumLanes = serial_link_pkg::NumLanes,
-  parameter int MaxClkDiv = serial_link_pkg::MaxClkDiv,
-  parameter bit NoRegCdc = 1'b0,
-  localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1
+  parameter type hw2reg_t   = logic,
+  parameter type reg2hw_t   = logic
 ) (
   // There are 3 different clock/resets:
   // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
@@ -63,7 +70,10 @@ import serial_link_pkg::*;
   output logic                      reset_no
 );
 
-  import serial_link_pkg::*;
+  localparam int unsigned NumBitsPerCycle = NumLanes * (1 + EnDdr);
+
+  typedef logic [$clog2(NumCredits):0] credit_t;
+  typedef logic [NumBitsPerCycle-1:0] phy_data_t;
 
   // Determine the largest sized AXI channel
   localparam int AxiChannels[5] = {$bits(b_chan_t),
@@ -83,11 +93,11 @@ import serial_link_pkg::*;
     logic [MaxAxiChannelBits-1:0] axi_ch;
     logic b_valid;
     b_chan_t b;
-    tag_e hdr;
+    serial_link_pkg::tag_e hdr;
     credit_t credit;
   } payload_t;
 
-  localparam int BandWidth = NumChannels * NumLanes * 2;
+  localparam int BandWidth = NumChannels * NumBitsPerCycle; // doubled BW if DDR enabled
   localparam int PayloadSplits = ($bits(payload_t) + BandWidth - 1) / BandWidth;
   localparam int RecvFifoDepth = NumCredits * PayloadSplits;
 
@@ -105,9 +115,6 @@ import serial_link_pkg::*;
   typedef logic tuser_t;
   typedef logic tready_t;
   `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, tuser_t, tready_t)
-
-  //typedefs for physical layer
-  typedef logic [NumLanes*2-1:0] phy_data_t;
 
   cfg_req_t cfg_req;
   cfg_rsp_t cfg_rsp;
@@ -179,13 +186,13 @@ import serial_link_pkg::*;
   serial_link_data_link #(
     .axis_req_t       ( axis_req_t        ),
     .axis_rsp_t       ( axis_rsp_t        ),
-    .payload_t        ( payload_t         ),
     .phy_data_t       ( phy_data_t        ),
     .NumChannels      ( NumChannels       ),
     .NumLanes         ( NumLanes          ),
     .RecvFifoDepth    ( RecvFifoDepth     ),
     .RawModeFifoDepth ( RawModeFifoDepth  ),
-    .PayloadSplits    ( PayloadSplits     )
+    .PayloadSplits    ( PayloadSplits     ),
+    .EnDdr            ( EnDdr             )
   ) i_serial_link_data_link (
     .clk_i                                   ( clk_sl_i                                         ),
     .rst_ni                                  ( rst_sl_ni                                        ),
@@ -202,11 +209,11 @@ import serial_link_pkg::*;
     .cfg_flow_control_fifo_clear_i           ( cfg_flow_control_fifo_clear                      ),
     .cfg_raw_mode_en_i                       ( reg2hw.raw_mode_en                               ),
     .cfg_raw_mode_in_ch_sel_i                ( reg2hw.raw_mode_in_ch_sel                        ),
-    .cfg_raw_mode_in_data_o                  ( hw2reg.raw_mode_in_data                          ),
+    .cfg_raw_mode_in_data_o                  ( hw2reg.raw_mode_in_data[NumBitsPerCycle-1:0]     ),
     .cfg_raw_mode_in_data_valid_o            ( hw2reg.raw_mode_in_data_valid                    ),
     .cfg_raw_mode_in_data_ready_i            ( reg2hw.raw_mode_in_data.re                       ),
     .cfg_raw_mode_out_ch_mask_i              ( reg2hw.raw_mode_out_ch_mask                      ),
-    .cfg_raw_mode_out_data_i                 ( reg2hw.raw_mode_out_data_fifo.q                  ),
+    .cfg_raw_mode_out_data_i                 ( phy_data_t'(reg2hw.raw_mode_out_data_fifo.q)     ),
     .cfg_raw_mode_out_data_valid_i           ( reg2hw.raw_mode_out_data_fifo.qe                 ),
     .cfg_raw_mode_out_en_i                   ( reg2hw.raw_mode_out_en                           ),
     .cfg_raw_mode_out_data_fifo_clear_i      ( cfg_raw_mode_out_data_fifo_clear                 ),
@@ -218,7 +225,7 @@ import serial_link_pkg::*;
   // CHANNEL ALLOCATOR //
   ///////////////////////
 
-  if (NumChannels == 1) begin :gen_no_channel_alloc
+  if (NumChannels == 1) begin : gen_no_channel_alloc
     // Don't instantiate the channel allocator for the single channel serial
     // link variant. We just feedthrough all the connections
 
@@ -286,10 +293,11 @@ import serial_link_pkg::*;
 
   for (genvar i = 0; i < NumChannels; i++) begin : gen_phy_channels
     serial_link_physical #(
-      .phy_data_t       ( phy_data_t        ),
       .NumLanes         ( NumLanes          ),
       .FifoDepth        ( RawModeFifoDepth  ),
-      .MaxClkDiv        ( MaxClkDiv         )
+      .MaxClkDiv        ( MaxClkDiv         ),
+      .EnDdr            ( EnDdr             ),
+      .phy_data_t       ( phy_data_t        )
     ) i_serial_link_physical (
       .clk_i             ( clk_sl_i                     ),
       .rst_ni            ( rst_sl_ni                    ),

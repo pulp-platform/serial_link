@@ -28,7 +28,7 @@ for {set i 1} {$i < 3} {incr i} {
 
     for {set c 0} {$c < $num_channels} {incr c} {
         add wave -noupdate -group $group_name -group PHY -group TX -group CH$c /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/gen_phy_channels[$c]/i_serial_link_physical/i_serial_link_physical_tx/*
-        add wave -noupdate -group $group_name -group PHY -group RX -group CH$c /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/gen_phy_channels[0]/i_serial_link_physical/i_serial_link_physical_rx/*
+        add wave -noupdate -group $group_name -group PHY -group RX -group CH$c /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/gen_phy_channels[$c]/i_serial_link_physical/i_serial_link_physical_rx/*
     }
 
     add wave -noupdate -group $group_name -group {CONFIG} /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/reg2hw

@@ -9,18 +9,16 @@
 
 // Implements the Data Link layer of the Serial Link
 // Handles the RAW mode
-module serial_link_data_link
-import serial_link_pkg::*;
-#(
+module serial_link_data_link #(
   parameter type axis_req_t = logic,
   parameter type axis_rsp_t = logic,
-  parameter type payload_t  = logic,
-  parameter type phy_data_t = serial_link_pkg::phy_data_t,
-  parameter int NumChannels = serial_link_pkg::NumChannels,
-  parameter int NumLanes    = serial_link_pkg::NumLanes,
+  parameter type phy_data_t = logic,
+  parameter int NumChannels = 1,
+  parameter int NumLanes    = 8,
   parameter int RecvFifoDepth = -1,
   parameter int RawModeFifoDepth = 8,
   parameter int PayloadSplits = -1,
+  parameter bit EnDdr = 1'b1,
   localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1,
   localparam int unsigned Log2RawModeFifoDepth = $clog2(RawModeFifoDepth)
 ) (
@@ -54,6 +52,10 @@ import serial_link_pkg::*;
   output logic                            cfg_raw_mode_out_data_fifo_is_full_o
 );
 
+  import serial_link_pkg::link_state_e;
+  import serial_link_pkg::LinkSendIdle;
+  import serial_link_pkg::LinkSendBusy;
+
 
   logic [PayloadSplits-1:0] recv_reg_in_valid, recv_reg_in_ready;
   logic [PayloadSplits-1:0] recv_reg_out_valid, recv_reg_out_ready;
@@ -61,7 +63,7 @@ import serial_link_pkg::*;
   logic [$clog2(PayloadSplits)-1:0] recv_reg_index_q, recv_reg_index_d;
 
   link_state_e link_state_q, link_state_d;
-  logic [$clog2(PayloadSplits*NumChannels*NumLanes*2):0] link_out_index_q, link_out_index_d;
+  logic [$clog2(PayloadSplits*NumChannels*NumLanes*(1+EnDdr)):0] link_out_index_q, link_out_index_d;
 
   logic raw_mode_fifo_full, raw_mode_fifo_empty;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
@@ -187,7 +189,7 @@ import serial_link_pkg::*;
       unique case (link_state_q)
         LinkSendIdle: begin
           if (axis_in_req_i.tvalid) begin
-            link_out_index_d = NumChannels * NumLanes * 2;
+            link_out_index_d = NumChannels * NumLanes * (1 + EnDdr);
             data_out_valid_o = '1;
             data_out_o = axis_in_req_i.t.data;
             if (data_out_ready_i) begin
@@ -204,7 +206,7 @@ import serial_link_pkg::*;
           data_out_valid_o = '1;
           data_out_o = axis_in_req_i.t.data >> link_out_index_q;
           if (data_out_ready_i) begin
-            link_out_index_d = link_out_index_q + NumChannels * NumLanes * 2;
+            link_out_index_d = link_out_index_q + NumChannels * NumLanes * (1 + EnDdr);
             if (link_out_index_d >= $bits(axis_in_req_i.t.data)) begin
               link_state_d = LinkSendIdle;
               axis_in_rsp_o.tready = 1'b1;
