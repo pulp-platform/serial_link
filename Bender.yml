@@ -50,9 +50,12 @@ sources:
       files:
       - src/serial_link_synth_wrapper.sv
 
-    - target: simulation
+    - target: any(simulation, test)
       files:
       - test/axi_channel_compare.sv
+
+    - target: test
+      files:
       - test/tb_axi_serial_link.sv
       - test/tb_ch_calib_serial_link.sv
       - test/tb_stream_chopper.sv
