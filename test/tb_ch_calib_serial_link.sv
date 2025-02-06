@@ -8,7 +8,8 @@
 module tb_ch_calib_serial_link #(
   parameter int unsigned NumChannels = 38,
   parameter int unsigned NumLanes = 8,
-  parameter bit EnDdr = 1'b1
+  parameter bit EnDdr = 1'b1,
+  parameter bit UseDelayLine = 1'b0
 );
 
   `include "axi/assign.svh"
@@ -120,7 +121,8 @@ module tb_ch_calib_serial_link #(
     .cfg_rsp_t        ( cfg_rsp_t       ),
     .NumChannels      ( NumChannels  ),
     .NumLanes         ( NumLanes     ),
-    .MaxClkDiv        ( MaxClkDiv       )
+    .MaxClkDiv        ( MaxClkDiv       ),
+    .UseDelayLine     ( UseDelayLine    )
   ) i_serial_link_1 (
       .clk_i          ( clk_1           ),
       .rst_ni         ( rst_1_n         ),
@@ -153,7 +155,8 @@ module tb_ch_calib_serial_link #(
     .cfg_rsp_t        ( cfg_rsp_t       ),
     .NumChannels      ( NumChannels  ),
     .NumLanes         ( NumLanes     ),
-    .MaxClkDiv        ( MaxClkDiv       )
+    .MaxClkDiv        ( MaxClkDiv       ),
+    .UseDelayLine     ( UseDelayLine    )
   ) i_serial_link_2 (
       .clk_i          ( clk_2           ),
       .rst_ni         ( rst_2_n         ),

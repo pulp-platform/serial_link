@@ -123,8 +123,10 @@ module serial_link_occamy_wrapper #(
       .reg2hw_t         ( serial_link_reg_pkg::serial_link_reg2hw_t ),
       .NumChannels      ( NumChannels ),
       .NumLanes         ( NumLanes    ),
+      .EnDdr            ( EnDdr       ),
+      .NumCredits       ( NumCredits  ),
       .MaxClkDiv        ( MaxClkDiv   ),
-      .EnDdr            ( EnDdr       )
+      .UseDelayLine     ( UseDelayLine )
     ) i_serial_link (
       .clk_i          ( clk_i             ),
       .rst_ni         ( rst_ni            ),
@@ -163,8 +165,10 @@ module serial_link_occamy_wrapper #(
       .reg2hw_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg2hw_t ),
       .NumChannels      ( NumChannels ),
       .NumLanes         ( NumLanes    ),
+      .EnDdr            ( EnDdr       ),
+      .NumCredits       ( NumCredits  ),
       .MaxClkDiv        ( MaxClkDiv   ),
-      .EnDdr            ( EnDdr       )
+      .UseDelayLine     ( UseDelayLine )
     ) i_serial_link (
       .clk_i          ( clk_i             ),
       .rst_ni         ( rst_ni            ),

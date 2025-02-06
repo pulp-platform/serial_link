@@ -26,6 +26,10 @@ sources:
     - src/regs/serial_link_reg_top.sv
     - src/regs/serial_link_single_channel_reg_pkg.sv
     - src/regs/serial_link_single_channel_reg_top.sv
+    - src/regs/serial_link_delay_line_reg_pkg.sv
+    - src/regs/serial_link_delay_line_reg_top.sv
+    - src/regs/serial_link_single_channel_delay_line_reg_pkg.sv
+    - src/regs/serial_link_single_channel_delay_line_reg_top.sv
 
     # Parametrization
     - src/serial_link_pkg.sv
@@ -39,6 +43,7 @@ sources:
     - src/serial_link_network.sv
     - src/serial_link_data_link.sv
     - src/serial_link_physical.sv
+    - src/serial_link_physical_delay_line.sv
 
     # Serial Link Wrapper
     - src/serial_link.sv
@@ -56,8 +61,13 @@ sources:
 
     - target: test
       files:
+      - models/configurable_delay.behav.sv
       - test/tb_axi_serial_link.sv
       - test/tb_ch_calib_serial_link.sv
       - test/tb_stream_chopper.sv
       - test/tb_stream_chopper_dechopper.sv
       - test/tb_channel_allocator.sv
+
+    - target: fpga
+      files:
+      - models/configurable_delay.fpga.sv

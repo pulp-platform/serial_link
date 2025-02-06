@@ -24,6 +24,9 @@ module serial_link #(
   parameter int MaxClkDiv         = 1024,
   // Whether to use a register CDC for the configuration registers
   parameter bit NoRegCdc          = 1'b0,
+  // Whether to use a TX delay line in a channel's PHY. This instantiates one
+  // delay line per channel
+  parameter bit UseDelayLine      = 1'b0,
   // The depth of the raw mode FIFO
   parameter int RawModeFifoDepth  = 8,
   parameter type axi_req_t  = logic,
@@ -292,29 +295,52 @@ module serial_link #(
   ////////////////////////
 
   for (genvar i = 0; i < NumChannels; i++) begin : gen_phy_channels
-    serial_link_physical #(
-      .NumLanes         ( NumLanes          ),
-      .FifoDepth        ( RawModeFifoDepth  ),
-      .MaxClkDiv        ( MaxClkDiv         ),
-      .EnDdr            ( EnDdr             ),
-      .phy_data_t       ( phy_data_t        )
-    ) i_serial_link_physical (
-      .clk_i             ( clk_sl_i                     ),
-      .rst_ni            ( rst_sl_ni                    ),
-      .clk_div_i         ( reg2hw.tx_phy_clk_div[i].q   ),
-      .clk_shift_start_i ( reg2hw.tx_phy_clk_start[i].q ),
-      .clk_shift_end_i   ( reg2hw.tx_phy_clk_end[i].q   ),
-      .ddr_rcv_clk_i     ( ddr_rcv_clk_i[i]             ),
-      .ddr_rcv_clk_o     ( ddr_rcv_clk_o[i]             ),
-      .data_out_i        ( alloc2phy_data_out[i]        ),
-      .data_out_valid_i  ( alloc2phy_data_out_valid[i]  ),
-      .data_out_ready_o  ( phy2alloc_data_out_ready[i]  ),
-      .data_in_o         ( phy2alloc_data_in[i]         ),
-      .data_in_valid_o   ( phy2alloc_data_in_valid[i]   ),
-      .data_in_ready_i   ( alloc2phy_data_in_ready[i]   ),
-      .ddr_i             ( ddr_i[i]                     ),
-      .ddr_o             ( ddr_o[i]                     )
-    );
+    if (UseDelayLine) begin : gen_phy_with_delay_lines
+       serial_link_physical_delay_line #(
+        .NumLanes         ( NumLanes          ),
+        .FifoDepth        ( RawModeFifoDepth  ),
+        .EnDdr            ( EnDdr             ),
+        .phy_data_t       ( phy_data_t        )
+      ) i_serial_link_physical_delay_line (
+        .clk_i             ( clk_sl_i                     ),
+        .rst_ni            ( rst_sl_ni                    ),
+        .clk_delay_i       ( reg2hw.quadrature_clk_delay  ),
+        .ddr_rcv_clk_i     ( ddr_rcv_clk_i[i]             ),
+        .ddr_rcv_clk_o     ( ddr_rcv_clk_o[i]             ),
+        .data_out_i        ( alloc2phy_data_out[i]        ),
+        .data_out_valid_i  ( alloc2phy_data_out_valid[i]  ),
+        .data_out_ready_o  ( phy2alloc_data_out_ready[i]  ),
+        .data_in_o         ( phy2alloc_data_in[i]         ),
+        .data_in_valid_o   ( phy2alloc_data_in_valid[i]   ),
+        .data_in_ready_i   ( alloc2phy_data_in_ready[i]   ),
+        .ddr_i             ( ddr_i[i]                     ),
+        .ddr_o             ( ddr_o[i]                     )
+      );
+    end else begin : gen_phy_with_clk_divider
+      serial_link_physical #(
+        .NumLanes         ( NumLanes          ),
+        .FifoDepth        ( RawModeFifoDepth  ),
+        .MaxClkDiv        ( MaxClkDiv         ),
+        .EnDdr            ( EnDdr             ),
+        .phy_data_t       ( phy_data_t        )
+      ) i_serial_link_physical (
+        .clk_i             ( clk_sl_i                     ),
+        .rst_ni            ( rst_sl_ni                    ),
+        .clk_div_i         ( reg2hw.tx_phy_clk_div[i].q   ),
+        .clk_shift_start_i ( reg2hw.tx_phy_clk_start[i].q ),
+        .clk_shift_end_i   ( reg2hw.tx_phy_clk_end[i].q   ),
+        .ddr_rcv_clk_i     ( ddr_rcv_clk_i[i]             ),
+        .ddr_rcv_clk_o     ( ddr_rcv_clk_o[i]             ),
+        .data_out_i        ( alloc2phy_data_out[i]        ),
+        .data_out_valid_i  ( alloc2phy_data_out_valid[i]  ),
+        .data_out_ready_o  ( phy2alloc_data_out_ready[i]  ),
+        .data_in_o         ( phy2alloc_data_in[i]         ),
+        .data_in_valid_o   ( phy2alloc_data_in_valid[i]   ),
+        .data_in_ready_i   ( alloc2phy_data_in_ready[i]   ),
+        .ddr_i             ( ddr_i[i]                     ),
+        .ddr_o             ( ddr_o[i]                     )
+      );
+    end
   end
 
   /////////////////////////////////
@@ -342,31 +368,61 @@ module serial_link #(
   end
 
   if (NumChannels == 1) begin : gen_single_channel_cfg_regs
-    serial_link_single_channel_reg_top #(
-      .reg_req_t (cfg_req_t),
-      .reg_rsp_t (cfg_rsp_t)
-    ) i_serial_link_reg_top (
-      .clk_i      ( clk_i       ),
-      .rst_ni     ( rst_ni      ),
-      .reg_req_i  ( cfg_req     ),
-      .reg_rsp_o  ( cfg_rsp     ),
-      .reg2hw     ( reg2hw      ),
-      .hw2reg     ( hw2reg      ),
-      .devmode_i  ( testmode_i  )
-    );
+    if (UseDelayLine) begin : gen_delay_line
+      serial_link_single_channel_delay_line_reg_top #(
+        .reg_req_t (cfg_req_t),
+        .reg_rsp_t (cfg_rsp_t)
+      ) i_serial_link_reg_top (
+        .clk_i      ( clk_i       ),
+        .rst_ni     ( rst_ni      ),
+        .reg_req_i  ( cfg_req     ),
+        .reg_rsp_o  ( cfg_rsp     ),
+        .reg2hw     ( reg2hw      ),
+        .hw2reg     ( hw2reg      ),
+        .devmode_i  ( testmode_i  )
+      );
+    end else begin : gen_no_delay_line
+      serial_link_single_channel_reg_top #(
+        .reg_req_t (cfg_req_t),
+        .reg_rsp_t (cfg_rsp_t)
+      ) i_serial_link_reg_top (
+        .clk_i      ( clk_i       ),
+        .rst_ni     ( rst_ni      ),
+        .reg_req_i  ( cfg_req     ),
+        .reg_rsp_o  ( cfg_rsp     ),
+        .reg2hw     ( reg2hw      ),
+        .hw2reg     ( hw2reg      ),
+        .devmode_i  ( testmode_i  )
+      );
+    end
   end else begin : gen_multi_channel_cfg_regs
-    serial_link_reg_top #(
-    .reg_req_t (cfg_req_t),
-    .reg_rsp_t (cfg_rsp_t)
-  ) i_serial_link_reg_top (
-    .clk_i      ( clk_i       ),
-    .rst_ni     ( rst_ni      ),
-    .reg_req_i  ( cfg_req     ),
-    .reg_rsp_o  ( cfg_rsp     ),
-    .reg2hw     ( reg2hw      ),
-    .hw2reg     ( hw2reg      ),
-    .devmode_i  ( testmode_i  )
-  );
+    if (UseDelayLine) begin : gen_delay_line
+      serial_link_delay_line_reg_top #(
+        .reg_req_t (cfg_req_t),
+        .reg_rsp_t (cfg_rsp_t)
+      ) i_serial_link_reg_top (
+        .clk_i      ( clk_i       ),
+        .rst_ni     ( rst_ni      ),
+        .reg_req_i  ( cfg_req     ),
+        .reg_rsp_o  ( cfg_rsp     ),
+        .reg2hw     ( reg2hw      ),
+        .hw2reg     ( hw2reg      ),
+        .devmode_i  ( testmode_i  )
+      );
+    end else begin : gen_no_delay_line
+      serial_link_reg_top #(
+        .reg_req_t (cfg_req_t),
+        .reg_rsp_t (cfg_rsp_t)
+      ) i_serial_link_reg_top (
+        .clk_i      ( clk_i       ),
+        .rst_ni     ( rst_ni      ),
+        .reg_req_i  ( cfg_req     ),
+        .reg_rsp_o  ( cfg_rsp     ),
+        .reg2hw     ( reg2hw      ),
+        .hw2reg     ( hw2reg      ),
+        .devmode_i  ( testmode_i  )
+      );
+    end
   end
 
   assign clk_ena_o = reg2hw.ctrl.clk_ena.q;
