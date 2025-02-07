@@ -45,8 +45,11 @@ sources:
     - src/serial_link_physical.sv
     - src/serial_link_physical_delay_line.sv
 
-    # Serial Link Wrapper
+    # Serial Link top level
     - src/serial_link.sv
+
+    # Serial Link wrapper for single-channel/multi-channel selection
+    - src/serial_link_wrapper.sv
 
     # Wrapper for Occamy
     - src/serial_link_occamy_wrapper.sv
