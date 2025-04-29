@@ -3,3 +3,5 @@ mistletoe
 mako
 pyyaml
 tabulate
+peakrdl
+peakrdl-regblock @ git+https://github.com/micprog/PeakRDL-regblock.git@offset_params

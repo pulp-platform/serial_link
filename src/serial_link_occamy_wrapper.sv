@@ -150,21 +150,21 @@ module serial_link_occamy_wrapper #(
     );
   end else begin : gen_single_channel_serial_link
     serial_link #(
-      .axi_req_t        ( axi_req_t   ),
-      .axi_rsp_t        ( axi_rsp_t   ),
-      .aw_chan_t        ( aw_chan_t   ),
-      .w_chan_t         ( w_chan_t    ),
-      .b_chan_t         ( b_chan_t    ),
-      .ar_chan_t        ( ar_chan_t   ),
-      .r_chan_t         ( r_chan_t    ),
-      .cfg_req_t        ( cfg_req_t   ),
-      .cfg_rsp_t        ( cfg_rsp_t   ),
-      .hw2reg_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg__in_t ),
-      .reg2hw_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg__out_t ),
-      .NumChannels      ( NumChannels ),
-      .NumLanes         ( NumLanes    ),
-      .MaxClkDiv        ( MaxClkDiv   ),
-      .EnDdr            ( EnDdr       )
+      .axi_req_t   ( axi_req_t   ),
+      .axi_rsp_t   ( axi_rsp_t   ),
+      .aw_chan_t   ( aw_chan_t   ),
+      .w_chan_t    ( w_chan_t    ),
+      .b_chan_t    ( b_chan_t    ),
+      .ar_chan_t   ( ar_chan_t   ),
+      .r_chan_t    ( r_chan_t    ),
+      .cfg_req_t   ( cfg_req_t   ),
+      .cfg_rsp_t   ( cfg_rsp_t   ),
+      .hw2reg_t    ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg__in_t ),
+      .reg2hw_t    ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg__out_t ),
+      .NumChannels ( NumChannels ),
+      .NumLanes    ( NumLanes    ),
+      .MaxClkDiv   ( MaxClkDiv   ),
+      .EnDdr       ( EnDdr       )
     ) i_serial_link (
       .clk_i          ( clk_i             ),
       .rst_ni         ( rst_ni            ),
