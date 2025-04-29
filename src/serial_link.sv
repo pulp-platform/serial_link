@@ -279,8 +279,10 @@ module serial_link #(
       & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.req_is_wr
       & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_biten.flush;
     for (genvar i = 0; i < NumChannels; i++) begin : gen_channel_en
-      assign cfg_tx_channel_en[i] = reg2hw.serial_link.CHANNEL_ALLOC_TX_CH_EN[i].channel_en.value;
-      assign cfg_rx_channel_en[i] = reg2hw.serial_link.CHANNEL_ALLOC_RX_CH_EN[i].channel_en.value;
+      assign cfg_tx_channel_en[i] =
+        reg2hw.serial_link.CHANNEL_ALLOC_TX_CH_EN[i].channel_alloc_tx_ch_en.value;
+      assign cfg_rx_channel_en[i] =
+        reg2hw.serial_link.CHANNEL_ALLOC_RX_CH_EN[i].channel_alloc_rx_ch_en.value;
     end
 
     serial_link_channel_allocator #(
