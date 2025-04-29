@@ -417,21 +417,21 @@ module serial_link #(
   assign hw2reg.serial_link.ISOLATED.rd_data.axi_in = isolated_i[0];
   assign hw2reg.serial_link.ISOLATED.rd_data.axi_out = isolated_i[1];
 
-  assign hw2reg.serial_link.ISOLATED.rd_ack = 1'b1;
+  assign hw2reg.serial_link.ISOLATED.rd_ack = reg2hw.serial_link.ISOLATED.req & ~reg2hw.serial_link.ISOLATED.req_is_wr;
   assign hw2reg.serial_link.ISOLATED.rd_data._reserved_31_2 = '0;
   for (genvar i = 0; i < NumChannels; i++) begin : gen_static_raw_mode_in_data_valid
-    assign hw2reg.serial_link.RAW_MODE_IN_DATA_VALID[i].rd_ack = 1'b1;
+    assign hw2reg.serial_link.RAW_MODE_IN_DATA_VALID[i].rd_ack = reg2hw.serial_link.RAW_MODE_IN_DATA_VALID[i].req & ~reg2hw.serial_link.RAW_MODE_IN_DATA_VALID[i].req_is_wr;
     assign hw2reg.serial_link.RAW_MODE_IN_DATA_VALID[i].rd_data._reserved_31_1 = '0;
   end
-  assign hw2reg.serial_link.RAW_MODE_IN_DATA.rd_ack = 1'b1;
+  assign hw2reg.serial_link.RAW_MODE_IN_DATA.rd_ack = reg2hw.serial_link.RAW_MODE_IN_DATA.req & ~reg2hw.serial_link.RAW_MODE_IN_DATA.req_is_wr;
   assign hw2reg.serial_link.RAW_MODE_IN_DATA.rd_data._reserved_31_16 = '0;
-  assign hw2reg.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_ack = 1'b1;
-  assign hw2reg.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.wr_ack = 1'b1;
+  assign hw2reg.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_ack = reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req & ~reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req_is_wr;
+  assign hw2reg.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.wr_ack = reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req & reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req_is_wr;
   assign hw2reg.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_data._reserved_7_0 = '0;
   assign hw2reg.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_data._reserved_30_11 = '0;
-  assign hw2reg.serial_link.FLOW_CONTROL_FIFO_CLEAR.wr_ack = 1'b1;
-  assign hw2reg.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_ack = 1'b1;
-  assign hw2reg.serial_link.CHANNEL_ALLOC_RX_CTRL.wr_ack = 1'b1;
+  assign hw2reg.serial_link.FLOW_CONTROL_FIFO_CLEAR.wr_ack = reg2hw.serial_link.FLOW_CONTROL_FIFO_CLEAR.req & reg2hw.serial_link.FLOW_CONTROL_FIFO_CLEAR.req_is_wr;
+  assign hw2reg.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_ack = reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.req & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.req_is_wr;
+  assign hw2reg.serial_link.CHANNEL_ALLOC_RX_CTRL.wr_ack = reg2hw.serial_link.CHANNEL_ALLOC_RX_CTRL.req & reg2hw.serial_link.CHANNEL_ALLOC_RX_CTRL.req_is_wr;
 
   ////////////////////
   //   ASSERTIONS   //
