@@ -53,8 +53,8 @@ module serial_link_synth_wrapper #(
       .r_chan_t         ( r_chan_t    ),
       .cfg_req_t        ( cfg_req_t   ),
       .cfg_rsp_t        ( cfg_rsp_t   ),
-      .hw2reg_t         ( serial_link_reg_pkg::serial_link_hw2reg_t ),
-      .reg2hw_t         ( serial_link_reg_pkg::serial_link_reg2hw_t ),
+      .hw2reg_t         ( serial_link_reg_pkg::serial_link_reg__in_t ),
+      .reg2hw_t         ( serial_link_reg_pkg::serial_link_reg__out_t ),
       .NumChannels      ( NumChannels ),
       .NumLanes         ( NumLanes    ),
       .MaxClkDiv        ( MaxClkDiv   )
@@ -92,8 +92,8 @@ module serial_link_synth_wrapper #(
       .r_chan_t         ( r_chan_t    ),
       .cfg_req_t        ( cfg_req_t   ),
       .cfg_rsp_t        ( cfg_rsp_t   ),
-      .hw2reg_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_hw2reg_t ),
-      .reg2hw_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg2hw_t ),
+      .hw2reg_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg__in_t ),
+      .reg2hw_t         ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg__out_t ),
       .NumChannels      ( NumChannels ),
       .NumLanes         ( NumLanes    ),
       .MaxClkDiv        ( MaxClkDiv   )

@@ -14,6 +14,7 @@ dependencies:
   common_cells:        { git: "https://github.com/pulp-platform/common_cells.git",       version: 1.28.0 }
   axi:                 { git: "https://github.com/pulp-platform/axi.git",                version: 0.38.0 }
   register_interface:  { git: "https://github.com/pulp-platform/register_interface.git", version: 0.3.8  }
+  apb:                 { git: "https://github.com/pulp-platform/apb.git",                version: 0.2.4  }
 
 export_include_dirs:
   - src/axis/include
@@ -22,10 +23,10 @@ sources:
   files:
 
     # Configuration Registers
-    - src/regs/serial_link_reg_pkg.sv
-    - src/regs/serial_link_reg_top.sv
-    - src/regs/serial_link_single_channel_reg_pkg.sv
-    - src/regs/serial_link_single_channel_reg_top.sv
+    - src/regs/rtl/serial_link_reg_pkg.sv
+    - src/regs/rtl/serial_link_reg.sv
+    - src/regs/rtl/serial_link_single_channel_reg_pkg.sv
+    - src/regs/rtl/serial_link_single_channel_reg.sv
 
     # Parametrization
     - src/serial_link_pkg.sv

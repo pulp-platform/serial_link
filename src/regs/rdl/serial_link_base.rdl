@@ -1,0 +1,272 @@
+// Copyright 2025 ETH Zurich and University of Bologna.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Authors:
+//   - Michael Rogenmoser <michaero@iis.ee.ethz.ch>
+//   - Tim Fischer <fischeti@iis.ee.ethz.ch>
+
+`ifndef SERIAL_LINK_BASE_RDL
+`define SERIAL_LINK_BASE_RDL
+
+regfile serial_link_base #(
+    longint unsigned NumChannels = 38,
+    longint unsigned Log2NumChannels = 6,
+    longint unsigned NumBits = 16,
+    longint unsigned Log2MaxClkDiv = 10,
+    longint unsigned FlushCounterWidth = 8,
+    longint unsigned Log2RawModeTXFifoDepth = 3
+) {
+    reg CTRL {
+        desc = "Global clock, isolation and reset control configuration";
+        default sw = rw;
+        default hw = r;
+        field {
+            name = "clk_ena";
+            desc = "Clock gate enable for network, link, physical layer. (active-high)";
+        } clk_ena[0:0] = 0x0;
+        field {
+            name = "reset_n";
+            desc = "SW controlled synchronous reset. (active-low)";
+        } reset_n[1:1] = 0x1;
+        field {
+            name = "axi_in_isolate";
+            desc = "Isolate AXI slave in port. (active-high)";
+        } axi_in_isolate[8:8] = 0x1;
+        field {
+            name = "axi_out_isolate";
+            desc = "Isolate AXI master out port. (active-high)";
+        } axi_out_isolate[9:9] = 0x1;
+    };
+
+    reg ISOLATED {
+        desc = "Isolation status of AXI ports";
+        default sw = r;
+        default hw = w;
+        field {
+            name = "axi_in";
+            desc = "slave in isolation status";
+        } axi_in[0:0] = 0x1;
+        field {
+            name = "axi_out";
+            desc = "master out isolation status";
+        } axi_out[1:1] = 0x1;
+    };
+
+    reg TX_PHY_CLK_DIV {
+        default sw = rw;
+        default hw = r;
+        desc = "Holds clock divider factor for forwarded clock of the TX Phys";
+        field {
+            name = "clk_divs";
+            desc = "Clock division factor of TX clock";
+        } clk_divs[Log2MaxClkDiv:0] = 0x8;
+    };
+
+    reg TX_PHY_CLK_START {
+        default sw = rw;
+        default hw = r;
+        desc = "Controls duty cycle and phase of rising edge in TX Phys";
+        field {
+            name = "clk_shift_start";
+            desc = "Positive Edge of divided, shifted clock";
+        } clk_divs[Log2MaxClkDiv:0] = 0x2; // for DDR 2, for SDR 4
+    };
+
+    reg TX_PHY_CLK_END {
+        default sw = rw;
+        default hw = r;
+        desc = "Controls duty cycle and phase of falling edge in TX Phys";
+        field {
+            name = "clk_shift_end";
+            desc = "Negative Edge of divided, shifted clock";
+        } clk_shift_end[Log2MaxClkDiv:0] = 0x6; // for DDR 6, for SDR 0
+    };
+
+    reg RAW_MODE_EN {
+        default sw = w;
+        default hw = r;
+        desc = "Enables Raw Mode";
+        field {} raw_mode_en[0:0] = 0x0;
+    };
+
+    reg RAW_MODE_IN_CH_SEL {
+        default sw = w;
+        default hw = r;
+        desc = "Receive channel select in RAW mode";
+        field {} raw_mode_in_ch_sel[Log2NumChannels-1:0] = 0x0;
+    };
+
+    reg RAW_MODE_IN_DATA_VALID {
+        default sw = r;
+        default hw = w;
+        desc = "Mask for valid data in RX FIFOs during RAW mode.";
+        field {} raw_mode_in_data_valid[0:0];
+    };
+
+    reg RAW_MODE_IN_DATA {
+        default sw = r;
+        default hw = w;
+        desc = "Data received by the selected channel in RAW mode";
+        field {} raw_mode_in_data[NumBits-1:0];
+    };
+
+    reg RAW_MODE_OUT_CH_MASK {
+        default sw = w;
+        default hw = r;
+        desc = "Selects channels to send out data in RAW mode, '1 corresponds to broadcasting";
+        field {} raw_mode_out_ch_mask = 0x0;
+    };
+
+    reg RAW_MODE_OUT_DATA_FIFO {
+        default sw = w;
+        default hw = r;
+        desc = "Data that will be pushed to the RAW mode output FIFO";
+        field {
+            swmod;
+        } raw_mode_out_data_fifo[NumBits-1:0] = 0x0;
+    };
+
+    reg RAW_MODE_OUT_DATA_FIFO_CTRL {
+        default sw = rw;
+        default hw = rw;
+        desc = "Status and control register for the RAW mode data out FIFO";
+        field {
+            name = "clear";
+            sw = w;
+            hw = r;
+            desc = "Clears the raw mode TX FIFO";
+        } clear[0:0];
+        field {
+            name = "fill_state";
+            sw = r;
+            hw = w;
+            desc = "The number of elements currently stored in the RAW mode TX FIFO that are ready to be sent.";
+        } fill_state[8+Log2RawModeTXFifoDepth-1:8] = 0x0;
+        field {
+            name = "is_full";
+            sw = r;
+            hw = w;
+            desc = "If '1' the FIFO is full and does not accept any more items. Any additional write to the data fill register will be ignored until there is sufficient space again.";
+        } is_full[31:31] = 0x0;
+    };
+
+    reg RAW_MODE_OUT_EN {
+        default sw = rw;
+        default hw = r;
+        desc = "Enable transmission of data currently hold in the output FIFO";
+        field {} raw_mode_out_en[0:0] = 0x0;
+    };
+
+    reg FLOW_CONTROL_FIFO_CLEAR {
+        default sw = w;
+        default hw = r;
+        desc = "Clears the flow control Fifo";
+        field {} flow_control_fifo_clear[0:0] = 0x0;
+    };
+
+    reg CHANNEL_ALLOC_TX_CFG {
+        default sw = rw;
+        default hw = r;
+        desc = "Configuration settings for the TX side in the channel allocator";
+        field {
+            name = "bypass_en";
+            desc = "Enable bypassing the TX channel allocator";
+        } bypass_en[0:0] = 0x1;
+        field {
+            name = "auto_flush_en";
+            desc = "Enable the auto-flush feature of the TX side in the channel allocator";
+        } auto_flush_en[1:1] = 0x1;
+        field {
+            name = "auto_flush_count";
+            desc = "The number of cycles to wait before auto flushing (sending) packets in the channel allocator";
+        } auto_flush_count[15:8] = 0x2;
+    };
+
+    reg CHANNEL_ALLOC_TX_CH_EN {
+        default sw = rw;
+        default hw = r;
+        desc = "Channel enable mask for the TX side.";
+        field {} channel_alloc_tx_ch_en[0:0] = 0x1;
+    };
+
+    reg CHANNEL_ALLOC_TX_CTRL {
+        default sw = w;
+        default hw = r;
+        desc = "Soft clear or force flush the TX side of the channel allocator.";
+        field {
+            name = "clear";
+            desc = "Software clear the TX side of the channel allocator.";
+        } clear[0:0];
+        field {
+            name = "flush";
+            desc = "Flush (transmit remaining data) in the TX side of the channel allocator.";
+        } flush[1:1];
+    };
+
+    reg CHANNEL_ALLOC_RX_CFG {
+        default sw = rw;
+        default hw = r;
+        desc = "Configuration settings for the RX side in the channel allocator.";
+        field {
+            name = "bypass_en";
+            desc = "Enable bypassing the RX channel allocator.";
+        } bypass_en[0:0] = 0x1;
+        field {
+            name = "auto_flush_en";
+            desc = "Enable the auto-flush feature of the RX side in the channel allocator.";
+        } auto_flush_en[1:1] = 0x1;
+        field {
+            name = "auto_flush_count";
+            desc = "The number of cycles to wait before synchronizing on partial packets on the RX side.";
+        } auto_flush_count[15:8] = 0x2;
+        field {
+            name = "sync_en";
+            desc = "Enable (1) or disable (0) the synchronization barrier between the channels (needs to be disabled in raw mode).";
+        } sync_en[16:16] = 0x1;
+    };
+
+    reg CHANNEL_ALLOC_RX_CTRL {
+        default sw = w;
+        default hw = r;
+        desc = "Soft clear the RX side of the channel allocator.";
+        field {
+            name = "clear";
+            desc = "Software clear the RX side of the channel allocator.";
+        } clear[0:0];
+    };
+
+   reg CHANNEL_ALLOC_RX_CH_EN {
+        default sw = rw;
+        default hw = r;
+        desc = "Channel enable mask for the RX side.";
+        field {
+            name = "channel_alloc_rx_ch_en";
+            desc = "Enable or disable specific RX channels.";
+        } channel_alloc_rx_ch_en[0:0] = 0x1;
+    };
+
+
+             CTRL                        CTRL;
+    external ISOLATED                    ISOLATED;
+             TX_PHY_CLK_DIV              TX_PHY_CLK_DIV[NumChannels];
+             TX_PHY_CLK_START            TX_PHY_CLK_START[NumChannels];
+             TX_PHY_CLK_END              TX_PHY_CLK_END[NumChannels];
+             RAW_MODE_EN                 RAW_MODE_EN;
+             RAW_MODE_IN_CH_SEL          RAW_MODE_IN_CH_SEL;
+    external RAW_MODE_IN_DATA_VALID      RAW_MODE_IN_DATA_VALID[NumChannels];
+    external RAW_MODE_IN_DATA            RAW_MODE_IN_DATA;
+             RAW_MODE_OUT_CH_MASK        RAW_MODE_OUT_CH_MASK[NumChannels];
+             RAW_MODE_OUT_DATA_FIFO      RAW_MODE_OUT_DATA_FIFO;
+    external RAW_MODE_OUT_DATA_FIFO_CTRL RAW_MODE_OUT_DATA_FIFO_CTRL;
+             RAW_MODE_OUT_EN             RAW_MODE_OUT_EN;
+    external FLOW_CONTROL_FIFO_CLEAR     FLOW_CONTROL_FIFO_CLEAR;
+             CHANNEL_ALLOC_TX_CFG        CHANNEL_ALLOC_TX_CFG;
+             CHANNEL_ALLOC_TX_CH_EN      CHANNEL_ALLOC_TX_CH_EN[NumChannels];
+    external CHANNEL_ALLOC_TX_CTRL       CHANNEL_ALLOC_TX_CTRL;
+             CHANNEL_ALLOC_RX_CFG        CHANNEL_ALLOC_RX_CFG;
+    external CHANNEL_ALLOC_RX_CTRL       CHANNEL_ALLOC_RX_CTRL;
+             CHANNEL_ALLOC_RX_CH_EN      CHANNEL_ALLOC_RX_CH_EN[NumChannels];
+};
+
+`endif // SERIAL_LINK_BASE_RDL

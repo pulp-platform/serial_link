@@ -4,12 +4,9 @@
 
 # Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-BENDER      ?= bender
-VSIM        ?= vsim
-PYTHON      ?= python3
-REGGEN_PATH ?= $(shell ${BENDER} path register_interface)/vendor/lowrisc_opentitan/util/regtool.py
-REGGEN       = $(PYTHON) $(REGGEN_PATH)
-WORK        ?= work
+BENDER 		?= bender
+VSIM 		  ?= vsim
+WORK 		  ?= work
 
 all: compile_questa
 
@@ -40,10 +37,9 @@ clean_bender:
 
 .PHONY: update-regs
 
-update-regs: src/regs/*.hjson
-	echo $(REGGEN)
-	$(REGGEN) src/regs/serial_link.hjson -r -t src/regs
-	$(REGGEN) src/regs/serial_link_single_channel.hjson -r -t src/regs
+update-regs: src/regs/rdl/*.rdl
+	peakrdl regblock src/regs/rdl/serial_link.rdl -I src/regs/rdl -o src/regs/rtl/. --default-reset arst_n --cpuif apb4-flat
+	peakrdl regblock src/regs/rdl/serial_link_single_channel.rdl -I src/regs/rdl -o src/regs/rtl/. --default-reset arst_n --cpuif apb4-flat
 
 # --------------
 # QuestaSim
