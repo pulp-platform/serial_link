@@ -179,6 +179,7 @@ module serial_link #(
   logic cfg_flow_control_fifo_clear;
   logic cfg_raw_mode_out_data_fifo_clear;
   logic [NumChannels-1:0] raw_mode_in_data_valid;
+  logic [NumChannels-1:0] raw_mode_out_ch_mask;
 
   assign cfg_flow_control_fifo_clear = reg2hw.serial_link.FLOW_CONTROL_FIFO_CLEAR.wr_data.flow_control_fifo_clear
     & reg2hw.serial_link.FLOW_CONTROL_FIFO_CLEAR.req & reg2hw.serial_link.FLOW_CONTROL_FIFO_CLEAR.req_is_wr
@@ -187,7 +188,8 @@ module serial_link #(
     & reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req & reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req_is_wr
     & reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.wr_biten.clear;
   for (genvar i = 0; i < NumChannels; i++) begin : gen_raw_mode_in_data_valid
-    assign raw_mode_in_data_valid[i] = hw2reg.serial_link.RAW_MODE_IN_DATA_VALID[i].rd_data.raw_mode_in_data_valid;
+    assign hw2reg.serial_link.RAW_MODE_IN_DATA_VALID[i].rd_data.raw_mode_in_data_valid = raw_mode_in_data_valid[i];
+    assign raw_mode_out_ch_mask[i] = reg2hw.serial_link.RAW_MODE_OUT_CH_MASK[i].raw_mode_out_ch_mask.value;
   end
 
   serial_link_data_link #(
