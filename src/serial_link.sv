@@ -251,12 +251,15 @@ module serial_link #(
     logic cfg_tx_clear, cfg_rx_clear;
     logic cfg_tx_flush_trigger;
 
-    assign cfg_tx_clear = reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_data.channel_alloc_tx_ctrl.clear
-      & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_data.req & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_data.req_is_wr;
-    assign cfg_rx_clear = reg2hw.serial_link.CHANNEL_ALLOC_RX_CTRL.wr_data.channel_alloc_rx_ctrl.clear
-      & reg2hw.serial_link.CHANNEL_ALLOC_RX_CTRL.wr_data.req & reg2hw.serial_link.CHANNEL_ALLOC_RX_CTRL.wr_data.req_is_wr;
-    assign cfg_tx_flush_trigger = reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_data.channel_alloc_tx_ctrl.flush
-      & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_data.req & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_data.req_is_wr;
+    assign cfg_tx_clear = reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_data.clear
+      & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.req & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.req_is_wr
+      & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_biten.clear;
+    assign cfg_rx_clear = reg2hw.serial_link.CHANNEL_ALLOC_RX_CTRL.wr_data.clear
+      & reg2hw.serial_link.CHANNEL_ALLOC_RX_CTRL.req & reg2hw.serial_link.CHANNEL_ALLOC_RX_CTRL.req_is_wr
+      & reg2hw.serial_link.CHANNEL_ALLOC_RX_CTRL.wr_biten.clear;
+    assign cfg_tx_flush_trigger = reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_data.flush
+      & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.req & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.req_is_wr
+      & reg2hw.serial_link.CHANNEL_ALLOC_TX_CTRL.wr_biten.flush;
 
     serial_link_channel_allocator #(
       .phy_data_t  ( phy_data_t    ),
