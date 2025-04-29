@@ -40,6 +40,8 @@ clean_bender:
 update-regs: src/regs/rdl/*.rdl
 	peakrdl regblock src/regs/rdl/serial_link.rdl -I src/regs/rdl -o src/regs/rtl/. --default-reset arst_n --cpuif apb4-flat
 	peakrdl regblock src/regs/rdl/serial_link_single_channel.rdl -I src/regs/rdl -o src/regs/rtl/. --default-reset arst_n --cpuif apb4-flat
+	@sed -i '1i// Copyright 2025 ETH Zurich and University of Bologna.\n// Solderpad Hardware License, Version 0.51, see LICENSE for details.\n// SPDX-License-Identifier: SHL-0.51\n' src/regs/rtl/*.sv
+
 
 # --------------
 # QuestaSim
