@@ -444,11 +444,11 @@ module tb_ch_calib_serial_link #(
     $info("[DDR%0d]: Enabling clock and deassert link reset.", id);
     // Reset and clock gate sequence, AXI isolation remains enabled
     // De-assert reset
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CTRL_OFFSET, 32'h300);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET, 32'h300);
     // Assert reset
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CTRL_OFFSET, 32'h302);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET, 32'h302);
     // Enable clock
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CTRL_OFFSET, 32'h303);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET, 32'h303);
   endtask
 
   task automatic calibrate_link(reg_master_t drv, int id);
@@ -469,68 +469,68 @@ module tb_ch_calib_serial_link #(
     // isolated before the master out port on the other side. Otherwise there might
     // transactions in flight that get lost
     $info("[DDR%0d]: Isolating AXI Slave In", id);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CTRL_OFFSET, 32'h103);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET, 32'h103);
     do begin
-      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_ISOLATED_OFFSET, data);
+      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__ISOLATED__OFFSET, data);
     end while(data[0] != 1'b1); // Wait until isolation status bit is 1
     $info("[DDR%0d]: Isolated AXI Slave In", id);
     // Wait for a few clock cycles before isolating AXI Master out
     repeat(100) @(posedge clk_reg);
     $info("[DDR%0d]: Isolating AXI Master Out", id);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CTRL_OFFSET, 32'h303);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET, 32'h303);
     do begin
-      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_ISOLATED_OFFSET, data);
+      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__ISOLATED__OFFSET, data);
     end while(data[1:0] != 2'b11); // Wait until both isolation status bit is are 1
     $info("[DDR%0d]: Isolated AXI Master Out", id);
     // Configure Raw Mode
     $info("[DDR%0d]: Preparing link for calibration...",id);
     // Prepare channel allocator for RAW mode
     // Enable bypass mode and auto flush feature but disable sync for RX side
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_TX_CFG_OFFSET, 32'h3);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_RX_CFG_OFFSET, 32'h3);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CFG__OFFSET, 32'h3);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CFG__OFFSET, 32'h3);
     // Enable Raw Mode
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_EN_OFFSET, 1);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_EN__OFFSET, 1);
     // Set mask for sending out pattern
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_OUT_CH_MASK_0_OFFSET, '1);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_OUT_CH_MASK_1_OFFSET, '1);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_CH_MASK__OFFSET, '1);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_CH_MASK__OFFSET + 4, '1);
     // Enable same channels in TX side of channel allocator
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_0_OFFSET, '1);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_0_OFFSET, '1);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_1_OFFSET, '1);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_1_OFFSET, '1);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CH_EN__OFFSET, '1);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CH_EN__OFFSET, '1);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CH_EN__OFFSET + 4, '1);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CH_EN__OFFSET + 4, '1);
     $info("[DDR%0d]: Sending calibration sequence", id);
     // Clear the TX Fifo
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_CTRL_OFFSET, 32'h1);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_CTRL_OFFSET, 32'h0);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO_CTRL__OFFSET, 32'h1);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO_CTRL__OFFSET, 32'h0);
     // Send a pattern sequence to TX FIFO
     for (int i = 0; i < 8; i++) begin
       pattern = 16'haaaa << i;
       pattern_q.push_back(pattern);
-      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_OFFSET, pattern);
+      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO__OFFSET, pattern);
     end
     // Send out pattern
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_OUT_EN_OFFSET, 1);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_EN__OFFSET, 1);
     // Wait until some channels have received data
     do begin
-      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_OFFSET, raw_mode_data_in_valid[31:0]);
-      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_DATA_VALID_1_OFFSET, raw_mode_data_in_valid[63:32]);
+      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET, raw_mode_data_in_valid[31:0]);
+      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET + 4, raw_mode_data_in_valid[63:32]);
     end while(raw_mode_data_in_valid[NumChannels-1:0] == 0);
     // Iterate through every channel
     for (int c = 0; c < NumChannels; c++) begin
       // Select read channel
-      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_CH_SEL_OFFSET, c);
+      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_CH_SEL__OFFSET, c);
       // Check read patterns
       foreach(pattern_q[i]) begin
         // Check first that there is valid data in the RX FIFO
-      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_OFFSET, raw_mode_data_in_valid[31:0]);
-      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_DATA_VALID_1_OFFSET, raw_mode_data_in_valid[63:32]);
+      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET, raw_mode_data_in_valid[31:0]);
+      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET + 4, raw_mode_data_in_valid[63:32]);
       if (raw_mode_data_in_valid[c] == 1'b0) begin
           $info("[DDR%0d][CH%0d] No data in RX FIFO", id, c);
           working_rx_channels[c] = 1'b0;
           break;
         end
         // Read out first pattern
-        cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_DATA_OFFSET, data);
+        cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA__OFFSET, data);
         if (pattern_q[i] != data) begin
           $error("[DDR%0d][CH%0d] Pattern missmatch actual %h data expected %h",
             id, c, data, pattern_q[i]);
@@ -547,65 +547,65 @@ module tb_ch_calib_serial_link #(
     $info("[DDR%0d] RX channel mask %32b", id, working_rx_channels);
     // Check that there is no more valid data in the RX FIFOs
     // of all working channels
-    cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_OFFSET, raw_mode_data_in_valid[31:0]);
-    cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_DATA_VALID_1_OFFSET, raw_mode_data_in_valid[63:32]);
+    cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET, raw_mode_data_in_valid[31:0]);
+    cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET + 4, raw_mode_data_in_valid[63:32]);
     assert ((raw_mode_data_in_valid[NumChannels-1:0] & working_rx_channels) == '0) else begin
       $error("[DDR%0d] Still data in RX FIFO %32b", id, data & working_rx_channels);
     end
     // Clear the TX Fifo
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_CTRL_OFFSET, 32'h1);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_CTRL_OFFSET, 32'h0);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO_CTRL__OFFSET, 32'h1);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO_CTRL__OFFSET, 32'h0);
     // Load the channel mask of working channels into TX FIFO
     // They should be immediately sent as TX FIFO is still enabled
     $info("[DDR%0d] Sending out RX channel mask.", id);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_OFFSET, working_rx_channels[15:0]);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_OFFSET, working_rx_channels[31:16]);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO__OFFSET, working_rx_channels[15:0]);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO__OFFSET, working_rx_channels[31:16]);
     // Wait until the channel mask from the other side has arrived
     do begin
-      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_OFFSET, raw_mode_data_in_valid[31:0]);
-      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_DATA_VALID_1_OFFSET, raw_mode_data_in_valid[63:32]);
+      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET, raw_mode_data_in_valid[31:0]);
+      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET + 4, raw_mode_data_in_valid[63:32]);
     end while(raw_mode_data_in_valid[NumChannels-1:0] == 0);
     // Only check RX channels that are working
     for (int c = 0; c < NumChannels; c++) begin
       if (working_rx_channels[c]) begin
         // Select channel to read from
-        cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_CH_SEL_OFFSET, c);
+        cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_CH_SEL__OFFSET, c);
         // Read the mask
-        cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_DATA_OFFSET, working_tx_channels[15:0]);
-        cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_IN_DATA_OFFSET, working_tx_channels[31:16]);
+        cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA__OFFSET, working_tx_channels[15:0]);
+        cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA__OFFSET, working_tx_channels[31:16]);
       end
     end
     $info("[DDR%0d] TX channel mask %32b", id, working_tx_channels);
     // Disable TX Fifo
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_OUT_EN_OFFSET, 0);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_EN__OFFSET, 0);
     // Enable RX/TX channels
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_0_OFFSET, working_tx_channels);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_0_OFFSET, working_rx_channels);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_1_OFFSET, working_tx_channels);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_1_OFFSET, working_rx_channels);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CH_EN__OFFSET, working_tx_channels);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CH_EN__OFFSET, working_rx_channels);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CH_EN__OFFSET + 4, working_tx_channels);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CH_EN__OFFSET + 4, working_rx_channels);
     // Configure channel allocator
     // Set auto-flush count value == 2
     if ($countones(working_tx_channels) == NumChannels) begin
       // Enable bypass
-      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_TX_CFG_OFFSET, 32'h203);
+      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CFG__OFFSET, 32'h203);
     end else begin
       // Disable bypass
-      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_TX_CFG_OFFSET, 32'h202);
+      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CFG__OFFSET, 32'h202);
     end
     // Set auto-flush count value == 2 and re-enable RX synchronization
     if ($countones(working_rx_channels) == NumChannels) begin
-      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_RX_CFG_OFFSET, 32'h10203);
+      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CFG__OFFSET, 32'h10203);
     end else begin
-      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_RX_CFG_OFFSET, 32'h10202);
+      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CFG__OFFSET, 32'h10202);
     end
     // Configure normal operating mode
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_RAW_MODE_EN_OFFSET, 0);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_EN__OFFSET, 0);
     // Wait for the other Serial Link to be ready
     repeat(100) @(posedge clk_reg);
     $info("[DDR%0d] Enabling AXI ports...",id);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CTRL_OFFSET, 32'h03);
+    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET, 32'h03);
     do begin
-      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_ISOLATED_OFFSET, data);
+      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__ISOLATED__OFFSET, data);
     end while(data != 0); // Wait until both isolation status bits are 0 to
                           // indicate disabling of isolation
     $info("[DDR%0d] Link is ready", id);
