@@ -218,8 +218,8 @@ module serial_link #(
     .cfg_raw_mode_in_ch_sel_i                ( reg2hw.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value ),
     .cfg_raw_mode_in_data_o                  ( hw2reg.serial_link.RAW_MODE_IN_DATA.rd_data.raw_mode_in_data ),
     .cfg_raw_mode_in_data_valid_o            ( raw_mode_in_data_valid ),
-    .cfg_raw_mode_in_data_ready_i            ( reg2hw.serial_linik.RAW_MODE_IN_DATA.req & ~reg2hw.serial_link.RAW_MODE_IN_DATA.req_is_wr ),
-    .cfg_raw_mode_out_ch_mask_i              ( reg2hw.serial_linik.RAW_MODE_OUT_CH_MASK.raw_mode_out_ch_mask.value ),
+    .cfg_raw_mode_in_data_ready_i            ( reg2hw.serial_link.RAW_MODE_IN_DATA.req & ~reg2hw.serial_link.RAW_MODE_IN_DATA.req_is_wr ),
+    .cfg_raw_mode_out_ch_mask_i              ( reg2hw.serial_link.RAW_MODE_OUT_CH_MASK.raw_mode_out_ch_mask.value ),
     .cfg_raw_mode_out_data_i                 ( phy_data_t'(reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value) ),
     .cfg_raw_mode_out_data_valid_i           ( reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.swmod                 ),
     .cfg_raw_mode_out_en_i                   ( reg2hw.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value     ),
@@ -414,8 +414,10 @@ module serial_link #(
 
   assign hw2reg.serial_link.ISOLATED.rd_ack = 1'b1;
   assign hw2reg.serial_link.ISOLATED.rd_data._reserved_31_2 = '0;
-  assign hw2reg.serial_link.RAW_MODE_IN_DATA_VALID.rd_ack = 1'b1;
-  assign hw2reg.serial_link.RAW_MODE_IN_DATA_VALID.rd_data._reserved_31_1 = '0;
+  for (genvar i = 0; i < NumChannels; i++) begin : gen_static_raw_mode_in_data_valid
+    assign hw2reg.serial_link.RAW_MODE_IN_DATA_VALID[i].rd_ack = 1'b1;
+    assign hw2reg.serial_link.RAW_MODE_IN_DATA_VALID[i].rd_data._reserved_31_1 = '0;
+  end
   assign hw2reg.serial_link.RAW_MODE_IN_DATA.rd_ack = 1'b1;
   assign hw2reg.serial_link.RAW_MODE_IN_DATA.rd_data._reserved_31_16 = '0;
   assign hw2reg.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_ack = 1'b1;
