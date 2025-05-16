@@ -17,6 +17,9 @@ module tb_axi_serial_link #(
   `include "register_interface/assign.svh"
   `include "register_interface/typedef.svh"
 
+  `include "serial_link_addrmap.svh"
+  `include "serial_link_single_channel_addrmap.svh"
+
   // ==============
   //    Config
   // ==============
@@ -431,24 +434,24 @@ module tb_axi_serial_link #(
     $info("[DDR%0d]: Enabling clock and deassert link reset.", id);
     // Reset and clock gate sequence, AXI isolation remains enabled
     // De-assert reset
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET, 32'h300);
+    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CTRL_REG_OFFSET, 32'h300);
     // Assert reset
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET, 32'h302);
+    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CTRL_REG_OFFSET, 32'h302);
     // Enable clock
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET, 32'h303);
+    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CTRL_REG_OFFSET, 32'h303);
     // Enable channel allocator bypass mode and
     // auto flush feature but disable sync for RX side
     if (NumChannels > 1) begin
-      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CFG__OFFSET, 32'h3);
-      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CFG__OFFSET, 32'h3);
+      cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_TX_CFG_REG_OFFSET, 32'h3);
+      cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_RX_CFG_REG_OFFSET, 32'h3);
     end
     // Wait for some clock cycles
     repeat(50) drv.cycle_end();
     // De-isolate AXI ports
     $info("[DDR%0d] Enabling AXI ports...",id);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET, 32'h03);
+    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CTRL_REG_OFFSET, 32'h03);
     do begin
-      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__ISOLATED__OFFSET, data);
+      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_ISOLATED_REG_OFFSET, data);
     end while(data != 0); // Wait until both isolation status bits are 0 to
                           // indicate disabling of isolation
     $info("[DDR%0d] Link is ready", id);
