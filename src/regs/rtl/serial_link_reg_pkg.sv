@@ -322,25 +322,4 @@ package serial_link_reg_pkg;
     typedef struct {
         serial_link_base__out_t serial_link;
     } serial_link_reg__out_t;
-
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET = 11'h0;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__ISOLATED__OFFSET = 11'h4;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_DIV__OFFSET = 11'h8;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_START__OFFSET = 11'ha0;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_END__OFFSET = 11'h138;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_EN__OFFSET = 11'h1d0;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_CH_SEL__OFFSET = 11'h1d4;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET = 11'h1d8;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA__OFFSET = 11'h270;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_CH_MASK__OFFSET = 11'h274;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO__OFFSET = 11'h30c;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO_CTRL__OFFSET = 11'h310;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_EN__OFFSET = 11'h314;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__FLOW_CONTROL_FIFO_CLEAR__OFFSET = 11'h318;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CFG__OFFSET = 11'h31c;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CH_EN__OFFSET = 11'h320;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CTRL__OFFSET = 11'h3b8;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CFG__OFFSET = 11'h3bc;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CTRL__OFFSET = 11'h3c0;
-    localparam bit [10:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CH_EN__OFFSET = 11'h3c4;
 endpackage

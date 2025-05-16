@@ -144,46 +144,46 @@ module serial_link_reg (
     always_comb begin
         automatic logic is_external;
         is_external = '0;
-        decoded_reg_strb.serial_link.CTRL = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET);
-        decoded_reg_strb.serial_link.ISOLATED = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__ISOLATED__OFFSET);
-        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__ISOLATED__OFFSET) & !cpuif_req_is_wr;
+        decoded_reg_strb.serial_link.CTRL = cpuif_req_masked & (cpuif_addr == 11'h0);
+        decoded_reg_strb.serial_link.ISOLATED = cpuif_req_masked & (cpuif_addr == 11'h4);
+        is_external |= cpuif_req_masked & (cpuif_addr == 11'h4) & !cpuif_req_is_wr;
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.TX_PHY_CLK_DIV[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_DIV__OFFSET + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.TX_PHY_CLK_DIV[i0] = cpuif_req_masked & (cpuif_addr == 11'h8 + (11)'(i0) * 11'h4);
         end
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.TX_PHY_CLK_START[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_START__OFFSET + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.TX_PHY_CLK_START[i0] = cpuif_req_masked & (cpuif_addr == 11'ha0 + (11)'(i0) * 11'h4);
         end
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.TX_PHY_CLK_END[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_END__OFFSET + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.TX_PHY_CLK_END[i0] = cpuif_req_masked & (cpuif_addr == 11'h138 + (11)'(i0) * 11'h4);
         end
-        decoded_reg_strb.serial_link.RAW_MODE_EN = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_EN__OFFSET);
-        decoded_reg_strb.serial_link.RAW_MODE_IN_CH_SEL = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_CH_SEL__OFFSET);
+        decoded_reg_strb.serial_link.RAW_MODE_EN = cpuif_req_masked & (cpuif_addr == 11'h1d0);
+        decoded_reg_strb.serial_link.RAW_MODE_IN_CH_SEL = cpuif_req_masked & (cpuif_addr == 11'h1d4);
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.RAW_MODE_IN_DATA_VALID[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET + (11)'(i0) * 11'h4);
-            is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET + (11)'(i0) * 11'h4) & !cpuif_req_is_wr;
+            decoded_reg_strb.serial_link.RAW_MODE_IN_DATA_VALID[i0] = cpuif_req_masked & (cpuif_addr == 11'h1d8 + (11)'(i0) * 11'h4);
+            is_external |= cpuif_req_masked & (cpuif_addr == 11'h1d8 + (11)'(i0) * 11'h4) & !cpuif_req_is_wr;
         end
-        decoded_reg_strb.serial_link.RAW_MODE_IN_DATA = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA__OFFSET);
-        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA__OFFSET) & !cpuif_req_is_wr;
+        decoded_reg_strb.serial_link.RAW_MODE_IN_DATA = cpuif_req_masked & (cpuif_addr == 11'h270);
+        is_external |= cpuif_req_masked & (cpuif_addr == 11'h270) & !cpuif_req_is_wr;
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.RAW_MODE_OUT_CH_MASK[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_CH_MASK__OFFSET + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.RAW_MODE_OUT_CH_MASK[i0] = cpuif_req_masked & (cpuif_addr == 11'h274 + (11)'(i0) * 11'h4);
         end
-        decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO__OFFSET);
-        decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO_CTRL__OFFSET);
-        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO_CTRL__OFFSET);
-        decoded_reg_strb.serial_link.RAW_MODE_OUT_EN = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_EN__OFFSET);
-        decoded_reg_strb.serial_link.FLOW_CONTROL_FIFO_CLEAR = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__FLOW_CONTROL_FIFO_CLEAR__OFFSET);
-        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__FLOW_CONTROL_FIFO_CLEAR__OFFSET) & cpuif_req_is_wr;
-        decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CFG = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CFG__OFFSET);
+        decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO = cpuif_req_masked & (cpuif_addr == 11'h30c);
+        decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL = cpuif_req_masked & (cpuif_addr == 11'h310);
+        is_external |= cpuif_req_masked & (cpuif_addr == 11'h310);
+        decoded_reg_strb.serial_link.RAW_MODE_OUT_EN = cpuif_req_masked & (cpuif_addr == 11'h314);
+        decoded_reg_strb.serial_link.FLOW_CONTROL_FIFO_CLEAR = cpuif_req_masked & (cpuif_addr == 11'h318);
+        is_external |= cpuif_req_masked & (cpuif_addr == 11'h318) & cpuif_req_is_wr;
+        decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CFG = cpuif_req_masked & (cpuif_addr == 11'h31c);
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CH_EN__OFFSET + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0] = cpuif_req_masked & (cpuif_addr == 11'h320 + (11)'(i0) * 11'h4);
         end
-        decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CTRL = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CTRL__OFFSET);
-        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CTRL__OFFSET) & cpuif_req_is_wr;
-        decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CFG__OFFSET);
-        decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CTRL = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CTRL__OFFSET);
-        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CTRL__OFFSET) & cpuif_req_is_wr;
+        decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CTRL = cpuif_req_masked & (cpuif_addr == 11'h3b8);
+        is_external |= cpuif_req_masked & (cpuif_addr == 11'h3b8) & cpuif_req_is_wr;
+        decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG = cpuif_req_masked & (cpuif_addr == 11'h3bc);
+        decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CTRL = cpuif_req_masked & (cpuif_addr == 11'h3c0);
+        is_external |= cpuif_req_masked & (cpuif_addr == 11'h3c0) & cpuif_req_is_wr;
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CH_EN[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CH_EN__OFFSET + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CH_EN[i0] = cpuif_req_masked & (cpuif_addr == 11'h3c4 + (11)'(i0) * 11'h4);
         end
         decoded_strb_is_external = is_external;
         external_req = is_external;
