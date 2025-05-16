@@ -38,11 +38,20 @@ clean_bender:
 
 .PHONY: update-regs
 
+SLINK_NUM_CHANNELS ?= 38
+SLINK_LOG2_NUM_CHANNELS ?= 6
+SLINK_NUM_BITS ?= 16
+SLINK_LOG2_MAX_CLK_DIV ?= 10
+SLINK_LOG2_RAW_MODE_TX_FIFO_DEPTH ?= 3
+
+PEAKRDL_MC_PARAMETER_FLAGS := -P NumChannels=$(SLINK_NUM_CHANNELS) -P Log2NumChannels=$(SLINK_LOG2_NUM_CHANNELS)
+PEAKRDL_PARAMETER_FLAGS := -P NumBits=$(SLINK_NUM_BITS) -P Log2MaxClkDiv=$(SLINK_LOG2_MAX_CLK_DIV) -P Log2RawModeTXFifoDepth=$(SLINK_LOG2_RAW_MODE_TX_FIFO_DEPTH)
+
 update-regs: src/regs/rdl/*.rdl
-	$(PEAKRDL) regblock src/regs/rdl/serial_link.rdl -I src/regs/rdl -o src/regs/rtl/. --default-reset arst_n --cpuif apb4-flat
-	$(PEAKRDL) regblock src/regs/rdl/serial_link_single_channel.rdl -I src/regs/rdl -o src/regs/rtl/. --default-reset arst_n --cpuif apb4-flat
-	$(PEAKRDL) raw-header src/regs/rdl/serial_link.rdl -o src/regs/rtl/serial_link_addrmap.svh --format svh -I src/regs/rtl
-	$(PEAKRDL) raw-header src/regs/rdl/serial_link_single_channel.rdl -o src/regs/rtl/serial_link_single_channel_addrmap.svh --format svh -I src/regs/rtl
+	$(PEAKRDL) regblock src/regs/rdl/serial_link.rdl -I src/regs/rdl -o src/regs/rtl/. --default-reset arst_n --cpuif apb4-flat $(PEAKRDL_MC_PARAMETER_FLAGS) $(PEAKRDL_PARAMETER_FLAGS)
+	$(PEAKRDL) regblock src/regs/rdl/serial_link_single_channel.rdl -I src/regs/rdl -o src/regs/rtl/. --default-reset arst_n --cpuif apb4-flat $(PEAKRDL_PARAMETER_FLAGS)
+	$(PEAKRDL) raw-header src/regs/rdl/serial_link.rdl -o src/regs/rtl/serial_link_addrmap.svh --format svh -I src/regs/rtl $(PEAKRDL_MC_PARAMETER_FLAGS) $(PEAKRDL_PARAMETER_FLAGS)
+	$(PEAKRDL) raw-header src/regs/rdl/serial_link_single_channel.rdl -o src/regs/rtl/serial_link_single_channel_addrmap.svh --format svh -I src/regs/rtl $(PEAKRDL_PARAMETER_FLAGS)
 	@sed -i '1i// Copyright 2025 ETH Zurich and University of Bologna.\n// Solderpad Hardware License, Version 0.51, see LICENSE for details.\n// SPDX-License-Identifier: SHL-0.51\n' src/regs/rtl/*.sv
 
 
