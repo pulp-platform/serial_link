@@ -392,7 +392,8 @@ module serial_link #(
       .s_apb_penable (apb_req.penable),
       .s_apb_pwrite  (apb_req.pwrite),
       .s_apb_pprot   (apb_req.pprot),
-      .s_apb_paddr   (apb_req.paddr[serial_link_single_channel_reg_pkg::SERIAL_LINK_SINGLE_CHANNEL_REG_MIN_ADDR_WIDTH-1:0]),
+      .s_apb_paddr   (apb_req.paddr[
+        serial_link_single_channel_reg_pkg::SERIAL_LINK_SINGLE_CHANNEL_REG_MIN_ADDR_WIDTH-1:0]),
       .s_apb_pwdata  (apb_req.pwdata),
       .s_apb_pstrb   (apb_req.pstrb),
       .s_apb_pready  (apb_rsp.pready),
