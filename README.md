@@ -39,7 +39,7 @@ For simple use cases with lower low bandwidth requirements (e.g. binary preloadi
 For use cases that require a higher bandwidth (e.g. Die2Die communication), a multi-channel configuration is recommended. In multi-channel configurations, each channel has its own source-synchronous forwarded clock and the channels are synchronized on the receiver side again. Further, a channel allocator handles faulty channels by redistributing the packets to functional channels. The detection of faulty channels can be done entirely in SW with a special _Raw Mode_ that decouples the link from the AXI interface and allows full controllability and observability of independent channels.
 
 ### Configuration Registers
-Single-channel and Multi-channels currently use different configuration register files because the multi-channel configuration requires additional registers for the channel allocator etc. The registers are generated with the [reggen](https://opentitan.org/book/util/reggen/index.html). The config files for single-channel (`serial_link_single_channel.hjson`) and multi-channel (`serial_link.hjson`) can be found in the `src/regs` folder and can be regenerated with the following command:
+Single-channel and Multi-channels currently use different configuration register files because the multi-channel configuration requires additional registers for the channel allocator etc. The registers are generated with [peakrdl](https://peakrdl-regblock.readthedocs.io/en/latest/). The SystemRDL config files for single-channel (`serial_link_single_channel.rdl`) and multi-channel (`serial_link.rdl`) can be found in the `src/regs/rdl` folder and can be regenerated with the following command:
 
 ```
 make update-regs
