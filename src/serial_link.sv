@@ -9,7 +9,6 @@
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
 `include "axis/typedef.svh"
-`include "apb/typedef.svh"
 
 /// A simple serial link to go off-chip
 module serial_link #(
@@ -34,8 +33,11 @@ module serial_link #(
   parameter type r_chan_t   = logic,
   parameter type w_chan_t   = logic,
   parameter type b_chan_t   = logic,
-  parameter type cfg_req_t  = logic,
-  parameter type cfg_rsp_t  = logic,
+  parameter type apb_req_t  = logic,
+  parameter type apb_rsp_t  = logic,
+  parameter type apb_addr_t = logic[31:0],
+  parameter type apb_data_t = logic[31:0],
+  parameter type apb_strb_t = logic[3:0],
   parameter type hw2reg_t   = logic,
   parameter type reg2hw_t   = logic
 ) (
@@ -56,8 +58,8 @@ module serial_link #(
   output axi_rsp_t                  axi_in_rsp_o,
   output axi_req_t                  axi_out_req_o,
   input  axi_rsp_t                  axi_out_rsp_i,
-  input  cfg_req_t                  cfg_req_i,
-  output cfg_rsp_t                  cfg_rsp_o,
+  input  apb_req_t                  apb_req_i,
+  output apb_rsp_t                  apb_rsp_o,
   input  logic [NumChannels-1:0]    ddr_rcv_clk_i,
   output logic [NumChannels-1:0]    ddr_rcv_clk_o,
   input  logic [NumChannels-1:0][NumLanes-1:0] ddr_i,
@@ -117,8 +119,8 @@ module serial_link #(
   typedef logic tready_t;
   `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, tuser_t, tready_t)
 
-  cfg_req_t cfg_req;
-  cfg_rsp_t cfg_rsp;
+  apb_req_t apb_req;
+  apb_rsp_t apb_rsp;
 
   axis_req_t  axis_out_req, axis_in_req;
   axis_rsp_t  axis_out_rsp, axis_in_rsp;
@@ -358,42 +360,28 @@ module serial_link #(
   /////////////////////////////////
 
   if (!NoRegCdc) begin : gen_reg_cdc
-    reg_cdc #(
-      .req_t  ( cfg_req_t ),
-      .rsp_t  ( cfg_rsp_t )
+    apb_cdc #(
+      .LogDepth ( 1          ),
+      .req_t    ( apb_req_t  ),
+      .resp_t   ( apb_rsp_t  ),
+      .addr_t   ( apb_addr_t ),
+      .data_t   ( apb_data_t ),
+      .strb_t   ( apb_strb_t )
     ) i_cdc_cfg (
-      .src_clk_i  ( clk_reg_i   ),
-      .src_rst_ni ( rst_reg_ni  ),
-      .src_req_i  ( cfg_req_i   ),
-      .src_rsp_o  ( cfg_rsp_o   ),
+      .src_pclk_i    ( clk_reg_i   ),
+      .src_preset_ni ( rst_reg_ni  ),
+      .src_req_i     ( apb_req_i   ),
+      .src_resp_o    ( apb_rsp_o   ),
 
-      .dst_clk_i  ( clk_i       ),
-      .dst_rst_ni ( rst_ni      ),
-      .dst_req_o  ( cfg_req     ),
-      .dst_rsp_i  ( cfg_rsp     )
+      .dst_pclk_i    ( clk_i       ),
+      .dst_preset_ni ( rst_ni      ),
+      .dst_req_o     ( apb_req     ),
+      .dst_resp_i    ( apb_rsp     )
     );
   end else begin : gen_no_reg_cdc
-    assign cfg_req = cfg_req_i;
-    assign cfg_rsp_o = cfg_rsp;
+    assign apb_req = apb_req_i;
+    assign apb_rsp_o = apb_rsp;
   end
-
-  `APB_TYPEDEF_ALL(apb, logic[31:0], logic[31:0], logic[3:0])
-  apb_req_t apb_req;
-  apb_resp_t apb_rsp;
-
-  reg_to_apb #(
-    .reg_req_t (cfg_req_t),
-    .reg_rsp_t (cfg_rsp_t),
-    .apb_req_t (apb_req_t),
-    .apb_rsp_t (apb_resp_t)
-  ) i_reg_to_apb (
-    .clk_i      ( clk_i       ),
-    .rst_ni     ( rst_ni      ),
-    .reg_req_i  ( cfg_req     ),
-    .reg_rsp_o  ( cfg_rsp     ),
-    .apb_req_o  ( apb_req     ),
-    .apb_rsp_i  ( apb_rsp     )
-  );
 
   if (NumChannels == 1) begin : gen_single_channel_cfg_regs
     serial_link_single_channel_reg i_serial_link_reg (
@@ -404,7 +392,7 @@ module serial_link #(
       .s_apb_penable (apb_req.penable),
       .s_apb_pwrite  (apb_req.pwrite),
       .s_apb_pprot   (apb_req.pprot),
-      .s_apb_paddr   (apb_req.paddr),
+      .s_apb_paddr   (apb_req.paddr[serial_link_single_channel_reg_pkg::SERIAL_LINK_SINGLE_CHANNEL_REG_MIN_ADDR_WIDTH-1:0]),
       .s_apb_pwdata  (apb_req.pwdata),
       .s_apb_pstrb   (apb_req.pstrb),
       .s_apb_pready  (apb_rsp.pready),
@@ -423,7 +411,7 @@ module serial_link #(
       .s_apb_penable (apb_req.penable),
       .s_apb_pwrite  (apb_req.pwrite),
       .s_apb_pprot   (apb_req.pprot),
-      .s_apb_paddr   (apb_req.paddr),
+      .s_apb_paddr   (apb_req.paddr[serial_link_reg_pkg::SERIAL_LINK_REG_MIN_ADDR_WIDTH-1:0]),
       .s_apb_pwdata  (apb_req.pwdata),
       .s_apb_pstrb   (apb_req.pstrb),
       .s_apb_pready  (apb_rsp.pready),
