@@ -52,7 +52,7 @@ update-regs: src/regs/rdl/*.rdl
 	$(PEAKRDL) regblock src/regs/rdl/serial_link_single_channel.rdl -I src/regs/rdl -o src/regs/rtl/. --default-reset arst_n --cpuif apb4-flat $(PEAKRDL_PARAMETER_FLAGS)
 	$(PEAKRDL) raw-header src/regs/rdl/serial_link.rdl -o src/regs/rtl/serial_link_addrmap.svh --format svh -I src/regs/rtl $(PEAKRDL_MC_PARAMETER_FLAGS) $(PEAKRDL_PARAMETER_FLAGS)
 	$(PEAKRDL) raw-header src/regs/rdl/serial_link_single_channel.rdl -o src/regs/rtl/serial_link_single_channel_addrmap.svh --format svh -I src/regs/rtl $(PEAKRDL_PARAMETER_FLAGS)
-	@sed -i '1i// Copyright 2025 ETH Zurich and University of Bologna.\n// Solderpad Hardware License, Version 0.51, see LICENSE for details.\n// SPDX-License-Identifier: SHL-0.51\n' src/regs/rtl/*.sv
+	@sed -i '1i// Copyright 2025 ETH Zurich and University of Bologna.\n// Solderpad Hardware License, Version 0.51, see LICENSE for details.\n// SPDX-License-Identifier: SHL-0.51\n' src/regs/rtl/*.sv*
 
 
 # --------------
