@@ -8,7 +8,8 @@
 module tb_axi_serial_link #(
   parameter int unsigned NumChannels = 1,
   parameter int unsigned NumLanes = 8,
-  parameter bit EnDdr = 1'b1
+  parameter bit EnDdr = 1'b1,
+  parameter bit UseDelayLine = 1'b0
 );
 
   `include "axi/assign.svh"
@@ -118,7 +119,8 @@ module tb_axi_serial_link #(
     .NumChannels      ( NumChannels     ),
     .NumLanes         ( NumLanes        ),
     .MaxClkDiv        ( MaxClkDiv       ),
-    .EnDdr            ( EnDdr           )
+    .EnDdr            ( EnDdr           ),
+    .UseDelayLine     ( UseDelayLine    )
   ) i_serial_link_1 (
       .clk_i          ( clk_1           ),
       .rst_ni         ( rst_1_n         ),
@@ -151,7 +153,8 @@ module tb_axi_serial_link #(
     .NumChannels      ( NumChannels     ),
     .NumLanes         ( NumLanes        ),
     .MaxClkDiv        ( MaxClkDiv       ),
-    .EnDdr            ( EnDdr           )
+    .EnDdr            ( EnDdr           ),
+    .UseDelayLine     ( UseDelayLine    )
   ) i_serial_link_2 (
       .clk_i          ( clk_2           ),
       .rst_ni         ( rst_2_n         ),

@@ -44,6 +44,8 @@ update-regs: src/regs/*.hjson
 	echo $(REGGEN)
 	$(REGGEN) src/regs/serial_link.hjson -r -t src/regs
 	$(REGGEN) src/regs/serial_link_single_channel.hjson -r -t src/regs
+	$(REGGEN) src/regs/serial_link_delay_line.hjson -r -t src/regs
+	$(REGGEN) src/regs/serial_link_single_channel_delay_line.hjson -r -t src/regs
 
 # --------------
 # QuestaSim
@@ -51,7 +53,7 @@ update-regs: src/regs/*.hjson
 
 TB_DUT ?= tb_axi_serial_link
 
-BENDER_FLAGS := -t test -t simulation
+BENDER_FLAGS := -t slink_test -t simulation
 
 VLOG_FLAGS += -suppress vlog-2583
 VLOG_FLAGS += -suppress vlog-13314
