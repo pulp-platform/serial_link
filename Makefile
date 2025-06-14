@@ -51,7 +51,7 @@ update-regs: src/regs/*.hjson
 
 TB_DUT ?= tb_axi_serial_link
 
-BENDER_FLAGS := -t test -t simulation
+BENDER_FLAGS := -t slink_test -t simulation
 
 VLOG_FLAGS += -suppress vlog-2583
 VLOG_FLAGS += -suppress vlog-13314

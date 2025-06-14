@@ -58,18 +58,18 @@ sources:
       files:
       - src/serial_link_synth_wrapper.sv
 
-    - target: any(simulation, test)
+    - target: slink_test
       files:
       - test/axi_channel_compare.sv
-
-    - target: test
-      files:
-      - models/configurable_delay.behav.sv
       - test/tb_axi_serial_link.sv
       - test/tb_ch_calib_serial_link.sv
       - test/tb_stream_chopper.sv
       - test/tb_stream_chopper_dechopper.sv
       - test/tb_channel_allocator.sv
+
+    - target: any(test, simulation)
+      files:
+      - models/configurable_delay.behav.sv
 
     - target: fpga
       files:
