@@ -62,7 +62,8 @@ module tb_ch_calib_serial_link #(
 
   `APB_TYPEDEF_ALL(apb, cfg_addr_t, cfg_data_t, cfg_strb_t)
 
-  typedef logic [NumLanes*(1+EnDdr)-1:0]  phy_data_t;
+  localparam int unsigned NumBits = NumLanes*(1+EnDdr);
+  typedef logic [NumBits-1:0]  phy_data_t;
 
   // Model signals
   axi_req_t   axi_out_req_1, axi_out_req_2;
@@ -500,13 +501,14 @@ module tb_ch_calib_serial_link #(
     // Enable Raw Mode
     cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_EN_REG_OFFSET, 1);
     // Set mask for sending out pattern
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_OUT_CH_MASK_0_REG_OFFSET, '1);
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_OUT_CH_MASK_1_REG_OFFSET, '1);
+    for (int i = 0; i < NumChannels; i++) begin
+      cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_OUT_CH_MASK_0_REG_OFFSET + i * 4, 1);
+    end
+    for (int i = 0; i < NumChannels; i++) begin
     // Enable same channels in TX side of channel allocator
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_0_REG_OFFSET, '1);
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_0_REG_OFFSET, '1);
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_1_REG_OFFSET, '1);
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_1_REG_OFFSET, '1);
+      cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_0_REG_OFFSET + i * 4, 1);
+      cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_0_REG_OFFSET + i * 4, 1);
+    end
     $info("[DDR%0d]: Sending calibration sequence", id);
     // Clear the TX Fifo
     cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_CTRL_REG_OFFSET, 32'h1);
@@ -521,8 +523,10 @@ module tb_ch_calib_serial_link #(
     cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_OUT_EN_REG_OFFSET, 1);
     // Wait until some channels have received data
     do begin
-      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET, raw_mode_data_in_valid[31:0]);
-      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_1_REG_OFFSET, raw_mode_data_in_valid[63:32]);
+      for (int i = 0; i < NumChannels; i++) begin
+        cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET, data);
+        raw_mode_data_in_valid[i] = data[0];
+      end
     end while(raw_mode_data_in_valid[NumChannels-1:0] == 0);
     // Iterate through every channel
     for (int c = 0; c < NumChannels; c++) begin
@@ -531,9 +535,8 @@ module tb_ch_calib_serial_link #(
       // Check read patterns
       foreach(pattern_q[i]) begin
         // Check first that there is valid data in the RX FIFO
-      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET, raw_mode_data_in_valid[31:0]);
-      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_1_REG_OFFSET, raw_mode_data_in_valid[63:32]);
-      if (raw_mode_data_in_valid[c] == 1'b0) begin
+      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET + i * 4, data);
+      if (data == 1'b0) begin
           $info("[DDR%0d][CH%0d] No data in RX FIFO", id, c);
           working_rx_channels[c] = 1'b0;
           break;
@@ -556,8 +559,10 @@ module tb_ch_calib_serial_link #(
     $info("[DDR%0d] RX channel mask %32b", id, working_rx_channels);
     // Check that there is no more valid data in the RX FIFOs
     // of all working channels
-    cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET, raw_mode_data_in_valid[31:0]);
-    cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_1_REG_OFFSET, raw_mode_data_in_valid[63:32]);
+    for (int i = 0; i < NumChannels; i++) begin
+      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET, read);
+      raw_mode_data_in_valid[i] = read[0];
+    end
     assert ((raw_mode_data_in_valid[NumChannels-1:0] & working_rx_channels) == '0) else begin
       $error("[DDR%0d] Still data in RX FIFO %32b", id, data & working_rx_channels);
     end
@@ -567,12 +572,16 @@ module tb_ch_calib_serial_link #(
     // Load the channel mask of working channels into TX FIFO
     // They should be immediately sent as TX FIFO is still enabled
     $info("[DDR%0d] Sending out RX channel mask.", id);
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_REG_OFFSET, working_rx_channels[15:0]);
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_REG_OFFSET, working_rx_channels[31:16]);
+    for (int i = 0; i < $ceil(NumChannels/NumBits); i++) begin
+      // Write the channel mask into the TX FIFO
+      cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_REG_OFFSET, working_rx_channels[NumBits*i+:NumBits]);
+    end
     // Wait until the channel mask from the other side has arrived
     do begin
-      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET, raw_mode_data_in_valid[31:0]);
-      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_1_REG_OFFSET, raw_mode_data_in_valid[63:32]);
+      for (int i = 0; i < NumChannels; i++) begin
+        cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET + i * 4, read);
+        raw_mode_data_in_valid[i] = read[0];
+      end
     end while(raw_mode_data_in_valid[NumChannels-1:0] == 0);
     // Only check RX channels that are working
     for (int c = 0; c < NumChannels; c++) begin
@@ -580,18 +589,19 @@ module tb_ch_calib_serial_link #(
         // Select channel to read from
         cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_CH_SEL_REG_OFFSET, c);
         // Read the mask
-        cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_REG_OFFSET, working_tx_channels[15:0]);
-        cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_REG_OFFSET, working_tx_channels[31:16]);
+        for (int i = 0; i < NumChannels/NumBits; i++) begin
+          cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_REG_OFFSET, working_tx_channels[NumBits*i+:NumBits]);
+        end
       end
     end
     $info("[DDR%0d] TX channel mask %32b", id, working_tx_channels);
     // Disable TX Fifo
     cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_OUT_EN_REG_OFFSET, 0);
     // Enable RX/TX channels
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_0_REG_OFFSET, working_tx_channels);
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_0_REG_OFFSET, working_rx_channels);
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_1_REG_OFFSET, working_tx_channels);
-    cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_1_REG_OFFSET, working_rx_channels);
+    for (int i = 0; i < NumChannels; i++) begin
+      cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_TX_CH_EN_0_REG_OFFSET + 4 * i, working_tx_channels[i]);
+      cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_CHANNEL_ALLOC_RX_CH_EN_0_REG_OFFSET + 4 * i, working_rx_channels[i]);
+    end
     // Configure channel allocator
     // Set auto-flush count value == 2
     if ($countones(working_tx_channels) == NumChannels) begin
