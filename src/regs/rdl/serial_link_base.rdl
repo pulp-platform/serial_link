@@ -247,26 +247,26 @@ regfile serial_link_base #(
     };
 
 
-             CTRL                        CTRL;
-    external ISOLATED                    ISOLATED;
-             TX_PHY_CLK_DIV              TX_PHY_CLK_DIV[NumChannels];
-             TX_PHY_CLK_START            TX_PHY_CLK_START[NumChannels];
-             TX_PHY_CLK_END              TX_PHY_CLK_END[NumChannels];
-             RAW_MODE_EN                 RAW_MODE_EN;
-             RAW_MODE_IN_CH_SEL          RAW_MODE_IN_CH_SEL;
-    external RAW_MODE_IN_DATA_VALID      RAW_MODE_IN_DATA_VALID[NumChannels];
-    external RAW_MODE_IN_DATA            RAW_MODE_IN_DATA;
-             RAW_MODE_OUT_CH_MASK        RAW_MODE_OUT_CH_MASK[NumChannels];
-             RAW_MODE_OUT_DATA_FIFO      RAW_MODE_OUT_DATA_FIFO;
-    external RAW_MODE_OUT_DATA_FIFO_CTRL RAW_MODE_OUT_DATA_FIFO_CTRL;
-             RAW_MODE_OUT_EN             RAW_MODE_OUT_EN;
-    external FLOW_CONTROL_FIFO_CLEAR     FLOW_CONTROL_FIFO_CLEAR;
-             CHANNEL_ALLOC_TX_CFG        CHANNEL_ALLOC_TX_CFG;
-             CHANNEL_ALLOC_TX_CH_EN      CHANNEL_ALLOC_TX_CH_EN[NumChannels];
-    external CHANNEL_ALLOC_TX_CTRL       CHANNEL_ALLOC_TX_CTRL;
-             CHANNEL_ALLOC_RX_CFG        CHANNEL_ALLOC_RX_CFG;
-    external CHANNEL_ALLOC_RX_CTRL       CHANNEL_ALLOC_RX_CTRL;
-             CHANNEL_ALLOC_RX_CH_EN      CHANNEL_ALLOC_RX_CH_EN[NumChannels];
+             CTRL                        CTRL @0x0;
+    external ISOLATED                    ISOLATED @0x4;
+             RAW_MODE_EN                 RAW_MODE_EN @0x8;
+    external RAW_MODE_IN_DATA            RAW_MODE_IN_DATA @0x0c;
+             RAW_MODE_IN_CH_SEL          RAW_MODE_IN_CH_SEL @0x10;
+             RAW_MODE_OUT_DATA_FIFO      RAW_MODE_OUT_DATA_FIFO @0x14;
+    external RAW_MODE_OUT_DATA_FIFO_CTRL RAW_MODE_OUT_DATA_FIFO_CTRL @0x18;
+             RAW_MODE_OUT_EN             RAW_MODE_OUT_EN @0x1c;
+    external FLOW_CONTROL_FIFO_CLEAR     FLOW_CONTROL_FIFO_CLEAR @0x20;
+    external RAW_MODE_IN_DATA_VALID      RAW_MODE_IN_DATA_VALID[NumChannels] @0x100;
+             RAW_MODE_OUT_CH_MASK        RAW_MODE_OUT_CH_MASK[NumChannels] @0x200;
+             TX_PHY_CLK_DIV              TX_PHY_CLK_DIV[NumChannels] @0x300;
+             TX_PHY_CLK_START            TX_PHY_CLK_START[NumChannels] @0x400;
+             TX_PHY_CLK_END              TX_PHY_CLK_END[NumChannels] @0x500;
+             CHANNEL_ALLOC_TX_CFG        CHANNEL_ALLOC_TX_CFG @0x600;
+    external CHANNEL_ALLOC_TX_CTRL       CHANNEL_ALLOC_TX_CTRL @0x604;
+             CHANNEL_ALLOC_RX_CFG        CHANNEL_ALLOC_RX_CFG @0x608;
+    external CHANNEL_ALLOC_RX_CTRL       CHANNEL_ALLOC_RX_CTRL @0x60c;
+             CHANNEL_ALLOC_TX_CH_EN      CHANNEL_ALLOC_TX_CH_EN[NumChannels] @0x700;
+             CHANNEL_ALLOC_RX_CH_EN      CHANNEL_ALLOC_RX_CH_EN[NumChannels] @0x800;
 };
 
 `endif // SERIAL_LINK_BASE_RDL

@@ -13,7 +13,7 @@ module serial_link_reg (
         input wire s_apb_penable,
         input wire s_apb_pwrite,
         input wire [2:0] s_apb_pprot,
-        input wire [10:0] s_apb_paddr,
+        input wire [11:0] s_apb_paddr,
         input wire [31:0] s_apb_pwdata,
         input wire [3:0] s_apb_pstrb,
         output logic s_apb_pready,
@@ -29,7 +29,7 @@ module serial_link_reg (
     //--------------------------------------------------------------------------
     logic cpuif_req;
     logic cpuif_req_is_wr;
-    logic [10:0] cpuif_addr;
+    logic [11:0] cpuif_addr;
     logic [31:0] cpuif_wr_data;
     logic [31:0] cpuif_wr_biten;
     logic cpuif_req_stall_wr;
@@ -58,7 +58,7 @@ module serial_link_reg (
                     is_active <= '1;
                     cpuif_req <= '1;
                     cpuif_req_is_wr <= s_apb_pwrite;
-                    cpuif_addr <= {s_apb_paddr[10:2], 2'b0};
+                    cpuif_addr <= {s_apb_paddr[11:2], 2'b0};
                     cpuif_wr_data <= s_apb_pwdata;
                     for(int i=0; i<4; i++) begin
                         cpuif_wr_biten[i*8 +: 8] <= {8{s_apb_pstrb[i]}};
@@ -113,23 +113,23 @@ module serial_link_reg (
         struct {
             logic CTRL;
             logic ISOLATED;
-            logic TX_PHY_CLK_DIV[38];
-            logic TX_PHY_CLK_START[38];
-            logic TX_PHY_CLK_END[38];
             logic RAW_MODE_EN;
-            logic RAW_MODE_IN_CH_SEL;
-            logic RAW_MODE_IN_DATA_VALID[38];
             logic RAW_MODE_IN_DATA;
-            logic RAW_MODE_OUT_CH_MASK[38];
+            logic RAW_MODE_IN_CH_SEL;
             logic RAW_MODE_OUT_DATA_FIFO;
             logic RAW_MODE_OUT_DATA_FIFO_CTRL;
             logic RAW_MODE_OUT_EN;
             logic FLOW_CONTROL_FIFO_CLEAR;
+            logic RAW_MODE_IN_DATA_VALID[38];
+            logic RAW_MODE_OUT_CH_MASK[38];
+            logic TX_PHY_CLK_DIV[38];
+            logic TX_PHY_CLK_START[38];
+            logic TX_PHY_CLK_END[38];
             logic CHANNEL_ALLOC_TX_CFG;
-            logic CHANNEL_ALLOC_TX_CH_EN[38];
             logic CHANNEL_ALLOC_TX_CTRL;
             logic CHANNEL_ALLOC_RX_CFG;
             logic CHANNEL_ALLOC_RX_CTRL;
+            logic CHANNEL_ALLOC_TX_CH_EN[38];
             logic CHANNEL_ALLOC_RX_CH_EN[38];
         } serial_link;
     } decoded_reg_strb_t;
@@ -144,46 +144,46 @@ module serial_link_reg (
     always_comb begin
         automatic logic is_external;
         is_external = '0;
-        decoded_reg_strb.serial_link.CTRL = cpuif_req_masked & (cpuif_addr == 11'h0);
-        decoded_reg_strb.serial_link.ISOLATED = cpuif_req_masked & (cpuif_addr == 11'h4);
-        is_external |= cpuif_req_masked & (cpuif_addr == 11'h4) & !cpuif_req_is_wr;
+        decoded_reg_strb.serial_link.CTRL = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET);
+        decoded_reg_strb.serial_link.ISOLATED = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__ISOLATED__OFFSET);
+        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__ISOLATED__OFFSET) & !cpuif_req_is_wr;
+        decoded_reg_strb.serial_link.RAW_MODE_EN = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_EN__OFFSET);
+        decoded_reg_strb.serial_link.RAW_MODE_IN_DATA = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA__OFFSET);
+        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA__OFFSET) & !cpuif_req_is_wr;
+        decoded_reg_strb.serial_link.RAW_MODE_IN_CH_SEL = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_CH_SEL__OFFSET);
+        decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO__OFFSET);
+        decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO_CTRL__OFFSET);
+        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO_CTRL__OFFSET);
+        decoded_reg_strb.serial_link.RAW_MODE_OUT_EN = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_EN__OFFSET);
+        decoded_reg_strb.serial_link.FLOW_CONTROL_FIFO_CLEAR = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__FLOW_CONTROL_FIFO_CLEAR__OFFSET);
+        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__FLOW_CONTROL_FIFO_CLEAR__OFFSET) & cpuif_req_is_wr;
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.TX_PHY_CLK_DIV[i0] = cpuif_req_masked & (cpuif_addr == 11'h8 + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.RAW_MODE_IN_DATA_VALID[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET + (12)'(i0) * 12'h4);
+            is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET + (12)'(i0) * 12'h4) & !cpuif_req_is_wr;
         end
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.TX_PHY_CLK_START[i0] = cpuif_req_masked & (cpuif_addr == 11'ha0 + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.RAW_MODE_OUT_CH_MASK[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_CH_MASK__OFFSET + (12)'(i0) * 12'h4);
         end
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.TX_PHY_CLK_END[i0] = cpuif_req_masked & (cpuif_addr == 11'h138 + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.TX_PHY_CLK_DIV[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_DIV__OFFSET + (12)'(i0) * 12'h4);
         end
-        decoded_reg_strb.serial_link.RAW_MODE_EN = cpuif_req_masked & (cpuif_addr == 11'h1d0);
-        decoded_reg_strb.serial_link.RAW_MODE_IN_CH_SEL = cpuif_req_masked & (cpuif_addr == 11'h1d4);
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.RAW_MODE_IN_DATA_VALID[i0] = cpuif_req_masked & (cpuif_addr == 11'h1d8 + (11)'(i0) * 11'h4);
-            is_external |= cpuif_req_masked & (cpuif_addr == 11'h1d8 + (11)'(i0) * 11'h4) & !cpuif_req_is_wr;
+            decoded_reg_strb.serial_link.TX_PHY_CLK_START[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_START__OFFSET + (12)'(i0) * 12'h4);
         end
-        decoded_reg_strb.serial_link.RAW_MODE_IN_DATA = cpuif_req_masked & (cpuif_addr == 11'h270);
-        is_external |= cpuif_req_masked & (cpuif_addr == 11'h270) & !cpuif_req_is_wr;
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.RAW_MODE_OUT_CH_MASK[i0] = cpuif_req_masked & (cpuif_addr == 11'h274 + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.TX_PHY_CLK_END[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_END__OFFSET + (12)'(i0) * 12'h4);
         end
-        decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO = cpuif_req_masked & (cpuif_addr == 11'h30c);
-        decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL = cpuif_req_masked & (cpuif_addr == 11'h310);
-        is_external |= cpuif_req_masked & (cpuif_addr == 11'h310);
-        decoded_reg_strb.serial_link.RAW_MODE_OUT_EN = cpuif_req_masked & (cpuif_addr == 11'h314);
-        decoded_reg_strb.serial_link.FLOW_CONTROL_FIFO_CLEAR = cpuif_req_masked & (cpuif_addr == 11'h318);
-        is_external |= cpuif_req_masked & (cpuif_addr == 11'h318) & cpuif_req_is_wr;
-        decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CFG = cpuif_req_masked & (cpuif_addr == 11'h31c);
+        decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CFG = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CFG__OFFSET);
+        decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CTRL = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CTRL__OFFSET);
+        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CTRL__OFFSET) & cpuif_req_is_wr;
+        decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CFG__OFFSET);
+        decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CTRL = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CTRL__OFFSET);
+        is_external |= cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CTRL__OFFSET) & cpuif_req_is_wr;
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0] = cpuif_req_masked & (cpuif_addr == 11'h320 + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CH_EN__OFFSET + (12)'(i0) * 12'h4);
         end
-        decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CTRL = cpuif_req_masked & (cpuif_addr == 11'h3b8);
-        is_external |= cpuif_req_masked & (cpuif_addr == 11'h3b8) & cpuif_req_is_wr;
-        decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG = cpuif_req_masked & (cpuif_addr == 11'h3bc);
-        decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CTRL = cpuif_req_masked & (cpuif_addr == 11'h3c0);
-        is_external |= cpuif_req_masked & (cpuif_addr == 11'h3c0) & cpuif_req_is_wr;
         for(int i0=0; i0<38; i0++) begin
-            decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CH_EN[i0] = cpuif_req_masked & (cpuif_addr == 11'h3c4 + (11)'(i0) * 11'h4);
+            decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CH_EN[i0] = cpuif_req_masked & (cpuif_addr == serial_link_reg_pkg::SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CH_EN__OFFSET + (12)'(i0) * 12'h4);
         end
         decoded_strb_is_external = is_external;
         external_req = is_external;
@@ -220,6 +220,36 @@ module serial_link_reg (
             } CTRL;
             struct {
                 struct {
+                    logic next;
+                    logic load_next;
+                } raw_mode_en;
+            } RAW_MODE_EN;
+            struct {
+                struct {
+                    logic [5:0] next;
+                    logic load_next;
+                } raw_mode_in_ch_sel;
+            } RAW_MODE_IN_CH_SEL;
+            struct {
+                struct {
+                    logic [15:0] next;
+                    logic load_next;
+                } raw_mode_out_data_fifo;
+            } RAW_MODE_OUT_DATA_FIFO;
+            struct {
+                struct {
+                    logic next;
+                    logic load_next;
+                } raw_mode_out_en;
+            } RAW_MODE_OUT_EN;
+            struct {
+                struct {
+                    logic next;
+                    logic load_next;
+                } raw_mode_out_ch_mask;
+            } RAW_MODE_OUT_CH_MASK[38];
+            struct {
+                struct {
                     logic [10:0] next;
                     logic load_next;
                 } clk_divs;
@@ -240,36 +270,6 @@ module serial_link_reg (
                 struct {
                     logic next;
                     logic load_next;
-                } raw_mode_en;
-            } RAW_MODE_EN;
-            struct {
-                struct {
-                    logic [5:0] next;
-                    logic load_next;
-                } raw_mode_in_ch_sel;
-            } RAW_MODE_IN_CH_SEL;
-            struct {
-                struct {
-                    logic next;
-                    logic load_next;
-                } raw_mode_out_ch_mask;
-            } RAW_MODE_OUT_CH_MASK[38];
-            struct {
-                struct {
-                    logic [15:0] next;
-                    logic load_next;
-                } raw_mode_out_data_fifo;
-            } RAW_MODE_OUT_DATA_FIFO;
-            struct {
-                struct {
-                    logic next;
-                    logic load_next;
-                } raw_mode_out_en;
-            } RAW_MODE_OUT_EN;
-            struct {
-                struct {
-                    logic next;
-                    logic load_next;
                 } bypass_en;
                 struct {
                     logic next;
@@ -280,12 +280,6 @@ module serial_link_reg (
                     logic load_next;
                 } auto_flush_count;
             } CHANNEL_ALLOC_TX_CFG;
-            struct {
-                struct {
-                    logic next;
-                    logic load_next;
-                } channel_alloc_tx_ch_en;
-            } CHANNEL_ALLOC_TX_CH_EN[38];
             struct {
                 struct {
                     logic next;
@@ -304,6 +298,12 @@ module serial_link_reg (
                     logic load_next;
                 } sync_en;
             } CHANNEL_ALLOC_RX_CFG;
+            struct {
+                struct {
+                    logic next;
+                    logic load_next;
+                } channel_alloc_tx_ch_en;
+            } CHANNEL_ALLOC_TX_CH_EN[38];
             struct {
                 struct {
                     logic next;
@@ -332,6 +332,31 @@ module serial_link_reg (
             } CTRL;
             struct {
                 struct {
+                    logic value;
+                } raw_mode_en;
+            } RAW_MODE_EN;
+            struct {
+                struct {
+                    logic [5:0] value;
+                } raw_mode_in_ch_sel;
+            } RAW_MODE_IN_CH_SEL;
+            struct {
+                struct {
+                    logic [15:0] value;
+                } raw_mode_out_data_fifo;
+            } RAW_MODE_OUT_DATA_FIFO;
+            struct {
+                struct {
+                    logic value;
+                } raw_mode_out_en;
+            } RAW_MODE_OUT_EN;
+            struct {
+                struct {
+                    logic value;
+                } raw_mode_out_ch_mask;
+            } RAW_MODE_OUT_CH_MASK[38];
+            struct {
+                struct {
                     logic [10:0] value;
                 } clk_divs;
             } TX_PHY_CLK_DIV[38];
@@ -348,31 +373,6 @@ module serial_link_reg (
             struct {
                 struct {
                     logic value;
-                } raw_mode_en;
-            } RAW_MODE_EN;
-            struct {
-                struct {
-                    logic [5:0] value;
-                } raw_mode_in_ch_sel;
-            } RAW_MODE_IN_CH_SEL;
-            struct {
-                struct {
-                    logic value;
-                } raw_mode_out_ch_mask;
-            } RAW_MODE_OUT_CH_MASK[38];
-            struct {
-                struct {
-                    logic [15:0] value;
-                } raw_mode_out_data_fifo;
-            } RAW_MODE_OUT_DATA_FIFO;
-            struct {
-                struct {
-                    logic value;
-                } raw_mode_out_en;
-            } RAW_MODE_OUT_EN;
-            struct {
-                struct {
-                    logic value;
                 } bypass_en;
                 struct {
                     logic value;
@@ -381,11 +381,6 @@ module serial_link_reg (
                     logic [7:0] value;
                 } auto_flush_count;
             } CHANNEL_ALLOC_TX_CFG;
-            struct {
-                struct {
-                    logic value;
-                } channel_alloc_tx_ch_en;
-            } CHANNEL_ALLOC_TX_CH_EN[38];
             struct {
                 struct {
                     logic value;
@@ -400,6 +395,11 @@ module serial_link_reg (
                     logic value;
                 } sync_en;
             } CHANNEL_ALLOC_RX_CFG;
+            struct {
+                struct {
+                    logic value;
+                } channel_alloc_tx_ch_en;
+            } CHANNEL_ALLOC_TX_CH_EN[38];
             struct {
                 struct {
                     logic value;
@@ -504,6 +504,142 @@ module serial_link_reg (
 
     assign hwif_out.serial_link.ISOLATED.req = !decoded_req_is_wr ? decoded_reg_strb.serial_link.ISOLATED : '0;
     assign hwif_out.serial_link.ISOLATED.req_is_wr = decoded_req_is_wr;
+    // Field: serial_link_reg.serial_link.RAW_MODE_EN.raw_mode_en
+    always_comb begin
+        automatic logic [0:0] next_c;
+        automatic logic load_next_c;
+        next_c = field_storage.serial_link.RAW_MODE_EN.raw_mode_en.value;
+        load_next_c = '0;
+        if(decoded_reg_strb.serial_link.RAW_MODE_EN && decoded_req_is_wr) begin // SW write
+            next_c = (field_storage.serial_link.RAW_MODE_EN.raw_mode_en.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
+            load_next_c = '1;
+        end
+        field_combo.serial_link.RAW_MODE_EN.raw_mode_en.next = next_c;
+        field_combo.serial_link.RAW_MODE_EN.raw_mode_en.load_next = load_next_c;
+    end
+    always_ff @(posedge clk or negedge arst_n) begin
+        if(~arst_n) begin
+            field_storage.serial_link.RAW_MODE_EN.raw_mode_en.value <= 1'h0;
+        end else begin
+            if(field_combo.serial_link.RAW_MODE_EN.raw_mode_en.load_next) begin
+                field_storage.serial_link.RAW_MODE_EN.raw_mode_en.value <= field_combo.serial_link.RAW_MODE_EN.raw_mode_en.next;
+            end
+        end
+    end
+    assign hwif_out.serial_link.RAW_MODE_EN.raw_mode_en.value = field_storage.serial_link.RAW_MODE_EN.raw_mode_en.value;
+
+    assign hwif_out.serial_link.RAW_MODE_IN_DATA.req = !decoded_req_is_wr ? decoded_reg_strb.serial_link.RAW_MODE_IN_DATA : '0;
+    assign hwif_out.serial_link.RAW_MODE_IN_DATA.req_is_wr = decoded_req_is_wr;
+    // Field: serial_link_reg.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel
+    always_comb begin
+        automatic logic [5:0] next_c;
+        automatic logic load_next_c;
+        next_c = field_storage.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value;
+        load_next_c = '0;
+        if(decoded_reg_strb.serial_link.RAW_MODE_IN_CH_SEL && decoded_req_is_wr) begin // SW write
+            next_c = (field_storage.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value & ~decoded_wr_biten[5:0]) | (decoded_wr_data[5:0] & decoded_wr_biten[5:0]);
+            load_next_c = '1;
+        end
+        field_combo.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.next = next_c;
+        field_combo.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.load_next = load_next_c;
+    end
+    always_ff @(posedge clk or negedge arst_n) begin
+        if(~arst_n) begin
+            field_storage.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value <= 6'h0;
+        end else begin
+            if(field_combo.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.load_next) begin
+                field_storage.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value <= field_combo.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.next;
+            end
+        end
+    end
+    assign hwif_out.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value = field_storage.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value;
+    // Field: serial_link_reg.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo
+    always_comb begin
+        automatic logic [15:0] next_c;
+        automatic logic load_next_c;
+        next_c = field_storage.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value;
+        load_next_c = '0;
+        if(decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO && decoded_req_is_wr) begin // SW write
+            next_c = (field_storage.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value & ~decoded_wr_biten[15:0]) | (decoded_wr_data[15:0] & decoded_wr_biten[15:0]);
+            load_next_c = '1;
+        end
+        field_combo.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.next = next_c;
+        field_combo.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.load_next = load_next_c;
+    end
+    always_ff @(posedge clk or negedge arst_n) begin
+        if(~arst_n) begin
+            field_storage.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value <= 16'h0;
+        end else begin
+            if(field_combo.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.load_next) begin
+                field_storage.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value <= field_combo.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.next;
+            end
+        end
+    end
+    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value = field_storage.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value;
+    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.swmod = decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO && decoded_req_is_wr && |(decoded_wr_biten[15:0]);
+
+    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req = decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL;
+    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req_is_wr = decoded_req_is_wr;
+    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.wr_data = decoded_wr_data;
+    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.wr_biten = decoded_wr_biten;
+    // Field: serial_link_reg.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en
+    always_comb begin
+        automatic logic [0:0] next_c;
+        automatic logic load_next_c;
+        next_c = field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value;
+        load_next_c = '0;
+        if(decoded_reg_strb.serial_link.RAW_MODE_OUT_EN && decoded_req_is_wr) begin // SW write
+            next_c = (field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
+            load_next_c = '1;
+        end
+        field_combo.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.next = next_c;
+        field_combo.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.load_next = load_next_c;
+    end
+    always_ff @(posedge clk or negedge arst_n) begin
+        if(~arst_n) begin
+            field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value <= 1'h0;
+        end else begin
+            if(field_combo.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.load_next) begin
+                field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value <= field_combo.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.next;
+            end
+        end
+    end
+    assign hwif_out.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value = field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value;
+
+    assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.req = decoded_req_is_wr ? decoded_reg_strb.serial_link.FLOW_CONTROL_FIFO_CLEAR : '0;
+    assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.req_is_wr = decoded_req_is_wr;
+    assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.wr_data = decoded_wr_data;
+    assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.wr_biten = decoded_wr_biten;
+    for(genvar i0=0; i0<38; i0++) begin
+
+        assign hwif_out.serial_link.RAW_MODE_IN_DATA_VALID[i0].req = !decoded_req_is_wr ? decoded_reg_strb.serial_link.RAW_MODE_IN_DATA_VALID[i0] : '0;
+        assign hwif_out.serial_link.RAW_MODE_IN_DATA_VALID[i0].req_is_wr = decoded_req_is_wr;
+    end
+    for(genvar i0=0; i0<38; i0++) begin
+        // Field: serial_link_reg.serial_link.RAW_MODE_OUT_CH_MASK[].raw_mode_out_ch_mask
+        always_comb begin
+            automatic logic [0:0] next_c;
+            automatic logic load_next_c;
+            next_c = field_storage.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value;
+            load_next_c = '0;
+            if(decoded_reg_strb.serial_link.RAW_MODE_OUT_CH_MASK[i0] && decoded_req_is_wr) begin // SW write
+                next_c = (field_storage.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
+                load_next_c = '1;
+            end
+            field_combo.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.next = next_c;
+            field_combo.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.load_next = load_next_c;
+        end
+        always_ff @(posedge clk or negedge arst_n) begin
+            if(~arst_n) begin
+                field_storage.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value <= 1'h0;
+            end else begin
+                if(field_combo.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.load_next) begin
+                    field_storage.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value <= field_combo.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.next;
+                end
+            end
+        end
+        assign hwif_out.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value = field_storage.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value;
+    end
     for(genvar i0=0; i0<38; i0++) begin
         // Field: serial_link_reg.serial_link.TX_PHY_CLK_DIV[].clk_divs
         always_comb begin
@@ -579,142 +715,6 @@ module serial_link_reg (
         end
         assign hwif_out.serial_link.TX_PHY_CLK_END[i0].clk_shift_end.value = field_storage.serial_link.TX_PHY_CLK_END[i0].clk_shift_end.value;
     end
-    // Field: serial_link_reg.serial_link.RAW_MODE_EN.raw_mode_en
-    always_comb begin
-        automatic logic [0:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.serial_link.RAW_MODE_EN.raw_mode_en.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.serial_link.RAW_MODE_EN && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.serial_link.RAW_MODE_EN.raw_mode_en.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
-            load_next_c = '1;
-        end
-        field_combo.serial_link.RAW_MODE_EN.raw_mode_en.next = next_c;
-        field_combo.serial_link.RAW_MODE_EN.raw_mode_en.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.serial_link.RAW_MODE_EN.raw_mode_en.value <= 1'h0;
-        end else begin
-            if(field_combo.serial_link.RAW_MODE_EN.raw_mode_en.load_next) begin
-                field_storage.serial_link.RAW_MODE_EN.raw_mode_en.value <= field_combo.serial_link.RAW_MODE_EN.raw_mode_en.next;
-            end
-        end
-    end
-    assign hwif_out.serial_link.RAW_MODE_EN.raw_mode_en.value = field_storage.serial_link.RAW_MODE_EN.raw_mode_en.value;
-    // Field: serial_link_reg.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel
-    always_comb begin
-        automatic logic [5:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.serial_link.RAW_MODE_IN_CH_SEL && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value & ~decoded_wr_biten[5:0]) | (decoded_wr_data[5:0] & decoded_wr_biten[5:0]);
-            load_next_c = '1;
-        end
-        field_combo.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.next = next_c;
-        field_combo.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value <= 6'h0;
-        end else begin
-            if(field_combo.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.load_next) begin
-                field_storage.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value <= field_combo.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.next;
-            end
-        end
-    end
-    assign hwif_out.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value = field_storage.serial_link.RAW_MODE_IN_CH_SEL.raw_mode_in_ch_sel.value;
-    for(genvar i0=0; i0<38; i0++) begin
-
-        assign hwif_out.serial_link.RAW_MODE_IN_DATA_VALID[i0].req = !decoded_req_is_wr ? decoded_reg_strb.serial_link.RAW_MODE_IN_DATA_VALID[i0] : '0;
-        assign hwif_out.serial_link.RAW_MODE_IN_DATA_VALID[i0].req_is_wr = decoded_req_is_wr;
-    end
-
-    assign hwif_out.serial_link.RAW_MODE_IN_DATA.req = !decoded_req_is_wr ? decoded_reg_strb.serial_link.RAW_MODE_IN_DATA : '0;
-    assign hwif_out.serial_link.RAW_MODE_IN_DATA.req_is_wr = decoded_req_is_wr;
-    for(genvar i0=0; i0<38; i0++) begin
-        // Field: serial_link_reg.serial_link.RAW_MODE_OUT_CH_MASK[].raw_mode_out_ch_mask
-        always_comb begin
-            automatic logic [0:0] next_c;
-            automatic logic load_next_c;
-            next_c = field_storage.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value;
-            load_next_c = '0;
-            if(decoded_reg_strb.serial_link.RAW_MODE_OUT_CH_MASK[i0] && decoded_req_is_wr) begin // SW write
-                next_c = (field_storage.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
-                load_next_c = '1;
-            end
-            field_combo.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.next = next_c;
-            field_combo.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.load_next = load_next_c;
-        end
-        always_ff @(posedge clk or negedge arst_n) begin
-            if(~arst_n) begin
-                field_storage.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value <= 1'h0;
-            end else begin
-                if(field_combo.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.load_next) begin
-                    field_storage.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value <= field_combo.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.next;
-                end
-            end
-        end
-        assign hwif_out.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value = field_storage.serial_link.RAW_MODE_OUT_CH_MASK[i0].raw_mode_out_ch_mask.value;
-    end
-    // Field: serial_link_reg.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo
-    always_comb begin
-        automatic logic [15:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value & ~decoded_wr_biten[15:0]) | (decoded_wr_data[15:0] & decoded_wr_biten[15:0]);
-            load_next_c = '1;
-        end
-        field_combo.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.next = next_c;
-        field_combo.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value <= 16'h0;
-        end else begin
-            if(field_combo.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.load_next) begin
-                field_storage.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value <= field_combo.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.next;
-            end
-        end
-    end
-    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value = field_storage.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value;
-    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.swmod = decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO && decoded_req_is_wr && |(decoded_wr_biten[15:0]);
-
-    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req = decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL;
-    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req_is_wr = decoded_req_is_wr;
-    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.wr_data = decoded_wr_data;
-    assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.wr_biten = decoded_wr_biten;
-    // Field: serial_link_reg.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en
-    always_comb begin
-        automatic logic [0:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.serial_link.RAW_MODE_OUT_EN && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
-            load_next_c = '1;
-        end
-        field_combo.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.next = next_c;
-        field_combo.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value <= 1'h0;
-        end else begin
-            if(field_combo.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.load_next) begin
-                field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value <= field_combo.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.next;
-            end
-        end
-    end
-    assign hwif_out.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value = field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value;
-
-    assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.req = decoded_req_is_wr ? decoded_reg_strb.serial_link.FLOW_CONTROL_FIFO_CLEAR : '0;
-    assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.req_is_wr = decoded_req_is_wr;
-    assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.wr_data = decoded_wr_data;
-    assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.wr_biten = decoded_wr_biten;
     // Field: serial_link_reg.serial_link.CHANNEL_ALLOC_TX_CFG.bypass_en
     always_comb begin
         automatic logic [0:0] next_c;
@@ -784,31 +784,6 @@ module serial_link_reg (
         end
     end
     assign hwif_out.serial_link.CHANNEL_ALLOC_TX_CFG.auto_flush_count.value = field_storage.serial_link.CHANNEL_ALLOC_TX_CFG.auto_flush_count.value;
-    for(genvar i0=0; i0<38; i0++) begin
-        // Field: serial_link_reg.serial_link.CHANNEL_ALLOC_TX_CH_EN[].channel_alloc_tx_ch_en
-        always_comb begin
-            automatic logic [0:0] next_c;
-            automatic logic load_next_c;
-            next_c = field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value;
-            load_next_c = '0;
-            if(decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0] && decoded_req_is_wr) begin // SW write
-                next_c = (field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
-                load_next_c = '1;
-            end
-            field_combo.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.next = next_c;
-            field_combo.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.load_next = load_next_c;
-        end
-        always_ff @(posedge clk or negedge arst_n) begin
-            if(~arst_n) begin
-                field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value <= 1'h1;
-            end else begin
-                if(field_combo.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.load_next) begin
-                    field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value <= field_combo.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.next;
-                end
-            end
-        end
-        assign hwif_out.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value = field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value;
-    end
 
     assign hwif_out.serial_link.CHANNEL_ALLOC_TX_CTRL.req = decoded_req_is_wr ? decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CTRL : '0;
     assign hwif_out.serial_link.CHANNEL_ALLOC_TX_CTRL.req_is_wr = decoded_req_is_wr;
@@ -912,6 +887,31 @@ module serial_link_reg (
     assign hwif_out.serial_link.CHANNEL_ALLOC_RX_CTRL.wr_data = decoded_wr_data;
     assign hwif_out.serial_link.CHANNEL_ALLOC_RX_CTRL.wr_biten = decoded_wr_biten;
     for(genvar i0=0; i0<38; i0++) begin
+        // Field: serial_link_reg.serial_link.CHANNEL_ALLOC_TX_CH_EN[].channel_alloc_tx_ch_en
+        always_comb begin
+            automatic logic [0:0] next_c;
+            automatic logic load_next_c;
+            next_c = field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value;
+            load_next_c = '0;
+            if(decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0] && decoded_req_is_wr) begin // SW write
+                next_c = (field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
+                load_next_c = '1;
+            end
+            field_combo.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.next = next_c;
+            field_combo.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.load_next = load_next_c;
+        end
+        always_ff @(posedge clk or negedge arst_n) begin
+            if(~arst_n) begin
+                field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value <= 1'h1;
+            end else begin
+                if(field_combo.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.load_next) begin
+                    field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value <= field_combo.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.next;
+                end
+            end
+        end
+        assign hwif_out.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value = field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value;
+    end
+    for(genvar i0=0; i0<38; i0++) begin
         // Field: serial_link_reg.serial_link.CHANNEL_ALLOC_RX_CH_EN[].channel_alloc_rx_ch_en
         always_comb begin
             automatic logic [0:0] next_c;
@@ -961,11 +961,11 @@ module serial_link_reg (
         automatic logic rd_ack;
         rd_ack = '0;
         rd_ack |= hwif_in.serial_link.ISOLATED.rd_ack;
+        rd_ack |= hwif_in.serial_link.RAW_MODE_IN_DATA.rd_ack;
+        rd_ack |= hwif_in.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_ack;
         for(int i0=0; i0<38; i0++) begin
             rd_ack |= hwif_in.serial_link.RAW_MODE_IN_DATA_VALID[i0].rd_ack;
         end
-        rd_ack |= hwif_in.serial_link.RAW_MODE_IN_DATA.rd_ack;
-        rd_ack |= hwif_in.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_ack;
         readback_external_rd_ack_c = rd_ack;
     end
 
@@ -986,40 +986,40 @@ module serial_link_reg (
     assign readback_array[0][9:9] = (decoded_reg_strb.serial_link.CTRL && !decoded_req_is_wr) ? field_storage.serial_link.CTRL.axi_out_isolate.value : '0;
     assign readback_array[0][31:10] = '0;
     assign readback_array[1] = hwif_in.serial_link.ISOLATED.rd_ack ? hwif_in.serial_link.ISOLATED.rd_data : '0;
+    assign readback_array[2] = hwif_in.serial_link.RAW_MODE_IN_DATA.rd_ack ? hwif_in.serial_link.RAW_MODE_IN_DATA.rd_data : '0;
+    assign readback_array[3] = hwif_in.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_ack ? hwif_in.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_data : '0;
+    assign readback_array[4][0:0] = (decoded_reg_strb.serial_link.RAW_MODE_OUT_EN && !decoded_req_is_wr) ? field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value : '0;
+    assign readback_array[4][31:1] = '0;
     for(genvar i0=0; i0<38; i0++) begin
-        assign readback_array[i0 * 1 + 2][10:0] = (decoded_reg_strb.serial_link.TX_PHY_CLK_DIV[i0] && !decoded_req_is_wr) ? field_storage.serial_link.TX_PHY_CLK_DIV[i0].clk_divs.value : '0;
-        assign readback_array[i0 * 1 + 2][31:11] = '0;
+        assign readback_array[i0 * 1 + 5] = hwif_in.serial_link.RAW_MODE_IN_DATA_VALID[i0].rd_ack ? hwif_in.serial_link.RAW_MODE_IN_DATA_VALID[i0].rd_data : '0;
     end
     for(genvar i0=0; i0<38; i0++) begin
-        assign readback_array[i0 * 1 + 40][10:0] = (decoded_reg_strb.serial_link.TX_PHY_CLK_START[i0] && !decoded_req_is_wr) ? field_storage.serial_link.TX_PHY_CLK_START[i0].clk_divs.value : '0;
-        assign readback_array[i0 * 1 + 40][31:11] = '0;
+        assign readback_array[i0 * 1 + 43][10:0] = (decoded_reg_strb.serial_link.TX_PHY_CLK_DIV[i0] && !decoded_req_is_wr) ? field_storage.serial_link.TX_PHY_CLK_DIV[i0].clk_divs.value : '0;
+        assign readback_array[i0 * 1 + 43][31:11] = '0;
     end
     for(genvar i0=0; i0<38; i0++) begin
-        assign readback_array[i0 * 1 + 78][10:0] = (decoded_reg_strb.serial_link.TX_PHY_CLK_END[i0] && !decoded_req_is_wr) ? field_storage.serial_link.TX_PHY_CLK_END[i0].clk_shift_end.value : '0;
-        assign readback_array[i0 * 1 + 78][31:11] = '0;
+        assign readback_array[i0 * 1 + 81][10:0] = (decoded_reg_strb.serial_link.TX_PHY_CLK_START[i0] && !decoded_req_is_wr) ? field_storage.serial_link.TX_PHY_CLK_START[i0].clk_divs.value : '0;
+        assign readback_array[i0 * 1 + 81][31:11] = '0;
     end
     for(genvar i0=0; i0<38; i0++) begin
-        assign readback_array[i0 * 1 + 116] = hwif_in.serial_link.RAW_MODE_IN_DATA_VALID[i0].rd_ack ? hwif_in.serial_link.RAW_MODE_IN_DATA_VALID[i0].rd_data : '0;
+        assign readback_array[i0 * 1 + 119][10:0] = (decoded_reg_strb.serial_link.TX_PHY_CLK_END[i0] && !decoded_req_is_wr) ? field_storage.serial_link.TX_PHY_CLK_END[i0].clk_shift_end.value : '0;
+        assign readback_array[i0 * 1 + 119][31:11] = '0;
     end
-    assign readback_array[154] = hwif_in.serial_link.RAW_MODE_IN_DATA.rd_ack ? hwif_in.serial_link.RAW_MODE_IN_DATA.rd_data : '0;
-    assign readback_array[155] = hwif_in.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_ack ? hwif_in.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_data : '0;
-    assign readback_array[156][0:0] = (decoded_reg_strb.serial_link.RAW_MODE_OUT_EN && !decoded_req_is_wr) ? field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value : '0;
-    assign readback_array[156][31:1] = '0;
     assign readback_array[157][0:0] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CFG && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_TX_CFG.bypass_en.value : '0;
     assign readback_array[157][1:1] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CFG && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_TX_CFG.auto_flush_en.value : '0;
     assign readback_array[157][7:2] = '0;
     assign readback_array[157][15:8] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CFG && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_TX_CFG.auto_flush_count.value : '0;
     assign readback_array[157][31:16] = '0;
+    assign readback_array[158][0:0] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_RX_CFG.bypass_en.value : '0;
+    assign readback_array[158][1:1] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_RX_CFG.auto_flush_en.value : '0;
+    assign readback_array[158][7:2] = '0;
+    assign readback_array[158][15:8] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_RX_CFG.auto_flush_count.value : '0;
+    assign readback_array[158][16:16] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_RX_CFG.sync_en.value : '0;
+    assign readback_array[158][31:17] = '0;
     for(genvar i0=0; i0<38; i0++) begin
-        assign readback_array[i0 * 1 + 158][0:0] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0] && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value : '0;
-        assign readback_array[i0 * 1 + 158][31:1] = '0;
+        assign readback_array[i0 * 1 + 159][0:0] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0] && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0].channel_alloc_tx_ch_en.value : '0;
+        assign readback_array[i0 * 1 + 159][31:1] = '0;
     end
-    assign readback_array[196][0:0] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_RX_CFG.bypass_en.value : '0;
-    assign readback_array[196][1:1] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_RX_CFG.auto_flush_en.value : '0;
-    assign readback_array[196][7:2] = '0;
-    assign readback_array[196][15:8] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_RX_CFG.auto_flush_count.value : '0;
-    assign readback_array[196][16:16] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_RX_CFG.sync_en.value : '0;
-    assign readback_array[196][31:17] = '0;
     for(genvar i0=0; i0<38; i0++) begin
         assign readback_array[i0 * 1 + 197][0:0] = (decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CH_EN[i0] && !decoded_req_is_wr) ? field_storage.serial_link.CHANNEL_ALLOC_RX_CH_EN[i0].channel_alloc_rx_ch_en.value : '0;
         assign readback_array[i0 * 1 + 197][31:1] = '0;

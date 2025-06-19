@@ -8,8 +8,8 @@
 package serial_link_reg_pkg;
 
     localparam SERIAL_LINK_REG_DATA_WIDTH = 32;
-    localparam SERIAL_LINK_REG_MIN_ADDR_WIDTH = 11;
-    localparam SERIAL_LINK_REG_SIZE = 'h45c;
+    localparam SERIAL_LINK_REG_MIN_ADDR_WIDTH = 12;
+    localparam SERIAL_LINK_REG_SIZE = 'h898;
 
     localparam NumChannels = 'h26;
     localparam Log2NumChannels = 'h6;
@@ -27,16 +27,6 @@ package serial_link_reg_pkg;
         logic rd_ack;
         serial_link_base__ISOLATED__external__fields__in_t rd_data;
     } serial_link_base__ISOLATED__external__in_t;
-
-    typedef struct packed {
-        logic [30:0] _reserved_31_1;
-        logic raw_mode_in_data_valid;
-    } serial_link_base__RAW_MODE_IN_DATA_VALID__external__fields__in_t;
-
-    typedef struct {
-        logic rd_ack;
-        serial_link_base__RAW_MODE_IN_DATA_VALID__external__fields__in_t rd_data;
-    } serial_link_base__RAW_MODE_IN_DATA_VALID__external__in_t;
 
     typedef struct packed {
         logic [15:0] _reserved_31_16;
@@ -65,6 +55,16 @@ package serial_link_reg_pkg;
         logic wr_ack;
     } serial_link_base__FLOW_CONTROL_FIFO_CLEAR__external__in_t;
 
+    typedef struct packed {
+        logic [30:0] _reserved_31_1;
+        logic raw_mode_in_data_valid;
+    } serial_link_base__RAW_MODE_IN_DATA_VALID__external__fields__in_t;
+
+    typedef struct {
+        logic rd_ack;
+        serial_link_base__RAW_MODE_IN_DATA_VALID__external__fields__in_t rd_data;
+    } serial_link_base__RAW_MODE_IN_DATA_VALID__external__in_t;
+
     typedef struct {
         logic wr_ack;
     } serial_link_base__CHANNEL_ALLOC_TX_CTRL__external__in_t;
@@ -75,10 +75,10 @@ package serial_link_reg_pkg;
 
     typedef struct {
         serial_link_base__ISOLATED__external__in_t ISOLATED;
-        serial_link_base__RAW_MODE_IN_DATA_VALID__external__in_t RAW_MODE_IN_DATA_VALID[38];
         serial_link_base__RAW_MODE_IN_DATA__external__in_t RAW_MODE_IN_DATA;
         serial_link_base__RAW_MODE_OUT_DATA_FIFO_CTRL__external__in_t RAW_MODE_OUT_DATA_FIFO_CTRL;
         serial_link_base__FLOW_CONTROL_FIFO_CLEAR__external__in_t FLOW_CONTROL_FIFO_CLEAR;
+        serial_link_base__RAW_MODE_IN_DATA_VALID__external__in_t RAW_MODE_IN_DATA_VALID[38];
         serial_link_base__CHANNEL_ALLOC_TX_CTRL__external__in_t CHANNEL_ALLOC_TX_CTRL;
         serial_link_base__CHANNEL_ALLOC_RX_CTRL__external__in_t CHANNEL_ALLOC_RX_CTRL;
     } serial_link_base__in_t;
@@ -116,30 +116,6 @@ package serial_link_reg_pkg;
     } serial_link_base__ISOLATED__external__out_t;
 
     typedef struct {
-        logic [10:0] value;
-    } serial_link_base__TX_PHY_CLK_DIV__clk_divs__out_t;
-
-    typedef struct {
-        serial_link_base__TX_PHY_CLK_DIV__clk_divs__out_t clk_divs;
-    } serial_link_base__TX_PHY_CLK_DIV__out_t;
-
-    typedef struct {
-        logic [10:0] value;
-    } serial_link_base__TX_PHY_CLK_START__clk_divs__out_t;
-
-    typedef struct {
-        serial_link_base__TX_PHY_CLK_START__clk_divs__out_t clk_divs;
-    } serial_link_base__TX_PHY_CLK_START__out_t;
-
-    typedef struct {
-        logic [10:0] value;
-    } serial_link_base__TX_PHY_CLK_END__clk_shift_end__out_t;
-
-    typedef struct {
-        serial_link_base__TX_PHY_CLK_END__clk_shift_end__out_t clk_shift_end;
-    } serial_link_base__TX_PHY_CLK_END__out_t;
-
-    typedef struct {
         logic value;
     } serial_link_base__RAW_MODE_EN__raw_mode_en__out_t;
 
@@ -148,30 +124,17 @@ package serial_link_reg_pkg;
     } serial_link_base__RAW_MODE_EN__out_t;
 
     typedef struct {
+        logic req;
+        logic req_is_wr;
+    } serial_link_base__RAW_MODE_IN_DATA__external__out_t;
+
+    typedef struct {
         logic [5:0] value;
     } serial_link_base__RAW_MODE_IN_CH_SEL__raw_mode_in_ch_sel__out_t;
 
     typedef struct {
         serial_link_base__RAW_MODE_IN_CH_SEL__raw_mode_in_ch_sel__out_t raw_mode_in_ch_sel;
     } serial_link_base__RAW_MODE_IN_CH_SEL__out_t;
-
-    typedef struct {
-        logic req;
-        logic req_is_wr;
-    } serial_link_base__RAW_MODE_IN_DATA_VALID__external__out_t;
-
-    typedef struct {
-        logic req;
-        logic req_is_wr;
-    } serial_link_base__RAW_MODE_IN_DATA__external__out_t;
-
-    typedef struct {
-        logic value;
-    } serial_link_base__RAW_MODE_OUT_CH_MASK__raw_mode_out_ch_mask__out_t;
-
-    typedef struct {
-        serial_link_base__RAW_MODE_OUT_CH_MASK__raw_mode_out_ch_mask__out_t raw_mode_out_ch_mask;
-    } serial_link_base__RAW_MODE_OUT_CH_MASK__out_t;
 
     typedef struct {
         logic [15:0] value;
@@ -215,6 +178,43 @@ package serial_link_reg_pkg;
     } serial_link_base__FLOW_CONTROL_FIFO_CLEAR__external__out_t;
 
     typedef struct {
+        logic req;
+        logic req_is_wr;
+    } serial_link_base__RAW_MODE_IN_DATA_VALID__external__out_t;
+
+    typedef struct {
+        logic value;
+    } serial_link_base__RAW_MODE_OUT_CH_MASK__raw_mode_out_ch_mask__out_t;
+
+    typedef struct {
+        serial_link_base__RAW_MODE_OUT_CH_MASK__raw_mode_out_ch_mask__out_t raw_mode_out_ch_mask;
+    } serial_link_base__RAW_MODE_OUT_CH_MASK__out_t;
+
+    typedef struct {
+        logic [10:0] value;
+    } serial_link_base__TX_PHY_CLK_DIV__clk_divs__out_t;
+
+    typedef struct {
+        serial_link_base__TX_PHY_CLK_DIV__clk_divs__out_t clk_divs;
+    } serial_link_base__TX_PHY_CLK_DIV__out_t;
+
+    typedef struct {
+        logic [10:0] value;
+    } serial_link_base__TX_PHY_CLK_START__clk_divs__out_t;
+
+    typedef struct {
+        serial_link_base__TX_PHY_CLK_START__clk_divs__out_t clk_divs;
+    } serial_link_base__TX_PHY_CLK_START__out_t;
+
+    typedef struct {
+        logic [10:0] value;
+    } serial_link_base__TX_PHY_CLK_END__clk_shift_end__out_t;
+
+    typedef struct {
+        serial_link_base__TX_PHY_CLK_END__clk_shift_end__out_t clk_shift_end;
+    } serial_link_base__TX_PHY_CLK_END__out_t;
+
+    typedef struct {
         logic value;
     } serial_link_base__CHANNEL_ALLOC_TX_CFG__bypass_en__out_t;
 
@@ -231,14 +231,6 @@ package serial_link_reg_pkg;
         serial_link_base__CHANNEL_ALLOC_TX_CFG__auto_flush_en__out_t auto_flush_en;
         serial_link_base__CHANNEL_ALLOC_TX_CFG__auto_flush_count__out_t auto_flush_count;
     } serial_link_base__CHANNEL_ALLOC_TX_CFG__out_t;
-
-    typedef struct {
-        logic value;
-    } serial_link_base__CHANNEL_ALLOC_TX_CH_EN__channel_alloc_tx_ch_en__out_t;
-
-    typedef struct {
-        serial_link_base__CHANNEL_ALLOC_TX_CH_EN__channel_alloc_tx_ch_en__out_t channel_alloc_tx_ch_en;
-    } serial_link_base__CHANNEL_ALLOC_TX_CH_EN__out_t;
 
     typedef struct packed {
         logic [29:0] _reserved_31_2;
@@ -290,6 +282,14 @@ package serial_link_reg_pkg;
 
     typedef struct {
         logic value;
+    } serial_link_base__CHANNEL_ALLOC_TX_CH_EN__channel_alloc_tx_ch_en__out_t;
+
+    typedef struct {
+        serial_link_base__CHANNEL_ALLOC_TX_CH_EN__channel_alloc_tx_ch_en__out_t channel_alloc_tx_ch_en;
+    } serial_link_base__CHANNEL_ALLOC_TX_CH_EN__out_t;
+
+    typedef struct {
+        logic value;
     } serial_link_base__CHANNEL_ALLOC_RX_CH_EN__channel_alloc_rx_ch_en__out_t;
 
     typedef struct {
@@ -299,27 +299,48 @@ package serial_link_reg_pkg;
     typedef struct {
         serial_link_base__CTRL__out_t CTRL;
         serial_link_base__ISOLATED__external__out_t ISOLATED;
-        serial_link_base__TX_PHY_CLK_DIV__out_t TX_PHY_CLK_DIV[38];
-        serial_link_base__TX_PHY_CLK_START__out_t TX_PHY_CLK_START[38];
-        serial_link_base__TX_PHY_CLK_END__out_t TX_PHY_CLK_END[38];
         serial_link_base__RAW_MODE_EN__out_t RAW_MODE_EN;
-        serial_link_base__RAW_MODE_IN_CH_SEL__out_t RAW_MODE_IN_CH_SEL;
-        serial_link_base__RAW_MODE_IN_DATA_VALID__external__out_t RAW_MODE_IN_DATA_VALID[38];
         serial_link_base__RAW_MODE_IN_DATA__external__out_t RAW_MODE_IN_DATA;
-        serial_link_base__RAW_MODE_OUT_CH_MASK__out_t RAW_MODE_OUT_CH_MASK[38];
+        serial_link_base__RAW_MODE_IN_CH_SEL__out_t RAW_MODE_IN_CH_SEL;
         serial_link_base__RAW_MODE_OUT_DATA_FIFO__out_t RAW_MODE_OUT_DATA_FIFO;
         serial_link_base__RAW_MODE_OUT_DATA_FIFO_CTRL__external__out_t RAW_MODE_OUT_DATA_FIFO_CTRL;
         serial_link_base__RAW_MODE_OUT_EN__out_t RAW_MODE_OUT_EN;
         serial_link_base__FLOW_CONTROL_FIFO_CLEAR__external__out_t FLOW_CONTROL_FIFO_CLEAR;
+        serial_link_base__RAW_MODE_IN_DATA_VALID__external__out_t RAW_MODE_IN_DATA_VALID[38];
+        serial_link_base__RAW_MODE_OUT_CH_MASK__out_t RAW_MODE_OUT_CH_MASK[38];
+        serial_link_base__TX_PHY_CLK_DIV__out_t TX_PHY_CLK_DIV[38];
+        serial_link_base__TX_PHY_CLK_START__out_t TX_PHY_CLK_START[38];
+        serial_link_base__TX_PHY_CLK_END__out_t TX_PHY_CLK_END[38];
         serial_link_base__CHANNEL_ALLOC_TX_CFG__out_t CHANNEL_ALLOC_TX_CFG;
-        serial_link_base__CHANNEL_ALLOC_TX_CH_EN__out_t CHANNEL_ALLOC_TX_CH_EN[38];
         serial_link_base__CHANNEL_ALLOC_TX_CTRL__external__out_t CHANNEL_ALLOC_TX_CTRL;
         serial_link_base__CHANNEL_ALLOC_RX_CFG__out_t CHANNEL_ALLOC_RX_CFG;
         serial_link_base__CHANNEL_ALLOC_RX_CTRL__external__out_t CHANNEL_ALLOC_RX_CTRL;
+        serial_link_base__CHANNEL_ALLOC_TX_CH_EN__out_t CHANNEL_ALLOC_TX_CH_EN[38];
         serial_link_base__CHANNEL_ALLOC_RX_CH_EN__out_t CHANNEL_ALLOC_RX_CH_EN[38];
     } serial_link_base__out_t;
 
     typedef struct {
         serial_link_base__out_t serial_link;
     } serial_link_reg__out_t;
+
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__CTRL__OFFSET = 12'h0;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__ISOLATED__OFFSET = 12'h4;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_EN__OFFSET = 12'h8;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA__OFFSET = 12'hc;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_CH_SEL__OFFSET = 12'h10;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO__OFFSET = 12'h14;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_DATA_FIFO_CTRL__OFFSET = 12'h18;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_EN__OFFSET = 12'h1c;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__FLOW_CONTROL_FIFO_CLEAR__OFFSET = 12'h20;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_IN_DATA_VALID__OFFSET = 12'h100;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__RAW_MODE_OUT_CH_MASK__OFFSET = 12'h200;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_DIV__OFFSET = 12'h300;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_START__OFFSET = 12'h400;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__TX_PHY_CLK_END__OFFSET = 12'h500;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CFG__OFFSET = 12'h600;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CTRL__OFFSET = 12'h604;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CFG__OFFSET = 12'h608;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CTRL__OFFSET = 12'h60c;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_TX_CH_EN__OFFSET = 12'h700;
+    localparam bit [11:0] SERIAL_LINK_REG__SERIAL_LINK__CHANNEL_ALLOC_RX_CH_EN__OFFSET = 12'h800;
 endpackage
