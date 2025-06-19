@@ -5,7 +5,7 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 
-set tb_name tb_axi_serial_link
+set tb_name tb_ch_calib_serial_link
 
 for {set i 1} {$i < 3} {incr i} {
     set group_name "DDR $i"
@@ -33,8 +33,6 @@ for {set i 1} {$i < 3} {incr i} {
 
     add wave -noupdate -group $group_name -group {CONFIG} /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/reg2hw
     add wave -noupdate -group $group_name -group {CONFIG} /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/hw2reg
-    add wave -noupdate -group $group_name -group {CONFIG} /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/cfg_req
-    add wave -noupdate -group $group_name -group {CONFIG} /$tb_name/i_serial_link_$i/$gen_block_name/i_serial_link/cfg_rsp
 }
 
 TreeUpdate [SetDefaultTree]
