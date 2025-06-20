@@ -29,7 +29,6 @@ Bender.lock:
 
 clean_bender:
 	rm -rf .bender
-	rm -rf Bender.lock
 
 
 # --------------
