@@ -560,8 +560,8 @@ module tb_ch_calib_serial_link #(
     // Check that there is no more valid data in the RX FIFOs
     // of all working channels
     for (int i = 0; i < NumChannels; i++) begin
-      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET, read);
-      raw_mode_data_in_valid[i] = read[0];
+      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET, data);
+      raw_mode_data_in_valid[i] = data[0];
     end
     assert ((raw_mode_data_in_valid[NumChannels-1:0] & working_rx_channels) == '0) else begin
       $error("[DDR%0d] Still data in RX FIFO %32b", id, data & working_rx_channels);
@@ -579,8 +579,8 @@ module tb_ch_calib_serial_link #(
     // Wait until the channel mask from the other side has arrived
     do begin
       for (int i = 0; i < NumChannels; i++) begin
-        cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET + i * 4, read);
-        raw_mode_data_in_valid[i] = read[0];
+        cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET + i * 4, data);
+        raw_mode_data_in_valid[i] = data[0];
       end
     end while(raw_mode_data_in_valid[NumChannels-1:0] == 0);
     // Only check RX channels that are working

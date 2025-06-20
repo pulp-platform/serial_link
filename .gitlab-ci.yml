@@ -5,9 +5,9 @@
 # Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
 variables:
-  VSIM: 'questa-2021.3-kgf vsim'
-  VCS: 'vcs-2020.12 vcs'
-  VLOGAN: 'vcs-2020.12 vlogan'
+  VSIM: 'questa-2025.1-dz vsim'
+  VCS: 'vcs-2025.06-dz vcs'
+  VLOGAN: 'vcs-2025.06-dz vlogan'
 
 stages:
   - build
