@@ -180,6 +180,7 @@ module serial_link #(
 
   logic cfg_flow_control_fifo_clear;
   logic cfg_raw_mode_out_data_fifo_clear;
+  logic raw_mode_out_data_valid;
   logic [NumChannels-1:0] raw_mode_in_data_valid;
   logic [NumChannels-1:0] raw_mode_out_ch_mask;
 
@@ -235,8 +236,7 @@ module serial_link #(
     .cfg_raw_mode_out_ch_mask_i              ( raw_mode_out_ch_mask                             ),
     .cfg_raw_mode_out_data_i                 (
       phy_data_t'(reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value) ),
-    .cfg_raw_mode_out_data_valid_i           (
-      reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.swmod ),
+    .cfg_raw_mode_out_data_valid_i           ( raw_mode_out_data_valid ),
     .cfg_raw_mode_out_en_i                   (
       reg2hw.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value ),
     .cfg_raw_mode_out_data_fifo_clear_i      ( cfg_raw_mode_out_data_fifo_clear                 ),
@@ -245,6 +245,8 @@ module serial_link #(
     .cfg_raw_mode_out_data_fifo_is_full_o    (
       hw2reg.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.rd_data.is_full )
   );
+
+  `FF(raw_mode_out_data_valid, reg2hw.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.swmod, '0)
 
   ///////////////////////
   // CHANNEL ALLOCATOR //
