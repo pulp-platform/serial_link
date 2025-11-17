@@ -572,7 +572,7 @@ module tb_ch_calib_serial_link #(
     // Load the channel mask of working channels into TX FIFO
     // They should be immediately sent as TX FIFO is still enabled
     $info("[DDR%0d] Sending out RX channel mask.", id);
-    for (int i = 0; i < $ceil(NumChannels/NumBits); i++) begin
+    for (int i = 0; i < (NumChannels + NumBits - 1)/NumBits; i++) begin
       // Write the channel mask into the TX FIFO
       cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_OUT_DATA_FIFO_REG_OFFSET, working_rx_channels[NumBits*i+:NumBits]);
     end
@@ -589,7 +589,7 @@ module tb_ch_calib_serial_link #(
         // Select channel to read from
         cfg_write(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_CH_SEL_REG_OFFSET, c);
         // Read the mask
-        for (int i = 0; i < NumChannels/NumBits; i++) begin
+        for (int i = 0; i < (NumChannels + NumBits - 1)/NumBits; i++) begin
           cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_REG_OFFSET, working_tx_channels[NumBits*i+:NumBits]);
         end
       end
