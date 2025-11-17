@@ -535,8 +535,8 @@ module tb_ch_calib_serial_link #(
       // Check read patterns
       foreach(pattern_q[i]) begin
         // Check first that there is valid data in the RX FIFO
-      cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET + i * 4, data);
-      if (data == 1'b0) begin
+        cfg_read(drv, `SERIAL_LINK_REG_SERIAL_LINK_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET + c * 4, data);
+        if (data == 1'b0) begin
           $info("[DDR%0d][CH%0d] No data in RX FIFO", id, c);
           working_rx_channels[c] = 1'b0;
           break;
