@@ -105,16 +105,11 @@ vsim-run-batch:
 
 .PHONY: vcs-compile vcs-clean
 
-VLOGAN_ARGS := -assert svaext
-VLOGAN_ARGS += -assert disable_cover
-VLOGAN_ARGS += -full64
-VLOGAN_ARGS += -sysc=q
-VLOGAN_ARGS += -q
 VLOGAN_ARGS += -timescale=1ns/1ps
 
+VCS_ARGS    += -full64
 VCS_ARGS    += -Mlib=$(WORK)
 VCS_ARGS    += -Mdir=$(WORK)
-VCS_ARGS    += -j 8
 
 VCS_PARAMS  ?=
 TB_DUT 		?= tb_axi_serial_link
