@@ -77,9 +77,7 @@ VSIM_FLAGS_GUI += -do util/serial_link_wave.tcl
 
 scripts/compile_vsim.tcl: Bender.lock
 	@mkdir -p scripts
-	@echo 'set ROOT [file normalize [file dirname [info script]]/..]' > $@
-	$(BENDER) script vsim --vlog-arg="$(VLOG_FLAGS)" $(BENDER_FLAGS) | grep -v "set ROOT" >> $@
-	@echo >> $@
+	$(BENDER) script vsim --vlog-arg="$(VLOG_FLAGS)" $(BENDER_FLAGS) >> $@
 
 vsim-compile: scripts/compile_vsim.tcl
 	$(VSIM) -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log
