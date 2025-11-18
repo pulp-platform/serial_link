@@ -24,8 +24,6 @@ sources:
     # Configuration Registers
     - src/regs/rtl/serial_link_reg_pkg.sv
     - src/regs/rtl/serial_link_reg.sv
-    - src/regs/rtl/serial_link_single_channel_reg_pkg.sv
-    - src/regs/rtl/serial_link_single_channel_reg.sv
 
     # Parametrization
     - src/serial_link_pkg.sv

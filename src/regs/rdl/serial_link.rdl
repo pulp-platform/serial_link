@@ -9,24 +9,269 @@
 `ifndef SERIAL_LINK_RDL
 `define SERIAL_LINK_RDL
 
-`include "serial_link_base.rdl"
-
 addrmap serial_link_reg #(
-    longint unsigned NumChannels = 38,
-    longint unsigned Log2NumChannels = 6,
-    longint unsigned NumBits = 16,
+    longint unsigned NumChannels = 1,
+    longint unsigned NumLanes = 8,
+    longint unsigned NumBits = 2*NumLanes,
     longint unsigned Log2MaxClkDiv = 10,
-    longint unsigned Log2RawModeTXFifoDepth = 3
+    longint unsigned FlushCounterWidth = 8,
+    longint unsigned Log2RawModeTXFifoDepth = 3, // 8 entries
+    longint unsigned EnDdr = 1,
+    longint unsigned EnChAlloc = (NumChannels > 1)
 ) {
+
     default regwidth = 32;
 
-    serial_link_base #(
-        .NumChannels(NumChannels),
-        .Log2NumChannels(Log2NumChannels),
-        .NumBits(NumBits),
-        .Log2MaxClkDiv(Log2MaxClkDiv),
-        .Log2RawModeTXFifoDepth(Log2RawModeTXFifoDepth)
-    ) serial_link;
+    reg ctrl {
+        desc = "Global clock, isolation and reset control configuration";
+        default sw = rw;
+        default hw = r;
+        field {
+            name = "clk_ena";
+            desc = "Clock gate enable for network, link, physical layer. (active-high)";
+        } clk_ena[0:0] = 0x0;
+        field {
+            name = "reset_n";
+            desc = "SW controlled synchronous reset. (active-low)";
+        } reset_n[1:1] = 0x1;
+        field {
+            name = "axi_in_isolate";
+            desc = "Isolate AXI slave in port. (active-high)";
+        } axi_in_isolate[8:8] = 0x1;
+        field {
+            name = "axi_out_isolate";
+            desc = "Isolate AXI master out port. (active-high)";
+        } axi_out_isolate[9:9] = 0x1;
+    };
+
+    reg isolated {
+        desc = "Isolation status of AXI ports";
+        default sw = r;
+        default hw = w;
+        field {
+            name = "axi_in";
+            desc = "slave in isolation status";
+        } axi_in[0:0] = 0x1;
+        field {
+            name = "axi_out";
+            desc = "master out isolation status";
+        } axi_out[1:1] = 0x1;
+    };
+
+    reg tx_phy_clk_div {
+        default sw = rw;
+        default hw = r;
+        desc = "Holds clock divider factor for forwarded clock of the TX Phys";
+        field {
+            name = "clk_divs";
+            desc = "Clock division factor of TX clock";
+        } clk_divs[Log2MaxClkDiv:0] = 0x8;
+    };
+
+    reg tx_phy_clk_start {
+        default sw = rw;
+        default hw = r;
+        desc = "Controls duty cycle and phase of rising edge in TX Phys";
+        field {
+            name = "clk_shift_start";
+            desc = "Positive Edge of divided, shifted clock";
+        } clk_divs[Log2MaxClkDiv:0] = EnDdr? 0x2 : 0x4;
+    };
+
+    reg tx_phy_clk_end {
+        default sw = rw;
+        default hw = r;
+        desc = "Controls duty cycle and phase of falling edge in TX Phys";
+        field {
+            name = "clk_shift_end";
+            desc = "Negative Edge of divided, shifted clock";
+        } clk_shift_end[Log2MaxClkDiv:0] = EnDdr? 0x6 : 0x0;
+    };
+
+    reg raw_mode_en {
+        default sw = w;
+        default hw = r;
+        desc = "Enables Raw Mode";
+        field {} raw_mode_en[0:0] = 0x0;
+    };
+
+    reg raw_mode_in_ch_sel {
+        default sw = w;
+        default hw = r;
+        desc = "Receive channel select in RAW mode";
+        field {} raw_mode_in_ch_sel[7:0] = 0x0;
+    };
+
+    reg raw_mode_in_data_valid {
+        default sw = r;
+        default hw = w;
+        desc = "Mask for valid data in RX FIFOs during RAW mode.";
+        field {} raw_mode_in_data_valid[0:0];
+    };
+
+    reg raw_mode_in_data {
+        default sw = r;
+        default hw = w;
+        desc = "Data received by the selected channel in RAW mode";
+        field {} raw_mode_in_data[NumBits-1:0];
+    };
+
+    reg raw_mode_out_ch_mask {
+        default sw = w;
+        default hw = r;
+        desc = "Selects channels to send out data in RAW mode, '1 corresponds to broadcasting";
+        field {} raw_mode_out_ch_mask = 0x0;
+    };
+
+    reg raw_mode_out_data_fifo {
+        default sw = w;
+        default hw = r;
+        desc = "Data that will be pushed to the RAW mode output FIFO";
+        field {
+            swmod;
+        } raw_mode_out_data_fifo[NumBits-1:0] = 0x0;
+    };
+
+    reg raw_mode_out_data_fifo_ctrl {
+        default sw = rw;
+        default hw = rw;
+        desc = "Status and control register for the RAW mode data out FIFO";
+        field {
+            name = "clear";
+            sw = w;
+            hw = r;
+            desc = "Clears the raw mode TX FIFO";
+        } clear[0:0];
+        field {
+            name = "fill_state";
+            sw = r;
+            hw = w;
+            desc = "The number of elements currently stored in the RAW mode TX FIFO that are ready to be sent.";
+        } fill_state[8+Log2RawModeTXFifoDepth-1:8] = 0x0;
+        field {
+            name = "is_full";
+            sw = r;
+            hw = w;
+            desc = "If '1' the FIFO is full and does not accept any more items. Any additional write to the data fill register will be ignored until there is sufficient space again.";
+        } is_full[31:31] = 0x0;
+    };
+
+    reg raw_mode_out_en {
+        default sw = rw;
+        default hw = r;
+        desc = "Enable transmission of data currently hold in the output FIFO";
+        field {} raw_mode_out_en[0:0] = 0x0;
+    };
+
+    reg flow_control_fifo_clear {
+        default sw = w;
+        default hw = r;
+        desc = "Clears the flow control Fifo";
+        field {} flow_control_fifo_clear[0:0] = 0x0;
+    };
+
+    reg channel_alloc_tx_cfg {
+        default sw = EnChAlloc? rw : r;
+        default hw = r;
+        desc = "Configuration settings for the TX side in the channel allocator";
+        field {
+            name = "bypass_en";
+            desc = "Enable bypassing the TX channel allocator";
+        } bypass_en[0:0] = 0x1;
+        field {
+            name = "auto_flush_en";
+            desc = "Enable the auto-flush feature of the TX side in the channel allocator";
+        } auto_flush_en[1:1] = 0x1;
+        field {
+            name = "auto_flush_count";
+            desc = "The number of cycles to wait before auto flushing (sending) packets in the channel allocator";
+        } auto_flush_count[15:8] = 0x2;
+    };
+
+    reg channel_alloc_tx_ch_en {
+        default sw = EnChAlloc? rw : r;
+        default hw = r;
+        desc = "Channel enable mask for the TX side.";
+        field {} channel_alloc_tx_ch_en[0:0] = 0x1;
+    };
+
+    reg channel_alloc_tx_ctrl {
+        default sw = EnChAlloc? w : r;
+        default hw = r;
+        desc = "Soft clear or force flush the TX side of the channel allocator.";
+        field {
+            name = "clear";
+            desc = "Software clear the TX side of the channel allocator.";
+        } clear[0:0];
+        field {
+            name = "flush";
+            desc = "Flush (transmit remaining data) in the TX side of the channel allocator.";
+        } flush[1:1];
+    };
+
+    reg channel_alloc_rx_cfg {
+        default sw = EnChAlloc? rw : r;
+        default hw = r;
+        desc = "Configuration settings for the RX side in the channel allocator.";
+        field {
+            name = "bypass_en";
+            desc = "Enable bypassing the RX channel allocator.";
+        } bypass_en[0:0] = 0x1;
+        field {
+            name = "auto_flush_en";
+            desc = "Enable the auto-flush feature of the RX side in the channel allocator.";
+        } auto_flush_en[1:1] = 0x1;
+        field {
+            name = "auto_flush_count";
+            desc = "The number of cycles to wait before synchronizing on partial packets on the RX side.";
+        } auto_flush_count[15:8] = 0x2;
+        field {
+            name = "sync_en";
+            desc = "Enable (1) or disable (0) the synchronization barrier between the channels (needs to be disabled in raw mode).";
+        } sync_en[16:16] = 0x1;
+    };
+
+    reg channel_alloc_rx_ctrl {
+        default sw = EnChAlloc? w : r;
+        default hw = r;
+        desc = "Soft clear the RX side of the channel allocator.";
+        field {
+            name = "clear";
+            desc = "Software clear the RX side of the channel allocator.";
+        } clear[0:0];
+    };
+
+   reg channel_alloc_rx_ch_en {
+        default sw = EnChAlloc? rw : r;
+        default hw = r;
+        desc = "Channel enable mask for the RX side.";
+        field {
+            name = "channel_alloc_rx_ch_en";
+            desc = "Enable or disable specific RX channels.";
+        } channel_alloc_rx_ch_en[0:0] = 0x1;
+    };
+
+
+             ctrl                        ctrl @0x0;
+    external isolated                    isolated @0x4;
+             raw_mode_en                 raw_mode_en @0x8;
+    external raw_mode_in_data            raw_mode_in_data @0x0c;
+             raw_mode_in_ch_sel          raw_mode_in_ch_sel @0x10;
+             raw_mode_out_data_fifo      raw_mode_out_data_fifo @0x14;
+    external raw_mode_out_data_fifo_ctrl raw_mode_out_data_fifo_ctrl @0x18;
+             raw_mode_out_en             raw_mode_out_en @0x1c;
+    external flow_control_fifo_clear     flow_control_fifo_clear @0x20;
+    external raw_mode_in_data_valid      raw_mode_in_data_valid[NumChannels] @0x100;
+             raw_mode_out_ch_mask        raw_mode_out_ch_mask[NumChannels] @0x200;
+             tx_phy_clk_div              tx_phy_clk_div[NumChannels] @0x300;
+             tx_phy_clk_start            tx_phy_clk_start[NumChannels] @0x400;
+             tx_phy_clk_end              tx_phy_clk_end[NumChannels] @0x500;
+             channel_alloc_tx_cfg        channel_alloc_tx_cfg @0x600;
+    external channel_alloc_tx_ctrl       channel_alloc_tx_ctrl @0x604;
+             channel_alloc_rx_cfg        channel_alloc_rx_cfg @0x608;
+    external channel_alloc_rx_ctrl       channel_alloc_rx_ctrl @0x60c;
+             channel_alloc_tx_ch_en      channel_alloc_tx_ch_en[NumChannels] @0x700;
+             channel_alloc_rx_ch_en      channel_alloc_rx_ch_en[NumChannels] @0x800;
 };
 
-`endif // SERIAL_LINK_RDL
+`endif // SERIAL_LINK_BASE_RDL
