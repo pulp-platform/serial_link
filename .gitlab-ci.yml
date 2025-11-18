@@ -5,9 +5,10 @@
 # Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
 variables:
-  VSIM: 'questa-2025.1-dz vsim'
-  VCS: 'vcs-2025.06-dz vcs'
-  VLOGAN: 'vcs-2025.06-dz vlogan'
+  VSIM: 'questa-2025.1 vsim'
+  VCS: 'vcs-2025.06 vcs'
+  VLOGAN: 'vcs-2025.06 vlogan'
+  PEAKRDL: '/home/fischeti/.local/bin/uv run peakrdl'
 
 stages:
   - build
