@@ -89,13 +89,7 @@ scripts/compile_vsim.tcl: Bender.lock
 	@echo >> $@
 
 compile_questa: scripts/compile_vsim.tcl
-ifeq ($(SINGLE_CHANNEL),1)
-	@sed 's/NumChannels = [0-9]*/NumChannels = 1/' src/serial_link_pkg.sv -i.prev
 	$(VSIM) -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log
-	@mv src/serial_link_pkg.sv.prev src/serial_link_pkg.sv
-else
-	$(VSIM) -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log
-endif
 	@! grep -P "Errors: [1-9]*," $(dir $<)vsim.log
 
 clean_questa:
@@ -145,13 +139,7 @@ scripts/compile_vcs.sh: Bender.yml Bender.lock
 	chmod +x $@
 
 compile_vcs: scripts/compile_vcs.sh
-ifeq ($(SINGLE_CHANNEL),1)
-	@sed 's/NumChannels = [0-9]*/NumChannels = 1/' src/serial_link_pkg.sv -i.prev
 	$< > scripts/compile_vcs.log
-	@mv src/serial_link_pkg.sv.prev src/serial_link_pkg.sv
-else
-	$< > scripts/compile_vcs.log
-endif
 
 bin/%.vcs: scripts/compile_vcs.sh compile_vcs
 	mkdir -p bin
