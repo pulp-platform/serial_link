@@ -90,9 +90,9 @@ module serial_link_single_channel_reg (
             if(external_req & ~external_wr_ack & ~external_rd_ack) external_pending <= '1;
             else if(external_wr_ack | external_rd_ack) external_pending <= '0;
             `ifndef SYNTHESIS
-                assert(!external_wr_ack || (external_pending | external_req))
+                assert_bad_ext_wr_ack: assert(!external_wr_ack || (external_pending | external_req))
                     else $error("An external wr_ack strobe was asserted when no external request was active");
-                assert(!external_rd_ack || (external_pending | external_req))
+                assert_bad_ext_rd_ack: assert(!external_rd_ack || (external_pending | external_req))
                     else $error("An external rd_ack strobe was asserted when no external request was active");
             `endif
         end
@@ -134,6 +134,7 @@ module serial_link_single_channel_reg (
         } serial_link;
     } decoded_reg_strb_t;
     decoded_reg_strb_t decoded_reg_strb;
+    logic decoded_err;
     logic decoded_strb_is_external;
 
     logic decoded_req;
@@ -142,27 +143,31 @@ module serial_link_single_channel_reg (
     logic [31:0] decoded_wr_biten;
 
     always_comb begin
+        automatic logic is_valid_addr;
+        automatic logic is_invalid_rw;
         automatic logic is_external;
         is_external = '0;
+        is_valid_addr = '1; // No error checking on valid address access
+        is_invalid_rw = '0;
         decoded_reg_strb.serial_link.CTRL = cpuif_req_masked & (cpuif_addr == 12'h0);
-        decoded_reg_strb.serial_link.ISOLATED = cpuif_req_masked & (cpuif_addr == 12'h4);
+        decoded_reg_strb.serial_link.ISOLATED = cpuif_req_masked & (cpuif_addr == 12'h4) & !cpuif_req_is_wr;
         is_external |= cpuif_req_masked & (cpuif_addr == 12'h4) & !cpuif_req_is_wr;
-        decoded_reg_strb.serial_link.RAW_MODE_EN = cpuif_req_masked & (cpuif_addr == 12'h8);
-        decoded_reg_strb.serial_link.RAW_MODE_IN_DATA = cpuif_req_masked & (cpuif_addr == 12'hc);
+        decoded_reg_strb.serial_link.RAW_MODE_EN = cpuif_req_masked & (cpuif_addr == 12'h8) & cpuif_req_is_wr;
+        decoded_reg_strb.serial_link.RAW_MODE_IN_DATA = cpuif_req_masked & (cpuif_addr == 12'hc) & !cpuif_req_is_wr;
         is_external |= cpuif_req_masked & (cpuif_addr == 12'hc) & !cpuif_req_is_wr;
-        decoded_reg_strb.serial_link.RAW_MODE_IN_CH_SEL = cpuif_req_masked & (cpuif_addr == 12'h10);
-        decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO = cpuif_req_masked & (cpuif_addr == 12'h14);
+        decoded_reg_strb.serial_link.RAW_MODE_IN_CH_SEL = cpuif_req_masked & (cpuif_addr == 12'h10) & cpuif_req_is_wr;
+        decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO = cpuif_req_masked & (cpuif_addr == 12'h14) & cpuif_req_is_wr;
         decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL = cpuif_req_masked & (cpuif_addr == 12'h18);
         is_external |= cpuif_req_masked & (cpuif_addr == 12'h18);
         decoded_reg_strb.serial_link.RAW_MODE_OUT_EN = cpuif_req_masked & (cpuif_addr == 12'h1c);
-        decoded_reg_strb.serial_link.FLOW_CONTROL_FIFO_CLEAR = cpuif_req_masked & (cpuif_addr == 12'h20);
+        decoded_reg_strb.serial_link.FLOW_CONTROL_FIFO_CLEAR = cpuif_req_masked & (cpuif_addr == 12'h20) & cpuif_req_is_wr;
         is_external |= cpuif_req_masked & (cpuif_addr == 12'h20) & cpuif_req_is_wr;
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.serial_link.RAW_MODE_IN_DATA_VALID[i0] = cpuif_req_masked & (cpuif_addr == 12'h100 + (12)'(i0) * 12'h4);
+            decoded_reg_strb.serial_link.RAW_MODE_IN_DATA_VALID[i0] = cpuif_req_masked & (cpuif_addr == 12'h100 + (12)'(i0) * 12'h4) & !cpuif_req_is_wr;
             is_external |= cpuif_req_masked & (cpuif_addr == 12'h100 + (12)'(i0) * 12'h4) & !cpuif_req_is_wr;
         end
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.serial_link.RAW_MODE_OUT_CH_MASK[i0] = cpuif_req_masked & (cpuif_addr == 12'h200 + (12)'(i0) * 12'h4);
+            decoded_reg_strb.serial_link.RAW_MODE_OUT_CH_MASK[i0] = cpuif_req_masked & (cpuif_addr == 12'h200 + (12)'(i0) * 12'h4) & cpuif_req_is_wr;
         end
         for(int i0=0; i0<1; i0++) begin
             decoded_reg_strb.serial_link.TX_PHY_CLK_DIV[i0] = cpuif_req_masked & (cpuif_addr == 12'h300 + (12)'(i0) * 12'h4);
@@ -174,10 +179,10 @@ module serial_link_single_channel_reg (
             decoded_reg_strb.serial_link.TX_PHY_CLK_END[i0] = cpuif_req_masked & (cpuif_addr == 12'h500 + (12)'(i0) * 12'h4);
         end
         decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CFG = cpuif_req_masked & (cpuif_addr == 12'h600);
-        decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CTRL = cpuif_req_masked & (cpuif_addr == 12'h604);
+        decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CTRL = cpuif_req_masked & (cpuif_addr == 12'h604) & cpuif_req_is_wr;
         is_external |= cpuif_req_masked & (cpuif_addr == 12'h604) & cpuif_req_is_wr;
         decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CFG = cpuif_req_masked & (cpuif_addr == 12'h608);
-        decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CTRL = cpuif_req_masked & (cpuif_addr == 12'h60c);
+        decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CTRL = cpuif_req_masked & (cpuif_addr == 12'h60c) & cpuif_req_is_wr;
         is_external |= cpuif_req_masked & (cpuif_addr == 12'h60c) & cpuif_req_is_wr;
         for(int i0=0; i0<1; i0++) begin
             decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CH_EN[i0] = cpuif_req_masked & (cpuif_addr == 12'h700 + (12)'(i0) * 12'h4);
@@ -185,6 +190,7 @@ module serial_link_single_channel_reg (
         for(int i0=0; i0<1; i0++) begin
             decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CH_EN[i0] = cpuif_req_masked & (cpuif_addr == 12'h800 + (12)'(i0) * 12'h4);
         end
+        decoded_err = (~is_valid_addr | is_invalid_rw) & decoded_req;
         decoded_strb_is_external = is_external;
         external_req = is_external;
     end
@@ -501,6 +507,7 @@ module serial_link_single_channel_reg (
         end
     end
     assign hwif_out.serial_link.CTRL.axi_out_isolate.value = field_storage.serial_link.CTRL.axi_out_isolate.value;
+    // External register: serial_link_single_channel_reg.serial_link.ISOLATED
 
     assign hwif_out.serial_link.ISOLATED.req = !decoded_req_is_wr ? decoded_reg_strb.serial_link.ISOLATED : '0;
     assign hwif_out.serial_link.ISOLATED.req_is_wr = decoded_req_is_wr;
@@ -527,6 +534,7 @@ module serial_link_single_channel_reg (
         end
     end
     assign hwif_out.serial_link.RAW_MODE_EN.raw_mode_en.value = field_storage.serial_link.RAW_MODE_EN.raw_mode_en.value;
+    // External register: serial_link_single_channel_reg.serial_link.RAW_MODE_IN_DATA
 
     assign hwif_out.serial_link.RAW_MODE_IN_DATA.req = !decoded_req_is_wr ? decoded_reg_strb.serial_link.RAW_MODE_IN_DATA : '0;
     assign hwif_out.serial_link.RAW_MODE_IN_DATA.req_is_wr = decoded_req_is_wr;
@@ -577,7 +585,7 @@ module serial_link_single_channel_reg (
     end
     assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value = field_storage.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.value;
     assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO.raw_mode_out_data_fifo.swmod = decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO && decoded_req_is_wr && |(decoded_wr_biten[15:0]);
-
+    // External register: serial_link_single_channel_reg.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL
     assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req = decoded_reg_strb.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL;
     assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.req_is_wr = decoded_req_is_wr;
     assign hwif_out.serial_link.RAW_MODE_OUT_DATA_FIFO_CTRL.wr_data = decoded_wr_data;
@@ -605,12 +613,14 @@ module serial_link_single_channel_reg (
         end
     end
     assign hwif_out.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value = field_storage.serial_link.RAW_MODE_OUT_EN.raw_mode_out_en.value;
+    // External register: serial_link_single_channel_reg.serial_link.FLOW_CONTROL_FIFO_CLEAR
 
     assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.req = decoded_req_is_wr ? decoded_reg_strb.serial_link.FLOW_CONTROL_FIFO_CLEAR : '0;
     assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.req_is_wr = decoded_req_is_wr;
     assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.wr_data = decoded_wr_data;
     assign hwif_out.serial_link.FLOW_CONTROL_FIFO_CLEAR.wr_biten = decoded_wr_biten;
     for(genvar i0=0; i0<1; i0++) begin
+        // External register: serial_link_single_channel_reg.serial_link.RAW_MODE_IN_DATA_VALID[]
 
         assign hwif_out.serial_link.RAW_MODE_IN_DATA_VALID[i0].req = !decoded_req_is_wr ? decoded_reg_strb.serial_link.RAW_MODE_IN_DATA_VALID[i0] : '0;
         assign hwif_out.serial_link.RAW_MODE_IN_DATA_VALID[i0].req_is_wr = decoded_req_is_wr;
@@ -784,6 +794,7 @@ module serial_link_single_channel_reg (
         end
     end
     assign hwif_out.serial_link.CHANNEL_ALLOC_TX_CFG.auto_flush_count.value = field_storage.serial_link.CHANNEL_ALLOC_TX_CFG.auto_flush_count.value;
+    // External register: serial_link_single_channel_reg.serial_link.CHANNEL_ALLOC_TX_CTRL
 
     assign hwif_out.serial_link.CHANNEL_ALLOC_TX_CTRL.req = decoded_req_is_wr ? decoded_reg_strb.serial_link.CHANNEL_ALLOC_TX_CTRL : '0;
     assign hwif_out.serial_link.CHANNEL_ALLOC_TX_CTRL.req_is_wr = decoded_req_is_wr;
@@ -881,6 +892,7 @@ module serial_link_single_channel_reg (
         end
     end
     assign hwif_out.serial_link.CHANNEL_ALLOC_RX_CFG.sync_en.value = field_storage.serial_link.CHANNEL_ALLOC_RX_CFG.sync_en.value;
+    // External register: serial_link_single_channel_reg.serial_link.CHANNEL_ALLOC_RX_CTRL
 
     assign hwif_out.serial_link.CHANNEL_ALLOC_RX_CTRL.req = decoded_req_is_wr ? decoded_reg_strb.serial_link.CHANNEL_ALLOC_RX_CTRL : '0;
     assign hwif_out.serial_link.CHANNEL_ALLOC_RX_CTRL.req_is_wr = decoded_req_is_wr;

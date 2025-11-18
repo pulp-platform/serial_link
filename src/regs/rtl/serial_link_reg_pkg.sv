@@ -10,7 +10,6 @@ package serial_link_reg_pkg;
     localparam SERIAL_LINK_REG_DATA_WIDTH = 32;
     localparam SERIAL_LINK_REG_MIN_ADDR_WIDTH = 12;
     localparam SERIAL_LINK_REG_SIZE = 'h898;
-
     localparam NumChannels = 'h26;
     localparam Log2NumChannels = 'h6;
     localparam NumBits = 'h10;

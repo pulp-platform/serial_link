@@ -10,7 +10,6 @@ package serial_link_single_channel_reg_pkg;
     localparam SERIAL_LINK_SINGLE_CHANNEL_REG_DATA_WIDTH = 32;
     localparam SERIAL_LINK_SINGLE_CHANNEL_REG_MIN_ADDR_WIDTH = 12;
     localparam SERIAL_LINK_SINGLE_CHANNEL_REG_SIZE = 'h804;
-
     localparam NumChannels = 'h1;
     localparam Log2NumChannels = 'h1;
     localparam NumBits = 'h10;
