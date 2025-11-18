@@ -28,9 +28,9 @@ module tb_axi_serial_link;
   localparam time         TckReg          = 200ns;
   localparam int unsigned RstClkCyclesSys = 1;
 
-  localparam int unsigned AxiIdWidth      = 8;
-  localparam int unsigned AxiAddrWidth    = 48;
-  localparam int unsigned AxiDataWidth    = 512;
+  localparam int unsigned AxiIdWidth      = 3;
+  localparam int unsigned AxiAddrWidth    = 32;
+  localparam int unsigned AxiDataWidth    = 64;
   localparam int unsigned AxiStrbWidth    = AxiDataWidth / 8;
   localparam int unsigned AxiUserWidth    = 1;
 
