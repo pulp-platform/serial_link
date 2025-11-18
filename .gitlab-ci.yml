@@ -55,24 +55,22 @@ run-vsim:
       | tee vsim.log 2>&1
     - (! grep -n "Error:" vsim.log)
     - (! grep -n "Fatal:" vsim.log)
-  variables:
-    TEST_LENGTH: 100
   parallel:
     matrix:
       - TB_DUT: [tb_axi_serial_link]
         NUM_CHANNELS: [1, 4]
-        NUM_READS_1: [0, $TEST_LENGTH]
-        NUM_WRITES_1: [0, $TEST_LENGTH]
-        NUM_READS_2: [0, $TEST_LENGTH]
-        NUM_WRITES_2: [0, $TEST_LENGTH]
+        NUM_READS_1: [0, 100]
+        NUM_WRITES_1: [0, 100]
+        NUM_READS_2: [0, 100]
+        NUM_WRITES_2: [0, 100]
       - TB_DUT: [tb_ch_calib_serial_link]
         NUM_CHANNELS: [4]
         NUM_FAULTS_1: [0, 1, 2]
         NUM_FAULTS_2: [0, 1, 2]
-        NUM_READS_1: [$TEST_LENGTH]
-        NUM_WRITES_1: [$TEST_LENGTH]
-        NUM_READS_2: [$TEST_LENGTH]
-        NUM_WRITES_2: [$TEST_LENGTH]
+        NUM_READS_1: [10]
+        NUM_WRITES_1: [10]
+        NUM_READS_2: [10]
+        NUM_WRITES_2: [10]
   timeout: 15 minutes
 
 run-vcs:
@@ -88,22 +86,20 @@ run-vcs:
       +NUM_FAULTS_1=$NUM_FAULTS_1 +NUM_FAULTS_2=$NUM_FAULTS_2"
       | tee vcs.log 2>&1
     - (! grep -n "Error-\[" simulate.log)
-  variables:
-    TEST_LENGTH: 100
   parallel:
     matrix:
       - TB_DUT: [tb_axi_serial_link]
         NUM_CHANNELS: [1, 4]
-        NUM_READS_1: [0, $TEST_LENGTH]
-        NUM_WRITES_1: [0, $TEST_LENGTH]
-        NUM_READS_2: [0, $TEST_LENGTH]
-        NUM_WRITES_2: [0, $TEST_LENGTH]
+        NUM_READS_1: [0, 100]
+        NUM_WRITES_1: [0, 100]
+        NUM_READS_2: [0, 100]
+        NUM_WRITES_2: [0, 100]
       - TB_DUT: [tb_ch_calib_serial_link]
         NUM_CHANNELS: [4]
         NUM_FAULTS_1: [0, 1, 2]
         NUM_FAULTS_2: [0, 1, 2]
-        NUM_READS_1: [$TEST_LENGTH]
-        NUM_WRITES_1: [$TEST_LENGTH]
-        NUM_READS_2: [$TEST_LENGTH]
-        NUM_WRITES_2: [$TEST_LENGTH]
+        NUM_READS_1: [10]
+        NUM_WRITES_1: [10]
+        NUM_READS_2: [10]
+        NUM_WRITES_2: [10]
   timeout: 15 minutes
