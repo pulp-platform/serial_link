@@ -1,7 +1,11 @@
+# Copyright 2022 ETH Zurich and University of Bologna.
+# Solderpad Hardware License, Version 0.51, see LICENSE for details.
+# SPDX-License-Identifier: SHL-0.51
+
 [project]
-name = "serial-link"
+name = "serial_link"
 version = "0.1.0"
-description = "Add your description here"
+description = "A simple, scalable, source-synchronous, all-digital DDR link"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
