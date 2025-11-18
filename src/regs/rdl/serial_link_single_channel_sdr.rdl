@@ -16,7 +16,8 @@ addrmap serial_link_single_channel_sdr_reg #(
     longint unsigned Log2NumChannels = 1,
     longint unsigned NumBits = 8,
     longint unsigned Log2MaxClkDiv = 10,
-    longint unsigned Log2RawModeTXFifoDepth = 3
+    longint unsigned Log2RawModeTXFifoDepth = 3,
+    longint unsigned EnDdr = 0
 ) {
     default regwidth = 32;
 

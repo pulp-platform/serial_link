@@ -15,7 +15,8 @@ regfile serial_link_base #(
     longint unsigned NumBits = 16,
     longint unsigned Log2MaxClkDiv = 10,
     longint unsigned FlushCounterWidth = 8,
-    longint unsigned Log2RawModeTXFifoDepth = 3
+    longint unsigned Log2RawModeTXFifoDepth = 3,
+    longint unsigned EnDdr = 1
 ) {
     reg ctrl {
         desc = "Global clock, isolation and reset control configuration";
@@ -70,7 +71,7 @@ regfile serial_link_base #(
         field {
             name = "clk_shift_start";
             desc = "Positive Edge of divided, shifted clock";
-        } clk_divs[Log2MaxClkDiv:0] = 0x2; // for DDR 2, for SDR 4
+        } clk_divs[Log2MaxClkDiv:0] = EnDdr? 0x2 : 0x4;
     };
 
     reg tx_phy_clk_end {
@@ -80,7 +81,7 @@ regfile serial_link_base #(
         field {
             name = "clk_shift_end";
             desc = "Negative Edge of divided, shifted clock";
-        } clk_shift_end[Log2MaxClkDiv:0] = 0x6; // for DDR 6, for SDR 0
+        } clk_shift_end[Log2MaxClkDiv:0] = EnDdr? 0x6 : 0x0;
     };
 
     reg raw_mode_en {
