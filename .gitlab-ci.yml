@@ -39,7 +39,7 @@ build-vcs:
         TB_DUT: [tb_axi_serial_link, tb_ch_calib_serial_link]
   artifacts:
     paths:
-      - bin/${TB_DUT}_${NUM_CHANNELS}.vcs
+      - bin/${TB_DUT}_${NUM_CHANNELS}.vcs*
 
 run-vsim:
   stage: test
