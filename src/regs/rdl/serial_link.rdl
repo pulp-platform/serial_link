@@ -12,11 +12,11 @@
 addrmap serial_link_reg #(
     longint unsigned NumChannels = 1,
     longint unsigned NumLanes = 8,
-    longint unsigned NumBits = 2*NumLanes,
+    longint unsigned EnDdr = 1,
+    longint unsigned NumBits = (1+EnDdr)*NumLanes,
     longint unsigned Log2MaxClkDiv = 10,
     longint unsigned FlushCounterWidth = 8,
     longint unsigned Log2RawModeTXFifoDepth = 3, // 8 entries
-    longint unsigned EnDdr = 1,
     longint unsigned EnChAlloc = (NumChannels > 1)
 ) {
 

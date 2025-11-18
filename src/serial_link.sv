@@ -219,7 +219,7 @@ module serial_link
     .cfg_flow_control_fifo_clear_i           ( cfg_flow_control_fifo_clear                      ),
     .cfg_raw_mode_en_i                       ( reg2hw.raw_mode_en.raw_mode_en.value ),
     .cfg_raw_mode_in_ch_sel_i                (
-      reg2hw.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value ),
+      reg2hw.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value[cf_math_pkg::idx_width(NumChannels)-1:0] ),
     .cfg_raw_mode_in_data_o                  (
       hw2reg.raw_mode_in_data.rd_data.raw_mode_in_data ),
     .cfg_raw_mode_in_data_valid_o            ( raw_mode_in_data_valid                           ),
@@ -414,7 +414,7 @@ module serial_link
   end
   assign hw2reg.raw_mode_in_data.rd_ack = reg2hw.raw_mode_in_data.req
     & ~reg2hw.raw_mode_in_data.req_is_wr;
-  assign hw2reg.raw_mode_in_data.rd_data._reserved_31_8 = '0;
+  assign hw2reg.raw_mode_in_data.rd_data._reserved_31_16 = '0;
   assign hw2reg.raw_mode_out_data_fifo_ctrl.rd_ack =
       reg2hw.raw_mode_out_data_fifo_ctrl.req
     & ~reg2hw.raw_mode_out_data_fifo_ctrl.req_is_wr;

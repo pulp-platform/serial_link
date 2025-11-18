@@ -12,306 +12,306 @@ package serial_link_reg_pkg;
     localparam SERIAL_LINK_REG_SIZE = 'h804;
     localparam NumChannels = 'h1;
     localparam NumLanes = 'h8;
-    localparam NumBits = 'h8;
+    localparam EnDdr = 'h1;
+    localparam NumBits = 'h10;
     localparam Log2MaxClkDiv = 'ha;
     localparam FlushCounterWidth = 'h8;
     localparam Log2RawModeTXFifoDepth = 'h3;
-    localparam EnDdr = 'h1;
     localparam EnChAlloc = 'h0;
 
     typedef struct packed {
         logic [29:0] _reserved_31_2;
         logic axi_out;
         logic axi_in;
-    } serial_link_reg_NumBits_8__isolated__external__fields__in_t;
+    } serial_link_reg__isolated__external__fields__in_t;
 
     typedef struct {
         logic rd_ack;
-        serial_link_reg_NumBits_8__isolated__external__fields__in_t rd_data;
-    } serial_link_reg_NumBits_8__isolated__external__in_t;
+        serial_link_reg__isolated__external__fields__in_t rd_data;
+    } serial_link_reg__isolated__external__in_t;
 
     typedef struct packed {
-        logic [23:0] _reserved_31_8;
-        logic [7:0] raw_mode_in_data;
-    } serial_link_reg_NumBits_8__raw_mode_in_data__external__fields__in_t;
+        logic [15:0] _reserved_31_16;
+        logic [15:0] raw_mode_in_data;
+    } serial_link_reg__raw_mode_in_data__external__fields__in_t;
 
     typedef struct {
         logic rd_ack;
-        serial_link_reg_NumBits_8__raw_mode_in_data__external__fields__in_t rd_data;
-    } serial_link_reg_NumBits_8__raw_mode_in_data__external__in_t;
+        serial_link_reg__raw_mode_in_data__external__fields__in_t rd_data;
+    } serial_link_reg__raw_mode_in_data__external__in_t;
 
     typedef struct packed {
         logic is_full;
         logic [19:0] _reserved_30_11;
         logic [2:0] fill_state;
         logic [7:0] _reserved_7_0;
-    } serial_link_reg_NumBits_8__raw_mode_out_data_fifo_ctrl__external__fields__in_t;
+    } serial_link_reg__raw_mode_out_data_fifo_ctrl__external__fields__in_t;
 
     typedef struct {
         logic rd_ack;
-        serial_link_reg_NumBits_8__raw_mode_out_data_fifo_ctrl__external__fields__in_t rd_data;
+        serial_link_reg__raw_mode_out_data_fifo_ctrl__external__fields__in_t rd_data;
         logic wr_ack;
-    } serial_link_reg_NumBits_8__raw_mode_out_data_fifo_ctrl__external__in_t;
+    } serial_link_reg__raw_mode_out_data_fifo_ctrl__external__in_t;
 
     typedef struct {
         logic wr_ack;
-    } serial_link_reg_NumBits_8__flow_control_fifo_clear__external__in_t;
+    } serial_link_reg__flow_control_fifo_clear__external__in_t;
 
     typedef struct packed {
         logic [30:0] _reserved_31_1;
         logic raw_mode_in_data_valid;
-    } serial_link_reg_NumBits_8__raw_mode_in_data_valid__external__fields__in_t;
+    } serial_link_reg__raw_mode_in_data_valid__external__fields__in_t;
 
     typedef struct {
         logic rd_ack;
-        serial_link_reg_NumBits_8__raw_mode_in_data_valid__external__fields__in_t rd_data;
-    } serial_link_reg_NumBits_8__raw_mode_in_data_valid__external__in_t;
+        serial_link_reg__raw_mode_in_data_valid__external__fields__in_t rd_data;
+    } serial_link_reg__raw_mode_in_data_valid__external__in_t;
 
     typedef struct packed {
         logic [29:0] _reserved_31_2;
         logic flush;
         logic clear;
-    } serial_link_reg_NumBits_8__channel_alloc_tx_ctrl__external__fields__in_t;
+    } serial_link_reg__channel_alloc_tx_ctrl__external__fields__in_t;
 
     typedef struct {
         logic rd_ack;
-        serial_link_reg_NumBits_8__channel_alloc_tx_ctrl__external__fields__in_t rd_data;
-    } serial_link_reg_NumBits_8__channel_alloc_tx_ctrl__external__in_t;
+        serial_link_reg__channel_alloc_tx_ctrl__external__fields__in_t rd_data;
+    } serial_link_reg__channel_alloc_tx_ctrl__external__in_t;
 
     typedef struct packed {
         logic [30:0] _reserved_31_1;
         logic clear;
-    } serial_link_reg_NumBits_8__channel_alloc_rx_ctrl__external__fields__in_t;
+    } serial_link_reg__channel_alloc_rx_ctrl__external__fields__in_t;
 
     typedef struct {
         logic rd_ack;
-        serial_link_reg_NumBits_8__channel_alloc_rx_ctrl__external__fields__in_t rd_data;
-    } serial_link_reg_NumBits_8__channel_alloc_rx_ctrl__external__in_t;
+        serial_link_reg__channel_alloc_rx_ctrl__external__fields__in_t rd_data;
+    } serial_link_reg__channel_alloc_rx_ctrl__external__in_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__isolated__external__in_t isolated;
-        serial_link_reg_NumBits_8__raw_mode_in_data__external__in_t raw_mode_in_data;
-        serial_link_reg_NumBits_8__raw_mode_out_data_fifo_ctrl__external__in_t raw_mode_out_data_fifo_ctrl;
-        serial_link_reg_NumBits_8__flow_control_fifo_clear__external__in_t flow_control_fifo_clear;
-        serial_link_reg_NumBits_8__raw_mode_in_data_valid__external__in_t raw_mode_in_data_valid[1];
-        serial_link_reg_NumBits_8__channel_alloc_tx_ctrl__external__in_t channel_alloc_tx_ctrl;
-        serial_link_reg_NumBits_8__channel_alloc_rx_ctrl__external__in_t channel_alloc_rx_ctrl;
+        serial_link_reg__isolated__external__in_t isolated;
+        serial_link_reg__raw_mode_in_data__external__in_t raw_mode_in_data;
+        serial_link_reg__raw_mode_out_data_fifo_ctrl__external__in_t raw_mode_out_data_fifo_ctrl;
+        serial_link_reg__flow_control_fifo_clear__external__in_t flow_control_fifo_clear;
+        serial_link_reg__raw_mode_in_data_valid__external__in_t raw_mode_in_data_valid[1];
+        serial_link_reg__channel_alloc_tx_ctrl__external__in_t channel_alloc_tx_ctrl;
+        serial_link_reg__channel_alloc_rx_ctrl__external__in_t channel_alloc_rx_ctrl;
     } serial_link_reg__in_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__ctrl__clk_ena__out_t;
+    } serial_link_reg__ctrl__clk_ena__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__ctrl__reset_n__out_t;
+    } serial_link_reg__ctrl__reset_n__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__ctrl__axi_in_isolate__out_t;
+    } serial_link_reg__ctrl__axi_in_isolate__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__ctrl__axi_out_isolate__out_t;
+    } serial_link_reg__ctrl__axi_out_isolate__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__ctrl__clk_ena__out_t clk_ena;
-        serial_link_reg_NumBits_8__ctrl__reset_n__out_t reset_n;
-        serial_link_reg_NumBits_8__ctrl__axi_in_isolate__out_t axi_in_isolate;
-        serial_link_reg_NumBits_8__ctrl__axi_out_isolate__out_t axi_out_isolate;
-    } serial_link_reg_NumBits_8__ctrl__out_t;
+        serial_link_reg__ctrl__clk_ena__out_t clk_ena;
+        serial_link_reg__ctrl__reset_n__out_t reset_n;
+        serial_link_reg__ctrl__axi_in_isolate__out_t axi_in_isolate;
+        serial_link_reg__ctrl__axi_out_isolate__out_t axi_out_isolate;
+    } serial_link_reg__ctrl__out_t;
 
     typedef struct {
         logic req;
         logic req_is_wr;
-    } serial_link_reg_NumBits_8__isolated__external__out_t;
+    } serial_link_reg__isolated__external__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__raw_mode_en__raw_mode_en__out_t;
+    } serial_link_reg__raw_mode_en__raw_mode_en__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__raw_mode_en__raw_mode_en__out_t raw_mode_en;
-    } serial_link_reg_NumBits_8__raw_mode_en__out_t;
+        serial_link_reg__raw_mode_en__raw_mode_en__out_t raw_mode_en;
+    } serial_link_reg__raw_mode_en__out_t;
 
     typedef struct {
         logic req;
         logic req_is_wr;
-    } serial_link_reg_NumBits_8__raw_mode_in_data__external__out_t;
+    } serial_link_reg__raw_mode_in_data__external__out_t;
 
     typedef struct {
         logic [7:0] value;
-    } serial_link_reg_NumBits_8__raw_mode_in_ch_sel__raw_mode_in_ch_sel__out_t;
+    } serial_link_reg__raw_mode_in_ch_sel__raw_mode_in_ch_sel__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__raw_mode_in_ch_sel__raw_mode_in_ch_sel__out_t raw_mode_in_ch_sel;
-    } serial_link_reg_NumBits_8__raw_mode_in_ch_sel__out_t;
+        serial_link_reg__raw_mode_in_ch_sel__raw_mode_in_ch_sel__out_t raw_mode_in_ch_sel;
+    } serial_link_reg__raw_mode_in_ch_sel__out_t;
 
     typedef struct {
-        logic [7:0] value;
+        logic [15:0] value;
         logic swmod;
-    } serial_link_reg_NumBits_8__raw_mode_out_data_fifo__raw_mode_out_data_fifo__out_t;
+    } serial_link_reg__raw_mode_out_data_fifo__raw_mode_out_data_fifo__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__raw_mode_out_data_fifo__raw_mode_out_data_fifo__out_t raw_mode_out_data_fifo;
-    } serial_link_reg_NumBits_8__raw_mode_out_data_fifo__out_t;
+        serial_link_reg__raw_mode_out_data_fifo__raw_mode_out_data_fifo__out_t raw_mode_out_data_fifo;
+    } serial_link_reg__raw_mode_out_data_fifo__out_t;
 
     typedef struct packed {
         logic [30:0] _reserved_31_1;
         logic clear;
-    } serial_link_reg_NumBits_8__raw_mode_out_data_fifo_ctrl__external__fields__out_t;
+    } serial_link_reg__raw_mode_out_data_fifo_ctrl__external__fields__out_t;
 
     typedef struct {
         logic req;
         logic req_is_wr;
-        serial_link_reg_NumBits_8__raw_mode_out_data_fifo_ctrl__external__fields__out_t wr_data;
-        serial_link_reg_NumBits_8__raw_mode_out_data_fifo_ctrl__external__fields__out_t wr_biten;
-    } serial_link_reg_NumBits_8__raw_mode_out_data_fifo_ctrl__external__out_t;
+        serial_link_reg__raw_mode_out_data_fifo_ctrl__external__fields__out_t wr_data;
+        serial_link_reg__raw_mode_out_data_fifo_ctrl__external__fields__out_t wr_biten;
+    } serial_link_reg__raw_mode_out_data_fifo_ctrl__external__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__raw_mode_out_en__raw_mode_out_en__out_t;
+    } serial_link_reg__raw_mode_out_en__raw_mode_out_en__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__raw_mode_out_en__raw_mode_out_en__out_t raw_mode_out_en;
-    } serial_link_reg_NumBits_8__raw_mode_out_en__out_t;
+        serial_link_reg__raw_mode_out_en__raw_mode_out_en__out_t raw_mode_out_en;
+    } serial_link_reg__raw_mode_out_en__out_t;
 
     typedef struct packed {
         logic [30:0] _reserved_31_1;
         logic flow_control_fifo_clear;
-    } serial_link_reg_NumBits_8__flow_control_fifo_clear__external__fields__out_t;
+    } serial_link_reg__flow_control_fifo_clear__external__fields__out_t;
 
     typedef struct {
         logic req;
         logic req_is_wr;
-        serial_link_reg_NumBits_8__flow_control_fifo_clear__external__fields__out_t wr_data;
-        serial_link_reg_NumBits_8__flow_control_fifo_clear__external__fields__out_t wr_biten;
-    } serial_link_reg_NumBits_8__flow_control_fifo_clear__external__out_t;
+        serial_link_reg__flow_control_fifo_clear__external__fields__out_t wr_data;
+        serial_link_reg__flow_control_fifo_clear__external__fields__out_t wr_biten;
+    } serial_link_reg__flow_control_fifo_clear__external__out_t;
 
     typedef struct {
         logic req;
         logic req_is_wr;
-    } serial_link_reg_NumBits_8__raw_mode_in_data_valid__external__out_t;
+    } serial_link_reg__raw_mode_in_data_valid__external__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__raw_mode_out_ch_mask__raw_mode_out_ch_mask__out_t;
+    } serial_link_reg__raw_mode_out_ch_mask__raw_mode_out_ch_mask__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__raw_mode_out_ch_mask__raw_mode_out_ch_mask__out_t raw_mode_out_ch_mask;
-    } serial_link_reg_NumBits_8__raw_mode_out_ch_mask__out_t;
-
-    typedef struct {
-        logic [10:0] value;
-    } serial_link_reg_NumBits_8__tx_phy_clk_div__clk_divs__out_t;
-
-    typedef struct {
-        serial_link_reg_NumBits_8__tx_phy_clk_div__clk_divs__out_t clk_divs;
-    } serial_link_reg_NumBits_8__tx_phy_clk_div__out_t;
+        serial_link_reg__raw_mode_out_ch_mask__raw_mode_out_ch_mask__out_t raw_mode_out_ch_mask;
+    } serial_link_reg__raw_mode_out_ch_mask__out_t;
 
     typedef struct {
         logic [10:0] value;
-    } serial_link_reg_NumBits_8__tx_phy_clk_start__clk_divs__out_t;
+    } serial_link_reg__tx_phy_clk_div__clk_divs__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__tx_phy_clk_start__clk_divs__out_t clk_divs;
-    } serial_link_reg_NumBits_8__tx_phy_clk_start__out_t;
+        serial_link_reg__tx_phy_clk_div__clk_divs__out_t clk_divs;
+    } serial_link_reg__tx_phy_clk_div__out_t;
 
     typedef struct {
         logic [10:0] value;
-    } serial_link_reg_NumBits_8__tx_phy_clk_end__clk_shift_end__out_t;
+    } serial_link_reg__tx_phy_clk_start__clk_divs__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__tx_phy_clk_end__clk_shift_end__out_t clk_shift_end;
-    } serial_link_reg_NumBits_8__tx_phy_clk_end__out_t;
+        serial_link_reg__tx_phy_clk_start__clk_divs__out_t clk_divs;
+    } serial_link_reg__tx_phy_clk_start__out_t;
+
+    typedef struct {
+        logic [10:0] value;
+    } serial_link_reg__tx_phy_clk_end__clk_shift_end__out_t;
+
+    typedef struct {
+        serial_link_reg__tx_phy_clk_end__clk_shift_end__out_t clk_shift_end;
+    } serial_link_reg__tx_phy_clk_end__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__channel_alloc_tx_cfg__bypass_en__out_t;
+    } serial_link_reg__channel_alloc_tx_cfg__bypass_en__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__channel_alloc_tx_cfg__auto_flush_en__out_t;
+    } serial_link_reg__channel_alloc_tx_cfg__auto_flush_en__out_t;
 
     typedef struct {
         logic [7:0] value;
-    } serial_link_reg_NumBits_8__channel_alloc_tx_cfg__auto_flush_count__out_t;
+    } serial_link_reg__channel_alloc_tx_cfg__auto_flush_count__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__channel_alloc_tx_cfg__bypass_en__out_t bypass_en;
-        serial_link_reg_NumBits_8__channel_alloc_tx_cfg__auto_flush_en__out_t auto_flush_en;
-        serial_link_reg_NumBits_8__channel_alloc_tx_cfg__auto_flush_count__out_t auto_flush_count;
-    } serial_link_reg_NumBits_8__channel_alloc_tx_cfg__out_t;
+        serial_link_reg__channel_alloc_tx_cfg__bypass_en__out_t bypass_en;
+        serial_link_reg__channel_alloc_tx_cfg__auto_flush_en__out_t auto_flush_en;
+        serial_link_reg__channel_alloc_tx_cfg__auto_flush_count__out_t auto_flush_count;
+    } serial_link_reg__channel_alloc_tx_cfg__out_t;
 
     typedef struct {
         logic req;
         logic req_is_wr;
-    } serial_link_reg_NumBits_8__channel_alloc_tx_ctrl__external__out_t;
+    } serial_link_reg__channel_alloc_tx_ctrl__external__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__channel_alloc_rx_cfg__bypass_en__out_t;
+    } serial_link_reg__channel_alloc_rx_cfg__bypass_en__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__channel_alloc_rx_cfg__auto_flush_en__out_t;
+    } serial_link_reg__channel_alloc_rx_cfg__auto_flush_en__out_t;
 
     typedef struct {
         logic [7:0] value;
-    } serial_link_reg_NumBits_8__channel_alloc_rx_cfg__auto_flush_count__out_t;
+    } serial_link_reg__channel_alloc_rx_cfg__auto_flush_count__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__channel_alloc_rx_cfg__sync_en__out_t;
+    } serial_link_reg__channel_alloc_rx_cfg__sync_en__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__channel_alloc_rx_cfg__bypass_en__out_t bypass_en;
-        serial_link_reg_NumBits_8__channel_alloc_rx_cfg__auto_flush_en__out_t auto_flush_en;
-        serial_link_reg_NumBits_8__channel_alloc_rx_cfg__auto_flush_count__out_t auto_flush_count;
-        serial_link_reg_NumBits_8__channel_alloc_rx_cfg__sync_en__out_t sync_en;
-    } serial_link_reg_NumBits_8__channel_alloc_rx_cfg__out_t;
+        serial_link_reg__channel_alloc_rx_cfg__bypass_en__out_t bypass_en;
+        serial_link_reg__channel_alloc_rx_cfg__auto_flush_en__out_t auto_flush_en;
+        serial_link_reg__channel_alloc_rx_cfg__auto_flush_count__out_t auto_flush_count;
+        serial_link_reg__channel_alloc_rx_cfg__sync_en__out_t sync_en;
+    } serial_link_reg__channel_alloc_rx_cfg__out_t;
 
     typedef struct {
         logic req;
         logic req_is_wr;
-    } serial_link_reg_NumBits_8__channel_alloc_rx_ctrl__external__out_t;
+    } serial_link_reg__channel_alloc_rx_ctrl__external__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__channel_alloc_tx_ch_en__channel_alloc_tx_ch_en__out_t;
+    } serial_link_reg__channel_alloc_tx_ch_en__channel_alloc_tx_ch_en__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__channel_alloc_tx_ch_en__channel_alloc_tx_ch_en__out_t channel_alloc_tx_ch_en;
-    } serial_link_reg_NumBits_8__channel_alloc_tx_ch_en__out_t;
+        serial_link_reg__channel_alloc_tx_ch_en__channel_alloc_tx_ch_en__out_t channel_alloc_tx_ch_en;
+    } serial_link_reg__channel_alloc_tx_ch_en__out_t;
 
     typedef struct {
         logic value;
-    } serial_link_reg_NumBits_8__channel_alloc_rx_ch_en__channel_alloc_rx_ch_en__out_t;
+    } serial_link_reg__channel_alloc_rx_ch_en__channel_alloc_rx_ch_en__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__channel_alloc_rx_ch_en__channel_alloc_rx_ch_en__out_t channel_alloc_rx_ch_en;
-    } serial_link_reg_NumBits_8__channel_alloc_rx_ch_en__out_t;
+        serial_link_reg__channel_alloc_rx_ch_en__channel_alloc_rx_ch_en__out_t channel_alloc_rx_ch_en;
+    } serial_link_reg__channel_alloc_rx_ch_en__out_t;
 
     typedef struct {
-        serial_link_reg_NumBits_8__ctrl__out_t ctrl;
-        serial_link_reg_NumBits_8__isolated__external__out_t isolated;
-        serial_link_reg_NumBits_8__raw_mode_en__out_t raw_mode_en;
-        serial_link_reg_NumBits_8__raw_mode_in_data__external__out_t raw_mode_in_data;
-        serial_link_reg_NumBits_8__raw_mode_in_ch_sel__out_t raw_mode_in_ch_sel;
-        serial_link_reg_NumBits_8__raw_mode_out_data_fifo__out_t raw_mode_out_data_fifo;
-        serial_link_reg_NumBits_8__raw_mode_out_data_fifo_ctrl__external__out_t raw_mode_out_data_fifo_ctrl;
-        serial_link_reg_NumBits_8__raw_mode_out_en__out_t raw_mode_out_en;
-        serial_link_reg_NumBits_8__flow_control_fifo_clear__external__out_t flow_control_fifo_clear;
-        serial_link_reg_NumBits_8__raw_mode_in_data_valid__external__out_t raw_mode_in_data_valid[1];
-        serial_link_reg_NumBits_8__raw_mode_out_ch_mask__out_t raw_mode_out_ch_mask[1];
-        serial_link_reg_NumBits_8__tx_phy_clk_div__out_t tx_phy_clk_div[1];
-        serial_link_reg_NumBits_8__tx_phy_clk_start__out_t tx_phy_clk_start[1];
-        serial_link_reg_NumBits_8__tx_phy_clk_end__out_t tx_phy_clk_end[1];
-        serial_link_reg_NumBits_8__channel_alloc_tx_cfg__out_t channel_alloc_tx_cfg;
-        serial_link_reg_NumBits_8__channel_alloc_tx_ctrl__external__out_t channel_alloc_tx_ctrl;
-        serial_link_reg_NumBits_8__channel_alloc_rx_cfg__out_t channel_alloc_rx_cfg;
-        serial_link_reg_NumBits_8__channel_alloc_rx_ctrl__external__out_t channel_alloc_rx_ctrl;
-        serial_link_reg_NumBits_8__channel_alloc_tx_ch_en__out_t channel_alloc_tx_ch_en[1];
-        serial_link_reg_NumBits_8__channel_alloc_rx_ch_en__out_t channel_alloc_rx_ch_en[1];
+        serial_link_reg__ctrl__out_t ctrl;
+        serial_link_reg__isolated__external__out_t isolated;
+        serial_link_reg__raw_mode_en__out_t raw_mode_en;
+        serial_link_reg__raw_mode_in_data__external__out_t raw_mode_in_data;
+        serial_link_reg__raw_mode_in_ch_sel__out_t raw_mode_in_ch_sel;
+        serial_link_reg__raw_mode_out_data_fifo__out_t raw_mode_out_data_fifo;
+        serial_link_reg__raw_mode_out_data_fifo_ctrl__external__out_t raw_mode_out_data_fifo_ctrl;
+        serial_link_reg__raw_mode_out_en__out_t raw_mode_out_en;
+        serial_link_reg__flow_control_fifo_clear__external__out_t flow_control_fifo_clear;
+        serial_link_reg__raw_mode_in_data_valid__external__out_t raw_mode_in_data_valid[1];
+        serial_link_reg__raw_mode_out_ch_mask__out_t raw_mode_out_ch_mask[1];
+        serial_link_reg__tx_phy_clk_div__out_t tx_phy_clk_div[1];
+        serial_link_reg__tx_phy_clk_start__out_t tx_phy_clk_start[1];
+        serial_link_reg__tx_phy_clk_end__out_t tx_phy_clk_end[1];
+        serial_link_reg__channel_alloc_tx_cfg__out_t channel_alloc_tx_cfg;
+        serial_link_reg__channel_alloc_tx_ctrl__external__out_t channel_alloc_tx_ctrl;
+        serial_link_reg__channel_alloc_rx_cfg__out_t channel_alloc_rx_cfg;
+        serial_link_reg__channel_alloc_rx_ctrl__external__out_t channel_alloc_rx_ctrl;
+        serial_link_reg__channel_alloc_tx_ch_en__out_t channel_alloc_tx_ch_en[1];
+        serial_link_reg__channel_alloc_rx_ch_en__out_t channel_alloc_rx_ch_en[1];
     } serial_link_reg__out_t;
 endpackage
