@@ -150,20 +150,3 @@ vcs-clean:
 	@rm -f  vc_hdrs.h
 	@rm -f  logs/*.vcs.log
 	@rm -f  scripts/compile_vcs.log
-
-######
-# CI #
-######
-
-.PHONY: bender
-
-bender:
-ifeq (,$(wildcard ./bender))
-	curl --proto '=https' --tlsv1.2 -sSf https://pulp-platform.github.io/bender/init \
-		| bash -s -- 0.25.3
-	touch bender
-endif
-
-.PHONY: remove_bender
-remove_bender:
-	rm -f bender
