@@ -410,6 +410,12 @@ module tb_ch_calib_serial_link;
     $stop();
   endtask
 
+  function automatic string print_ch_mask(
+    logic [NumChannels-1:0] channel_mask
+  );
+    return $sformatf($sformatf("%%%0db", NumChannels), channel_mask);
+  endfunction
+
   task automatic random_channel_faults(
     output logic [NumChannels-1:0] channel_mask_1,
     logic [NumChannels-1:0] channel_mask_2
@@ -423,10 +429,10 @@ module tb_ch_calib_serial_link;
       $countones(~channel_mask_2) == NumChannelFaults2;
     };
     assert(rand_success) else $error("Randomization failed.");
-    $info("Chip 1 to chip 2 %d faulty channels, enabled channels: %38b",
-      NumChannelFaults1, channel_mask_1);
-    $info("Chip 2 to chip 1 %d faulty channels, enabled channels: %38b",
-      NumChannelFaults2, channel_mask_2);
+    $info("Chip 1 to chip 2 %d faulty channels, enabled channels: %s",
+      NumChannelFaults1, print_ch_mask(channel_mask_1));
+    $info("Chip 2 to chip 1 %d faulty channels, enabled channels: %s",
+      NumChannelFaults2, print_ch_mask(channel_mask_2));
   endtask
 
   task automatic cfg_write(apb_master_t drv, cfg_addr_t addr, cfg_data_t data, cfg_strb_t strb='1);
@@ -547,7 +553,7 @@ module tb_ch_calib_serial_link;
         $info("[DDR%0d] Calibration failed for channel %0d.", id, c);
       end
     end
-    $info("[DDR%0d] RX channel mask %38b", id, working_rx_channels);
+    $info("[DDR%0d] RX channel mask %s", id, print_ch_mask(working_rx_channels));
     // Check that there is no more valid data in the RX FIFOs
     // of all working channels
     for (int i = 0; i < NumChannels; i++) begin
@@ -555,7 +561,7 @@ module tb_ch_calib_serial_link;
       raw_mode_data_in_valid[i] = data[0];
     end
     assert ((raw_mode_data_in_valid[NumChannels-1:0] & working_rx_channels) == '0) else begin
-      $error("[DDR%0d] Still data in RX FIFO %38b", id, data & working_rx_channels);
+      $error("[DDR%0d] Still data in RX FIFO %s", id, print_ch_mask(data & working_rx_channels));
     end
     // Clear the TX Fifo
     cfg_write(drv, `SERIAL_LINK_REG_RAW_MODE_OUT_DATA_FIFO_CTRL_REG_OFFSET, 32'h1);
@@ -585,7 +591,7 @@ module tb_ch_calib_serial_link;
         end
       end
     end
-    $info("[DDR%0d] TX channel mask %38b", id, working_tx_channels);
+    $info("[DDR%0d] TX channel mask %s", id, print_ch_mask(working_tx_channels));
     // Disable TX Fifo
     cfg_write(drv, `SERIAL_LINK_REG_RAW_MODE_OUT_EN_REG_OFFSET, 0);
     // Enable RX/TX channels
