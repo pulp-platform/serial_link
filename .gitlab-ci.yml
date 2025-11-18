@@ -32,14 +32,14 @@ build-vcs:
   stage: build
   script:
     - make update-regs NUM_CHANNELS=${NUM_CHANNELS}
-    - make bin/${TB_DUT}_${NUM_CHANNELS}
+    - make bin/${TB_DUT}_${NUM_CHANNELS}.vcs
   parallel:
     matrix:
       - NUM_CHANNELS: [1, 4, 38]
         TB_DUT: [tb_axi_serial_link, tb_ch_calib_serial_link]
   artifacts:
     paths:
-      - bin/${TB_DUT}_${NUM_CHANNELS}
+      - bin/${TB_DUT}_${NUM_CHANNELS}.vcs
 
 # run_vsim_axi:
 #   stage: test
