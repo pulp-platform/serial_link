@@ -93,10 +93,10 @@ vsim-clean:
 	@rm -rf scripts/vsim.log
 
 vsim-run:
-	$(VSIM) $(VSIM_FLAGS) $(VSIM_FLAGS_GUI) $(TB_DUT)
+	$(VSIM) $(VSIM_FLAGS) $(SIM_ARGS) $(VSIM_FLAGS_GUI) $(TB_DUT)
 
 vsim-run-batch:
-	$(VSIM) -c $(VSIM_FLAGS) $(TB_DUT) -do "run -all; quit"
+	$(VSIM) -c $(VSIM_FLAGS) $(SIM_ARGS) $(TB_DUT) -do "run -all; quit"
 
 
 ##################
@@ -107,9 +107,9 @@ vsim-run-batch:
 
 VLOGAN_ARGS += -timescale=1ns/1ps
 
-VCS_ARGS    += -full64
-VCS_ARGS    += -Mlib=$(WORK)
-VCS_ARGS    += -Mdir=$(WORK)
+VCS_FLAGS    += -full64
+VCS_FLAGS    += -Mlib=$(WORK)
+VCS_FLAGS    += -Mdir=$(WORK)
 
 VCS_PARAMS  ?=
 TB_DUT 		?= tb_axi_serial_link
@@ -127,12 +127,12 @@ scripts/compile_vcs.sh: Bender.yml Bender.lock
 bin/%.vcs: scripts/compile_vcs.sh
 	$< > scripts/compile_vcs.log
 	mkdir -p bin
-	$(VCS) $(VCS_ARGS) $(VCS_PARAMS) $(TB_DUT) -o $@
+	$(VCS) $(VCS_FLAGS) $(VCS_PARAMS) $(TB_DUT) -o $@
 
 vcs-compile: bin/$(TB_DUT).vcs
 
 vcs-run vcs-run-batch:
-	bin/$(TB_DUT).vcs +permissive -exitstatus +permissive-off
+	bin/$(TB_DUT).vcs +permissive -exitstatus +permissive-off $(SIM_ARGS)
 
 vcs-clean:
 	@rm -rf AN.DB

@@ -49,7 +49,7 @@ run-vsim:
     - echo "Running AXI test with R/W [$NUM_READS_1,$NUM_WRITES_1] <-> [$NUM_READS_2,$NUM_WRITES_2]"
     - >
       make vsim-run-batch TB_DUT=${TB_DUT} WORK=work_${NUM_CHANNELS}
-      VSIM_ARGS="+NUM_READS_1=$NUM_READS_1 +NUM_WRITES_1=$NUM_WRITES_1
+      SIM_ARGS="+NUM_READS_1=$NUM_READS_1 +NUM_WRITES_1=$NUM_WRITES_1
       +NUM_READS_2=$NUM_READS_2 +NUM_WRITES_2=$NUM_WRITES_2
       +NUM_FAULTS_1=$NUM_FAULTS_1 +NUM_FAULTS_2=$NUM_FAULTS_2"
       | tee vsim.log 2>&1
@@ -83,9 +83,9 @@ run-vcs:
     - echo "Running AXI test with R/W [$NUM_READS_1,$NUM_WRITES_1] <-> [$NUM_READS_2,$NUM_WRITES_2]"
     - >
       make vcs-run-batch TB_DUT=${TB_DUT}_${NUM_CHANNELS} WORK=work_${NUM_CHANNELS}
-      +NUM_READS_1=$NUM_READS_1 +NUM_WRITES_1=$NUM_WRITES_1
+      SIM_ARGS="+NUM_READS_1=$NUM_READS_1 +NUM_WRITES_1=$NUM_WRITES_1
       +NUM_READS_2=$NUM_READS_2 +NUM_WRITES_2=$NUM_WRITES_2
-      +NUM_FAULTS_1=$NUM_FAULTS_1 +NUM_FAULTS_2=$NUM_FAULTS_2
+      +NUM_FAULTS_1=$NUM_FAULTS_1 +NUM_FAULTS_2=$NUM_FAULTS_2"
       | tee vcs.log 2>&1
     - (! grep -n "Error-\[" simulate.log)
   variables:
