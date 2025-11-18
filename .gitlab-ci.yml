@@ -9,6 +9,7 @@ variables:
   VCS: 'vcs-2025.06 vcs'
   VLOGAN: 'vcs-2025.06 vlogan'
   PEAKRDL: '/home/fischeti/.local/bin/uv run peakrdl'
+  UV_LINK_MODE: copy
 
 stages:
   - build
