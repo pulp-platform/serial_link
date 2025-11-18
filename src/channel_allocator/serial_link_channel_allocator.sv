@@ -5,9 +5,8 @@
 // Author: Manuel Eggimann <meggimann@iis.ee.ethz.ch>
 
 module serial_link_channel_allocator
- import serial_link_pkg::*;
  #(
-  parameter type phy_data_t = serial_link_pkg::phy_data_t,
+  parameter type phy_data_t = logic,
   parameter int          NumChannels = 1,
   parameter int unsigned FlushCounterWidth = 8, // Number of bits for the
                                 // internal counter for the auto-flush feature.
