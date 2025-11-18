@@ -11,25 +11,12 @@ PEAKRDL 	?= peakrdl
 
 all: vsim-compile
 
-clean: clean_bender vsim-clean vcs-clean
+clean: vsim-clean vcs-clean
 
 run: vsim-run
 
 # Ensure half-built targets are purged
 .DELETE_ON_ERROR:
-
-###########
-# General #
-###########
-
-.PHONY: clean_bender
-
-Bender.lock:
-	$(BENDER) update
-
-clean_bender:
-	rm -rf .bender
-
 
 #################################
 # SystemRDL register generation #
