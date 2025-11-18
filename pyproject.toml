@@ -1,0 +1,14 @@
+[project]
+name = "serial-link"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "mako>=1.3.10",
+    "peakrdl>=1.5.0",
+    "peakrdl-rawheader",
+]
+
+[tool.uv.sources]
+peakrdl-rawheader = { git = "https://github.com/micprog/PeakRDL-rawheader.git" }
