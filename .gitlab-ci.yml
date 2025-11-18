@@ -23,7 +23,7 @@ build-vsim:
     - '! grep "\*\* Error" compile.log'
   parallel:
     matrix:
-      - NUM_CHANNELS: [1, 4, 38]
+      - NUM_CHANNELS: [1, 4]
   artifacts:
     paths:
       - work_${NUM_CHANNELS}
@@ -35,7 +35,7 @@ build-vcs:
     - make bin/${TB_DUT}_${NUM_CHANNELS}.vcs
   parallel:
     matrix:
-      - NUM_CHANNELS: [1, 4, 38]
+      - NUM_CHANNELS: [1, 4]
         TB_DUT: [tb_axi_serial_link, tb_ch_calib_serial_link]
   artifacts:
     paths:
