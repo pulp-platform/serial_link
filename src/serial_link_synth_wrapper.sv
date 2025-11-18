@@ -11,7 +11,9 @@
 `include "register_interface/assign.svh"
 `include "register_interface/typedef.svh"
 
-module serial_link_synth_wrapper #(
+module serial_link_synth_wrapper
+  import serial_link_reg_pkg::*;
+#(
   parameter type axi_req_t  = logic,
   parameter type axi_rsp_t  = logic,
   parameter type aw_chan_t  = logic,
@@ -20,10 +22,7 @@ module serial_link_synth_wrapper #(
   parameter type w_chan_t   = logic,
   parameter type b_chan_t   = logic,
   parameter type cfg_req_t  = logic,
-  parameter type cfg_rsp_t  = logic,
-  parameter int NumChannels = 1,
-  parameter int NumLanes = 8,
-  parameter int MaxClkDiv = 1024
+  parameter type cfg_rsp_t  = logic
 ) (
   input  logic                      clk_i,
   input  logic                      rst_ni,
@@ -42,85 +41,41 @@ module serial_link_synth_wrapper #(
   output logic [NumChannels-1:0][NumLanes-1:0] ddr_o
 );
 
-  if (NumChannels > 1) begin : gen_multi_channel_serial_link
-    serial_link #(
-      .axi_req_t        ( axi_req_t   ),
-      .axi_rsp_t        ( axi_rsp_t   ),
-      .aw_chan_t        ( aw_chan_t   ),
-      .w_chan_t         ( w_chan_t    ),
-      .b_chan_t         ( b_chan_t    ),
-      .ar_chan_t        ( ar_chan_t   ),
-      .r_chan_t         ( r_chan_t    ),
-      .cfg_req_t        ( cfg_req_t   ),
-      .cfg_rsp_t        ( cfg_rsp_t   ),
-      .hw2reg_t         ( serial_link_reg_pkg::serial_link_reg__in_t ),
-      .reg2hw_t         ( serial_link_reg_pkg::serial_link_reg__out_t ),
-      .NumChannels      ( NumChannels ),
-      .NumLanes         ( NumLanes    ),
-      .MaxClkDiv        ( MaxClkDiv   )
-    ) i_serial_link (
-      .clk_i          ( clk_i             ),
-      .rst_ni         ( rst_ni            ),
-      .clk_sl_i       ( clk_i             ),
-      .rst_sl_ni      ( rst_ni            ),
-      .clk_reg_i      ( clk_reg_i         ),
-      .rst_reg_ni     ( rst_reg_ni        ),
-      .testmode_i     ( testmode_i        ),
-      .axi_in_req_i   ( axi_in_req_i      ),
-      .axi_in_rsp_o   ( axi_in_rsp_o      ),
-      .axi_out_req_o  ( axi_out_req_o     ),
-      .axi_out_rsp_i  ( axi_out_rsp_i     ),
-      .cfg_req_i      ( cfg_req_i         ),
-      .cfg_rsp_o      ( cfg_rsp_o         ),
-      .ddr_rcv_clk_i  ( ddr_rcv_clk_i     ),
-      .ddr_rcv_clk_o  ( ddr_rcv_clk_o     ),
-      .ddr_i          ( ddr_i             ),
-      .ddr_o          ( ddr_o             ),
-      .isolated_i     ( '0                ),
-      .isolate_o      (                   ),
-      .clk_ena_o      (                   ),
-      .reset_no       (                   )
-    );
-  end else begin : gen_single_channel_serial_link
-    serial_link #(
-      .axi_req_t   ( axi_req_t   ),
-      .axi_rsp_t   ( axi_rsp_t   ),
-      .aw_chan_t   ( aw_chan_t   ),
-      .w_chan_t    ( w_chan_t    ),
-      .b_chan_t    ( b_chan_t    ),
-      .ar_chan_t   ( ar_chan_t   ),
-      .r_chan_t    ( r_chan_t    ),
-      .cfg_req_t   ( cfg_req_t   ),
-      .cfg_rsp_t   ( cfg_rsp_t   ),
-      .hw2reg_t    ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg__in_t ),
-      .reg2hw_t    ( serial_link_single_channel_reg_pkg::serial_link_single_channel_reg__out_t ),
-      .NumChannels ( NumChannels ),
-      .NumLanes    ( NumLanes    ),
-      .MaxClkDiv   ( MaxClkDiv   )
-    ) i_serial_link (
-      .clk_i          ( clk_i             ),
-      .rst_ni         ( rst_ni            ),
-      .clk_sl_i       ( clk_i             ),
-      .rst_sl_ni      ( rst_ni            ),
-      .clk_reg_i      ( clk_reg_i         ),
-      .rst_reg_ni     ( rst_reg_ni        ),
-      .testmode_i     ( testmode_i        ),
-      .axi_in_req_i   ( axi_in_req_i      ),
-      .axi_in_rsp_o   ( axi_in_rsp_o      ),
-      .axi_out_req_o  ( axi_out_req_o     ),
-      .axi_out_rsp_i  ( axi_out_rsp_i     ),
-      .cfg_req_i      ( cfg_req_i         ),
-      .cfg_rsp_o      ( cfg_rsp_o         ),
-      .ddr_rcv_clk_i  ( ddr_rcv_clk_i     ),
-      .ddr_rcv_clk_o  ( ddr_rcv_clk_o     ),
-      .ddr_i          ( ddr_i             ),
-      .ddr_o          ( ddr_o             ),
-      .isolated_i     ( '0                ),
-      .isolate_o      (                   ),
-      .clk_ena_o      (                   ),
-      .reset_no       (                   )
-    );
-  end
+  serial_link #(
+    .axi_req_t        ( axi_req_t   ),
+    .axi_rsp_t        ( axi_rsp_t   ),
+    .aw_chan_t        ( aw_chan_t   ),
+    .w_chan_t         ( w_chan_t    ),
+    .b_chan_t         ( b_chan_t    ),
+    .ar_chan_t        ( ar_chan_t   ),
+    .r_chan_t         ( r_chan_t    ),
+    .cfg_req_t        ( cfg_req_t   ),
+    .cfg_rsp_t        ( cfg_rsp_t   ),
+    .hw2reg_t         ( serial_link_reg_pkg::serial_link_reg__in_t ),
+    .reg2hw_t         ( serial_link_reg_pkg::serial_link_reg__out_t )
+  ) i_serial_link (
+    .clk_i          ( clk_i             ),
+    .rst_ni         ( rst_ni            ),
+    .clk_sl_i       ( clk_i             ),
+    .rst_sl_ni      ( rst_ni            ),
+    .clk_reg_i      ( clk_reg_i         ),
+    .rst_reg_ni     ( rst_reg_ni        ),
+    .testmode_i     ( testmode_i        ),
+    .axi_in_req_i   ( axi_in_req_i      ),
+    .axi_in_rsp_o   ( axi_in_rsp_o      ),
+    .axi_out_req_o  ( axi_out_req_o     ),
+    .axi_out_rsp_i  ( axi_out_rsp_i     ),
+    .cfg_req_i      ( cfg_req_i         ),
+    .cfg_rsp_o      ( cfg_rsp_o         ),
+    .ddr_rcv_clk_i  ( ddr_rcv_clk_i     ),
+    .ddr_rcv_clk_o  ( ddr_rcv_clk_o     ),
+    .ddr_i          ( ddr_i             ),
+    .ddr_o          ( ddr_o             ),
+    .isolated_i     ( '0                ),
+    .isolate_o      (                   ),
+    .clk_ena_o      (                   ),
+    .reset_no       (                   )
+  );
 
 endmodule
 
