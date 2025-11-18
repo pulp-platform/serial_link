@@ -427,14 +427,14 @@ module serial_link
       reg2hw.flow_control_fifo_clear.req
     & reg2hw.flow_control_fifo_clear.req_is_wr;
 
-  if (EnChAlloc) begin
+  if (EnChAlloc) begin : gen_channel_alloc_regs
     assign hw2reg.channel_alloc_tx_ctrl.wr_ack =
         reg2hw.channel_alloc_tx_ctrl.req
       & reg2hw.channel_alloc_tx_ctrl.req_is_wr;
     assign hw2reg.channel_alloc_rx_ctrl.wr_ack =
         reg2hw.channel_alloc_rx_ctrl.req
       & reg2hw.channel_alloc_rx_ctrl.req_is_wr;
-  end else begin
+  end else begin : gen_no_channel_alloc_regs
     assign hw2reg.channel_alloc_tx_ctrl = '{default: '0};
     assign hw2reg.channel_alloc_rx_ctrl = '{default: '0};
   end
