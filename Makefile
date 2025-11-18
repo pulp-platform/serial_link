@@ -9,18 +9,18 @@ VSIM 		  ?= vsim
 WORK 		  ?= work
 PEAKRDL 	?= peakrdl
 
-all: compile_questa
+all: vsim-compile
 
-clean: clean_bender clean_questa clean_vcs
+clean: clean_bender vsim-clean vcs-clean
 
-run: run_questa
+run: vsim-run
 
 # Ensure half-built targets are purged
 .DELETE_ON_ERROR:
 
-# --------------
-# General
-# --------------
+###########
+# General #
+###########
 
 .PHONY: clean_bender
 
@@ -31,9 +31,9 @@ clean_bender:
 	rm -rf .bender
 
 
-# --------------
-# Registers
-# --------------
+#################################
+# SystemRDL register generation #
+#################################
 
 .PHONY: update-regs
 
@@ -53,9 +53,9 @@ update-regs: src/regs/rdl/*.rdl
 	@sed -i '1i// Copyright 2025 ETH Zurich and University of Bologna.\n// Solderpad Hardware License, Version 0.51, see LICENSE for details.\n// SPDX-License-Identifier: SHL-0.51\n' src/regs/rtl/*.sv*
 
 
-# --------------
-# QuestaSim
-# --------------
+########################
+# QuestaSim Simulation #
+########################
 
 TB_DUT ?= tb_axi_serial_link
 
@@ -67,19 +67,13 @@ VLOG_FLAGS += -suppress vlog-13233
 VLOG_FLAGS += -timescale 1ns/1ps
 VLOG_FLAGS += -work $(WORK)
 
-VSIM_FLAGS += $(TB_DUT)
 VSIM_FLAGS += -work $(WORK)
-VSIM_FLAGS += $(RUN_ARGS)
 
-ifeq ($(GUI), true)
-	VSIM_FLAGS += -voptargs=+acc
-	VSIM_FLAGS += -do "log -r /*; do util/serial_link_wave.tcl; run -all"
-else
-	VSIM_FLAGS += -c
-	VSIM_FLAGS += -do "run -all; exit"
-endif
+VSIM_FLAGS_GUI += -voptargs=+acc
+VSIM_FLAGS_GUI += -do "log -r /*"
+VSIM_FLAGS_GUI += -do util/serial_link_wave.tcl
 
-.PHONY: compile_questa clean_questa run_questa
+.PHONY: vsim-compile vsim-clean vsim-run vsim-run-batch
 
 scripts/compile_vsim.tcl: Bender.lock
 	@mkdir -p scripts
@@ -87,11 +81,11 @@ scripts/compile_vsim.tcl: Bender.lock
 	$(BENDER) script vsim --vlog-arg="$(VLOG_FLAGS)" $(BENDER_FLAGS) | grep -v "set ROOT" >> $@
 	@echo >> $@
 
-compile_questa: scripts/compile_vsim.tcl
+vsim-compile: scripts/compile_vsim.tcl
 	$(VSIM) -c -work $(WORK) -do "source $<; quit" | tee $(dir $<)vsim.log
 	@! grep -P "Errors: [1-9]*," $(dir $<)vsim.log
 
-clean_questa:
+vsim-clean:
 	@rm -rf scripts/compile_vsim.tcl
 	@rm -rf work*
 	@rm -rf vsim.wlf
@@ -100,15 +94,18 @@ clean_questa:
 	@rm -rf *.vstf
 	@rm -rf scripts/vsim.log
 
-run_questa:
-	$(VSIM) $(VSIM_FLAGS)
+vsim-run:
+	$(VSIM) $(VSIM_FLAGS) $(VSIM_FLAGS_GUI) $(TB_DUT)
+
+vsim-run-batch:
+	$(VSIM) -c $(VSIM_FLAGS) $(TB_DUT) -do "run -all; quit"
 
 
-# --------------
-# VCS
-# --------------
+##################
+# VCS Simulation #
+##################
 
-.PHONY: compile_vcs clean_vcs
+.PHONY: vcs-compile vcs-clean
 
 VLOGAN_ARGS := -assert svaext
 VLOGAN_ARGS += -assert disable_cover
@@ -117,12 +114,9 @@ VLOGAN_ARGS += -sysc=q
 VLOGAN_ARGS += -q
 VLOGAN_ARGS += -timescale=1ns/1ps
 
-VCS_ARGS    := -full64
 VCS_ARGS    += -Mlib=$(WORK)
 VCS_ARGS    += -Mdir=$(WORK)
-VCS_ARGS    += -debug_access+pp
 VCS_ARGS    += -j 8
-VCS_ARGS    += -CFLAGS "-Os"
 
 VCS_PARAMS  ?=
 TB_DUT 		?= tb_axi_serial_link
@@ -137,14 +131,17 @@ scripts/compile_vcs.sh: Bender.yml Bender.lock
 	$(BENDER) script vcs -t test -t rtl -t simulation --vlog-arg "\$(VLOGAN_ARGS)" --vlogan-bin "$(VLOGAN)" $(VLOGAN_REL_PATHS) > $@
 	chmod +x $@
 
-compile_vcs: scripts/compile_vcs.sh
+bin/%.vcs: scripts/compile_vcs.sh
 	$< > scripts/compile_vcs.log
-
-bin/%.vcs: scripts/compile_vcs.sh compile_vcs
 	mkdir -p bin
 	$(VCS) $(VCS_ARGS) $(VCS_PARAMS) $(TB_DUT) -o $@
 
-clean_vcs:
+vcs-compile: bin/$(TB_DUT).vcs
+
+vcs-run vcs-run-batch:
+	bin/$(TB_DUT).vcs +permissive -exitstatus +permissive-off
+
+vcs-clean:
 	@rm -rf AN.DB
 	@rm -f  scripts/compile_vcs.sh
 	@rm -rf bin
@@ -154,9 +151,9 @@ clean_vcs:
 	@rm -f  logs/*.vcs.log
 	@rm -f  scripts/compile_vcs.log
 
-# --------------
-# CI
-# --------------
+######
+# CI #
+######
 
 .PHONY: bender
 
