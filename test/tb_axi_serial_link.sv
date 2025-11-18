@@ -5,11 +5,9 @@
 // Authors:
 //  - Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-module tb_axi_serial_link #(
-  parameter int unsigned NumChannels = 1,
-  parameter int unsigned NumLanes = 8,
-  parameter bit EnDdr = 1'b1
-);
+module tb_axi_serial_link;
+
+  import serial_link_reg_pkg::*;
 
   `include "axi/assign.svh"
   `include "axi/typedef.svh"
