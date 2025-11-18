@@ -121,10 +121,7 @@ module tb_ch_calib_serial_link;
     .apb_rsp_t        ( apb_resp_t      ),
     .apb_addr_t       ( cfg_addr_t      ),
     .apb_data_t       ( cfg_data_t      ),
-    .apb_strb_t       ( cfg_strb_t      ),
-    .NumChannels      ( NumChannels  ),
-    .NumLanes         ( NumLanes     ),
-    .MaxClkDiv        ( MaxClkDiv       )
+    .apb_strb_t       ( cfg_strb_t      )
   ) i_serial_link_1 (
       .clk_i          ( clk_1           ),
       .rst_ni         ( rst_1_n         ),
@@ -157,10 +154,7 @@ module tb_ch_calib_serial_link;
     .apb_rsp_t        ( apb_resp_t      ),
     .apb_addr_t       ( cfg_addr_t      ),
     .apb_data_t       ( cfg_data_t      ),
-    .apb_strb_t       ( cfg_strb_t      ),
-    .NumChannels      ( NumChannels  ),
-    .NumLanes         ( NumLanes     ),
-    .MaxClkDiv        ( MaxClkDiv       )
+    .apb_strb_t       ( cfg_strb_t      )
   ) i_serial_link_2 (
       .clk_i          ( clk_2           ),
       .rst_ni         ( rst_2_n         ),
