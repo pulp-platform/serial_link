@@ -168,6 +168,7 @@ regfile serial_link_base #(
     reg channel_alloc_tx_cfg {
         default sw = rw;
         default hw = r;
+        ispresent = NumChannels > 1;
         desc = "Configuration settings for the TX side in the channel allocator";
         field {
             name = "bypass_en";
@@ -186,6 +187,7 @@ regfile serial_link_base #(
     reg channel_alloc_tx_ch_en {
         default sw = rw;
         default hw = r;
+        ispresent = NumChannels > 1;
         desc = "Channel enable mask for the TX side.";
         field {} channel_alloc_tx_ch_en[0:0] = 0x1;
     };
@@ -193,6 +195,7 @@ regfile serial_link_base #(
     reg channel_alloc_tx_ctrl {
         default sw = w;
         default hw = r;
+        ispresent = NumChannels > 1;
         desc = "Soft clear or force flush the TX side of the channel allocator.";
         field {
             name = "clear";
@@ -207,6 +210,7 @@ regfile serial_link_base #(
     reg channel_alloc_rx_cfg {
         default sw = rw;
         default hw = r;
+        ispresent = NumChannels > 1;
         desc = "Configuration settings for the RX side in the channel allocator.";
         field {
             name = "bypass_en";
@@ -229,6 +233,7 @@ regfile serial_link_base #(
     reg channel_alloc_rx_ctrl {
         default sw = w;
         default hw = r;
+        ispresent = NumChannels > 1;
         desc = "Soft clear the RX side of the channel allocator.";
         field {
             name = "clear";
@@ -239,6 +244,7 @@ regfile serial_link_base #(
    reg channel_alloc_rx_ch_en {
         default sw = rw;
         default hw = r;
+        ispresent = NumChannels > 1;
         desc = "Channel enable mask for the RX side.";
         field {
             name = "channel_alloc_rx_ch_en";

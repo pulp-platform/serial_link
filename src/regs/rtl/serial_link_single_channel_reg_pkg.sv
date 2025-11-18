@@ -65,21 +65,11 @@ package serial_link_single_channel_reg_pkg;
     } serial_link_base_NumChannels_1_Log2NumChannels_1__raw_mode_in_data_valid__external__in_t;
 
     typedef struct {
-        logic wr_ack;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_ctrl__external__in_t;
-
-    typedef struct {
-        logic wr_ack;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_ctrl__external__in_t;
-
-    typedef struct {
         serial_link_base_NumChannels_1_Log2NumChannels_1__isolated__external__in_t isolated;
         serial_link_base_NumChannels_1_Log2NumChannels_1__raw_mode_in_data__external__in_t raw_mode_in_data;
         serial_link_base_NumChannels_1_Log2NumChannels_1__raw_mode_out_data_fifo_ctrl__external__in_t raw_mode_out_data_fifo_ctrl;
         serial_link_base_NumChannels_1_Log2NumChannels_1__flow_control_fifo_clear__external__in_t flow_control_fifo_clear;
         serial_link_base_NumChannels_1_Log2NumChannels_1__raw_mode_in_data_valid__external__in_t raw_mode_in_data_valid[1];
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_ctrl__external__in_t channel_alloc_tx_ctrl;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_ctrl__external__in_t channel_alloc_rx_ctrl;
     } serial_link_base_NumChannels_1_Log2NumChannels_1__in_t;
 
     typedef struct {
@@ -214,88 +204,6 @@ package serial_link_single_channel_reg_pkg;
     } serial_link_base_NumChannels_1_Log2NumChannels_1__tx_phy_clk_end__out_t;
 
     typedef struct {
-        logic value;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_cfg__bypass_en__out_t;
-
-    typedef struct {
-        logic value;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_cfg__auto_flush_en__out_t;
-
-    typedef struct {
-        logic [7:0] value;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_cfg__auto_flush_count__out_t;
-
-    typedef struct {
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_cfg__bypass_en__out_t bypass_en;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_cfg__auto_flush_en__out_t auto_flush_en;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_cfg__auto_flush_count__out_t auto_flush_count;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_cfg__out_t;
-
-    typedef struct packed {
-        logic [29:0] _reserved_31_2;
-        logic flush;
-        logic clear;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_ctrl__external__fields__out_t;
-
-    typedef struct {
-        logic req;
-        logic req_is_wr;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_ctrl__external__fields__out_t wr_data;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_ctrl__external__fields__out_t wr_biten;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_ctrl__external__out_t;
-
-    typedef struct {
-        logic value;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_cfg__bypass_en__out_t;
-
-    typedef struct {
-        logic value;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_cfg__auto_flush_en__out_t;
-
-    typedef struct {
-        logic [7:0] value;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_cfg__auto_flush_count__out_t;
-
-    typedef struct {
-        logic value;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_cfg__sync_en__out_t;
-
-    typedef struct {
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_cfg__bypass_en__out_t bypass_en;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_cfg__auto_flush_en__out_t auto_flush_en;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_cfg__auto_flush_count__out_t auto_flush_count;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_cfg__sync_en__out_t sync_en;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_cfg__out_t;
-
-    typedef struct packed {
-        logic [30:0] _reserved_31_1;
-        logic clear;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_ctrl__external__fields__out_t;
-
-    typedef struct {
-        logic req;
-        logic req_is_wr;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_ctrl__external__fields__out_t wr_data;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_ctrl__external__fields__out_t wr_biten;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_ctrl__external__out_t;
-
-    typedef struct {
-        logic value;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_ch_en__channel_alloc_tx_ch_en__out_t;
-
-    typedef struct {
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_ch_en__channel_alloc_tx_ch_en__out_t channel_alloc_tx_ch_en;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_ch_en__out_t;
-
-    typedef struct {
-        logic value;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_ch_en__channel_alloc_rx_ch_en__out_t;
-
-    typedef struct {
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_ch_en__channel_alloc_rx_ch_en__out_t channel_alloc_rx_ch_en;
-    } serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_ch_en__out_t;
-
-    typedef struct {
         serial_link_base_NumChannels_1_Log2NumChannels_1__ctrl__out_t ctrl;
         serial_link_base_NumChannels_1_Log2NumChannels_1__isolated__external__out_t isolated;
         serial_link_base_NumChannels_1_Log2NumChannels_1__raw_mode_en__out_t raw_mode_en;
@@ -310,12 +218,6 @@ package serial_link_single_channel_reg_pkg;
         serial_link_base_NumChannels_1_Log2NumChannels_1__tx_phy_clk_div__out_t tx_phy_clk_div[1];
         serial_link_base_NumChannels_1_Log2NumChannels_1__tx_phy_clk_start__out_t tx_phy_clk_start[1];
         serial_link_base_NumChannels_1_Log2NumChannels_1__tx_phy_clk_end__out_t tx_phy_clk_end[1];
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_cfg__out_t channel_alloc_tx_cfg;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_ctrl__external__out_t channel_alloc_tx_ctrl;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_cfg__out_t channel_alloc_rx_cfg;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_ctrl__external__out_t channel_alloc_rx_ctrl;
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_tx_ch_en__out_t channel_alloc_tx_ch_en[1];
-        serial_link_base_NumChannels_1_Log2NumChannels_1__channel_alloc_rx_ch_en__out_t channel_alloc_rx_ch_en[1];
     } serial_link_base_NumChannels_1_Log2NumChannels_1__out_t;
 
     typedef struct {

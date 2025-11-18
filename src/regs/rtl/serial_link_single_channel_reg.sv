@@ -125,12 +125,6 @@ module serial_link_single_channel_reg (
             logic tx_phy_clk_div[1];
             logic tx_phy_clk_start[1];
             logic tx_phy_clk_end[1];
-            logic channel_alloc_tx_cfg;
-            logic channel_alloc_tx_ctrl;
-            logic channel_alloc_rx_cfg;
-            logic channel_alloc_rx_ctrl;
-            logic channel_alloc_tx_ch_en[1];
-            logic channel_alloc_rx_ch_en[1];
         } serial_link;
     } decoded_reg_strb_t;
     decoded_reg_strb_t decoded_reg_strb;
@@ -177,18 +171,6 @@ module serial_link_single_channel_reg (
         end
         for(int i0=0; i0<1; i0++) begin
             decoded_reg_strb.serial_link.tx_phy_clk_end[i0] = cpuif_req_masked & (cpuif_addr == 12'h500 + (12)'(i0) * 12'h4);
-        end
-        decoded_reg_strb.serial_link.channel_alloc_tx_cfg = cpuif_req_masked & (cpuif_addr == 12'h600);
-        decoded_reg_strb.serial_link.channel_alloc_tx_ctrl = cpuif_req_masked & (cpuif_addr == 12'h604) & cpuif_req_is_wr;
-        is_external |= cpuif_req_masked & (cpuif_addr == 12'h604) & cpuif_req_is_wr;
-        decoded_reg_strb.serial_link.channel_alloc_rx_cfg = cpuif_req_masked & (cpuif_addr == 12'h608);
-        decoded_reg_strb.serial_link.channel_alloc_rx_ctrl = cpuif_req_masked & (cpuif_addr == 12'h60c) & cpuif_req_is_wr;
-        is_external |= cpuif_req_masked & (cpuif_addr == 12'h60c) & cpuif_req_is_wr;
-        for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.serial_link.channel_alloc_tx_ch_en[i0] = cpuif_req_masked & (cpuif_addr == 12'h700 + (12)'(i0) * 12'h4);
-        end
-        for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.serial_link.channel_alloc_rx_ch_en[i0] = cpuif_req_masked & (cpuif_addr == 12'h800 + (12)'(i0) * 12'h4);
         end
         decoded_err = (~is_valid_addr | is_invalid_rw) & decoded_req;
         decoded_strb_is_external = is_external;
@@ -272,50 +254,6 @@ module serial_link_single_channel_reg (
                     logic load_next;
                 } clk_shift_end;
             } tx_phy_clk_end[1];
-            struct {
-                struct {
-                    logic next;
-                    logic load_next;
-                } bypass_en;
-                struct {
-                    logic next;
-                    logic load_next;
-                } auto_flush_en;
-                struct {
-                    logic [7:0] next;
-                    logic load_next;
-                } auto_flush_count;
-            } channel_alloc_tx_cfg;
-            struct {
-                struct {
-                    logic next;
-                    logic load_next;
-                } bypass_en;
-                struct {
-                    logic next;
-                    logic load_next;
-                } auto_flush_en;
-                struct {
-                    logic [7:0] next;
-                    logic load_next;
-                } auto_flush_count;
-                struct {
-                    logic next;
-                    logic load_next;
-                } sync_en;
-            } channel_alloc_rx_cfg;
-            struct {
-                struct {
-                    logic next;
-                    logic load_next;
-                } channel_alloc_tx_ch_en;
-            } channel_alloc_tx_ch_en[1];
-            struct {
-                struct {
-                    logic next;
-                    logic load_next;
-                } channel_alloc_rx_ch_en;
-            } channel_alloc_rx_ch_en[1];
         } serial_link;
     } field_combo_t;
     field_combo_t field_combo;
@@ -376,41 +314,6 @@ module serial_link_single_channel_reg (
                     logic [10:0] value;
                 } clk_shift_end;
             } tx_phy_clk_end[1];
-            struct {
-                struct {
-                    logic value;
-                } bypass_en;
-                struct {
-                    logic value;
-                } auto_flush_en;
-                struct {
-                    logic [7:0] value;
-                } auto_flush_count;
-            } channel_alloc_tx_cfg;
-            struct {
-                struct {
-                    logic value;
-                } bypass_en;
-                struct {
-                    logic value;
-                } auto_flush_en;
-                struct {
-                    logic [7:0] value;
-                } auto_flush_count;
-                struct {
-                    logic value;
-                } sync_en;
-            } channel_alloc_rx_cfg;
-            struct {
-                struct {
-                    logic value;
-                } channel_alloc_tx_ch_en;
-            } channel_alloc_tx_ch_en[1];
-            struct {
-                struct {
-                    logic value;
-                } channel_alloc_rx_ch_en;
-            } channel_alloc_rx_ch_en[1];
         } serial_link;
     } field_storage_t;
     field_storage_t field_storage;
@@ -725,229 +628,6 @@ module serial_link_single_channel_reg (
         end
         assign hwif_out.serial_link.tx_phy_clk_end[i0].clk_shift_end.value = field_storage.serial_link.tx_phy_clk_end[i0].clk_shift_end.value;
     end
-    // Field: serial_link_single_channel_reg.serial_link.channel_alloc_tx_cfg.bypass_en
-    always_comb begin
-        automatic logic [0:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.serial_link.channel_alloc_tx_cfg.bypass_en.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.serial_link.channel_alloc_tx_cfg && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.serial_link.channel_alloc_tx_cfg.bypass_en.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
-            load_next_c = '1;
-        end
-        field_combo.serial_link.channel_alloc_tx_cfg.bypass_en.next = next_c;
-        field_combo.serial_link.channel_alloc_tx_cfg.bypass_en.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.serial_link.channel_alloc_tx_cfg.bypass_en.value <= 1'h1;
-        end else begin
-            if(field_combo.serial_link.channel_alloc_tx_cfg.bypass_en.load_next) begin
-                field_storage.serial_link.channel_alloc_tx_cfg.bypass_en.value <= field_combo.serial_link.channel_alloc_tx_cfg.bypass_en.next;
-            end
-        end
-    end
-    assign hwif_out.serial_link.channel_alloc_tx_cfg.bypass_en.value = field_storage.serial_link.channel_alloc_tx_cfg.bypass_en.value;
-    // Field: serial_link_single_channel_reg.serial_link.channel_alloc_tx_cfg.auto_flush_en
-    always_comb begin
-        automatic logic [0:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_en.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.serial_link.channel_alloc_tx_cfg && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_en.value & ~decoded_wr_biten[1:1]) | (decoded_wr_data[1:1] & decoded_wr_biten[1:1]);
-            load_next_c = '1;
-        end
-        field_combo.serial_link.channel_alloc_tx_cfg.auto_flush_en.next = next_c;
-        field_combo.serial_link.channel_alloc_tx_cfg.auto_flush_en.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_en.value <= 1'h1;
-        end else begin
-            if(field_combo.serial_link.channel_alloc_tx_cfg.auto_flush_en.load_next) begin
-                field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_en.value <= field_combo.serial_link.channel_alloc_tx_cfg.auto_flush_en.next;
-            end
-        end
-    end
-    assign hwif_out.serial_link.channel_alloc_tx_cfg.auto_flush_en.value = field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_en.value;
-    // Field: serial_link_single_channel_reg.serial_link.channel_alloc_tx_cfg.auto_flush_count
-    always_comb begin
-        automatic logic [7:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_count.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.serial_link.channel_alloc_tx_cfg && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_count.value & ~decoded_wr_biten[15:8]) | (decoded_wr_data[15:8] & decoded_wr_biten[15:8]);
-            load_next_c = '1;
-        end
-        field_combo.serial_link.channel_alloc_tx_cfg.auto_flush_count.next = next_c;
-        field_combo.serial_link.channel_alloc_tx_cfg.auto_flush_count.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_count.value <= 8'h2;
-        end else begin
-            if(field_combo.serial_link.channel_alloc_tx_cfg.auto_flush_count.load_next) begin
-                field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_count.value <= field_combo.serial_link.channel_alloc_tx_cfg.auto_flush_count.next;
-            end
-        end
-    end
-    assign hwif_out.serial_link.channel_alloc_tx_cfg.auto_flush_count.value = field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_count.value;
-    // External register: serial_link_single_channel_reg.serial_link.channel_alloc_tx_ctrl
-
-    assign hwif_out.serial_link.channel_alloc_tx_ctrl.req = decoded_req_is_wr ? decoded_reg_strb.serial_link.channel_alloc_tx_ctrl : '0;
-    assign hwif_out.serial_link.channel_alloc_tx_ctrl.req_is_wr = decoded_req_is_wr;
-    assign hwif_out.serial_link.channel_alloc_tx_ctrl.wr_data = decoded_wr_data;
-    assign hwif_out.serial_link.channel_alloc_tx_ctrl.wr_biten = decoded_wr_biten;
-    // Field: serial_link_single_channel_reg.serial_link.channel_alloc_rx_cfg.bypass_en
-    always_comb begin
-        automatic logic [0:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.serial_link.channel_alloc_rx_cfg.bypass_en.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.serial_link.channel_alloc_rx_cfg && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.serial_link.channel_alloc_rx_cfg.bypass_en.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
-            load_next_c = '1;
-        end
-        field_combo.serial_link.channel_alloc_rx_cfg.bypass_en.next = next_c;
-        field_combo.serial_link.channel_alloc_rx_cfg.bypass_en.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.serial_link.channel_alloc_rx_cfg.bypass_en.value <= 1'h1;
-        end else begin
-            if(field_combo.serial_link.channel_alloc_rx_cfg.bypass_en.load_next) begin
-                field_storage.serial_link.channel_alloc_rx_cfg.bypass_en.value <= field_combo.serial_link.channel_alloc_rx_cfg.bypass_en.next;
-            end
-        end
-    end
-    assign hwif_out.serial_link.channel_alloc_rx_cfg.bypass_en.value = field_storage.serial_link.channel_alloc_rx_cfg.bypass_en.value;
-    // Field: serial_link_single_channel_reg.serial_link.channel_alloc_rx_cfg.auto_flush_en
-    always_comb begin
-        automatic logic [0:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_en.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.serial_link.channel_alloc_rx_cfg && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_en.value & ~decoded_wr_biten[1:1]) | (decoded_wr_data[1:1] & decoded_wr_biten[1:1]);
-            load_next_c = '1;
-        end
-        field_combo.serial_link.channel_alloc_rx_cfg.auto_flush_en.next = next_c;
-        field_combo.serial_link.channel_alloc_rx_cfg.auto_flush_en.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_en.value <= 1'h1;
-        end else begin
-            if(field_combo.serial_link.channel_alloc_rx_cfg.auto_flush_en.load_next) begin
-                field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_en.value <= field_combo.serial_link.channel_alloc_rx_cfg.auto_flush_en.next;
-            end
-        end
-    end
-    assign hwif_out.serial_link.channel_alloc_rx_cfg.auto_flush_en.value = field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_en.value;
-    // Field: serial_link_single_channel_reg.serial_link.channel_alloc_rx_cfg.auto_flush_count
-    always_comb begin
-        automatic logic [7:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_count.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.serial_link.channel_alloc_rx_cfg && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_count.value & ~decoded_wr_biten[15:8]) | (decoded_wr_data[15:8] & decoded_wr_biten[15:8]);
-            load_next_c = '1;
-        end
-        field_combo.serial_link.channel_alloc_rx_cfg.auto_flush_count.next = next_c;
-        field_combo.serial_link.channel_alloc_rx_cfg.auto_flush_count.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_count.value <= 8'h2;
-        end else begin
-            if(field_combo.serial_link.channel_alloc_rx_cfg.auto_flush_count.load_next) begin
-                field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_count.value <= field_combo.serial_link.channel_alloc_rx_cfg.auto_flush_count.next;
-            end
-        end
-    end
-    assign hwif_out.serial_link.channel_alloc_rx_cfg.auto_flush_count.value = field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_count.value;
-    // Field: serial_link_single_channel_reg.serial_link.channel_alloc_rx_cfg.sync_en
-    always_comb begin
-        automatic logic [0:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.serial_link.channel_alloc_rx_cfg.sync_en.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.serial_link.channel_alloc_rx_cfg && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.serial_link.channel_alloc_rx_cfg.sync_en.value & ~decoded_wr_biten[16:16]) | (decoded_wr_data[16:16] & decoded_wr_biten[16:16]);
-            load_next_c = '1;
-        end
-        field_combo.serial_link.channel_alloc_rx_cfg.sync_en.next = next_c;
-        field_combo.serial_link.channel_alloc_rx_cfg.sync_en.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.serial_link.channel_alloc_rx_cfg.sync_en.value <= 1'h1;
-        end else begin
-            if(field_combo.serial_link.channel_alloc_rx_cfg.sync_en.load_next) begin
-                field_storage.serial_link.channel_alloc_rx_cfg.sync_en.value <= field_combo.serial_link.channel_alloc_rx_cfg.sync_en.next;
-            end
-        end
-    end
-    assign hwif_out.serial_link.channel_alloc_rx_cfg.sync_en.value = field_storage.serial_link.channel_alloc_rx_cfg.sync_en.value;
-    // External register: serial_link_single_channel_reg.serial_link.channel_alloc_rx_ctrl
-
-    assign hwif_out.serial_link.channel_alloc_rx_ctrl.req = decoded_req_is_wr ? decoded_reg_strb.serial_link.channel_alloc_rx_ctrl : '0;
-    assign hwif_out.serial_link.channel_alloc_rx_ctrl.req_is_wr = decoded_req_is_wr;
-    assign hwif_out.serial_link.channel_alloc_rx_ctrl.wr_data = decoded_wr_data;
-    assign hwif_out.serial_link.channel_alloc_rx_ctrl.wr_biten = decoded_wr_biten;
-    for(genvar i0=0; i0<1; i0++) begin
-        // Field: serial_link_single_channel_reg.serial_link.channel_alloc_tx_ch_en[].channel_alloc_tx_ch_en
-        always_comb begin
-            automatic logic [0:0] next_c;
-            automatic logic load_next_c;
-            next_c = field_storage.serial_link.channel_alloc_tx_ch_en[i0].channel_alloc_tx_ch_en.value;
-            load_next_c = '0;
-            if(decoded_reg_strb.serial_link.channel_alloc_tx_ch_en[i0] && decoded_req_is_wr) begin // SW write
-                next_c = (field_storage.serial_link.channel_alloc_tx_ch_en[i0].channel_alloc_tx_ch_en.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
-                load_next_c = '1;
-            end
-            field_combo.serial_link.channel_alloc_tx_ch_en[i0].channel_alloc_tx_ch_en.next = next_c;
-            field_combo.serial_link.channel_alloc_tx_ch_en[i0].channel_alloc_tx_ch_en.load_next = load_next_c;
-        end
-        always_ff @(posedge clk or negedge arst_n) begin
-            if(~arst_n) begin
-                field_storage.serial_link.channel_alloc_tx_ch_en[i0].channel_alloc_tx_ch_en.value <= 1'h1;
-            end else begin
-                if(field_combo.serial_link.channel_alloc_tx_ch_en[i0].channel_alloc_tx_ch_en.load_next) begin
-                    field_storage.serial_link.channel_alloc_tx_ch_en[i0].channel_alloc_tx_ch_en.value <= field_combo.serial_link.channel_alloc_tx_ch_en[i0].channel_alloc_tx_ch_en.next;
-                end
-            end
-        end
-        assign hwif_out.serial_link.channel_alloc_tx_ch_en[i0].channel_alloc_tx_ch_en.value = field_storage.serial_link.channel_alloc_tx_ch_en[i0].channel_alloc_tx_ch_en.value;
-    end
-    for(genvar i0=0; i0<1; i0++) begin
-        // Field: serial_link_single_channel_reg.serial_link.channel_alloc_rx_ch_en[].channel_alloc_rx_ch_en
-        always_comb begin
-            automatic logic [0:0] next_c;
-            automatic logic load_next_c;
-            next_c = field_storage.serial_link.channel_alloc_rx_ch_en[i0].channel_alloc_rx_ch_en.value;
-            load_next_c = '0;
-            if(decoded_reg_strb.serial_link.channel_alloc_rx_ch_en[i0] && decoded_req_is_wr) begin // SW write
-                next_c = (field_storage.serial_link.channel_alloc_rx_ch_en[i0].channel_alloc_rx_ch_en.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
-                load_next_c = '1;
-            end
-            field_combo.serial_link.channel_alloc_rx_ch_en[i0].channel_alloc_rx_ch_en.next = next_c;
-            field_combo.serial_link.channel_alloc_rx_ch_en[i0].channel_alloc_rx_ch_en.load_next = load_next_c;
-        end
-        always_ff @(posedge clk or negedge arst_n) begin
-            if(~arst_n) begin
-                field_storage.serial_link.channel_alloc_rx_ch_en[i0].channel_alloc_rx_ch_en.value <= 1'h1;
-            end else begin
-                if(field_combo.serial_link.channel_alloc_rx_ch_en[i0].channel_alloc_rx_ch_en.load_next) begin
-                    field_storage.serial_link.channel_alloc_rx_ch_en[i0].channel_alloc_rx_ch_en.value <= field_combo.serial_link.channel_alloc_rx_ch_en[i0].channel_alloc_rx_ch_en.next;
-                end
-            end
-        end
-        assign hwif_out.serial_link.channel_alloc_rx_ch_en[i0].channel_alloc_rx_ch_en.value = field_storage.serial_link.channel_alloc_rx_ch_en[i0].channel_alloc_rx_ch_en.value;
-    end
 
     //--------------------------------------------------------------------------
     // Write response
@@ -957,8 +637,6 @@ module serial_link_single_channel_reg (
         wr_ack = '0;
         wr_ack |= hwif_in.serial_link.raw_mode_out_data_fifo_ctrl.wr_ack;
         wr_ack |= hwif_in.serial_link.flow_control_fifo_clear.wr_ack;
-        wr_ack |= hwif_in.serial_link.channel_alloc_tx_ctrl.wr_ack;
-        wr_ack |= hwif_in.serial_link.channel_alloc_rx_ctrl.wr_ack;
         external_wr_ack = wr_ack;
     end
     assign cpuif_wr_ack = external_wr_ack | (decoded_req & decoded_req_is_wr & ~decoded_strb_is_external);
@@ -990,7 +668,7 @@ module serial_link_single_channel_reg (
     logic [31:0] readback_data;
 
     // Assign readback values to a flattened array
-    logic [31:0] readback_array[13];
+    logic [31:0] readback_array[9];
     assign readback_array[0][0:0] = (decoded_reg_strb.serial_link.ctrl && !decoded_req_is_wr) ? field_storage.serial_link.ctrl.clk_ena.value : '0;
     assign readback_array[0][1:1] = (decoded_reg_strb.serial_link.ctrl && !decoded_req_is_wr) ? field_storage.serial_link.ctrl.reset_n.value : '0;
     assign readback_array[0][7:2] = '0;
@@ -1017,25 +695,6 @@ module serial_link_single_channel_reg (
         assign readback_array[i0 * 1 + 8][10:0] = (decoded_reg_strb.serial_link.tx_phy_clk_end[i0] && !decoded_req_is_wr) ? field_storage.serial_link.tx_phy_clk_end[i0].clk_shift_end.value : '0;
         assign readback_array[i0 * 1 + 8][31:11] = '0;
     end
-    assign readback_array[9][0:0] = (decoded_reg_strb.serial_link.channel_alloc_tx_cfg && !decoded_req_is_wr) ? field_storage.serial_link.channel_alloc_tx_cfg.bypass_en.value : '0;
-    assign readback_array[9][1:1] = (decoded_reg_strb.serial_link.channel_alloc_tx_cfg && !decoded_req_is_wr) ? field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_en.value : '0;
-    assign readback_array[9][7:2] = '0;
-    assign readback_array[9][15:8] = (decoded_reg_strb.serial_link.channel_alloc_tx_cfg && !decoded_req_is_wr) ? field_storage.serial_link.channel_alloc_tx_cfg.auto_flush_count.value : '0;
-    assign readback_array[9][31:16] = '0;
-    assign readback_array[10][0:0] = (decoded_reg_strb.serial_link.channel_alloc_rx_cfg && !decoded_req_is_wr) ? field_storage.serial_link.channel_alloc_rx_cfg.bypass_en.value : '0;
-    assign readback_array[10][1:1] = (decoded_reg_strb.serial_link.channel_alloc_rx_cfg && !decoded_req_is_wr) ? field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_en.value : '0;
-    assign readback_array[10][7:2] = '0;
-    assign readback_array[10][15:8] = (decoded_reg_strb.serial_link.channel_alloc_rx_cfg && !decoded_req_is_wr) ? field_storage.serial_link.channel_alloc_rx_cfg.auto_flush_count.value : '0;
-    assign readback_array[10][16:16] = (decoded_reg_strb.serial_link.channel_alloc_rx_cfg && !decoded_req_is_wr) ? field_storage.serial_link.channel_alloc_rx_cfg.sync_en.value : '0;
-    assign readback_array[10][31:17] = '0;
-    for(genvar i0=0; i0<1; i0++) begin
-        assign readback_array[i0 * 1 + 11][0:0] = (decoded_reg_strb.serial_link.channel_alloc_tx_ch_en[i0] && !decoded_req_is_wr) ? field_storage.serial_link.channel_alloc_tx_ch_en[i0].channel_alloc_tx_ch_en.value : '0;
-        assign readback_array[i0 * 1 + 11][31:1] = '0;
-    end
-    for(genvar i0=0; i0<1; i0++) begin
-        assign readback_array[i0 * 1 + 12][0:0] = (decoded_reg_strb.serial_link.channel_alloc_rx_ch_en[i0] && !decoded_req_is_wr) ? field_storage.serial_link.channel_alloc_rx_ch_en[i0].channel_alloc_rx_ch_en.value : '0;
-        assign readback_array[i0 * 1 + 12][31:1] = '0;
-    end
 
     // Reduce the array
     always_comb begin
@@ -1043,7 +702,7 @@ module serial_link_single_channel_reg (
         readback_done = decoded_req & ~decoded_req_is_wr & ~decoded_strb_is_external;
         readback_err = '0;
         readback_data_var = '0;
-        for(int i=0; i<13; i++) readback_data_var |= readback_array[i];
+        for(int i=0; i<9; i++) readback_data_var |= readback_array[i];
         readback_data = readback_data_var;
     end
 
