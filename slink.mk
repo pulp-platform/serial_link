@@ -22,6 +22,9 @@ PEAKRDL_PARAMS += -P Log2RawModeTXFifoDepth=$(SLINK_LOG2_RAW_MODE_TX_FIFO_DEPTH)
 
 COPYRIGHT_NOTICE = // Copyright 2025 ETH Zurich and University of Bologna.\n// Solderpad Hardware License, Version 0.51, see LICENSE for details.\n// SPDX-License-Identifier: SHL-0.51\n
 
+# the Makefile variables to configure the serial link do not have a timestamp, meaning Make does not see a reason
+# to update the generated sources once they exist. Therefore we force regeneration when parameters change
+# with a dummy .params file that changes the timestamp when parameters change
 .PHONY: SLINK_FORCE
 SLINK_FORCE:
 
