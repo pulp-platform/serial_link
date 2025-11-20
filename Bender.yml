@@ -44,10 +44,6 @@ sources:
     # Wrapper for Occamy
     - src/serial_link_occamy_wrapper.sv
 
-    - target: synthesis
-      files:
-      - src/serial_link_synth_wrapper.sv
-
     - target: any(simulation, test)
       files:
       - test/axi_channel_compare.sv
