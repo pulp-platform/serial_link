@@ -4,6 +4,8 @@
 
 # Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
+SLINK_ROOT = $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+
 BENDER 		?= bender
 VSIM 		  ?= vsim
 WORK 		  ?= work
@@ -24,8 +26,8 @@ run: vsim-run
 
 include slink.mk
 
-.PHONY: update-regs
-update-regs: slink-update-regs
+.PHONY: gen-regs
+gen-regs: slink-gen-regs
 
 ########################
 # QuestaSim Simulation #

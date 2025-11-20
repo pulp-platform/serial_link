@@ -39,7 +39,7 @@ make <simulator>-run TB_DUT=tb_ch_calib_serial_link
 The link can be parametrized with arbitrary AXI interfaces resp. structs (`axi_req_t`, `axi_rsp_t`). The number of channels is also configurable at synthesis time. To do this, you have to regenerate the register files with the following command:
 
 ```sh
-make update-regs SLINK_NUM_CHANNELS=<num_channels> SLINK_NUM_LANES=<num_lanes>
+make gen-regs SLINK_NUM_CHANNELS=<num_channels> SLINK_NUM_LANES=<num_lanes>
 ```
 
 The registers are generated with [peakrdl](https://peakrdl-regblock.readthedocs.io/en/latest/) with the parametrized SystemRDL config file [`serial_link.rdl`](src/regs/rdl/serial_link.rdl).
