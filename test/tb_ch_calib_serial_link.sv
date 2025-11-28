@@ -17,6 +17,8 @@ module tb_ch_calib_serial_link;
 
   `include "serial_link_addrmap.svh"
 
+  `define MIN(a,b) ((a)<(b)?(a):(b))
+
   // ==============
   //    Config
   // ==============
@@ -39,6 +41,8 @@ module tb_ch_calib_serial_link;
   localparam int unsigned RegDataWidth    = 32;
   localparam int unsigned RegStrbWidth    = RegDataWidth / 8;
 
+  localparam int unsigned ChMaskBitsPerCycle = `MIN(`MIN(NumBits, NumChannels), RegDataWidth);
+
   // ==============
   //    DDR Link
   // ==============
@@ -59,7 +63,6 @@ module tb_ch_calib_serial_link;
 
   `APB_TYPEDEF_ALL(apb, cfg_addr_t, cfg_data_t, cfg_strb_t)
 
-  localparam int unsigned NumBits = NumLanes*(1+EnDdr);
   typedef logic [NumBits-1:0]  phy_data_t;
 
   // Model signals
@@ -569,9 +572,9 @@ module tb_ch_calib_serial_link;
     // Load the channel mask of working channels into TX FIFO
     // They should be immediately sent as TX FIFO is still enabled
     $info("[DDR%0d] Sending out RX channel mask.", id);
-    for (int i = 0; i < (NumChannels + NumBits - 1)/NumBits; i++) begin
+    for (int i = 0; i < (NumChannels + ChMaskBitsPerCycle - 1)/ChMaskBitsPerCycle; i++) begin
       // Write the channel mask into the TX FIFO
-      cfg_write(drv, `SERIAL_LINK_REG_RAW_MODE_OUT_DATA_FIFO_REG_OFFSET, working_rx_channels[NumBits*i+:NumBits]);
+      cfg_write(drv, `SERIAL_LINK_REG_RAW_MODE_OUT_DATA_FIFO_REG_OFFSET, {'0, working_rx_channels[ChMaskBitsPerCycle*i+:ChMaskBitsPerCycle]});
     end
     // Wait until the channel mask from the other side has arrived
     do begin
@@ -586,8 +589,8 @@ module tb_ch_calib_serial_link;
         // Select channel to read from
         cfg_write(drv, `SERIAL_LINK_REG_RAW_MODE_IN_CH_SEL_REG_OFFSET, c);
         // Read the mask
-        for (int i = 0; i < (NumChannels + NumBits - 1)/NumBits; i++) begin
-          cfg_read(drv, `SERIAL_LINK_REG_RAW_MODE_IN_DATA_REG_OFFSET, working_tx_channels[NumBits*i+:NumBits]);
+        for (int i = 0; i < (NumChannels + ChMaskBitsPerCycle - 1)/ChMaskBitsPerCycle; i++) begin
+          cfg_read(drv, `SERIAL_LINK_REG_RAW_MODE_IN_DATA_REG_OFFSET, working_tx_channels[ChMaskBitsPerCycle*i+:ChMaskBitsPerCycle]);
         end
       end
     end
