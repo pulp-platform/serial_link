@@ -44,6 +44,7 @@ VLOG_FLAGS += -timescale 1ns/1ps
 VLOG_FLAGS += -work $(WORK)
 
 VSIM_FLAGS += -work $(WORK)
+VSIM_FLAGS += -sv_seed 42
 
 VSIM_FLAGS_GUI += -voptargs=+acc
 VSIM_FLAGS_GUI += -do "log -r /*"
