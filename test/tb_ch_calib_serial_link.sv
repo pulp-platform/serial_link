@@ -524,7 +524,7 @@ module tb_ch_calib_serial_link;
     // Wait until some channels have received data
     do begin
       for (int i = 0; i < NumChannels; i++) begin
-        cfg_read(drv, `SERIAL_LINK_REG_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET, data);
+        cfg_read(drv, `SERIAL_LINK_REG_RAW_MODE_IN_DATA_VALID_0_REG_OFFSET + i * 4, data);
         raw_mode_data_in_valid[i] = data[0];
       end
     end while(raw_mode_data_in_valid[NumChannels-1:0] == 0);
