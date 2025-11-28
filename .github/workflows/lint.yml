@@ -23,7 +23,7 @@ jobs:
         uses: pulp-platform/pulp-actions/bender-install@v2
       - name: Check clean make targets
         run: |
-          uv run make -B update-regs
+          uv run make -B slink-gen-regs
           uv run make clean
           git status && test -z "$(git status --porcelain)"
 
@@ -40,7 +40,7 @@ jobs:
         uses: pulp-platform/pulp-actions/bender-install@v2
       - name: Check clean makefile
         run: |
-          uv run make -B update-regs
+          uv run make -B slink-gen-regs
           git status && test -z "$(git status --porcelain)"
 
   #####################
