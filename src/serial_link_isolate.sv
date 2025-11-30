@@ -7,7 +7,7 @@
 /// A wrapper around the Serial Link with additional
 /// AXI isolation, reset controller & clock gating
 module serial_link_isolate
-  import serial_link_reg_pkg::*;
+  import slink_reg_pkg::*;
 #(
   parameter type axi_req_t  = logic,
   parameter type axi_rsp_t  = logic,

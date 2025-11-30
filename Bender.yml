@@ -22,8 +22,8 @@ sources:
   files:
 
     # Configuration Registers
-    - src/regs/serial_link_reg_pkg.sv
-    - src/regs/serial_link_reg.sv
+    - src/regs/slink_reg_pkg.sv
+    - src/regs/slink_reg.sv
 
     # Parametrization
     - src/serial_link_pkg.sv

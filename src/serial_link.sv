@@ -12,7 +12,7 @@
 
 /// A simple serial link to go off-chip
 module serial_link
-  import serial_link_reg_pkg::*;
+  import slink_reg_pkg::*;
 #(
   // Number of credits for flow control
   parameter int NumCredits        = 8,
@@ -118,8 +118,8 @@ module serial_link
   axis_req_t  axis_out_req, axis_in_req;
   axis_rsp_t  axis_out_rsp, axis_in_rsp;
 
-  serial_link_reg__out_t reg2hw;
-  serial_link_reg__in_t hw2reg;
+  slink_reg__out_t reg2hw;
+  slink_reg__in_t hw2reg;
 
   phy_data_t [NumChannels-1:0]  data_link2alloc_data_out;
   logic [NumChannels-1:0]       data_link2alloc_data_out_valid;
@@ -379,7 +379,7 @@ module serial_link
     assign apb_rsp_o = apb_rsp;
   end
 
-  serial_link_reg i_serial_link_reg (
+  slink_reg i_serial_link_reg (
     .clk  (clk_i),
     .arst_n (rst_ni),
 
@@ -387,7 +387,7 @@ module serial_link
     .s_apb_penable (apb_req.penable),
     .s_apb_pwrite  (apb_req.pwrite),
     .s_apb_pprot   (apb_req.pprot),
-    .s_apb_paddr   (apb_req.paddr[serial_link_reg_pkg::SERIAL_LINK_REG_MIN_ADDR_WIDTH-1:0]),
+    .s_apb_paddr   (apb_req.paddr[slink_reg_pkg::SLINK_REG_MIN_ADDR_WIDTH-1:0]),
     .s_apb_pwdata  (apb_req.pwdata),
     .s_apb_pstrb   (apb_req.pstrb),
     .s_apb_pready  (apb_rsp.pready),

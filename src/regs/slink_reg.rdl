@@ -6,10 +6,10 @@
 //   - Michael Rogenmoser <michaero@iis.ee.ethz.ch>
 //   - Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-`ifndef SERIAL_LINK_RDL
-`define SERIAL_LINK_RDL
+`ifndef SLINK_RDL
+`define SLINK_RDL
 
-addrmap serial_link_reg #(
+addrmap slink_reg #(
     longint unsigned NumChannels = 1,
     longint unsigned NumLanes = 8,
     longint unsigned EnDdr = 1,
