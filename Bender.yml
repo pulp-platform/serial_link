@@ -42,7 +42,7 @@ sources:
     - src/serial_link.sv
 
     # Wrapper for Occamy
-    - src/serial_link_occamy_wrapper.sv
+    - src/serial_link_isolate.sv
 
     - target: any(simulation, test)
       files:

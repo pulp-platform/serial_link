@@ -105,7 +105,7 @@ module tb_axi_serial_link;
   );
 
   // first serial instance
-  serial_link_occamy_wrapper #(
+  serial_link_isolate #(
     .axi_req_t        ( axi_req_t       ),
     .axi_rsp_t        ( axi_resp_t      ),
     .aw_chan_t        ( axi_aw_chan_t   ),
@@ -137,7 +137,7 @@ module tb_axi_serial_link;
   );
 
   // second serial instance
-  serial_link_occamy_wrapper #(
+  serial_link_isolate #(
     .axi_req_t        ( axi_req_t       ),
     .axi_rsp_t        ( axi_resp_t      ),
     .aw_chan_t        ( axi_aw_chan_t   ),
