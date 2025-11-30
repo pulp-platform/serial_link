@@ -22,8 +22,8 @@ sources:
   files:
 
     # Configuration Registers
-    - src/regs/rtl/serial_link_reg_pkg.sv
-    - src/regs/rtl/serial_link_reg.sv
+    - src/regs/serial_link_reg_pkg.sv
+    - src/regs/serial_link_reg.sv
 
     # Parametrization
     - src/serial_link_pkg.sv
@@ -50,7 +50,7 @@ sources:
 
     - target: test
       include_dirs:
-      - src/regs/rtl
+      - src/regs
       files:
       - test/tb_axi_serial_link.sv
       - test/tb_ch_calib_serial_link.sv

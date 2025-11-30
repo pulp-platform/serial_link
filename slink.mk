@@ -34,15 +34,15 @@ $(SLINK_ROOT)/.generated: SLINK_FORCE
 	@printf '%s\n' "$(SLINK_PEAKRDL_PARAMS)" | cmp -s - $@ || printf '%s\n' "$(SLINK_PEAKRDL_PARAMS)" > $@
 
 
-$(SLINK_ROOT)/src/regs/rtl/serial_link_reg.sv:$(SLINK_ROOT)/src/regs/rtl/serial_link_reg_pkg.sv
-$(SLINK_ROOT)/src/regs/rtl/serial_link_reg_pkg.sv: $(SLINK_ROOT)/src/regs/rdl/serial_link.rdl $(SLINK_ROOT)/.generated
+$(SLINK_ROOT)/src/regs/serial_link_reg.sv:$(SLINK_ROOT)/src/regs/serial_link_reg_pkg.sv
+$(SLINK_ROOT)/src/regs/serial_link_reg_pkg.sv: $(SLINK_ROOT)/src/regs/serial_link.rdl $(SLINK_ROOT)/.generated
 	$(PEAKRDL) regblock $< -o $(dir $@) --default-reset arst_n --cpuif apb4-flat $(SLINK_PEAKRDL_PARAMS)
 	@sed -i '1i$(SLINK_COPYRIGHT_NOTICE)' $@ $(dir $@)/serial_link_reg.sv
 
-$(SLINK_ROOT)/src/regs/rtl/serial_link_addrmap.svh: $(SLINK_ROOT)/src/regs/rdl/serial_link.rdl $(SLINK_ROOT)/.generated
+$(SLINK_ROOT)/src/regs/serial_link_addrmap.svh: $(SLINK_ROOT)/src/regs/serial_link.rdl $(SLINK_ROOT)/.generated
 	$(PEAKRDL) raw-header $< -o $@ --format svh $(SLINK_PEAKRDL_PARAMS)
 	@sed -i '1i$(SLINK_COPYRIGHT_NOTICE)' $@
 
 .PHONY: slink-gen-regs slink-gen-regs-only
-slink-gen-regs: $(SLINK_ROOT)/src/regs/rtl/serial_link_reg.sv $(SLINK_ROOT)/src/regs/rtl/serial_link_addrmap.svh
-slink-gen-regs-only: $(SLINK_ROOT)/src/regs/rtl/serial_link_reg.sv
+slink-gen-regs: $(SLINK_ROOT)/src/regs/serial_link_reg.sv $(SLINK_ROOT)/src/regs/serial_link_addrmap.svh
+slink-gen-regs-only: $(SLINK_ROOT)/src/regs/serial_link_reg.sv
