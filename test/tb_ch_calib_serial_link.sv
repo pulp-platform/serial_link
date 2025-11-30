@@ -24,7 +24,7 @@ module tb_ch_calib_serial_link;
   // ==============
   localparam int unsigned TestDuration    = 1000;
   localparam int unsigned FaultyChannels  = 3;
-  localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;
+  localparam int unsigned MaxClkDiv       = 2**serial_link_reg_pkg::Log2MaxClkDiv;
 
   localparam time         TckSys1         = 50ns;
   localparam time         TckSys2         = 54ns;

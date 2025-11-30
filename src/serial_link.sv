@@ -79,6 +79,7 @@ module serial_link
   localparam int MaxAxiChannelBits =
   serial_link_pkg::find_max_channel(AxiChannels);
 
+
   // The payload that is converted into an AXI stream consists of
   // 1) AXI Beat
   // 2) B Channel (which is always transmitted)
@@ -142,6 +143,7 @@ module serial_link
   ////////////////////////
 
   serial_link_protocol #(
+    .NumCredits     ( NumCredits    ),
     .axi_req_t      ( axi_req_t     ),
     .axi_rsp_t      ( axi_rsp_t     ),
     .axis_req_t     ( axis_req_t    ),
@@ -152,7 +154,7 @@ module serial_link
     .ar_chan_t      ( ar_chan_t     ),
     .r_chan_t       ( r_chan_t      ),
     .payload_t      ( payload_t     ),
-    .NumCredits     ( NumCredits    )
+    .credit_t       ( credit_t      )
   ) i_serial_link_protocol (
     .clk_i          ( clk_sl_i        ),
     .rst_ni         ( rst_sl_ni       ),

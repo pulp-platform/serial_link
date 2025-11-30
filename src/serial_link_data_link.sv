@@ -52,10 +52,7 @@ module serial_link_data_link #(
   output logic                            cfg_raw_mode_out_data_fifo_is_full_o
 );
 
-  import serial_link_pkg::link_state_e;
-  import serial_link_pkg::LinkSendIdle;
-  import serial_link_pkg::LinkSendBusy;
-
+  typedef enum logic [1:0] {LinkSendIdle, LinkSendBusy} link_state_e;
 
   logic [PayloadSplits-1:0] recv_reg_in_valid, recv_reg_in_ready;
   logic [PayloadSplits-1:0] recv_reg_out_valid, recv_reg_out_ready;

@@ -7,41 +7,13 @@
 /// A simple serial link package
 package serial_link_pkg;
 
-  // Number of outstanding transactions for flow control
-  // FIFO depths depend on it -> expensive to increase!
-  localparam int NumCredits = 8;
-
-  // Number of words in the pattern sequence that can be sent out at once
-  // Must be smaller than RecvFifoDepth
-  localparam int RawModeFifoDepth = 8;
-
-  // Maximum Clock division
-  localparam int MaxClkDiv = 1024;
-
-  typedef enum logic [1:0] {LinkSendIdle, LinkSendBusy} link_state_e;
-
-  // TODO(zarubaf,fschuiki) ICEBOX: Fix
-  // B beats are generated on the write side without the knowledge of the
-  // receiver. Hence we also have no means to see whether writes actually
-  // succeeded.
   typedef enum logic [3:0]  {
-    TagIdle       = 0,
-    TagAW         = 1,
-    TagW          = 2,
-    TagAR         = 3,
-    TagR          = 4
+    TagIdle = 4'd0,
+    TagAW   = 4'd1,
+    TagW    = 4'd2,
+    TagAR   = 4'd3,
+    TagR    = 4'd4
   } tag_e;
-
-  typedef logic [$clog2(NumCredits):0] credit_t;
-
-  // PHY FSM
-  typedef enum logic [2:0] {
-    PHYIdle           = 0,
-    PHYBusy           = 1,
-    PHYTrain          = 2,
-    PHYTrainWaitPeer  = 3,
-    PHYTrainWaitIdle  = 4
-  } phy_state_e;
 
   function automatic int find_max_channel(input int channel[5]);
     int max_value = 0;
