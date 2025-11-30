@@ -44,11 +44,7 @@ sources:
     # Wrapper for Occamy
     - src/serial_link_isolate.sv
 
-    - target: any(simulation, test)
-      files:
-      - test/axi_channel_compare.sv
-
-    - target: test
+    - target: slink_test
       include_dirs:
       - src/regs
       files:

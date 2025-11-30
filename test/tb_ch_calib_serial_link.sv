@@ -359,7 +359,7 @@ module tb_ch_calib_serial_link;
   //    Checks
   // ==============
 
-  axi_channel_compare #(
+  axi_chan_compare #(
     .aw_chan_t ( axi_aw_chan_t ),
     .w_chan_t  ( axi_w_chan_t  ),
     .b_chan_t  ( axi_b_chan_t  ),
@@ -367,7 +367,7 @@ module tb_ch_calib_serial_link;
     .r_chan_t  ( axi_r_chan_t  ),
     .req_t     ( axi_req_t     ),
     .resp_t    ( axi_resp_t    )
-  ) i_axi_channel_compare_1_to_2 (
+  ) i_axi_chan_compare_1_to_2 (
     .clk_a_i   ( clk_1          ),
     .clk_b_i   ( clk_2          ),
     .axi_a_req ( axi_in_req_1   ),
@@ -376,7 +376,7 @@ module tb_ch_calib_serial_link;
     .axi_b_res ( axi_out_rsp_2  )
   );
 
-  axi_channel_compare #(
+  axi_chan_compare #(
     .aw_chan_t ( axi_aw_chan_t ),
     .w_chan_t  ( axi_w_chan_t  ),
     .b_chan_t  ( axi_b_chan_t  ),
@@ -384,7 +384,7 @@ module tb_ch_calib_serial_link;
     .r_chan_t  ( axi_r_chan_t  ),
     .req_t     ( axi_req_t     ),
     .resp_t    ( axi_resp_t    )
-  ) i_axi_channel_compare_2_to_1 (
+  ) i_axi_chan_compare_2_to_1 (
     .clk_a_i   ( clk_2          ),
     .clk_b_i   ( clk_1          ),
     .axi_a_req ( axi_in_req_2   ),
