@@ -1,6 +1,6 @@
 # Documentation of Serial Link
 This folder contains the documentation of the architecture which is split into different modules:
-* Network layer ([`serial_link_network`](../src/serial_link_network.sv))
+* Protocol layer ([`serial_link_protocol`](../src/serial_link_protocol.sv))
 * Data Link layer ([`serial_link_data_link`](../src/serial_link_data_link.sv))
 * Channel Allocator ([`serial_link_channel_allocator`](../src/channel_allocator/serial_link_channel_allocator.sv))
 * Physical layer ([`serial_link_physical`](../src/serial_link_physical.sv))
@@ -32,8 +32,8 @@ The Serial Link has the following configuration Parameters:
 |-----------------|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `clk_i`         | `logic`                        | Always-on system clock coming from the SoC domain. Only the configuration registers are connected to this clock                                                                                                  |
 | `rst_ni`        | `logic`                        | Global asynchronous reset, active-low. Only the configuration registers are connected to this reset signal                                                                                                       |
-| `clk_sl_i`      | `logic`                        | Clock for `serial_link_network`, `serial_link_data_link`, `serial_link_channel_allocator` and `serial_link_physical`. Intended for clock gating purposes, otherwise connect to `clk_i`                           |
-| `rst_sl_ni`     | `logic`                        | Asynchronous reset, active low. Resets `serial_link_network`, `serial_link_data_link`, `serial_link_channel_allocator` and `serial_link_physical`. Intended for SW reset purposes, otherwise connect to `rst_ni` |
+| `clk_sl_i`      | `logic`                        | Clock for `serial_link_protocol`, `serial_link_data_link`, `serial_link_channel_allocator` and `serial_link_physical`. Intended for clock gating purposes, otherwise connect to `clk_i`                           |
+| `rst_sl_ni`     | `logic`                        | Asynchronous reset, active low. Resets `serial_link_protocol`, `serial_link_data_link`, `serial_link_channel_allocator` and `serial_link_physical`. Intended for SW reset purposes, otherwise connect to `rst_ni` |
 | `clk_reg_i`     | `logic`                        | Clock for `cfg_req_i` and `cfg_rsp_o`                                                                                                                                                                            |
 | `rst_reg_ni`    | `logic`                        | Asynchronous active-low reset for `cfg_req_i` and `cfg_rsp_o`                                                                                                                                                    |
 | `testmode_i`    | `logic`                        | Currently not used, tie to `'0`                                                                                                                                                                                  |

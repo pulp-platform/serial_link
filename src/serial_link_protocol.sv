@@ -7,9 +7,9 @@
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
 
-// Implements the Network layer of the Serial Link
+// Implements the Protocol layer of the Serial Link
 // Translates from the AXI to the AXIStream interface and vice-versa
-module serial_link_network #(
+module serial_link_protocol #(
     parameter type axi_req_t  = logic,
     parameter type axi_rsp_t  = logic,
     parameter type axis_req_t = logic,

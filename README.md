@@ -2,11 +2,11 @@
 # Serial Link
 [![SHL-0.51 license](https://img.shields.io/badge/license-SHL--0.51-green)](LICENSE)
 
-The serial link is a simple all-digital Double-Data-Rate (DDR) or Single-Data-Rate (SDR) link with a source-synchronous interface. The link is scalable and can be used for high-bandwidth low latency applications like Die2Die communication as well as lower demanding tasks like binary preloading. The link has an AXI4 interface and implements Network, Data Link and Physical layer. The serial link is part of the [PULP (Parallel Ultra-Low Power) Platform](https://pulp-platform.org/) and is being used in various chip tapeouts e.g. [Snitch based Systems](https://github.com/pulp-platform/snitch)
+The serial link is a simple all-digital Double-Data-Rate (DDR) or Single-Data-Rate (SDR) link with a source-synchronous interface. The link is scalable and can be used for high-bandwidth low latency applications like Die2Die communication as well as lower demanding tasks like binary preloading. The link has an AXI4 interface and implements Protocol, Data Link and Physical layer. The serial link is part of the [PULP (Parallel Ultra-Low Power) Platform](https://pulp-platform.org/) and is being used in various chip tapeouts e.g. [Snitch based Systems](https://github.com/pulp-platform/snitch)
 
 ## Architecture Overview
 The serial link implements the 3 lowest layers of the OSI reference model:
-* **Network Layer:** AXI requests and the responses are serialized and translated to an AXI-Stream interface
+* **Protocol Layer:** AXI requests and the responses are serialized and translated to an AXI-Stream interface
 * **Data Link Layer:** Splits the payload of the AXI stream into multiple packets which are distributed over the physical channels. A *Channel Allocator* reshuffles the packets and is able to recover defects of physical channels. It is able to apply back-pressure with a credit-based flow control mechanism. It also synchronizes the packets of multiple channels.
 * **Physical Layer:** Parametrizable number of channels and wires per channel. Each TX channel forwards its own source-synchronous clock which is a divided clock of the system clock. The RX channels samples the data with the received clock and has a CDC to synchronize to the local system clock.
 

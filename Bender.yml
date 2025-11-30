@@ -34,7 +34,7 @@ sources:
     - src/channel_allocator/channel_despread_sfr.sv
     - src/channel_allocator/channel_spread_sfr.sv
     - src/channel_allocator/serial_link_channel_allocator.sv
-    - src/serial_link_network.sv
+    - src/serial_link_protocol.sv
     - src/serial_link_data_link.sv
     - src/serial_link_physical.sv
 

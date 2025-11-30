@@ -34,7 +34,7 @@ module serial_link
   // There are 3 different clock/resets:
   // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
   // 2) clk_sl_i & rst_sl_ni: Same as 1) but clock is gated and reset is SW synchronized. This is the clock that drives the serial link
-  //    i.e. network, data-link and physical layer all run on this clock and can be clock gated if needed. If no clock gating, reset synchronization
+  //    i.e. protocol, data-link and physical layer all run on this clock and can be clock gated if needed. If no clock gating, reset synchronization
   //    is desired, you can tie clk_sl_i -> clk_i resp. rst_sl_ni -> rst_ni
   // 3) clk_reg_i & rst_reg_ni: peripheral clock and reset. Only connected to RegBus CDC. If NoRegCdc is set, this clock must be the same as 1)
   input  logic                      clk_i,
@@ -137,11 +137,11 @@ module serial_link
   logic [NumChannels-1:0]       alloc2phy_data_in_ready;
 
 
-  ///////////////////////
-  //   NETWORK LAYER   //
-  ///////////////////////
+  ////////////////////////
+  //   PROTOCOL LAYER   //
+  ////////////////////////
 
-  serial_link_network #(
+  serial_link_protocol #(
     .axi_req_t      ( axi_req_t     ),
     .axi_rsp_t      ( axi_rsp_t     ),
     .axis_req_t     ( axis_req_t    ),
@@ -153,7 +153,7 @@ module serial_link
     .r_chan_t       ( r_chan_t      ),
     .payload_t      ( payload_t     ),
     .NumCredits     ( NumCredits    )
-  ) i_serial_link_network (
+  ) i_serial_link_protocol (
     .clk_i          ( clk_sl_i        ),
     .rst_ni         ( rst_sl_ni       ),
     .axi_in_req_i   ( axi_in_req_i    ),
