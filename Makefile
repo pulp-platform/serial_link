@@ -47,7 +47,7 @@ VSIM_FLAGS += -work $(WORK)
 
 VSIM_FLAGS_GUI += -voptargs=+acc
 VSIM_FLAGS_GUI += -do "log -r /*"
-VSIM_FLAGS_GUI += -do util/serial_link_wave.tcl
+VSIM_FLAGS_GUI += -do util/wave.tcl
 
 .PHONY: vsim-compile vsim-clean vsim-run vsim-run-batch
 
