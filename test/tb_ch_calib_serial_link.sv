@@ -557,6 +557,8 @@ module tb_ch_calib_serial_link;
       end
     end
     $info("[DDR%0d] RX channel mask %s", id, print_ch_mask(working_rx_channels));
+    // Wait for some time to make sure that the other side has handled calibration as well
+    repeat(500) @(posedge clk_reg);
     // Check that there is no more valid data in the RX FIFOs
     // of all working channels
     for (int i = 0; i < NumChannels; i++) begin
