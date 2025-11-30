@@ -12,8 +12,8 @@ package:
 
 dependencies:
   common_cells:        { git: "https://github.com/pulp-platform/common_cells.git",       version: 1.28.0 }
-  axi:                 { git: "https://github.com/pulp-platform/axi.git",                version: 0.38.0 }
-  register_interface:  { git: "https://github.com/pulp-platform/register_interface.git", version: 0.3.8  }
+  axi:                 { git: "https://github.com/pulp-platform/axi.git",                version: 0.39.0 }
+  apb:                 { git: "https://github.com/pulp-platform/apb.git",                version: 0.2.4  }
 
 export_include_dirs:
   - src/axis/include
@@ -22,10 +22,8 @@ sources:
   files:
 
     # Configuration Registers
-    - src/regs/serial_link_reg_pkg.sv
-    - src/regs/serial_link_reg_top.sv
-    - src/regs/serial_link_single_channel_reg_pkg.sv
-    - src/regs/serial_link_single_channel_reg_top.sv
+    - src/regs/rtl/serial_link_reg_pkg.sv
+    - src/regs/rtl/serial_link_reg.sv
 
     # Parametrization
     - src/serial_link_pkg.sv
@@ -46,15 +44,13 @@ sources:
     # Wrapper for Occamy
     - src/serial_link_occamy_wrapper.sv
 
-    - target: synthesis
-      files:
-      - src/serial_link_synth_wrapper.sv
-
     - target: any(simulation, test)
       files:
       - test/axi_channel_compare.sv
 
     - target: test
+      include_dirs:
+      - src/regs/rtl
       files:
       - test/tb_axi_serial_link.sv
       - test/tb_ch_calib_serial_link.sv

@@ -14,8 +14,9 @@ The serial link implements the 3 lowest layers of the OSI reference model:
 The Serial Link is released under Solderpad v0.51 (SHL-0.51) see [`LICENSE`](LICENSE):
 
 ## Getting started
+
 ### Dependencies
-The link uses [bender](https://github.com/pulp-platform/bender) to manage its dependencies and to automatically generate compilation scripts. Further `Python >= 3.8` is required with the packages listed in `requirements.txt`. Currently, we do not provide any open-source simulation setup. Internally, the Serial Link was tested using QuestaSim.
+The link uses [bender](https://github.com/pulp-platform/bender) to manage its dependencies and to automatically generate compilation scripts. Further `Python >= 3.11` is required with the packages listed in `requirements.txt`. Currently, we do not provide any open-source simulation setup. Internally, the Serial Link is verified using QuestaSim and Synopsys VCS.
 
 ### Simulation
 The Serial Link can be simulated in QuestaSim with the following steps:
@@ -23,24 +24,30 @@ The Serial Link can be simulated in QuestaSim with the following steps:
 # To compile the link, run the following command:
 make all
 # Run the simulation. This will start the simulation in batch mode.
-make run
+make <simulator>-run
 # To open it in the GUI mode, run the following command:
 # This command will also add all interesting waves to the wave window.
-make run GUI=true
+make <simulator>-run
+```
+
+where `<simulator>` can be either `vsim` (for ModelSim/QuestaSim) or `vcs` (for Synopsys VCS). To test the testbench (defaults to `tb_axi_serial_link`), you can set the `TB_DUT` variable:
+```sh
+make <simulator>-run TB_DUT=tb_ch_calib_serial_link
 ```
 
 ## Configuration
-The link can be parametrized with arbitrary AXI interfaces resp. structs (`axi_req_t`, `axi_rsp_t`). Further, the number of Channels number of Lanes per Channel is configurable in `serial_link_pkg.sv`.
+The link can be parametrized with arbitrary AXI interfaces resp. structs (`axi_req_t`, `axi_rsp_t`). The number of channels is also configurable at synthesis time. To do this, you have to regenerate the register files with the following command:
+
+```sh
+make gen-regs SLINK_NUM_CHANNELS=<num_channels> SLINK_NUM_LANES=<num_lanes>
+```
+
+The registers are generated with [peakrdl](https://peakrdl-regblock.readthedocs.io/en/latest/) with the parametrized SystemRDL config file [`serial_link.rdl`](src/regs/rdl/serial_link.rdl).
+
+In order to do this, you need to have [uv](https://docs.astral.sh/uv/) installed.
 
 ### Single-Channel
 For simple use cases with lower low bandwidth requirements (e.g. binary preloading), it is recommended to use a single-channel configuration, possibly with Single-Data-Rate. Single-channel configurations come with less overhead for channel synchronization and fault detection.
 
 ### Multi-Channel
 For use cases that require a higher bandwidth (e.g. Die2Die communication), a multi-channel configuration is recommended. In multi-channel configurations, each channel has its own source-synchronous forwarded clock and the channels are synchronized on the receiver side again. Further, a channel allocator handles faulty channels by redistributing the packets to functional channels. The detection of faulty channels can be done entirely in SW with a special _Raw Mode_ that decouples the link from the AXI interface and allows full controllability and observability of independent channels.
-
-### Configuration Registers
-Single-channel and Multi-channels currently use different configuration register files because the multi-channel configuration requires additional registers for the channel allocator etc. The registers are generated with the [reggen](https://opentitan.org/book/util/reggen/index.html). The config files for single-channel (`serial_link_single_channel.hjson`) and multi-channel (`serial_link.hjson`) can be found in the `src/regs` folder and can be regenerated with the following command:
-
-```
-make update-regs
-```

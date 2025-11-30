@@ -11,21 +11,13 @@
 `include "axis/typedef.svh"
 
 /// A simple serial link to go off-chip
-module serial_link #(
-  // The number of physical chnannels
-  parameter int NumChannels       = 1,
-  // The number of lanes per channel
-  parameter int NumLanes          = 8,
-  // Whether to enable DDR mode
-  parameter bit EnDdr             = 1'b1,
+module serial_link
+  import serial_link_reg_pkg::*;
+#(
   // Number of credits for flow control
   parameter int NumCredits        = 8,
-  // The maximum clock division factor
-  parameter int MaxClkDiv         = 1024,
   // Whether to use a register CDC for the configuration registers
   parameter bit NoRegCdc          = 1'b0,
-  // The depth of the raw mode FIFO
-  parameter int RawModeFifoDepth  = 8,
   parameter type axi_req_t  = logic,
   parameter type axi_rsp_t  = logic,
   parameter type aw_chan_t  = logic,
@@ -33,10 +25,11 @@ module serial_link #(
   parameter type r_chan_t   = logic,
   parameter type w_chan_t   = logic,
   parameter type b_chan_t   = logic,
-  parameter type cfg_req_t  = logic,
-  parameter type cfg_rsp_t  = logic,
-  parameter type hw2reg_t   = logic,
-  parameter type reg2hw_t   = logic
+  parameter type apb_req_t  = logic,
+  parameter type apb_rsp_t  = logic,
+  parameter type apb_addr_t = logic[31:0],
+  parameter type apb_data_t = logic[31:0],
+  parameter type apb_strb_t = logic[3:0]
 ) (
   // There are 3 different clock/resets:
   // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
@@ -55,8 +48,8 @@ module serial_link #(
   output axi_rsp_t                  axi_in_rsp_o,
   output axi_req_t                  axi_out_req_o,
   input  axi_rsp_t                  axi_out_rsp_i,
-  input  cfg_req_t                  cfg_req_i,
-  output cfg_rsp_t                  cfg_rsp_o,
+  input  apb_req_t                  apb_req_i,
+  output apb_rsp_t                  apb_rsp_o,
   input  logic [NumChannels-1:0]    ddr_rcv_clk_i,
   output logic [NumChannels-1:0]    ddr_rcv_clk_o,
   input  logic [NumChannels-1:0][NumLanes-1:0] ddr_i,
@@ -71,6 +64,8 @@ module serial_link #(
 );
 
   localparam int unsigned NumBitsPerCycle = NumLanes * (1 + EnDdr);
+  localparam int unsigned RawModeFifoDepth = 2**Log2RawModeTXFifoDepth;
+  localparam int unsigned MaxClkDiv = 2**Log2MaxClkDiv;
 
   typedef logic [$clog2(NumCredits):0] credit_t;
   typedef logic [NumBitsPerCycle-1:0] phy_data_t;
@@ -116,14 +111,14 @@ module serial_link #(
   typedef logic tready_t;
   `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, tuser_t, tready_t)
 
-  cfg_req_t cfg_req;
-  cfg_rsp_t cfg_rsp;
+  apb_req_t apb_req;
+  apb_rsp_t apb_rsp;
 
   axis_req_t  axis_out_req, axis_in_req;
   axis_rsp_t  axis_out_rsp, axis_in_rsp;
 
-  reg2hw_t reg2hw;
-  hw2reg_t hw2reg;
+  serial_link_reg__out_t reg2hw;
+  serial_link_reg__in_t hw2reg;
 
   phy_data_t [NumChannels-1:0]  data_link2alloc_data_out;
   logic [NumChannels-1:0]       data_link2alloc_data_out_valid;
@@ -177,11 +172,26 @@ module serial_link #(
 
   logic cfg_flow_control_fifo_clear;
   logic cfg_raw_mode_out_data_fifo_clear;
+  logic raw_mode_out_data_valid;
+  logic [NumChannels-1:0] raw_mode_in_data_valid;
+  logic [NumChannels-1:0] raw_mode_out_ch_mask;
 
-  assign cfg_flow_control_fifo_clear = reg2hw.flow_control_fifo_clear.q
-    & reg2hw.flow_control_fifo_clear.qe;
-  assign cfg_raw_mode_out_data_fifo_clear = reg2hw.raw_mode_out_data_fifo_ctrl.clear.q
-    & reg2hw.raw_mode_out_data_fifo_ctrl.clear.qe;
+  assign cfg_flow_control_fifo_clear =
+      reg2hw.flow_control_fifo_clear.wr_data.flow_control_fifo_clear
+    & reg2hw.flow_control_fifo_clear.req
+    & reg2hw.flow_control_fifo_clear.req_is_wr
+    & reg2hw.flow_control_fifo_clear.wr_biten.flow_control_fifo_clear;
+  assign cfg_raw_mode_out_data_fifo_clear =
+      reg2hw.raw_mode_out_data_fifo_ctrl.wr_data.clear
+    & reg2hw.raw_mode_out_data_fifo_ctrl.req
+    & reg2hw.raw_mode_out_data_fifo_ctrl.req_is_wr
+    & reg2hw.raw_mode_out_data_fifo_ctrl.wr_biten.clear;
+  for (genvar i = 0; i < NumChannels; i++) begin : gen_raw_mode_in_data_valid
+    assign hw2reg.raw_mode_in_data_valid[i].rd_data.raw_mode_in_data_valid =
+      raw_mode_in_data_valid[i];
+    assign raw_mode_out_ch_mask[i] =
+      reg2hw.raw_mode_out_ch_mask[i].raw_mode_out_ch_mask.value;
+  end
 
   serial_link_data_link #(
     .axis_req_t       ( axis_req_t        ),
@@ -207,25 +217,34 @@ module serial_link #(
     .data_in_valid_i                         ( alloc2data_link_data_in_valid                    ),
     .data_in_ready_o                         ( data_link2alloc_data_in_ready                    ),
     .cfg_flow_control_fifo_clear_i           ( cfg_flow_control_fifo_clear                      ),
-    .cfg_raw_mode_en_i                       ( reg2hw.raw_mode_en                               ),
-    .cfg_raw_mode_in_ch_sel_i                ( reg2hw.raw_mode_in_ch_sel                        ),
-    .cfg_raw_mode_in_data_o                  ( hw2reg.raw_mode_in_data[NumBitsPerCycle-1:0]     ),
-    .cfg_raw_mode_in_data_valid_o            ( hw2reg.raw_mode_in_data_valid                    ),
-    .cfg_raw_mode_in_data_ready_i            ( reg2hw.raw_mode_in_data.re                       ),
-    .cfg_raw_mode_out_ch_mask_i              ( reg2hw.raw_mode_out_ch_mask                      ),
-    .cfg_raw_mode_out_data_i                 ( phy_data_t'(reg2hw.raw_mode_out_data_fifo.q)     ),
-    .cfg_raw_mode_out_data_valid_i           ( reg2hw.raw_mode_out_data_fifo.qe                 ),
-    .cfg_raw_mode_out_en_i                   ( reg2hw.raw_mode_out_en                           ),
+    .cfg_raw_mode_en_i                       ( reg2hw.raw_mode_en.raw_mode_en.value ),
+    .cfg_raw_mode_in_ch_sel_i                (
+      reg2hw.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value[cf_math_pkg::idx_width(NumChannels)-1:0] ),
+    .cfg_raw_mode_in_data_o                  (
+      hw2reg.raw_mode_in_data.rd_data.raw_mode_in_data ),
+    .cfg_raw_mode_in_data_valid_o            ( raw_mode_in_data_valid                           ),
+    .cfg_raw_mode_in_data_ready_i            (
+      reg2hw.raw_mode_in_data.req & ~reg2hw.raw_mode_in_data.req_is_wr ),
+    .cfg_raw_mode_out_ch_mask_i              ( raw_mode_out_ch_mask                             ),
+    .cfg_raw_mode_out_data_i                 (
+      phy_data_t'(reg2hw.raw_mode_out_data_fifo.raw_mode_out_data_fifo.value) ),
+    .cfg_raw_mode_out_data_valid_i           ( raw_mode_out_data_valid ),
+    .cfg_raw_mode_out_en_i                   (
+      reg2hw.raw_mode_out_en.raw_mode_out_en.value ),
     .cfg_raw_mode_out_data_fifo_clear_i      ( cfg_raw_mode_out_data_fifo_clear                 ),
-    .cfg_raw_mode_out_data_fifo_fill_state_o ( hw2reg.raw_mode_out_data_fifo_ctrl.fill_state.d  ),
-    .cfg_raw_mode_out_data_fifo_is_full_o    ( hw2reg.raw_mode_out_data_fifo_ctrl.is_full.d     )
+    .cfg_raw_mode_out_data_fifo_fill_state_o (
+      hw2reg.raw_mode_out_data_fifo_ctrl.rd_data.fill_state ),
+    .cfg_raw_mode_out_data_fifo_is_full_o    (
+      hw2reg.raw_mode_out_data_fifo_ctrl.rd_data.is_full )
   );
+
+  `FF(raw_mode_out_data_valid, reg2hw.raw_mode_out_data_fifo.raw_mode_out_data_fifo.swmod, '0)
 
   ///////////////////////
   // CHANNEL ALLOCATOR //
   ///////////////////////
 
-  if (NumChannels == 1) begin : gen_no_channel_alloc
+  if (!EnChAlloc) begin : gen_no_channel_alloc
     // Don't instantiate the channel allocator for the single channel serial
     // link variant. We just feedthrough all the connections
 
@@ -237,17 +256,30 @@ module serial_link #(
     assign alloc2data_link_data_in_valid = phy2alloc_data_in_valid;
     assign alloc2phy_data_in_ready = data_link2alloc_data_in_ready;
 
-  end else begin :gen_channel_alloc
+  end else begin : gen_channel_alloc
 
     logic cfg_tx_clear, cfg_rx_clear;
     logic cfg_tx_flush_trigger;
+    logic [NumChannels-1:0] cfg_tx_channel_en, cfg_rx_channel_en;
 
-    assign cfg_tx_clear = reg2hw.channel_alloc_tx_ctrl.clear.q
-      & reg2hw.channel_alloc_tx_ctrl.clear.qe;
-    assign cfg_rx_clear = reg2hw.channel_alloc_rx_ctrl.q
-      & reg2hw.channel_alloc_rx_ctrl.qe;
-    assign cfg_tx_flush_trigger = reg2hw.channel_alloc_tx_ctrl.flush.q
-      & reg2hw.channel_alloc_tx_ctrl.flush.qe;
+    assign cfg_tx_clear = reg2hw.channel_alloc_tx_ctrl.wr_data.clear
+      & reg2hw.channel_alloc_tx_ctrl.req
+      & reg2hw.channel_alloc_tx_ctrl.req_is_wr
+      & reg2hw.channel_alloc_tx_ctrl.wr_biten.clear;
+    assign cfg_rx_clear = reg2hw.channel_alloc_rx_ctrl.wr_data.clear
+      & reg2hw.channel_alloc_rx_ctrl.req
+      & reg2hw.channel_alloc_rx_ctrl.req_is_wr
+      & reg2hw.channel_alloc_rx_ctrl.wr_biten.clear;
+    assign cfg_tx_flush_trigger = reg2hw.channel_alloc_tx_ctrl.wr_data.flush
+      & reg2hw.channel_alloc_tx_ctrl.req
+      & reg2hw.channel_alloc_tx_ctrl.req_is_wr
+      & reg2hw.channel_alloc_tx_ctrl.wr_biten.flush;
+    for (genvar i = 0; i < NumChannels; i++) begin : gen_channel_en
+      assign cfg_tx_channel_en[i] =
+        reg2hw.channel_alloc_tx_ch_en[i].channel_alloc_tx_ch_en.value;
+      assign cfg_rx_channel_en[i] =
+        reg2hw.channel_alloc_rx_ch_en[i].channel_alloc_rx_ch_en.value;
+    end
 
     serial_link_channel_allocator #(
       .phy_data_t  ( phy_data_t    ),
@@ -256,17 +288,17 @@ module serial_link #(
       .clk_i                     ( clk_sl_i                                       ),
       .rst_ni                    ( rst_sl_ni                                      ),
       .cfg_tx_clear_i            ( cfg_tx_clear                                   ),
-      .cfg_tx_channel_en_i       ( reg2hw.channel_alloc_tx_ch_en                  ),
-      .cfg_tx_bypass_en_i        ( reg2hw.channel_alloc_tx_cfg.bypass_en.q        ),
-      .cfg_tx_auto_flush_en_i    ( reg2hw.channel_alloc_tx_cfg.auto_flush_en.q    ),
-      .cfg_tx_auto_flush_count_i ( reg2hw.channel_alloc_tx_cfg.auto_flush_count.q ),
+      .cfg_tx_channel_en_i       ( cfg_tx_channel_en                              ),
+      .cfg_tx_bypass_en_i        ( reg2hw.channel_alloc_tx_cfg.bypass_en.value ),
+      .cfg_tx_auto_flush_en_i    ( reg2hw.channel_alloc_tx_cfg.auto_flush_en.value ),
+      .cfg_tx_auto_flush_count_i ( reg2hw.channel_alloc_tx_cfg.auto_flush_count.value ),
       .cfg_tx_flush_trigger_i    ( cfg_tx_flush_trigger                           ),
       .cfg_rx_clear_i            ( cfg_rx_clear                                   ),
-      .cfg_rx_bypass_en_i        ( reg2hw.channel_alloc_rx_cfg.bypass_en.q        ),
-      .cfg_rx_channel_en_i       ( reg2hw.channel_alloc_rx_ch_en                  ),
-      .cfg_rx_auto_flush_en_i    ( reg2hw.channel_alloc_rx_cfg.auto_flush_en.q    ),
-      .cfg_rx_auto_flush_count_i ( reg2hw.channel_alloc_rx_cfg.auto_flush_count.q ),
-      .cfg_rx_sync_en_i          ( reg2hw.channel_alloc_rx_cfg.sync_en.q          ),
+      .cfg_rx_bypass_en_i        ( reg2hw.channel_alloc_rx_cfg.bypass_en.value ),
+      .cfg_rx_channel_en_i       ( cfg_rx_channel_en                              ),
+      .cfg_rx_auto_flush_en_i    ( reg2hw.channel_alloc_rx_cfg.auto_flush_en.value ),
+      .cfg_rx_auto_flush_count_i ( reg2hw.channel_alloc_rx_cfg.auto_flush_count.value ),
+      .cfg_rx_sync_en_i          ( reg2hw.channel_alloc_rx_cfg.sync_en.value ),
       // From Data Link Layer
       .data_out_i                ( data_link2alloc_data_out                       ),
       .data_out_valid_i          ( data_link2alloc_data_out_valid                 ),
@@ -301,9 +333,9 @@ module serial_link #(
     ) i_serial_link_physical (
       .clk_i             ( clk_sl_i                     ),
       .rst_ni            ( rst_sl_ni                    ),
-      .clk_div_i         ( reg2hw.tx_phy_clk_div[i].q   ),
-      .clk_shift_start_i ( reg2hw.tx_phy_clk_start[i].q ),
-      .clk_shift_end_i   ( reg2hw.tx_phy_clk_end[i].q   ),
+      .clk_div_i         ( reg2hw.tx_phy_clk_div[i].clk_divs.value ),
+      .clk_shift_start_i ( reg2hw.tx_phy_clk_start[i].clk_divs.value ),
+      .clk_shift_end_i   ( reg2hw.tx_phy_clk_end[i].clk_shift_end.value ),
       .ddr_rcv_clk_i     ( ddr_rcv_clk_i[i]             ),
       .ddr_rcv_clk_o     ( ddr_rcv_clk_o[i]             ),
       .data_out_i        ( alloc2phy_data_out[i]        ),
@@ -322,58 +354,90 @@ module serial_link #(
   /////////////////////////////////
 
   if (!NoRegCdc) begin : gen_reg_cdc
-    reg_cdc #(
-      .req_t  ( cfg_req_t ),
-      .rsp_t  ( cfg_rsp_t )
+    apb_cdc #(
+      .LogDepth ( 1          ),
+      .req_t    ( apb_req_t  ),
+      .resp_t   ( apb_rsp_t  ),
+      .addr_t   ( apb_addr_t ),
+      .data_t   ( apb_data_t ),
+      .strb_t   ( apb_strb_t )
     ) i_cdc_cfg (
-      .src_clk_i  ( clk_reg_i   ),
-      .src_rst_ni ( rst_reg_ni  ),
-      .src_req_i  ( cfg_req_i   ),
-      .src_rsp_o  ( cfg_rsp_o   ),
+      .src_pclk_i    ( clk_reg_i   ),
+      .src_preset_ni ( rst_reg_ni  ),
+      .src_req_i     ( apb_req_i   ),
+      .src_resp_o    ( apb_rsp_o   ),
 
-      .dst_clk_i  ( clk_i       ),
-      .dst_rst_ni ( rst_ni      ),
-      .dst_req_o  ( cfg_req     ),
-      .dst_rsp_i  ( cfg_rsp     )
+      .dst_pclk_i    ( clk_i       ),
+      .dst_preset_ni ( rst_ni      ),
+      .dst_req_o     ( apb_req     ),
+      .dst_resp_i    ( apb_rsp     )
     );
   end else begin : gen_no_reg_cdc
-    assign cfg_req = cfg_req_i;
-    assign cfg_rsp_o = cfg_rsp;
+    assign apb_req = apb_req_i;
+    assign apb_rsp_o = apb_rsp;
   end
 
-  if (NumChannels == 1) begin : gen_single_channel_cfg_regs
-    serial_link_single_channel_reg_top #(
-      .reg_req_t (cfg_req_t),
-      .reg_rsp_t (cfg_rsp_t)
-    ) i_serial_link_reg_top (
-      .clk_i      ( clk_i       ),
-      .rst_ni     ( rst_ni      ),
-      .reg_req_i  ( cfg_req     ),
-      .reg_rsp_o  ( cfg_rsp     ),
-      .reg2hw     ( reg2hw      ),
-      .hw2reg     ( hw2reg      ),
-      .devmode_i  ( testmode_i  )
-    );
-  end else begin : gen_multi_channel_cfg_regs
-    serial_link_reg_top #(
-    .reg_req_t (cfg_req_t),
-    .reg_rsp_t (cfg_rsp_t)
-  ) i_serial_link_reg_top (
-    .clk_i      ( clk_i       ),
-    .rst_ni     ( rst_ni      ),
-    .reg_req_i  ( cfg_req     ),
-    .reg_rsp_o  ( cfg_rsp     ),
-    .reg2hw     ( reg2hw      ),
-    .hw2reg     ( hw2reg      ),
-    .devmode_i  ( testmode_i  )
+  serial_link_reg i_serial_link_reg (
+    .clk  (clk_i),
+    .arst_n (rst_ni),
+
+    .s_apb_psel    (apb_req.psel),
+    .s_apb_penable (apb_req.penable),
+    .s_apb_pwrite  (apb_req.pwrite),
+    .s_apb_pprot   (apb_req.pprot),
+    .s_apb_paddr   (apb_req.paddr[serial_link_reg_pkg::SERIAL_LINK_REG_MIN_ADDR_WIDTH-1:0]),
+    .s_apb_pwdata  (apb_req.pwdata),
+    .s_apb_pstrb   (apb_req.pstrb),
+    .s_apb_pready  (apb_rsp.pready),
+    .s_apb_prdata  (apb_rsp.prdata),
+    .s_apb_pslverr (apb_rsp.pslverr),
+
+    .hwif_in  (hw2reg),
+    .hwif_out (reg2hw)
   );
-  end
 
-  assign clk_ena_o = reg2hw.ctrl.clk_ena.q;
-  assign reset_no = reg2hw.ctrl.reset_n.q;
-  assign isolate_o = {reg2hw.ctrl.axi_out_isolate.q, reg2hw.ctrl.axi_in_isolate.q};
-  assign hw2reg.isolated.axi_in.d = isolated_i[0];
-  assign hw2reg.isolated.axi_out.d = isolated_i[1];
+  assign clk_ena_o = reg2hw.ctrl.clk_ena.value;
+  assign reset_no = reg2hw.ctrl.reset_n.value;
+  assign isolate_o = {reg2hw.ctrl.axi_out_isolate.value,
+                      reg2hw.ctrl.axi_in_isolate.value};
+  assign hw2reg.isolated.rd_data.axi_in = isolated_i[0];
+  assign hw2reg.isolated.rd_data.axi_out = isolated_i[1];
+
+  assign hw2reg.isolated.rd_ack = reg2hw.isolated.req
+    & ~reg2hw.isolated.req_is_wr;
+  assign hw2reg.isolated.rd_data._reserved_31_2 = '0;
+  for (genvar i = 0; i < NumChannels; i++) begin : gen_static_raw_mode_in_data_valid
+    assign hw2reg.raw_mode_in_data_valid[i].rd_ack =
+        reg2hw.raw_mode_in_data_valid[i].req
+      & ~reg2hw.raw_mode_in_data_valid[i].req_is_wr;
+    assign hw2reg.raw_mode_in_data_valid[i].rd_data._reserved_31_1 = '0;
+  end
+  assign hw2reg.raw_mode_in_data.rd_ack = reg2hw.raw_mode_in_data.req
+    & ~reg2hw.raw_mode_in_data.req_is_wr;
+  assign hw2reg.raw_mode_in_data.rd_data._reserved_31_16 = '0;
+  assign hw2reg.raw_mode_out_data_fifo_ctrl.rd_ack =
+      reg2hw.raw_mode_out_data_fifo_ctrl.req
+    & ~reg2hw.raw_mode_out_data_fifo_ctrl.req_is_wr;
+  assign hw2reg.raw_mode_out_data_fifo_ctrl.wr_ack =
+      reg2hw.raw_mode_out_data_fifo_ctrl.req
+    & reg2hw.raw_mode_out_data_fifo_ctrl.req_is_wr;
+  assign hw2reg.raw_mode_out_data_fifo_ctrl.rd_data._reserved_7_0 = '0;
+  assign hw2reg.raw_mode_out_data_fifo_ctrl.rd_data._reserved_30_11 = '0;
+  assign hw2reg.flow_control_fifo_clear.wr_ack =
+      reg2hw.flow_control_fifo_clear.req
+    & reg2hw.flow_control_fifo_clear.req_is_wr;
+
+  if (EnChAlloc) begin : gen_channel_alloc_regs
+    assign hw2reg.channel_alloc_tx_ctrl.wr_ack =
+        reg2hw.channel_alloc_tx_ctrl.req
+      & reg2hw.channel_alloc_tx_ctrl.req_is_wr;
+    assign hw2reg.channel_alloc_rx_ctrl.wr_ack =
+        reg2hw.channel_alloc_rx_ctrl.req
+      & reg2hw.channel_alloc_rx_ctrl.req_is_wr;
+  end else begin : gen_no_channel_alloc_regs
+    assign hw2reg.channel_alloc_tx_ctrl = '{default: '0};
+    assign hw2reg.channel_alloc_rx_ctrl = '{default: '0};
+  end
 
   ////////////////////
   //   ASSERTIONS   //

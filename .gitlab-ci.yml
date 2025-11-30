@@ -5,138 +5,101 @@
 # Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
 variables:
-  VSIM: 'questa-2021.3-kgf vsim'
-  VCS: 'vcs-2020.12 vcs'
-  VLOGAN: 'vcs-2020.12 vlogan'
+  VSIM: 'questa-2025.1 vsim'
+  VCS: 'vcs-2025.06 vcs'
+  VLOGAN: 'vcs-2025.06 vlogan'
+  PEAKRDL: '/home/fischeti/.local/bin/uv run peakrdl'
+  UV_LINK_MODE: copy
 
 stages:
   - build
   - test
 
-build_vsim:
+build-vsim:
   stage: build
   script:
-    - make clean
-    - make compile_questa VSIM="${VSIM}" WORK=work-vsim
+    - make slink-gen-regs SLINK_NUM_CHANNELS=${NUM_CHANNELS}
+    - make vsim-compile WORK=work_${NUM_CHANNELS} | tee compile.log 2>&1
+    - '! grep "\*\* Error" compile.log'
+  parallel:
+    matrix:
+      - NUM_CHANNELS: [1, 4]
   artifacts:
-      expire_in: 1 week
-      paths:
-        - work-vsim
-
-build_vsim_single_channel:
-  stage: build
-  script:
-    - make clean
-    - make compile_questa VSIM="${VSIM}" SINGLE_CHANNEL=1 WORK=work-vsim-single-channel
-  artifacts:
-    expire_in: 1 week
     paths:
-      - work-vsim-single-channel
+      - work_${NUM_CHANNELS}
 
-build_vcs_axi:
+build-vcs:
   stage: build
   script:
-    - make clean
-    - make bin/serial_link_axi.vcs TB_DUT=tb_axi_serial_link VCS="${VCS}" WORK=work-vcs
+    - make slink-gen-regs SLINK_NUM_CHANNELS=${NUM_CHANNELS}
+    - make bin/${TB_DUT}_${NUM_CHANNELS}.vcs
+  parallel:
+    matrix:
+      - NUM_CHANNELS: [1, 4]
+        TB_DUT: [tb_axi_serial_link, tb_ch_calib_serial_link]
   artifacts:
-      expire_in: 1 week
-      paths:
-        - bin/serial_link_axi.vcs*
-
-build_vcs_ch_calib:
-  stage: build
-  script:
-    - make clean
-    - make bin/serial_link_ch_calib.vcs TB_DUT=tb_ch_calib_serial_link VCS="${VCS}" WORK=work-vcs
-  artifacts:
-      expire_in: 1 week
-      paths:
-        - bin/serial_link_ch_calib.vcs*
-
-build_vcs_single_channel:
-  stage: build
-  script:
-    - make clean
-    - make bin/serial_link_single_channel.vcs TB_DUT=tb_axi_serial_link VCS="${VCS}" SINGLE_CHANNEL=1 WORK=work-vcs-single-channel
-  artifacts:
-    expire_in: 1 week
     paths:
-      - bin/serial_link_single_channel.vcs*
+      - bin/${TB_DUT}_${NUM_CHANNELS}.vcs*
 
-run_vsim_axi:
+run-vsim:
   stage: test
   needs:
-    - build_vsim
+    - build-vsim
   script:
     - echo "Running AXI test with R/W [$NUM_READS_1,$NUM_WRITES_1] <-> [$NUM_READS_2,$NUM_WRITES_2]"
-    - make run TB_DUT=tb_axi_serial_link WORK=work-vsim RUN_ARGS="+NUM_READS_1=$NUM_READS_1 +NUM_WRITES_1=$NUM_WRITES_1 +NUM_READS_2=$NUM_READS_2 +NUM_WRITES_2=$NUM_WRITES_2"
-  variables:
-    TEST_LENGTH: 100
+    - >
+      make vsim-run-batch TB_DUT=${TB_DUT} WORK=work_${NUM_CHANNELS}
+      SIM_ARGS="+NUM_READS_1=$NUM_READS_1 +NUM_WRITES_1=$NUM_WRITES_1
+      +NUM_READS_2=$NUM_READS_2 +NUM_WRITES_2=$NUM_WRITES_2
+      +NUM_FAULTS_1=$NUM_FAULTS_1 +NUM_FAULTS_2=$NUM_FAULTS_2"
+      | tee vsim.log 2>&1
+    - (! grep -n "Error:" vsim.log)
+    - (! grep -n "Fatal:" vsim.log)
   parallel:
     matrix:
-      - NUM_READS_1: [0, $TEST_LENGTH]
-        NUM_WRITES_1: [0, $TEST_LENGTH]
-        NUM_READS_2: [0, $TEST_LENGTH]
-        NUM_WRITES_2: [0, $TEST_LENGTH]
+      - TB_DUT: [tb_axi_serial_link]
+        NUM_CHANNELS: [1, 4]
+        NUM_READS_1: [0, 100]
+        NUM_WRITES_1: [0, 100]
+        NUM_READS_2: [0, 100]
+        NUM_WRITES_2: [0, 100]
+      - TB_DUT: [tb_ch_calib_serial_link]
+        NUM_CHANNELS: [4]
+        NUM_FAULTS_1: [0, 1, 2]
+        NUM_FAULTS_2: [0, 1, 2]
+        NUM_READS_1: [10]
+        NUM_WRITES_1: [10]
+        NUM_READS_2: [10]
+        NUM_WRITES_2: [10]
   timeout: 15 minutes
 
-run_vsim_ch_calib:
+run-vcs:
   stage: test
   needs:
-    - build_vsim
-  script:
-    - echo "Running Channel Calibration test with [$NUM_FAULTS, $NUM_FAULTS]"
-    - make run TB_DUT=tb_ch_calib_serial_link WORK=work-vsim RUN_ARGS="+NUM_FAULTS_1=$NUM_FAULTS +NUM_FAULTS_2=$NUM_FAULTS"
-  parallel:
-    matrix:
-      - NUM_FAULTS: [0, 3, 7]
-  timeout: 15 minutes
-
-run_vsim_single_channel:
-  stage: test
-  needs:
-    - build_vsim_single_channel
-  script:
-    - echo "Running test with single channel instance"
-    - make run TB_DUT=tb_axi_serial_link WORK=work-vsim-single-channel
-  timeout: 15 minutes
-
-run_vcs_axi:
-  stage: test
-  needs:
-    - build_vcs_axi
+    - build-vcs
   script:
     - echo "Running AXI test with R/W [$NUM_READS_1,$NUM_WRITES_1] <-> [$NUM_READS_2,$NUM_WRITES_2]"
-    - bin/serial_link_axi.vcs +permissive -exitstatus +NUM_READS_1=$NUM_READS_1 +NUM_WRITES_1=$NUM_WRITES_1 +NUM_READS_2=$NUM_READS_2 +NUM_WRITES_2=$NUM_WRITES_2 +permissive-off
-  variables:
-    TEST_LENGTH: 100
+    - >
+      make vcs-run-batch TB_DUT=${TB_DUT}_${NUM_CHANNELS} WORK=work_${NUM_CHANNELS}
+      SIM_ARGS="+NUM_READS_1=$NUM_READS_1 +NUM_WRITES_1=$NUM_WRITES_1
+      +NUM_READS_2=$NUM_READS_2 +NUM_WRITES_2=$NUM_WRITES_2
+      +NUM_FAULTS_1=$NUM_FAULTS_1 +NUM_FAULTS_2=$NUM_FAULTS_2"
+      | tee vcs.log 2>&1
+    - (! grep -n "Error-\[" simulate.log)
   parallel:
     matrix:
-      - NUM_READS_1: [0, $TEST_LENGTH]
-        NUM_WRITES_1: [0, $TEST_LENGTH]
-        NUM_READS_2: [0, $TEST_LENGTH]
-        NUM_WRITES_2: [0, $TEST_LENGTH]
-  timeout: 15 minutes
-
-run_vcs_ch_calib:
-  stage: test
-  needs:
-    - build_vcs_ch_calib
-  script:
-    - echo "Running Channel Calibration test with [$NUM_FAULTS, $NUM_FAULTS]"
-    - bin/serial_link_ch_calib.vcs +permissive -exitstatus +NUM_FAULTS_1=$NUM_FAULTS +NUM_FAULTS_2=$NUM_FAULTS +permissive-off
-  parallel:
-    matrix:
-      # TODO: Check why CI fails with 7 faults in VCS
-      # - NUM_FAULTS: [0, 3, 7]
-      - NUM_FAULTS: [0, 3]
-  timeout: 15 minutes
-
-run_vcs_single_channel:
-  stage: test
-  needs:
-    - build_vcs_single_channel
-  script:
-    - echo "Running test with single channel instance"
-    - bin/serial_link_single_channel.vcs
+      - TB_DUT: [tb_axi_serial_link]
+        NUM_CHANNELS: [1, 4]
+        NUM_READS_1: [0, 100]
+        NUM_WRITES_1: [0, 100]
+        NUM_READS_2: [0, 100]
+        NUM_WRITES_2: [0, 100]
+      - TB_DUT: [tb_ch_calib_serial_link]
+        NUM_CHANNELS: [4]
+        NUM_FAULTS_1: [0, 1, 2]
+        NUM_FAULTS_2: [0, 1, 2]
+        NUM_READS_1: [10]
+        NUM_WRITES_1: [10]
+        NUM_READS_2: [10]
+        NUM_WRITES_2: [10]
   timeout: 15 minutes

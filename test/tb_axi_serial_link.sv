@@ -5,17 +5,17 @@
 // Authors:
 //  - Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-module tb_axi_serial_link #(
-  parameter int unsigned NumChannels = 1,
-  parameter int unsigned NumLanes = 8,
-  parameter bit EnDdr = 1'b1
-);
+module tb_axi_serial_link;
+
+  import serial_link_reg_pkg::*;
 
   `include "axi/assign.svh"
   `include "axi/typedef.svh"
 
-  `include "register_interface/assign.svh"
-  `include "register_interface/typedef.svh"
+  `include "apb/assign.svh"
+  `include "apb/typedef.svh"
+
+  `include "serial_link_addrmap.svh"
 
   // ==============
   //    Config
@@ -28,9 +28,9 @@ module tb_axi_serial_link #(
   localparam time         TckReg          = 200ns;
   localparam int unsigned RstClkCyclesSys = 1;
 
-  localparam int unsigned AxiIdWidth      = 8;
-  localparam int unsigned AxiAddrWidth    = 48;
-  localparam int unsigned AxiDataWidth    = 512;
+  localparam int unsigned AxiIdWidth      = 3;
+  localparam int unsigned AxiAddrWidth    = 32;
+  localparam int unsigned AxiDataWidth    = 64;
   localparam int unsigned AxiStrbWidth    = AxiDataWidth / 8;
   localparam int unsigned AxiUserWidth    = 1;
 
@@ -51,12 +51,12 @@ module tb_axi_serial_link #(
 
   `AXI_TYPEDEF_ALL(axi, axi_addr_t, axi_id_t, axi_data_t, axi_strb_t, axi_user_t)
 
-  // RegBus types for typedefs
+  // APB types for typedefs
   typedef logic [RegAddrWidth-1:0]  cfg_addr_t;
   typedef logic [RegDataWidth-1:0]  cfg_data_t;
   typedef logic [RegStrbWidth-1:0]  cfg_strb_t;
 
-  `REG_BUS_TYPEDEF_ALL(cfg, cfg_addr_t, cfg_data_t, cfg_strb_t)
+  `APB_TYPEDEF_ALL(apb, cfg_addr_t, cfg_data_t, cfg_strb_t)
 
   typedef logic [NumLanes*(1+EnDdr)-1:0]  phy_data_t;
 
@@ -66,10 +66,10 @@ module tb_axi_serial_link #(
   axi_resp_t  axi_out_rsp_1, axi_out_rsp_2;
   axi_req_t   axi_in_req_1,  axi_in_req_2;
   axi_resp_t  axi_in_rsp_1,  axi_in_rsp_2;
-  cfg_req_t   cfg_req_1;
-  cfg_rsp_t   cfg_rsp_1;
-  cfg_req_t   cfg_req_2;
-  cfg_rsp_t   cfg_rsp_2;
+  apb_req_t   apb_req_1;
+  apb_resp_t  apb_rsp_1;
+  apb_req_t   apb_req_2;
+  apb_resp_t  apb_rsp_2;
 
   // link
   wire [NumChannels*NumLanes-1:0] ddr_o;
@@ -113,12 +113,11 @@ module tb_axi_serial_link #(
     .b_chan_t         ( axi_b_chan_t    ),
     .ar_chan_t        ( axi_ar_chan_t   ),
     .r_chan_t         ( axi_r_chan_t    ),
-    .cfg_req_t        ( cfg_req_t       ),
-    .cfg_rsp_t        ( cfg_rsp_t       ),
-    .NumChannels      ( NumChannels     ),
-    .NumLanes         ( NumLanes        ),
-    .MaxClkDiv        ( MaxClkDiv       ),
-    .EnDdr            ( EnDdr           )
+    .apb_req_t        ( apb_req_t       ),
+    .apb_rsp_t        ( apb_resp_t      ),
+    .apb_addr_t       ( cfg_addr_t      ),
+    .apb_data_t       ( cfg_data_t      ),
+    .apb_strb_t       ( cfg_strb_t      )
   ) i_serial_link_1 (
       .clk_i          ( clk_1           ),
       .rst_ni         ( rst_1_n         ),
@@ -129,8 +128,8 @@ module tb_axi_serial_link #(
       .axi_in_rsp_o   ( axi_in_rsp_1    ),
       .axi_out_req_o  ( axi_out_req_1   ),
       .axi_out_rsp_i  ( axi_out_rsp_1   ),
-      .cfg_req_i      ( cfg_req_1       ),
-      .cfg_rsp_o      ( cfg_rsp_1       ),
+      .apb_req_i      ( apb_req_1       ),
+      .apb_rsp_o      ( apb_rsp_1       ),
       .ddr_rcv_clk_i  ( ddr_rcv_clk_2   ),
       .ddr_rcv_clk_o  ( ddr_rcv_clk_1   ),
       .ddr_i          ( ddr_i           ),
@@ -146,12 +145,11 @@ module tb_axi_serial_link #(
     .b_chan_t         ( axi_b_chan_t    ),
     .ar_chan_t        ( axi_ar_chan_t   ),
     .r_chan_t         ( axi_r_chan_t    ),
-    .cfg_req_t        ( cfg_req_t       ),
-    .cfg_rsp_t        ( cfg_rsp_t       ),
-    .NumChannels      ( NumChannels     ),
-    .NumLanes         ( NumLanes        ),
-    .MaxClkDiv        ( MaxClkDiv       ),
-    .EnDdr            ( EnDdr           )
+    .apb_req_t        ( apb_req_t       ),
+    .apb_rsp_t        ( apb_resp_t      ),
+    .apb_addr_t       ( cfg_addr_t      ),
+    .apb_data_t       ( cfg_data_t      ),
+    .apb_strb_t       ( cfg_strb_t      )
   ) i_serial_link_2 (
       .clk_i          ( clk_2           ),
       .rst_ni         ( rst_2_n         ),
@@ -162,34 +160,34 @@ module tb_axi_serial_link #(
       .axi_in_rsp_o   ( axi_in_rsp_2    ),
       .axi_out_req_o  ( axi_out_req_2   ),
       .axi_out_rsp_i  ( axi_out_rsp_2   ),
-      .cfg_req_i      ( cfg_req_2       ),
-      .cfg_rsp_o      ( cfg_rsp_2       ),
+      .apb_req_i      ( apb_req_2       ),
+      .apb_rsp_o      ( apb_rsp_2       ),
       .ddr_rcv_clk_i  ( ddr_rcv_clk_1   ),
       .ddr_rcv_clk_o  ( ddr_rcv_clk_2   ),
       .ddr_i          ( ddr_o           ),
       .ddr_o          ( ddr_i           )
   );
 
-  REG_BUS #(
+  APB_DV #(
     .ADDR_WIDTH (RegAddrWidth),
     .DATA_WIDTH (RegDataWidth)
   ) cfg_1(clk_reg), cfg_2(clk_reg);
 
-  `REG_BUS_ASSIGN_TO_REQ(cfg_req_1, cfg_1)
-  `REG_BUS_ASSIGN_FROM_RSP(cfg_1, cfg_rsp_1)
+  `APB_ASSIGN_TO_REQ(apb_req_1, cfg_1)
+  `APB_ASSIGN_FROM_RESP(cfg_1, apb_rsp_1)
 
-  `REG_BUS_ASSIGN_TO_REQ(cfg_req_2, cfg_2)
-  `REG_BUS_ASSIGN_FROM_RSP(cfg_2, cfg_rsp_2)
+  `APB_ASSIGN_TO_REQ(apb_req_2, cfg_2)
+  `APB_ASSIGN_FROM_RESP(cfg_2, apb_rsp_2)
 
-  typedef reg_test::reg_driver #(
-    .AW ( RegAddrWidth  ),
-    .DW ( RegDataWidth  ),
+  typedef apb_test::apb_driver #(
+    .ADDR_WIDTH ( RegAddrWidth  ),
+    .DATA_WIDTH ( RegDataWidth  ),
     .TA ( 100ps         ),
     .TT ( 500ps         )
-  ) reg_master_t;
+  ) apb_master_t;
 
-  static reg_master_t reg_master_1 = new ( cfg_1 );
-  static reg_master_t reg_master_2 = new ( cfg_2 );
+  static apb_master_t apb_master_1 = new ( cfg_1 );
+  static apb_master_t apb_master_2 = new ( cfg_2 );
 
   AXI_BUS_DV #(
     .AXI_ADDR_WIDTH ( AxiAddrWidth  ),
@@ -337,16 +335,16 @@ module tb_axi_serial_link #(
   end
 
   initial begin : stimuli_process
-    reg_master_1.reset_master();
-    reg_master_2.reset_master();
+    apb_master_1.reset_master();
+    apb_master_2.reset_master();
     fork
       wait_for_reset_1();
       wait_for_reset_2();
     join
     $info("[SYS] Reset complete");
     fork
-      start_link(reg_master_1, 1);
-      start_link(reg_master_2, 2);
+      start_link(apb_master_1, 1);
+      start_link(apb_master_2, 2);
     join
     $info("[SYS] Links are ready");
     while (mst_done != '1) begin
@@ -413,42 +411,36 @@ module tb_axi_serial_link #(
     $stop();
   endtask
 
-  task automatic cfg_write(reg_master_t drv, cfg_addr_t addr, cfg_data_t data, cfg_strb_t strb='1);
+  task automatic cfg_write(apb_master_t drv, cfg_addr_t addr, cfg_data_t data, cfg_strb_t strb='1);
     automatic logic resp;
-    drv.send_write(addr, data, strb, resp);
+    drv.write(addr, data, strb, resp);
     assert (!resp) else $error("Not able to write cfg reg");
   endtask
 
-  task automatic cfg_read(reg_master_t drv, cfg_addr_t addr, output cfg_data_t data);
+  task automatic cfg_read(apb_master_t drv, cfg_addr_t addr, output cfg_data_t data);
     automatic logic resp;
-    drv.send_read(addr, data, resp);
+    drv.read(addr, data, resp);
     assert (!resp) else $error("Not able to write cfg reg");
   endtask
 
-  task automatic start_link(reg_master_t drv, int id);
+  task automatic start_link(apb_master_t drv, int id);
     automatic phy_data_t pattern, pattern_q[$];
     automatic cfg_data_t data;
     $info("[DDR%0d]: Enabling clock and deassert link reset.", id);
     // Reset and clock gate sequence, AXI isolation remains enabled
     // De-assert reset
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CTRL_OFFSET, 32'h300);
+    cfg_write(drv, `SERIAL_LINK_REG_CTRL_REG_OFFSET, 32'h300);
     // Assert reset
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CTRL_OFFSET, 32'h302);
+    cfg_write(drv, `SERIAL_LINK_REG_CTRL_REG_OFFSET, 32'h302);
     // Enable clock
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CTRL_OFFSET, 32'h303);
-    // Enable channel allocator bypass mode and
-    // auto flush feature but disable sync for RX side
-    if (NumChannels > 1) begin
-      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_TX_CFG_OFFSET, 32'h3);
-      cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CHANNEL_ALLOC_RX_CFG_OFFSET, 32'h3);
-    end
+    cfg_write(drv, `SERIAL_LINK_REG_CTRL_REG_OFFSET, 32'h303);
     // Wait for some clock cycles
     repeat(50) drv.cycle_end();
     // De-isolate AXI ports
     $info("[DDR%0d] Enabling AXI ports...",id);
-    cfg_write(drv, serial_link_reg_pkg::SERIAL_LINK_CTRL_OFFSET, 32'h03);
+    cfg_write(drv, `SERIAL_LINK_REG_CTRL_REG_OFFSET, 32'h03);
     do begin
-      cfg_read(drv, serial_link_reg_pkg::SERIAL_LINK_ISOLATED_OFFSET, data);
+      cfg_read(drv, `SERIAL_LINK_REG_ISOLATED_REG_OFFSET, data);
     end while(data != 0); // Wait until both isolation status bits are 0 to
                           // indicate disabling of isolation
     $info("[DDR%0d] Link is ready", id);

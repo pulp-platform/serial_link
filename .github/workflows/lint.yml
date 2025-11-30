@@ -16,18 +16,15 @@ jobs:
   check-clean:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
+      - uses: actions/checkout@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
       - name: Install bender
         uses: pulp-platform/pulp-actions/bender-install@v2
       - name: Check clean make targets
         run: |
-          make -B update-regs
-          make clean
+          uv run make -B slink-gen-regs
+          uv run make clean
           git status && test -z "$(git status --porcelain)"
 
   ###############
@@ -36,17 +33,14 @@ jobs:
   check-stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
+      - uses: actions/checkout@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
       - name: Install bender
         uses: pulp-platform/pulp-actions/bender-install@v2
       - name: Check clean makefile
         run: |
-          make -B update-regs
+          uv run make -B slink-gen-regs
           git status && test -z "$(git status --porcelain)"
 
   #####################

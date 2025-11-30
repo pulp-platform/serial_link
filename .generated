@@ -1,0 +1,1 @@
+-P NumChannels=1 -P NumLanes=8 -P Log2MaxClkDiv=10 -P Log2RawModeTXFifoDepth=3
