@@ -9,7 +9,7 @@
 /// by the individual valid signals). The shift register sequentially shifts each
 /// element such that only enabled channels are used and sends the result
 /// downstream.
-module channel_spread_sfr #(
+module slink_channel_spread_sfr #(
   parameter type element_t = logic[15:0],
   parameter int unsigned Width = -1,
   localparam int Log2Width = $clog2(Width)

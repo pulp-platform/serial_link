@@ -16,7 +16,7 @@
 /// only sporadic transmissions in the input stream where we could end up waiting
 /// forever for input stream to send another word to fill the next output word
 /// (i.e. <nr input words>*<Width>%cfg_chopsize_i != 0).
-module stream_chopper #(
+module slink_stream_chopper #(
   parameter type element_t = logic[15:0],
   parameter int signed Width = -1,
   parameter int unsigned FlushCounterWidth = 6,

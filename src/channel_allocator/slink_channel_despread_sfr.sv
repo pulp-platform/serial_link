@@ -10,7 +10,7 @@
 /// of N subelements in the output word are valid (shifts all subwords to the
 /// right until there are no more holes of invalid data within the valid data
 /// section).
-module channel_despread_sfr #(
+module slink_channel_despread_sfr #(
   parameter type element_t = logic[15:0],
   parameter int unsigned Width = -1,
   localparam int Log2Width = $clog2(Width)

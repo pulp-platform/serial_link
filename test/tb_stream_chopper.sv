@@ -169,7 +169,7 @@ module tb_stream_chopper;
     .rst_no ( rstn )
   );
 
-  stream_chopper #(
+  slink_stream_chopper #(
     .element_t ( element_t    ),
     .Width     ( ChannelCount )
   ) i_dut (

@@ -29,10 +29,10 @@ sources:
     - src/slink_pkg.sv
 
     # Abstraction Layers
-    - src/channel_allocator/stream_chopper.sv
-    - src/channel_allocator/stream_dechopper.sv
-    - src/channel_allocator/channel_despread_sfr.sv
-    - src/channel_allocator/channel_spread_sfr.sv
+    - src/channel_allocator/slink_stream_chopper.sv
+    - src/channel_allocator/slink_stream_dechopper.sv
+    - src/channel_allocator/slink_channel_despread_sfr.sv
+    - src/channel_allocator/slink_channel_spread_sfr.sv
     - src/channel_allocator/slink_ch_alloc.sv
     - src/slink_prot_layer.sv
     - src/slink_link_layer.sv
