@@ -68,7 +68,7 @@ make slink-gen-regs SLINK_NUM_CHANNELS=<num_channels> SLINK_NUM_LANES=<num_lanes
 make slink-gen-regs-all SLINK_NUM_CHANNELS=<num_channels> SLINK_NUM_LANES=<num_lanes>
 ```
 
-The registers are generated with [peakrdl](https://peakrdl-regblock.readthedocs.io/en/latest/) with the parametrized SystemRDL config file [`serial_link.rdl`](src/regs/rdl/serial_link.rdl).
+The registers are generated with [peakrdl](https://peakrdl-regblock.readthedocs.io/en/latest/) with the parametrized SystemRDL config file [`slink_reg.rdl`](src/regs/slink_reg.rdl).
 
 ### Single-Channel
 For simple use cases with lower low bandwidth requirements (e.g. binary preloading), it is recommended to use a single-channel configuration, possibly with Single-Data-Rate. Single-channel configurations come with less overhead for channel synchronization and fault detection.
