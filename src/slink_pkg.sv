@@ -4,8 +4,8 @@
 
 // Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-/// A simple serial link package
-package serial_link_pkg;
+/// A simple package for common serial link types and functions
+package slink_pkg;
 
   typedef enum logic [3:0]  {
     TagIdle = 4'd0,
@@ -23,4 +23,4 @@ package serial_link_pkg;
     return max_value;
   endfunction
 
-endpackage : serial_link_pkg
+endpackage : slink_pkg

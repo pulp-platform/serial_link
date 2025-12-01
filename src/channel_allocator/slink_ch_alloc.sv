@@ -4,7 +4,7 @@
 
 // Author: Manuel Eggimann <meggimann@iis.ee.ethz.ch>
 
-module serial_link_channel_allocator
+module slink_ch_alloc
  #(
   parameter type phy_data_t = logic,
   parameter int          NumChannels = 1,

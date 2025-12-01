@@ -11,7 +11,7 @@
 `include "axis/typedef.svh"
 
 /// A simple serial link to go off-chip
-module serial_link
+module slink
   import slink_reg_pkg::*;
 #(
   // Number of credits for flow control
@@ -77,7 +77,7 @@ module serial_link
                           $bits(ar_chan_t),
                           $bits(r_chan_t)};
   localparam int MaxAxiChannelBits =
-  serial_link_pkg::find_max_channel(AxiChannels);
+  slink_pkg::find_max_channel(AxiChannels);
 
 
   // The payload that is converted into an AXI stream consists of
@@ -89,7 +89,7 @@ module serial_link
     logic [MaxAxiChannelBits-1:0] axi_ch;
     logic b_valid;
     b_chan_t b;
-    serial_link_pkg::tag_e hdr;
+    slink_pkg::tag_e hdr;
     credit_t credit;
   } payload_t;
 
@@ -142,7 +142,7 @@ module serial_link
   //   PROTOCOL LAYER   //
   ////////////////////////
 
-  serial_link_protocol #(
+  slink_prot_layer #(
     .NumCredits     ( NumCredits    ),
     .axi_req_t      ( axi_req_t     ),
     .axi_rsp_t      ( axi_rsp_t     ),
@@ -195,7 +195,7 @@ module serial_link
       reg2hw.raw_mode_out_ch_mask[i].raw_mode_out_ch_mask.value;
   end
 
-  serial_link_data_link #(
+  slink_link_layer #(
     .axis_req_t       ( axis_req_t        ),
     .axis_rsp_t       ( axis_rsp_t        ),
     .phy_data_t       ( phy_data_t        ),
@@ -283,7 +283,7 @@ module serial_link
         reg2hw.channel_alloc_rx_ch_en[i].channel_alloc_rx_ch_en.value;
     end
 
-    serial_link_channel_allocator #(
+    slink_ch_alloc #(
       .phy_data_t  ( phy_data_t    ),
       .NumChannels ( NumChannels   )
     ) i_channel_allocator(
@@ -447,4 +447,4 @@ module serial_link
 
   `ASSERT_INIT(RawModeFifoDim, RecvFifoDepth >= RawModeFifoDepth)
 
-endmodule : serial_link
+endmodule : slink

@@ -306,7 +306,7 @@ module tb_channel_allocator;
   assign source_bus_valid = '{default: source_bus.valid};
   assign sink_bus.valid = |sink_bus_valid;
 
-  serial_link_channel_allocator #(
+  slink_ch_alloc #(
     .NumChannels ( ChannelCount )
   ) i_channel_allocator (
     .clk_i                     ( clk                          ),

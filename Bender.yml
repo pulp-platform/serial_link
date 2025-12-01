@@ -25,31 +25,31 @@ sources:
     - src/regs/slink_reg_pkg.sv
     - src/regs/slink_reg.sv
 
-    # Parametrization
-    - src/serial_link_pkg.sv
+    # General package
+    - src/slink_pkg.sv
 
     # Abstraction Layers
     - src/channel_allocator/stream_chopper.sv
     - src/channel_allocator/stream_dechopper.sv
     - src/channel_allocator/channel_despread_sfr.sv
     - src/channel_allocator/channel_spread_sfr.sv
-    - src/channel_allocator/serial_link_channel_allocator.sv
-    - src/serial_link_protocol.sv
-    - src/serial_link_data_link.sv
-    - src/serial_link_physical.sv
+    - src/channel_allocator/slink_ch_alloc.sv
+    - src/slink_prot_layer.sv
+    - src/slink_link_layer.sv
+    - src/slink_phys_layer.sv
 
     # Serial Link Wrapper
-    - src/serial_link.sv
+    - src/slink.sv
 
     # Wrapper for Occamy
-    - src/serial_link_isolate.sv
+    - src/slink_isolate.sv
 
     - target: slink_test
       include_dirs:
       - src/regs
       files:
-      - test/tb_axi_serial_link.sv
-      - test/tb_ch_calib_serial_link.sv
+      - test/tb_axi_slink.sv
+      - test/tb_ch_calib_slink.sv
       - test/tb_stream_chopper.sv
       - test/tb_stream_chopper_dechopper.sv
       - test/tb_channel_allocator.sv

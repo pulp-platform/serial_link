@@ -5,7 +5,7 @@
 // Authors:
 //  - Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-module tb_ch_calib_serial_link;
+module tb_ch_calib_slink;
 
   import slink_reg_pkg::*;
 
@@ -112,7 +112,7 @@ module tb_ch_calib_serial_link;
   );
 
   // first serial instance
-  serial_link_isolate #(
+  slink_isolate #(
     .axi_req_t        ( axi_req_t       ),
     .axi_rsp_t        ( axi_resp_t      ),
     .aw_chan_t        ( axi_aw_chan_t   ),
@@ -145,7 +145,7 @@ module tb_ch_calib_serial_link;
 
 
   // second serial instance
-  serial_link_isolate #(
+  slink_isolate #(
     .axi_req_t        ( axi_req_t       ),
     .axi_rsp_t        ( axi_resp_t      ),
     .aw_chan_t        ( axi_aw_chan_t   ),
@@ -632,4 +632,4 @@ module tb_ch_calib_serial_link;
     $info("[DDR%0d] Link is ready", id);
   endtask;
 
-endmodule : tb_ch_calib_serial_link
+endmodule : tb_ch_calib_slink

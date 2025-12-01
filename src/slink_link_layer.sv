@@ -9,7 +9,7 @@
 
 // Implements the Data Link layer of the Serial Link
 // Handles the RAW mode
-module serial_link_data_link #(
+module slink_link_layer #(
   parameter type axis_req_t = logic,
   parameter type axis_rsp_t = logic,
   parameter type phy_data_t = logic,

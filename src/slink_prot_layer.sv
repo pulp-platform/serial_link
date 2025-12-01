@@ -9,7 +9,7 @@
 
 // Implements the Protocol layer of the Serial Link
 // Translates from the AXI to the AXIStream interface and vice-versa
-module serial_link_protocol #(
+module slink_prot_layer #(
     parameter type axi_req_t  = logic,
     parameter type axi_rsp_t  = logic,
     parameter type axis_req_t = logic,
@@ -172,16 +172,16 @@ module serial_link_protocol #(
 
     if (aw_gnt) begin
       payload_out.axi_ch = axi_in_req_i.aw;
-      payload_out.hdr = serial_link_pkg::TagAW;
+      payload_out.hdr = slink_pkg::TagAW;
     end else if (w_gnt) begin
       payload_out.axi_ch = axi_in_req_i.w;
-      payload_out.hdr = serial_link_pkg::TagW;
+      payload_out.hdr = slink_pkg::TagW;
     end else if (ar_gnt) begin
       payload_out.axi_ch = axi_in_req_i.ar;
-      payload_out.hdr = serial_link_pkg::TagAR;
+      payload_out.hdr = slink_pkg::TagAR;
     end else if (r_gnt) begin
       payload_out.axi_ch = axi_out_rsp_i.r;
-      payload_out.hdr = serial_link_pkg::TagR;
+      payload_out.hdr = slink_pkg::TagR;
     end
 
     if (b_gnt) begin
@@ -193,7 +193,7 @@ module serial_link_protocol #(
     // 1) Send out an AXI beat (!TagIdle)
     // 2) Return a B response (b_valid)
     // 3) Send an empty packet with credits (credits_to_send_force)
-    axis_reg_valid_in = (payload_out.hdr != serial_link_pkg::TagIdle) | payload_out.b_valid | credit_to_send_force;
+    axis_reg_valid_in = (payload_out.hdr != slink_pkg::TagIdle) | payload_out.b_valid | credit_to_send_force;
 
     // There is a potential deadlock situation, when the last credit on the local side
     // is consumed and all the credits from the other side are currently in-flight.
@@ -261,8 +261,8 @@ module serial_link_protocol #(
   assign axi_ch_sent_d = aw_sent_d | w_sent_d | ar_sent_d | r_sent_d;
 
   assign payload_in = payload_t'(axis_in_req_i.t.data);
-  assign two_ch_packet = (payload_in.hdr != serial_link_pkg::TagIdle) & payload_in.b_valid;
-  assign credit_only_packet = (payload_in.hdr == serial_link_pkg::TagIdle) & ~payload_in.b_valid;
+  assign two_ch_packet = (payload_in.hdr != slink_pkg::TagIdle) & payload_in.b_valid;
+  assign credit_only_packet = (payload_in.hdr == slink_pkg::TagIdle) & ~payload_in.b_valid;
 
   always_comb begin : unpacker
     axi_out_req_o.aw_valid = 1'b0;
@@ -288,10 +288,10 @@ module serial_link_protocol #(
 
       Normal: begin
         if (axis_in_req_i.tvalid) begin
-          axi_out_req_o.aw_valid = (payload_in.hdr == serial_link_pkg::TagAW);
-          axi_out_req_o.w_valid = (payload_in.hdr == serial_link_pkg::TagW);
-          axi_out_req_o.ar_valid = (payload_in.hdr == serial_link_pkg::TagAR);
-          axi_in_rsp_o.r_valid = (payload_in.hdr == serial_link_pkg::TagR);
+          axi_out_req_o.aw_valid = (payload_in.hdr == slink_pkg::TagAW);
+          axi_out_req_o.w_valid = (payload_in.hdr == slink_pkg::TagW);
+          axi_out_req_o.ar_valid = (payload_in.hdr == slink_pkg::TagAR);
+          axi_in_rsp_o.r_valid = (payload_in.hdr == slink_pkg::TagR);
           axi_in_rsp_o.b_valid = payload_in.b_valid;
 
           // If there is a AXI channel + B response,
@@ -317,10 +317,10 @@ module serial_link_protocol #(
 
       Sync: begin
         // If AXI channel was not sent yet, raise AXI request
-        axi_out_req_o.aw_valid = (payload_in.hdr == serial_link_pkg::TagAW) & ~axi_ch_sent_q;
-        axi_out_req_o.w_valid = (payload_in.hdr == serial_link_pkg::TagW) & ~axi_ch_sent_q;
-        axi_out_req_o.ar_valid = (payload_in.hdr == serial_link_pkg::TagAR) & ~axi_ch_sent_q;
-        axi_in_rsp_o.r_valid = (payload_in.hdr == serial_link_pkg::TagR) & ~axi_ch_sent_q;
+        axi_out_req_o.aw_valid = (payload_in.hdr == slink_pkg::TagAW) & ~axi_ch_sent_q;
+        axi_out_req_o.w_valid = (payload_in.hdr == slink_pkg::TagW) & ~axi_ch_sent_q;
+        axi_out_req_o.ar_valid = (payload_in.hdr == slink_pkg::TagAR) & ~axi_ch_sent_q;
+        axi_in_rsp_o.r_valid = (payload_in.hdr == slink_pkg::TagR) & ~axi_ch_sent_q;
         // Same for B response
         axi_in_rsp_o.b_valid = payload_in.b_valid & ~b_sent_q;
 
