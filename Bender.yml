@@ -38,10 +38,10 @@ sources:
     - src/slink_link_layer.sv
     - src/slink_phys_layer.sv
 
-    # Serial Link Wrapper
+    # Serial Link main module
     - src/slink.sv
 
-    # Wrapper for Occamy
+    # Wrapper for additional isolation
     - src/slink_isolate.sv
 
     - target: slink_test
