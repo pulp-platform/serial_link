@@ -36,7 +36,7 @@ build-vcs:
   parallel:
     matrix:
       - NUM_CHANNELS: [1, 4]
-        TB_DUT: [tb_axi_serial_link, tb_ch_calib_serial_link]
+        TB_DUT: [tb_axi_slink, tb_ch_calib_slink]
   artifacts:
     paths:
       - bin/${TB_DUT}_${NUM_CHANNELS}.vcs*
@@ -57,13 +57,13 @@ run-vsim:
     - (! grep -n "Fatal:" vsim.log)
   parallel:
     matrix:
-      - TB_DUT: [tb_axi_serial_link]
+      - TB_DUT: [tb_axi_slink]
         NUM_CHANNELS: [1, 4]
         NUM_READS_1: [0, 100]
         NUM_WRITES_1: [0, 100]
         NUM_READS_2: [0, 100]
         NUM_WRITES_2: [0, 100]
-      - TB_DUT: [tb_ch_calib_serial_link]
+      - TB_DUT: [tb_ch_calib_slink]
         NUM_CHANNELS: [4]
         NUM_FAULTS_1: [0, 1, 2]
         NUM_FAULTS_2: [0, 1, 2]
@@ -88,13 +88,13 @@ run-vcs:
     - (! grep -n "Error-\[" simulate.log)
   parallel:
     matrix:
-      - TB_DUT: [tb_axi_serial_link]
+      - TB_DUT: [tb_axi_slink]
         NUM_CHANNELS: [1, 4]
         NUM_READS_1: [0, 100]
         NUM_WRITES_1: [0, 100]
         NUM_READS_2: [0, 100]
         NUM_WRITES_2: [0, 100]
-      - TB_DUT: [tb_ch_calib_serial_link]
+      - TB_DUT: [tb_ch_calib_slink]
         NUM_CHANNELS: [4]
         NUM_FAULTS_1: [0, 1, 2]
         NUM_FAULTS_2: [0, 1, 2]
