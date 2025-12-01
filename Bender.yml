@@ -13,10 +13,8 @@ package:
 dependencies:
   common_cells:        { git: "https://github.com/pulp-platform/common_cells.git",       version: 1.28.0 }
   axi:                 { git: "https://github.com/pulp-platform/axi.git",                version: 0.39.0 }
+  axi_stream:          { git: "https://github.com/pulp-platform/axi_stream.git",         version: 0.1.1  }
   apb:                 { git: "https://github.com/pulp-platform/apb.git",                version: 0.2.4  }
-
-export_include_dirs:
-  - src/axis/include
 
 sources:
   files:

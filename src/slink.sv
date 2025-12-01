@@ -8,7 +8,7 @@
 
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
-`include "axis/typedef.svh"
+`include "axi_stream/typedef.svh"
 
 /// A simple serial link to go off-chip
 module slink
@@ -105,12 +105,10 @@ module slink
   typedef logic [StreamDataBytes*8-1:0] tdata_t;
   typedef logic [StreamDataBytes-1:0] tstrb_t;
   typedef logic [StreamDataBytes-1:0] tkeep_t;
-  typedef logic tlast_t;
   typedef logic tid_t;
   typedef logic tdest_t;
   typedef logic tuser_t;
-  typedef logic tready_t;
-  `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, tuser_t, tready_t)
+  `AXI_STREAM_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tid_t, tdest_t, tuser_t)
 
   apb_req_t apb_req;
   apb_rsp_t apb_rsp;
