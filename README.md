@@ -4,21 +4,21 @@
 
 The serial link is a simple all-digital Double-Data-Rate (DDR) or Single-Data-Rate (SDR) link with a source-synchronous interface. The link is scalable and can be used for high-bandwidth low latency applications like Die2Die communication as well as lower demanding tasks like binary preloading. The link has an AXI4 interface and implements Protocol, Data Link and Physical layer. The serial link is part of the [PULP (Parallel Ultra-Low Power) Platform](https://pulp-platform.org/) and is being used in various chip tapeouts e.g. [Snitch based Systems](https://github.com/pulp-platform/snitch)
 
-## Architecture Overview
+## 🎨 Architecture Overview
 The serial link implements the 3 lowest layers of the OSI reference model:
 * **Protocol Layer:** AXI requests and the responses are serialized and translated to an AXI-Stream interface
 * **Data Link Layer:** Splits the payload of the AXI stream into multiple packets which are distributed over the physical channels. A *Channel Allocator* reshuffles the packets and is able to recover defects of physical channels. It is able to apply back-pressure with a credit-based flow control mechanism. It also synchronizes the packets of multiple channels.
 * **Physical Layer:** Parametrizable number of channels and wires per channel. Each TX channel forwards its own source-synchronous clock which is a divided clock of the system clock. The RX channels samples the data with the received clock and has a CDC to synchronize to the local system clock.
 
-## License
+## 🔐 License
 The Serial Link is released under Solderpad v0.51 (SHL-0.51) see [`LICENSE`](LICENSE):
 
-## Getting started
+## ⭐ Getting started
 
-### Dependencies
+### 🔗 Dependencies
 The link uses [bender](https://github.com/pulp-platform/bender) to manage its dependencies and to automatically generate compilation scripts. Further `Python >= 3.11` is required with the packages listed in `requirements.txt`. Currently, we do not provide any open-source simulation setup. Internally, the Serial Link is verified using QuestaSim and Synopsys VCS.
 
-### Simulation
+### 🔬 Simulation
 The Serial Link can be simulated in QuestaSim with the following steps:
 ```sh
 # To compile the link, run the following command:
@@ -35,7 +35,7 @@ where `<simulator>` can be either `vsim` (for ModelSim/QuestaSim) or `vcs` (for 
 make <simulator>-run TB_DUT=tb_ch_calib_serial_link
 ```
 
-## Configuration
+## 🔧 Configuration
 The link can be parametrized with arbitrary AXI interfaces resp. structs (`axi_req_t`, `axi_rsp_t`). The number of channels is also configurable at synthesis time. To do this, you have to regenerate the register files with the following command:
 
 ```sh
