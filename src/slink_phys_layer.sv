@@ -10,7 +10,7 @@
 `include "common_cells/assertions.svh"
 
 // Implements a single TX channel which forwards the source-synchronous clock
-module serial_link_physical_tx #(
+module slink_phys_layer #(
   parameter int NumLanes   = 8,
   parameter int MaxClkDiv  = 32,
   parameter bit EnDdr = 1'b1,
@@ -202,7 +202,7 @@ module serial_link_physical #(
   ////////////////
   //   PHY TX   //
   ////////////////
-  serial_link_physical_tx #(
+  slink_phys_layer #(
     .NumLanes   ( NumLanes    ),
     .EnDdr      ( EnDdr       ),
     .phy_data_t ( phy_data_t  ),

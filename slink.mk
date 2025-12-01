@@ -24,9 +24,10 @@ SLINK_PEAKRDL_PARAMS += -P Log2RawModeTXFifoDepth=$(SLINK_LOG2_RAW_MODE_TX_FIFO_
 
 SLINK_COPYRIGHT_NOTICE = // Copyright 2025 ETH Zurich and University of Bologna.\n// Solderpad Hardware License, Version 0.51, see LICENSE for details.\n// SPDX-License-Identifier: SHL-0.51\n
 
-# the Makefile variables to configure the serial link do not have a timestamp, meaning Make does not see a reason
-# to update the generated sources once they exist. Therefore we force regeneration when parameters change
-# with a dummy .generated file that changes the timestamp when parameters change
+# Track the currently generated configuration in the .generated file.
+# On every invocation of make, compare the specified configuration with the
+# currently generated one and modify the timestamp of the .generated file if they differ.
+# The new timestamp will trigger regeneration of the register files.
 .PHONY: SLINK_FORCE
 SLINK_FORCE:
 
@@ -34,15 +35,15 @@ $(SLINK_ROOT)/.generated: SLINK_FORCE
 	@printf '%s\n' "$(SLINK_PEAKRDL_PARAMS)" | cmp -s - $@ || printf '%s\n' "$(SLINK_PEAKRDL_PARAMS)" > $@
 
 
-$(SLINK_ROOT)/src/regs/rtl/serial_link_reg.sv:$(SLINK_ROOT)/src/regs/rtl/serial_link_reg_pkg.sv
-$(SLINK_ROOT)/src/regs/rtl/serial_link_reg_pkg.sv: $(SLINK_ROOT)/src/regs/rdl/serial_link.rdl $(SLINK_ROOT)/.generated
+$(SLINK_ROOT)/src/regs/slink_reg.sv:$(SLINK_ROOT)/src/regs/slink_reg_pkg.sv
+$(SLINK_ROOT)/src/regs/slink_reg_pkg.sv: $(SLINK_ROOT)/src/regs/slink_reg.rdl $(SLINK_ROOT)/.generated
 	$(PEAKRDL) regblock $< -o $(dir $@) --default-reset arst_n --cpuif apb4-flat $(SLINK_PEAKRDL_PARAMS)
-	@sed -i '1i$(SLINK_COPYRIGHT_NOTICE)' $@ $(dir $@)/serial_link_reg.sv
+	@sed -i '1i$(SLINK_COPYRIGHT_NOTICE)' $@ $(dir $@)/slink_reg.sv
 
-$(SLINK_ROOT)/src/regs/rtl/serial_link_addrmap.svh: $(SLINK_ROOT)/src/regs/rdl/serial_link.rdl $(SLINK_ROOT)/.generated
+$(SLINK_ROOT)/src/regs/slink_addrmap.svh: $(SLINK_ROOT)/src/regs/slink_reg.rdl $(SLINK_ROOT)/.generated
 	$(PEAKRDL) raw-header $< -o $@ --format svh $(SLINK_PEAKRDL_PARAMS)
 	@sed -i '1i$(SLINK_COPYRIGHT_NOTICE)' $@
 
-.PHONY: slink-gen-regs slink-gen-regs-only
-slink-gen-regs: $(SLINK_ROOT)/src/regs/rtl/serial_link_reg.sv $(SLINK_ROOT)/src/regs/rtl/serial_link_addrmap.svh
-slink-gen-regs-only: $(SLINK_ROOT)/src/regs/rtl/serial_link_reg.sv
+.PHONY: slink-gen-regs slink-gen-regs-all
+slink-gen-regs-all: $(SLINK_ROOT)/src/regs/slink_reg.sv $(SLINK_ROOT)/src/regs/slink_addrmap.svh
+slink-gen-regs: $(SLINK_ROOT)/src/regs/slink_reg.sv

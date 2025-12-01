@@ -5,9 +5,9 @@
 // Authors:
 //  - Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-module tb_axi_serial_link;
+module tb_axi_slink;
 
-  import serial_link_reg_pkg::*;
+  import slink_reg_pkg::*;
 
   `include "axi/assign.svh"
   `include "axi/typedef.svh"
@@ -15,13 +15,13 @@ module tb_axi_serial_link;
   `include "apb/assign.svh"
   `include "apb/typedef.svh"
 
-  `include "serial_link_addrmap.svh"
+  `include "slink_addrmap.svh"
 
   // ==============
   //    Config
   // ==============
   localparam int unsigned TestDuration    = 100;
-  localparam int unsigned MaxClkDiv       = serial_link_pkg::MaxClkDiv;
+  localparam int unsigned MaxClkDiv       = 2**Log2MaxClkDiv;
 
   localparam time         TckSys1         = 50ns;
   localparam time         TckSys2         = 54ns;
@@ -105,7 +105,7 @@ module tb_axi_serial_link;
   );
 
   // first serial instance
-  serial_link_occamy_wrapper #(
+  slink_isolate #(
     .axi_req_t        ( axi_req_t       ),
     .axi_rsp_t        ( axi_resp_t      ),
     .aw_chan_t        ( axi_aw_chan_t   ),
@@ -137,7 +137,7 @@ module tb_axi_serial_link;
   );
 
   // second serial instance
-  serial_link_occamy_wrapper #(
+  slink_isolate #(
     .axi_req_t        ( axi_req_t       ),
     .axi_rsp_t        ( axi_resp_t      ),
     .aw_chan_t        ( axi_aw_chan_t   ),
@@ -357,7 +357,7 @@ module tb_axi_serial_link;
   //    Checks
   // ==============
 
-  axi_channel_compare #(
+  axi_chan_compare #(
     .aw_chan_t ( axi_aw_chan_t ),
     .w_chan_t  ( axi_w_chan_t  ),
     .b_chan_t  ( axi_b_chan_t  ),
@@ -365,7 +365,7 @@ module tb_axi_serial_link;
     .r_chan_t  ( axi_r_chan_t  ),
     .req_t     ( axi_req_t     ),
     .resp_t    ( axi_resp_t    )
-  ) i_axi_channel_compare_1_to_2 (
+  ) i_axi_chan_compare_1_to_2 (
     .clk_a_i   ( clk_1          ),
     .clk_b_i   ( clk_2          ),
     .axi_a_req ( axi_in_req_1   ),
@@ -374,7 +374,7 @@ module tb_axi_serial_link;
     .axi_b_res ( axi_out_rsp_2  )
   );
 
-  axi_channel_compare #(
+  axi_chan_compare #(
     .aw_chan_t ( axi_aw_chan_t ),
     .w_chan_t  ( axi_w_chan_t  ),
     .b_chan_t  ( axi_b_chan_t  ),
@@ -382,7 +382,7 @@ module tb_axi_serial_link;
     .r_chan_t  ( axi_r_chan_t  ),
     .req_t     ( axi_req_t     ),
     .resp_t    ( axi_resp_t    )
-  ) i_axi_channel_compare_2_to_1 (
+  ) i_axi_chan_compare_2_to_1 (
     .clk_a_i   ( clk_2          ),
     .clk_b_i   ( clk_1          ),
     .axi_a_req ( axi_in_req_2   ),
@@ -429,21 +429,21 @@ module tb_axi_serial_link;
     $info("[DDR%0d]: Enabling clock and deassert link reset.", id);
     // Reset and clock gate sequence, AXI isolation remains enabled
     // De-assert reset
-    cfg_write(drv, `SERIAL_LINK_REG_CTRL_REG_OFFSET, 32'h300);
+    cfg_write(drv, `SLINK_REG_CTRL_REG_OFFSET, 32'h300);
     // Assert reset
-    cfg_write(drv, `SERIAL_LINK_REG_CTRL_REG_OFFSET, 32'h302);
+    cfg_write(drv, `SLINK_REG_CTRL_REG_OFFSET, 32'h302);
     // Enable clock
-    cfg_write(drv, `SERIAL_LINK_REG_CTRL_REG_OFFSET, 32'h303);
+    cfg_write(drv, `SLINK_REG_CTRL_REG_OFFSET, 32'h303);
     // Wait for some clock cycles
     repeat(50) drv.cycle_end();
     // De-isolate AXI ports
     $info("[DDR%0d] Enabling AXI ports...",id);
-    cfg_write(drv, `SERIAL_LINK_REG_CTRL_REG_OFFSET, 32'h03);
+    cfg_write(drv, `SLINK_REG_CTRL_REG_OFFSET, 32'h03);
     do begin
-      cfg_read(drv, `SERIAL_LINK_REG_ISOLATED_REG_OFFSET, data);
+      cfg_read(drv, `SLINK_REG_ISOLATED_REG_OFFSET, data);
     end while(data != 0); // Wait until both isolation status bits are 0 to
                           // indicate disabling of isolation
     $info("[DDR%0d] Link is ready", id);
   endtask;
 
-endmodule : tb_axi_serial_link
+endmodule : tb_axi_slink

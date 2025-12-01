@@ -33,9 +33,9 @@ gen-regs: slink-gen-regs
 # QuestaSim Simulation #
 ########################
 
-TB_DUT ?= tb_axi_serial_link
+TB_DUT ?= tb_axi_slink
 
-BENDER_FLAGS := -t test -t simulation
+BENDER_FLAGS := -t slink_test -t test
 
 VLOG_FLAGS += -suppress vlog-2583
 VLOG_FLAGS += -suppress vlog-13314
@@ -47,7 +47,7 @@ VSIM_FLAGS += -work $(WORK)
 
 VSIM_FLAGS_GUI += -voptargs=+acc
 VSIM_FLAGS_GUI += -do "log -r /*"
-VSIM_FLAGS_GUI += -do util/serial_link_wave.tcl
+VSIM_FLAGS_GUI += -do util/wave.tcl
 
 .PHONY: vsim-compile vsim-clean vsim-run vsim-run-batch
 
@@ -97,7 +97,7 @@ VLOGAN_REL_PATHS ?= | grep -v "ROOT=" | sed '3 i ROOT="."'
 
 scripts/compile_vcs.sh: Bender.yml Bender.lock
 	@mkdir -p scripts
-	$(BENDER) script vcs -t test -t rtl -t simulation --vlog-arg "\$(VLOGAN_ARGS)" --vlogan-bin "$(VLOGAN)" $(VLOGAN_REL_PATHS) > $@
+	$(BENDER) script vcs $(BENDER_FLAGS) --vlog-arg "\$(VLOGAN_ARGS)" --vlogan-bin "$(VLOGAN)" $(VLOGAN_REL_PATHS) > $@
 	chmod +x $@
 
 bin/%.vcs: scripts/compile_vcs.sh

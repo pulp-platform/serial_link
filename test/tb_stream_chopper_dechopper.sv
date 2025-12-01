@@ -152,7 +152,7 @@ module tb_stream_chopper_dechopper;
     .rst_no ( rstn )
   );
 
-  stream_chopper #(
+  slink_stream_chopper #(
     .element_t ( element_t    ),
     .Width     ( ChannelCount )
   ) i_chopper (
@@ -172,7 +172,7 @@ module tb_stream_chopper_dechopper;
   );
   assign chopper2dechopper_bus.valid = |chopper2dechoper_valid;
 
-  stream_dechopper #(
+  slink_stream_dechopper #(
     .element_t ( element_t    ),
     .Width     ( ChannelCount )
   ) i_dechopper(

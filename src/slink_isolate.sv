@@ -4,10 +4,10 @@
 
 // Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-/// A wrapper around the Serial Link intended for integration into Occamy
-/// The wrapper additionally includes AXI isolation, reset controller & clock gating
-module serial_link_occamy_wrapper
-  import serial_link_reg_pkg::*;
+/// A wrapper around the Serial Link with additional
+/// AXI isolation, reset controller & clock gating
+module slink_isolate
+  import slink_reg_pkg::*;
 #(
   parameter type axi_req_t  = logic,
   parameter type axi_rsp_t  = logic,
@@ -40,6 +40,7 @@ module serial_link_occamy_wrapper
 );
 
   logic clk_serial_link;
+
   logic rst_serial_link_n;
 
   logic clk_ena;
@@ -74,9 +75,8 @@ module serial_link_occamy_wrapper
     .AxiAddrWidth($bits(axi_in_req_i.aw.addr)),
     .AxiDataWidth($bits(axi_in_req_i.w.data)),
     .AxiUserWidth($bits(axi_in_req_i.aw.user)),
-    .axi_req_t    ( axi_req_t                   ),
-    .axi_resp_t   ( axi_rsp_t                   )
-
+    .axi_req_t    ( axi_req_t ),
+    .axi_resp_t   ( axi_rsp_t )
   ) i_serial_link_in_isolate  (
     .clk_i        ( clk_i         ),
     .rst_ni       ( rst_ni        ),
@@ -109,7 +109,7 @@ module serial_link_occamy_wrapper
     .isolated_o   ( isolated[1]   )
   );
 
-  serial_link #(
+  slink #(
     .axi_req_t        ( axi_req_t   ),
     .axi_rsp_t        ( axi_rsp_t   ),
     .aw_chan_t        ( aw_chan_t   ),

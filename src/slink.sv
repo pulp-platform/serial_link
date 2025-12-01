@@ -8,11 +8,11 @@
 
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
-`include "axis/typedef.svh"
+`include "axi_stream/typedef.svh"
 
 /// A simple serial link to go off-chip
-module serial_link
-  import serial_link_reg_pkg::*;
+module slink
+  import slink_reg_pkg::*;
 #(
   // Number of credits for flow control
   parameter int NumCredits        = 8,
@@ -34,7 +34,7 @@ module serial_link
   // There are 3 different clock/resets:
   // 1) clk_i & rst_ni: "always-on" clock & reset coming from the SoC domain. Only config registers are conected to this clock
   // 2) clk_sl_i & rst_sl_ni: Same as 1) but clock is gated and reset is SW synchronized. This is the clock that drives the serial link
-  //    i.e. network, data-link and physical layer all run on this clock and can be clock gated if needed. If no clock gating, reset synchronization
+  //    i.e. protocol, data-link and physical layer all run on this clock and can be clock gated if needed. If no clock gating, reset synchronization
   //    is desired, you can tie clk_sl_i -> clk_i resp. rst_sl_ni -> rst_ni
   // 3) clk_reg_i & rst_reg_ni: peripheral clock and reset. Only connected to RegBus CDC. If NoRegCdc is set, this clock must be the same as 1)
   input  logic                      clk_i,
@@ -77,7 +77,8 @@ module serial_link
                           $bits(ar_chan_t),
                           $bits(r_chan_t)};
   localparam int MaxAxiChannelBits =
-  serial_link_pkg::find_max_channel(AxiChannels);
+  slink_pkg::find_max_channel(AxiChannels);
+
 
   // The payload that is converted into an AXI stream consists of
   // 1) AXI Beat
@@ -88,7 +89,7 @@ module serial_link
     logic [MaxAxiChannelBits-1:0] axi_ch;
     logic b_valid;
     b_chan_t b;
-    serial_link_pkg::tag_e hdr;
+    slink_pkg::tag_e hdr;
     credit_t credit;
   } payload_t;
 
@@ -104,12 +105,10 @@ module serial_link
   typedef logic [StreamDataBytes*8-1:0] tdata_t;
   typedef logic [StreamDataBytes-1:0] tstrb_t;
   typedef logic [StreamDataBytes-1:0] tkeep_t;
-  typedef logic tlast_t;
   typedef logic tid_t;
   typedef logic tdest_t;
   typedef logic tuser_t;
-  typedef logic tready_t;
-  `AXIS_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tlast_t, tid_t, tdest_t, tuser_t, tready_t)
+  `AXI_STREAM_TYPEDEF_ALL(axis, tdata_t, tstrb_t, tkeep_t, tid_t, tdest_t, tuser_t)
 
   apb_req_t apb_req;
   apb_rsp_t apb_rsp;
@@ -117,8 +116,8 @@ module serial_link
   axis_req_t  axis_out_req, axis_in_req;
   axis_rsp_t  axis_out_rsp, axis_in_rsp;
 
-  serial_link_reg__out_t reg2hw;
-  serial_link_reg__in_t hw2reg;
+  slink_reg__out_t reg2hw;
+  slink_reg__in_t hw2reg;
 
   phy_data_t [NumChannels-1:0]  data_link2alloc_data_out;
   logic [NumChannels-1:0]       data_link2alloc_data_out_valid;
@@ -137,11 +136,12 @@ module serial_link
   logic [NumChannels-1:0]       alloc2phy_data_in_ready;
 
 
-  ///////////////////////
-  //   NETWORK LAYER   //
-  ///////////////////////
+  ////////////////////////
+  //   PROTOCOL LAYER   //
+  ////////////////////////
 
-  serial_link_network #(
+  slink_prot_layer #(
+    .NumCredits     ( NumCredits    ),
     .axi_req_t      ( axi_req_t     ),
     .axi_rsp_t      ( axi_rsp_t     ),
     .axis_req_t     ( axis_req_t    ),
@@ -152,8 +152,8 @@ module serial_link
     .ar_chan_t      ( ar_chan_t     ),
     .r_chan_t       ( r_chan_t      ),
     .payload_t      ( payload_t     ),
-    .NumCredits     ( NumCredits    )
-  ) i_serial_link_network (
+    .credit_t       ( credit_t      )
+  ) i_serial_link_protocol (
     .clk_i          ( clk_sl_i        ),
     .rst_ni         ( rst_sl_ni       ),
     .axi_in_req_i   ( axi_in_req_i    ),
@@ -193,7 +193,7 @@ module serial_link
       reg2hw.raw_mode_out_ch_mask[i].raw_mode_out_ch_mask.value;
   end
 
-  serial_link_data_link #(
+  slink_link_layer #(
     .axis_req_t       ( axis_req_t        ),
     .axis_rsp_t       ( axis_rsp_t        ),
     .phy_data_t       ( phy_data_t        ),
@@ -281,7 +281,7 @@ module serial_link
         reg2hw.channel_alloc_rx_ch_en[i].channel_alloc_rx_ch_en.value;
     end
 
-    serial_link_channel_allocator #(
+    slink_ch_alloc #(
       .phy_data_t  ( phy_data_t    ),
       .NumChannels ( NumChannels   )
     ) i_channel_allocator(
@@ -377,7 +377,7 @@ module serial_link
     assign apb_rsp_o = apb_rsp;
   end
 
-  serial_link_reg i_serial_link_reg (
+  slink_reg i_serial_link_reg (
     .clk  (clk_i),
     .arst_n (rst_ni),
 
@@ -385,7 +385,7 @@ module serial_link
     .s_apb_penable (apb_req.penable),
     .s_apb_pwrite  (apb_req.pwrite),
     .s_apb_pprot   (apb_req.pprot),
-    .s_apb_paddr   (apb_req.paddr[serial_link_reg_pkg::SERIAL_LINK_REG_MIN_ADDR_WIDTH-1:0]),
+    .s_apb_paddr   (apb_req.paddr[slink_reg_pkg::SLINK_REG_MIN_ADDR_WIDTH-1:0]),
     .s_apb_pwdata  (apb_req.pwdata),
     .s_apb_pstrb   (apb_req.pstrb),
     .s_apb_pready  (apb_rsp.pready),
@@ -445,4 +445,4 @@ module serial_link
 
   `ASSERT_INIT(RawModeFifoDim, RecvFifoDepth >= RawModeFifoDepth)
 
-endmodule : serial_link
+endmodule : slink

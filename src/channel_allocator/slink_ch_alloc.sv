@@ -4,7 +4,7 @@
 
 // Author: Manuel Eggimann <meggimann@iis.ee.ethz.ch>
 
-module serial_link_channel_allocator
+module slink_ch_alloc
  #(
   parameter type phy_data_t = logic,
   parameter int          NumChannels = 1,
@@ -73,7 +73,7 @@ module serial_link_channel_allocator
 
   assign s_tx_data_link2chopper_valid = |data_out_valid_i && !cfg_tx_bypass_en_i;
 
-  stream_chopper #(
+  slink_stream_chopper #(
     .element_t ( phy_data_t  ),
     .Width     ( NumChannels ),
     .FlushCounterWidth(FlushCounterWidth)
@@ -94,7 +94,7 @@ module serial_link_channel_allocator
     .ready_i                ( s_tx_spreader2chopper_ready  )
   );
 
-  channel_spread_sfr #(
+  slink_channel_spread_sfr #(
     .element_t ( phy_data_t  ),
     .Width     ( NumChannels )
   ) i_tx_spreader(
@@ -182,7 +182,7 @@ module serial_link_channel_allocator
      s_rx_recv_barrier_payload_out.valid: '0;
   assign s_rx_recv_barrier2despreader_data = s_rx_recv_barrier_payload_out.data;
 
-  channel_despread_sfr #(
+  slink_channel_despread_sfr #(
     .element_t ( phy_data_t  ),
     .Width     ( NumChannels )
   ) i_rx_despreader (
@@ -220,7 +220,7 @@ module serial_link_channel_allocator
   );
 
 
-  stream_dechopper #(
+  slink_stream_dechopper #(
     .element_t         ( phy_data_t        ),
     .Width             ( NumChannels       ),
     .FlushCounterWidth ( FlushCounterWidth )
