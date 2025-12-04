@@ -37,7 +37,10 @@ sources:
     - src/slink_phys_layer.sv
 
     # Serial Link main module
-    - src/slink.sv
+    - include_dirs:
+      - src/include
+      files:
+      - src/slink.sv
 
     # Wrapper for additional isolation
     - src/slink_isolate.sv
