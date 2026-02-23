@@ -13,7 +13,7 @@ for {set i 1} {$i < 3} {incr i} {
 
     add wave -noupdate -expand -group $group_name -ports /$tb_name/i_serial_link_$i/i_serial_link/*
 
-    add wave -noupdate -group $group_name -group {NETWORK} /$tb_name/i_serial_link_$i/i_serial_link/i_serial_link_network/*
+    add wave -noupdate -group $group_name -group {NETWORK} /$tb_name/i_serial_link_$i/i_serial_link/i_serial_link_protocol/*
 
     add wave -noupdate -group $group_name -group {LINK} /$tb_name/i_serial_link_$i/i_serial_link/i_serial_link_data_link/*
 

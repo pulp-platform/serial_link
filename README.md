@@ -17,7 +17,11 @@ The Serial Link is released under Solderpad v0.51 (SHL-0.51) see [`LICENSE`](LIC
 
 ### 🔗 Dependencies
 
-The link uses [bender](https://github.com/pulp-platform/bender) to manage its dependencies and to automatically generate compilation scripts. If you want to change the configuration of the serial link, you need to regenerate the register files, which requires `Python >= 3.11` and the [peakrdl](https://peakrdl-regblock.readthedocs.io/en/latest/) package. For standalone usages of the link with the testbenches, you need additional dependencies (see [pyproject.toml](pyproject.toml)) and we recommend to use [uv](https://docs.astral.sh/uv/) to manage them (see also [CI configuration](.github/workflows/lint.yml)).
+The link uses [bender](https://github.com/pulp-platform/bender) to manage its dependencies and to automatically generate compilation scripts. If you want to change the configuration of the serial link, you need to regenerate the register files, which requires `Python >= 3.11` and the [peakrdl](https://peakrdl-regblock.readthedocs.io/en/latest/) package. You can install the dependencies with pip:
+
+```sh
+pip install .
+```
 
 ### 💡 Integration
 
@@ -64,8 +68,6 @@ The link can be parametrized with arbitrary AXI interfaces resp. structs (`axi_r
 ```sh
 # Generates the registers for the desired configuration
 make slink-gen-regs SLINK_NUM_CHANNELS=<num_channels> SLINK_NUM_LANES=<num_lanes>
-# Additionall generates the address-map header file required for some testbenches
-make slink-gen-regs-all SLINK_NUM_CHANNELS=<num_channels> SLINK_NUM_LANES=<num_lanes>
 ```
 
 The registers are generated with [peakrdl](https://peakrdl-regblock.readthedocs.io/en/latest/) with the parametrized SystemRDL config file [`slink_reg.rdl`](src/regs/slink_reg.rdl).

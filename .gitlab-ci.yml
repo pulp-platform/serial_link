@@ -8,7 +8,7 @@ variables:
   VSIM: 'questa-2025.1 vsim'
   VCS: 'vcs-2025.06 vcs'
   VLOGAN: 'vcs-2025.06 vlogan'
-  PEAKRDL: '/home/fischeti/.local/bin/uv run peakrdl'
+  PEAKRDL: '/usr/local/uv/uv run peakrdl'
   UV_LINK_MODE: copy
 
 stages:
@@ -18,7 +18,7 @@ stages:
 build-vsim:
   stage: build
   script:
-    - make slink-gen-regs-all SLINK_NUM_CHANNELS=${NUM_CHANNELS}
+    - make slink-gen-regs SLINK_NUM_CHANNELS=${NUM_CHANNELS}
     - make vsim-compile WORK=work_${NUM_CHANNELS} | tee compile.log 2>&1
     - '! grep "\*\* Error" compile.log'
   parallel:
@@ -31,7 +31,7 @@ build-vsim:
 build-vcs:
   stage: build
   script:
-    - make slink-gen-regs-all SLINK_NUM_CHANNELS=${NUM_CHANNELS}
+    - make slink-gen-regs SLINK_NUM_CHANNELS=${NUM_CHANNELS}
     - make bin/${TB_DUT}_${NUM_CHANNELS}.vcs
   parallel:
     matrix:

@@ -9,6 +9,7 @@
 `include "common_cells/registers.svh"
 `include "common_cells/assertions.svh"
 `include "axi_stream/typedef.svh"
+`include "rdl_assign.svh"
 
 /// A simple serial link to go off-chip
 module slink
@@ -187,11 +188,13 @@ module slink
     & reg2hw.raw_mode_out_data_fifo_ctrl.req_is_wr
     & reg2hw.raw_mode_out_data_fifo_ctrl.wr_biten.clear;
   for (genvar i = 0; i < NumChannels; i++) begin : gen_raw_mode_in_data_valid
-    assign hw2reg.raw_mode_in_data_valid[i].rd_data.raw_mode_in_data_valid =
-      raw_mode_in_data_valid[i];
     assign raw_mode_out_ch_mask[i] =
       reg2hw.raw_mode_out_ch_mask[i].raw_mode_out_ch_mask.value;
   end
+
+  phy_data_t raw_mode_in_data_out;
+  logic [$clog2(RawModeFifoDepth)-1:0] raw_mode_out_data_fill_state;
+  logic raw_mode_out_data_is_full;
 
   slink_link_layer #(
     .axis_req_t       ( axis_req_t        ),
@@ -220,8 +223,7 @@ module slink
     .cfg_raw_mode_en_i                       ( reg2hw.raw_mode_en.raw_mode_en.value ),
     .cfg_raw_mode_in_ch_sel_i                (
       reg2hw.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value[cf_math_pkg::idx_width(NumChannels)-1:0] ),
-    .cfg_raw_mode_in_data_o                  (
-      hw2reg.raw_mode_in_data.rd_data.raw_mode_in_data ),
+    .cfg_raw_mode_in_data_o                  ( raw_mode_in_data_out ),
     .cfg_raw_mode_in_data_valid_o            ( raw_mode_in_data_valid                           ),
     .cfg_raw_mode_in_data_ready_i            (
       reg2hw.raw_mode_in_data.req & ~reg2hw.raw_mode_in_data.req_is_wr ),
@@ -232,11 +234,27 @@ module slink
     .cfg_raw_mode_out_en_i                   (
       reg2hw.raw_mode_out_en.raw_mode_out_en.value ),
     .cfg_raw_mode_out_data_fifo_clear_i      ( cfg_raw_mode_out_data_fifo_clear                 ),
-    .cfg_raw_mode_out_data_fifo_fill_state_o (
-      hw2reg.raw_mode_out_data_fifo_ctrl.rd_data.fill_state ),
-    .cfg_raw_mode_out_data_fifo_is_full_o    (
-      hw2reg.raw_mode_out_data_fifo_ctrl.rd_data.is_full )
+    .cfg_raw_mode_out_data_fifo_fill_state_o ( raw_mode_out_data_fill_state ),
+    .cfg_raw_mode_out_data_fifo_is_full_o    ( raw_mode_out_data_is_full )
   );
+
+  always_comb begin
+    hw2reg.raw_mode_in_data.rd_data = '0;
+    hw2reg.raw_mode_in_data.rd_data.raw_mode_in_data = raw_mode_in_data_out;
+    hw2reg.raw_mode_out_data_fifo_ctrl.rd_data = '0;
+    hw2reg.raw_mode_out_data_fifo_ctrl.rd_data.fill_state = raw_mode_out_data_fill_state;
+    hw2reg.raw_mode_out_data_fifo_ctrl.rd_data.is_full = raw_mode_out_data_is_full;
+    for (int i = 0; i < NumChannels; i++) begin
+      hw2reg.raw_mode_in_data_valid[i].rd_data = '0;
+      hw2reg.raw_mode_in_data_valid[i].rd_data.raw_mode_in_data_valid = raw_mode_in_data_valid[i];
+      `SLINK_SET_RDL_RD_ACK(raw_mode_in_data_valid[i])
+    end
+  end
+
+  `SLINK_ASSIGN_RDL_RD_ACK(raw_mode_in_data)
+  `SLINK_ASSIGN_RDL_RD_ACK(raw_mode_out_data_fifo_ctrl)
+  `SLINK_ASSIGN_RDL_WR_ACK(raw_mode_out_data_fifo_ctrl)
+  `SLINK_ASSIGN_RDL_WR_ACK(flow_control_fifo_clear)
 
   `FF(raw_mode_out_data_valid, reg2hw.raw_mode_out_data_fifo.raw_mode_out_data_fifo.swmod, '0)
 
@@ -400,40 +418,18 @@ module slink
   assign reset_no = reg2hw.ctrl.reset_n.value;
   assign isolate_o = {reg2hw.ctrl.axi_out_isolate.value,
                       reg2hw.ctrl.axi_in_isolate.value};
-  assign hw2reg.isolated.rd_data.axi_in = isolated_i[0];
-  assign hw2reg.isolated.rd_data.axi_out = isolated_i[1];
 
-  assign hw2reg.isolated.rd_ack = reg2hw.isolated.req
-    & ~reg2hw.isolated.req_is_wr;
-  assign hw2reg.isolated.rd_data._reserved_31_2 = '0;
-  for (genvar i = 0; i < NumChannels; i++) begin : gen_static_raw_mode_in_data_valid
-    assign hw2reg.raw_mode_in_data_valid[i].rd_ack =
-        reg2hw.raw_mode_in_data_valid[i].req
-      & ~reg2hw.raw_mode_in_data_valid[i].req_is_wr;
-    assign hw2reg.raw_mode_in_data_valid[i].rd_data._reserved_31_1 = '0;
+  always_comb begin
+    hw2reg.isolated.rd_data  = '0;
+    hw2reg.isolated.rd_data.axi_in = isolated_i[0];
+    hw2reg.isolated.rd_data.axi_out = isolated_i[1];
   end
-  assign hw2reg.raw_mode_in_data.rd_ack = reg2hw.raw_mode_in_data.req
-    & ~reg2hw.raw_mode_in_data.req_is_wr;
-  assign hw2reg.raw_mode_in_data.rd_data._reserved_31_16 = '0;
-  assign hw2reg.raw_mode_out_data_fifo_ctrl.rd_ack =
-      reg2hw.raw_mode_out_data_fifo_ctrl.req
-    & ~reg2hw.raw_mode_out_data_fifo_ctrl.req_is_wr;
-  assign hw2reg.raw_mode_out_data_fifo_ctrl.wr_ack =
-      reg2hw.raw_mode_out_data_fifo_ctrl.req
-    & reg2hw.raw_mode_out_data_fifo_ctrl.req_is_wr;
-  assign hw2reg.raw_mode_out_data_fifo_ctrl.rd_data._reserved_7_0 = '0;
-  assign hw2reg.raw_mode_out_data_fifo_ctrl.rd_data._reserved_30_11 = '0;
-  assign hw2reg.flow_control_fifo_clear.wr_ack =
-      reg2hw.flow_control_fifo_clear.req
-    & reg2hw.flow_control_fifo_clear.req_is_wr;
+
+  `SLINK_ASSIGN_RDL_RD_ACK(isolated)
 
   if (EnChAlloc) begin : gen_channel_alloc_regs
-    assign hw2reg.channel_alloc_tx_ctrl.wr_ack =
-        reg2hw.channel_alloc_tx_ctrl.req
-      & reg2hw.channel_alloc_tx_ctrl.req_is_wr;
-    assign hw2reg.channel_alloc_rx_ctrl.wr_ack =
-        reg2hw.channel_alloc_rx_ctrl.req
-      & reg2hw.channel_alloc_rx_ctrl.req_is_wr;
+    `SLINK_ASSIGN_RDL_WR_ACK(channel_alloc_tx_ctrl)
+    `SLINK_ASSIGN_RDL_WR_ACK(channel_alloc_rx_ctrl)
   end else begin : gen_no_channel_alloc_regs
     assign hw2reg.channel_alloc_tx_ctrl = '{default: '0};
     assign hw2reg.channel_alloc_rx_ctrl = '{default: '0};
