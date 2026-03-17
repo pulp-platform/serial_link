@@ -342,13 +342,13 @@ module slink
   ////////////////////////
 
   for (genvar i = 0; i < NumChannels; i++) begin : gen_phy_channels
-    serial_link_physical #(
+    slink_phys_layer #(
       .NumLanes         ( NumLanes          ),
       .FifoDepth        ( RawModeFifoDepth  ),
       .MaxClkDiv        ( MaxClkDiv         ),
       .EnDdr            ( EnDdr             ),
       .phy_data_t       ( phy_data_t        )
-    ) i_serial_link_physical (
+    ) i_slink_phys_layer (
       .clk_i             ( clk_sl_i                     ),
       .rst_ni            ( rst_sl_ni                    ),
       .clk_div_i         ( reg2hw.tx_phy_clk_div[i].clk_divs.value ),
