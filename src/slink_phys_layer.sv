@@ -28,13 +28,10 @@ module slink_phys_layer #(
   output logic                ddr_rcv_clk_o,
   output logic [NumLanes-1:0] ddr_o
 );
-  phy_data_t  data_out_q;
-
   clk_div_t clk_cnt_q, clk_cnt_d;
   logic clk_enable;
   logic clk_toggle, clk_slow_toggle;
   logic clk_slow;
-  logic ddr_sel;
 
   // Valid is always set, but
   // src_clk is clock gated
@@ -72,7 +69,6 @@ module slink_phys_layer #(
     if (~rst_ni) begin
       ddr_rcv_clk_o = 1'b1;
       clk_slow <= 1'b0;
-      ddr_sel <= 1'b0;
     end else begin
       if (clk_enable) begin
         if (clk_toggle) begin
@@ -80,12 +76,10 @@ module slink_phys_layer #(
         end
         if (clk_slow_toggle) begin
           clk_slow <= !clk_slow;
-          ddr_sel <= !ddr_sel;
         end
       end else begin
         ddr_rcv_clk_o = 1'b1;
         clk_slow <= 1'b0;
-        ddr_sel <= 1'b0;
       end
     end
   end
@@ -93,11 +87,24 @@ module slink_phys_layer #(
   /////////////////
   //   DDR OUT   //
   /////////////////
-  `FF(data_out_q, data_out_i, '0, clk_slow, rst_ni)
 
   if (EnDdr) begin : gen_ddr_mode
-    assign ddr_o = (ddr_sel)? data_out_q[NumLanes-1:0] : data_out_q[NumLanes*2-1:NumLanes];
+    // Both halves are registered on clk_slow. The output mux is driven by clk_slow
+    // itself (via tc_clk_mux2) rather than by a data register.
+    logic [NumLanes-1:0] data_lo_q, data_hi_q;
+    `FF(data_lo_q, data_out_i[NumLanes-1:0],          '0, clk_slow, rst_ni)
+    `FF(data_hi_q, data_out_i[NumLanes*2-1:NumLanes], '0, clk_slow, rst_ni)
+    for (genvar i = 0; i < NumLanes; i++) begin : gen_ddr_lanes
+      tc_clk_mux2 i_ddr_mux (
+        .clk0_i    ( data_hi_q[i] ), // selected when clk_slow == 0
+        .clk1_i    ( data_lo_q[i] ), // selected when clk_slow == 1
+        .clk_sel_i ( clk_slow     ),
+        .clk_o     ( ddr_o[i]     )
+      );
+    end
   end else begin : gen_sdr_mode
+    phy_data_t data_out_q;
+    `FF(data_out_q, data_out_i, '0, clk_slow, rst_ni)
     assign ddr_o = data_out_q;
   end
 
