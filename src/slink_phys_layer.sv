@@ -10,7 +10,7 @@
 `include "common_cells/assertions.svh"
 
 // Implements a single TX channel which forwards the source-synchronous clock
-module slink_phys_layer #(
+module slink_phys_layer_tx #(
   parameter int NumLanes   = 8,
   parameter int MaxClkDiv  = 32,
   parameter bit EnDdr = 1'b1,
@@ -110,9 +110,9 @@ module slink_phys_layer #(
 
 endmodule
 
-// Impelements a single RX channel which samples the data with the received clock
+// Implements a single RX channel which samples the data with the received clock
 // Synchronizes the data with the System clock with a CDC
-module serial_link_physical_rx #(
+module slink_phys_layer_rx #(
   parameter int NumLanes      = 8,
   parameter int FifoDepth     = 8,
   parameter int CdcSyncStages = 2,
@@ -174,7 +174,7 @@ endmodule
 
 // Implements the Physical Layer of the Serial Link
 // The number of Channels and Lanes per Channel is parametrizable
-module serial_link_physical #(
+module slink_phys_layer #(
   // Number of Wires in one channel
   parameter int NumLanes   = 8,
   // Fifo Depth of CDC, dependent on
@@ -209,7 +209,7 @@ module serial_link_physical #(
   ////////////////
   //   PHY TX   //
   ////////////////
-  slink_phys_layer #(
+  slink_phys_layer_tx #(
     .NumLanes   ( NumLanes    ),
     .EnDdr      ( EnDdr       ),
     .phy_data_t ( phy_data_t  ),
@@ -230,12 +230,12 @@ module serial_link_physical #(
   ////////////////
   //   PHY RX   //
   ////////////////
-  serial_link_physical_rx #(
+  slink_phys_layer_rx #(
     .NumLanes   ( NumLanes    ),
     .FifoDepth  ( FifoDepth   ),
     .EnDdr      ( EnDdr       ),
     .phy_data_t ( phy_data_t  )
-  ) i_serial_link_physical_rx (
+  ) i_slink_phys_layer_rx (
     .clk_i,
     .rst_ni,
     .ddr_rcv_clk_i,
