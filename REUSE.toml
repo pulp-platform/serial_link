@@ -1,0 +1,17 @@
+version = 1
+
+[[annotations]]
+path = [
+  "README.md",
+  "CHANGELOG.md",
+  "CODEOWNERS",
+  ".gitignore",
+  ".generated",
+  ".python-version",
+  "uv.lock",
+  "Bender.lock",
+  "LICENSE",
+  "doc/**",
+]
+SPDX-FileCopyrightText = "2022 ETH Zurich and University of Bologna"
+SPDX-License-Identifier = "SHL-0.51"
