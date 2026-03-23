@@ -70,16 +70,11 @@ jobs:
         fail_on_error: true
         reviewdog_reporter: github-check
 
-  #################
-  # Check License #
-  #################
-  lint-license:
+  #########
+  # REUSE #
+  #########
+  reuse:
     runs-on: ubuntu-latest
     steps:
-      - name: lint license
-        uses: pulp-platform/pulp-actions/lint-license@v2.4.4
-        with:
-          license: |
-            Copyright (\d{4}(-\d{4})?\s)?(ETH Zurich and University of Bologna|lowRISC contributors).
-            (Solderpad Hardware License, Version 0.51|Licensed under the Apache License, Version 2.0), see LICENSE for details.
-            SPDX-License-Identifier: (SHL-0.51|Apache-2.0)
+      - uses: actions/checkout@v6
+      - uses: fsfe/reuse-action@v6
