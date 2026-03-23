@@ -32,14 +32,14 @@ build-vcs:
   stage: build
   script:
     - just gen-regs ${NUM_CHANNELS}
-    - WORK=work_${NUM_CHANNELS} just compile vcs ${TB_DUT}_${NUM_CHANNELS}
+    - WORK=work_${NUM_CHANNELS} just compile vcs ${TB_DUT}
   parallel:
     matrix:
       - NUM_CHANNELS: [1, 4]
         TB_DUT: [tb_axi_slink, tb_ch_calib_slink]
   artifacts:
     paths:
-      - bin/${TB_DUT}_${NUM_CHANNELS}.vcs*
+      - work_${NUM_CHANNELS}/bin/${TB_DUT}.vcs*
 
 run-vsim:
   stage: test
@@ -80,7 +80,7 @@ run-vcs:
   script:
     - echo "Running AXI test with R/W [$NUM_READS_1,$NUM_WRITES_1] <-> [$NUM_READS_2,$NUM_WRITES_2]"
     - >
-      WORK=work_${NUM_CHANNELS} just run-batch vcs ${TB_DUT}_${NUM_CHANNELS}
+      WORK=work_${NUM_CHANNELS} just run-batch vcs ${TB_DUT}
       "+NUM_READS_1=$NUM_READS_1 +NUM_WRITES_1=$NUM_WRITES_1
       +NUM_READS_2=$NUM_READS_2 +NUM_WRITES_2=$NUM_WRITES_2
       +NUM_FAULTS_1=$NUM_FAULTS_1 +NUM_FAULTS_2=$NUM_FAULTS_2"

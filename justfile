@@ -89,17 +89,17 @@ _compile-vcs tb *vcs_params:
         | grep -v "ROOT=" | sed '3 i ROOT="."' > scripts/compile_vcs.sh
     chmod +x scripts/compile_vcs.sh
     scripts/compile_vcs.sh > scripts/compile_vcs.log
-    mkdir -p bin
-    {{ vcs }} {{ vcs_flags }} {{ vcs_params }} {{ tb }} -o bin/{{ tb }}.vcs
+    mkdir -p {{ work }}/bin
+    {{ vcs }} {{ vcs_flags }} {{ vcs_params }} {{ tb }} -o {{ work }}/bin/{{ tb }}.vcs
 
 [private]
 _run-vcs-gui tb *sim_args:
-    bin/{{ tb }}.vcs +permissive -exitstatus +permissive-off {{ sim_args }}
+    {{ work }}/bin/{{ tb }}.vcs +permissive -exitstatus +permissive-off {{ sim_args }}
 
 [private]
 _run-vcs-batch tb *sim_args:
-    bin/{{ tb }}.vcs +permissive -exitstatus +permissive-off {{ sim_args }}
+    {{ work }}/bin/{{ tb }}.vcs +permissive -exitstatus +permissive-off {{ sim_args }}
 
 [private]
 _vcs-clean:
-    rm -rf AN.DB scripts/compile_vcs.sh bin work-vcs ucli.key vc_hdrs.h logs/*.vcs.log scripts/compile_vcs.log
+    rm -rf AN.DB scripts/compile_vcs.sh ucli.key vc_hdrs.h logs/*.vcs.log scripts/compile_vcs.log
