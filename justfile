@@ -4,6 +4,9 @@
 
 # Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
+set dotenv-load
+set shell := ["bash", "-cu"]
+
 bender := env_var_or_default("BENDER", "bender")
 vsim   := env_var_or_default("VSIM",   "vsim")
 work   := env_var_or_default("WORK",   "work")
@@ -17,74 +20,86 @@ vsim_flags  := "-work " + work
 vlogan_args := "-timescale=1ns/1ps"
 vcs_flags   := "-full64 -Mlib=" + work + " -Mdir=" + work
 
-# Compile for QuestaSim (default)
-default: vsim-compile
-
-# Clean all build artefacts
-clean: vsim-clean vcs-clean
-
-# Run QuestaSim simulation (alias)
-run: vsim-run
-
-#################################
-# SystemRDL register generation #
-#################################
+# List all available recipes
+default:
+    @just --list
 
 # Generate register files from SystemRDL source
-gen-regs:
-    make -f slink.mk slink-gen-regs SLINK_ROOT={{ justfile_directory() }}
+[group("regs")]
+gen-regs num_channels="1" num_lanes="8" log2_max_clk_div="10" log2_raw_mode_tx_fifo_depth="3":
+    make -f slink.mk slink-gen-regs \
+        SLINK_ROOT={{ justfile_directory() }} \
+        SLINK_NUM_CHANNELS={{ num_channels }} \
+        SLINK_NUM_LANES={{ num_lanes }} \
+        SLINK_LOG2_MAX_CLK_DIV={{ log2_max_clk_div }} \
+        SLINK_LOG2_RAW_MODE_TX_FIFO_DEPTH={{ log2_raw_mode_tx_fifo_depth }}
 
-########################
-# QuestaSim Simulation #
-########################
+# Compile design (sim: vsim [default], vcs)
+[group("sim")]
+compile sim="vsim" tb="tb_axi_slink" *args="":
+    just _compile-{{ sim }} {{ tb }} {{ args }}
 
-# Generate QuestaSim compilation script
-gen-vsim-script:
+# Run simulation GUI (sim: vsim [default], vcs)
+[group("sim")]
+run sim="vsim" tb="tb_axi_slink" *sim_args="":
+    just _run-{{ sim }}-gui {{ tb }} {{ sim_args }}
+
+# Run simulation in batch mode (sim: vsim [default], vcs)
+[group("sim")]
+run-batch sim="vsim" tb="tb_axi_slink" *sim_args="":
+    just _run-{{ sim }}-batch {{ tb }} {{ sim_args }}
+
+# Remove all build artefacts
+[group("sim")]
+clean:
+    just _vsim-clean
+    just _vcs-clean
+
+####################
+# Private: QuestaSim
+####################
+
+[private]
+_compile-vsim tb *args:
     mkdir -p scripts
     {{ bender }} script vsim --vlog-arg="{{ vlog_flags }}" {{ bender_flags }} > scripts/compile_vsim.tcl
-
-# Compile design for QuestaSim
-vsim-compile: gen-vsim-script
     {{ vsim }} -c -work {{ work }} -do "source scripts/compile_vsim.tcl; quit" | tee scripts/vsim.log
     ! grep -P "Errors: [1-9]*," scripts/vsim.log
 
-# Run QuestaSim simulation (GUI)
-vsim-run tb="tb_axi_slink":
-    {{ vsim }} {{ vsim_flags }} ${SIM_ARGS:-} -voptargs=+acc -do "log -r /*" -do util/wave.tcl {{ tb }}
+[private]
+_run-vsim-gui tb *sim_args:
+    {{ vsim }} {{ vsim_flags }} {{ sim_args }} -voptargs=+acc -do "log -r /*" -do util/wave.tcl {{ tb }}
 
-# Run QuestaSim simulation (batch)
-vsim-run-batch tb="tb_axi_slink":
-    {{ vsim }} -c {{ vsim_flags }} ${SIM_ARGS:-} {{ tb }} -do "run -all; quit"
+[private]
+_run-vsim-batch tb *sim_args:
+    {{ vsim }} -c {{ vsim_flags }} {{ sim_args }} {{ tb }} -do "run -all; quit"
 
-# Remove QuestaSim build artefacts
-vsim-clean:
+[private]
+_vsim-clean:
     rm -rf scripts/compile_vsim.tcl work* vsim.wlf transcript modelsim.ini *.vstf scripts/vsim.log
 
-##################
-# VCS Simulation #
-##################
+################
+# Private: VCS
+################
 
-# Generate VCS compilation script
-gen-vcs-script:
+[private]
+_compile-vcs tb *vcs_params:
     mkdir -p scripts
-    {{ bender }} script vcs {{ bender_flags }} --vlog-arg "{{ vlogan_args }}" --vlogan-bin "{{ vlogan }}" \
+    {{ bender }} script vcs {{ bender_flags }} --vlogan-args="{{ vlogan_args }}" --vlogan-bin "{{ vlogan }}" \
         | grep -v "ROOT=" | sed '3 i ROOT="."' > scripts/compile_vcs.sh
     chmod +x scripts/compile_vcs.sh
-
-# Compile design for VCS
-vcs-compile tb="tb_axi_serial_link": gen-vcs-script
     scripts/compile_vcs.sh > scripts/compile_vcs.log
     mkdir -p bin
-    {{ vcs }} {{ vcs_flags }} ${VCS_PARAMS:-} {{ tb }} -o bin/{{ tb }}.vcs
+    {{ vcs }} {{ vcs_flags }} {{ vcs_params }} {{ tb }} -o bin/{{ tb }}.vcs
 
-# Run VCS simulation
-vcs-run tb="tb_axi_serial_link":
-    bin/{{ tb }}.vcs +permissive -exitstatus +permissive-off ${SIM_ARGS:-}
+[private]
+_run-vcs-gui tb *sim_args:
+    bin/{{ tb }}.vcs +permissive -exitstatus +permissive-off {{ sim_args }}
 
-# Run VCS simulation (batch)
-vcs-run-batch tb="tb_axi_serial_link":
-    bin/{{ tb }}.vcs +permissive -exitstatus +permissive-off ${SIM_ARGS:-}
+[private]
+_run-vcs-batch tb *sim_args:
+    bin/{{ tb }}.vcs +permissive -exitstatus +permissive-off {{ sim_args }}
 
-# Remove VCS build artefacts
-vcs-clean:
+[private]
+_vcs-clean:
     rm -rf AN.DB scripts/compile_vcs.sh bin work-vcs ucli.key vc_hdrs.h logs/*.vcs.log scripts/compile_vcs.log
