@@ -15,16 +15,20 @@ jobs:
   ###############
   check-clean:
     runs-on: ubuntu-latest
+    env:
+      PEAKRDL: uv run peakrdl
     steps:
       - uses: actions/checkout@v5
       - name: Install uv
         uses: astral-sh/setup-uv@v6
       - name: Install bender
         uses: pulp-platform/pulp-actions/bender-install@v2.4.4
-      - name: Check clean make targets
+      - name: Install just
+        uses: taiki-e/install-action@just
+      - name: Check clean targets
         run: |
-          uv run make -B slink-gen-regs
-          uv run make clean
+          just gen-regs
+          just clean
           git status && test -z "$(git status --porcelain)"
 
   ###############
@@ -32,15 +36,19 @@ jobs:
   ###############
   check-stale:
     runs-on: ubuntu-latest
+    env:
+      PEAKRDL: uv run peakrdl
     steps:
       - uses: actions/checkout@v5
       - name: Install uv
         uses: astral-sh/setup-uv@v6
       - name: Install bender
         uses: pulp-platform/pulp-actions/bender-install@v2.4.4
-      - name: Check clean makefile
+      - name: Install just
+        uses: taiki-e/install-action@just
+      - name: Check stale targets
         run: |
-          uv run make -B slink-gen-regs
+          just gen-regs
           git status && test -z "$(git status --porcelain)"
 
   #####################
