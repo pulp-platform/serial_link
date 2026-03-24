@@ -17,10 +17,12 @@ The Serial Link is released under Solderpad v0.51 (SHL-0.51) see [`LICENSE`](LIC
 
 ### 🔗 Dependencies
 
-The link uses [bender](https://github.com/pulp-platform/bender) to manage its dependencies and to automatically generate compilation scripts. If you want to change the configuration of the serial link, you need to regenerate the register files, which requires `Python >= 3.11` and the [peakrdl](https://peakrdl-regblock.readthedocs.io/en/latest/) package. You can install the dependencies with pip:
+The link uses [bender](https://github.com/pulp-platform/bender) to manage its dependencies and to automatically generate compilation scripts. Simulation and register generation are driven by [just](https://github.com/casey/just). If you want to change the configuration of the serial link, you need to regenerate the register files, which requires `Python >= 3.11` and the [peakrdl](https://peakrdl-regblock.readthedocs.io/en/latest/) package. Register generation uses [uv](https://github.com/astral-sh/uv) to run peakrdl without requiring a manual environment setup.
+
+Tool versions for EDA tools (simulators, bender) can be configured via a `.env` file. A template for IIS-internal tool versions is provided in [`.iis_env`](.iis_env):
 
 ```sh
-pip install .
+ln -s .iis_env .env
 ```
 
 ### 💡 Integration
@@ -47,18 +49,23 @@ all: $(SLINK_ROOT)/src/regs/slink_reg.sv
 If you want to use or test the Serial Link as a standalone design, it can be simulated with the following steps:
 
 ```sh
-# To compile the link, run the following command:
-make all
-# Run the simulation. This will start the simulation in batch mode.
-make <simulator>-run-batch
-# To open it in the GUI mode, run the following command:
-# This command will also add all interesting waves to the wave window.
-make <simulator>-run
+# Compile the design (simulator: vsim [default], vcs)
+just compile
+just compile vcs
+
+# Run in batch mode
+just run-batch
+just run-batch vcs
+
+# Open in GUI mode (also loads wave files)
+just run
+just run vcs
 ```
 
-where `<simulator>` can be either `vsim` (for ModelSim/QuestaSim) or `vcs` (for Synopsys VCS). To test the testbench (defaults to `tb_axi_slink`), you can set the `TB_DUT` variable:
+To use a different testbench (default: `tb_axi_slink`), pass it as the second argument:
 ```sh
-make <simulator>-run TB_DUT=tb_ch_calib_slink
+just compile vcs tb_ch_calib_slink
+just run-batch vcs tb_ch_calib_slink
 ```
 
 ## 🔧 Configuration
@@ -67,7 +74,7 @@ The link can be parametrized with arbitrary AXI interfaces resp. structs (`axi_r
 
 ```sh
 # Generates the registers for the desired configuration
-make slink-gen-regs SLINK_NUM_CHANNELS=<num_channels> SLINK_NUM_LANES=<num_lanes>
+just gen-regs SLINK_NUM_CHANNELS=<num_channels> SLINK_NUM_LANES=<num_lanes>
 ```
 
 The registers are generated with [peakrdl](https://peakrdl-regblock.readthedocs.io/en/latest/) with the parametrized SystemRDL config file [`slink_reg.rdl`](src/regs/slink_reg.rdl).
