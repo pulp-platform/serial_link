@@ -1,24 +1,21 @@
 # Copyright 2022 ETH Zurich and University of Bologna.
 # Solderpad Hardware License, Version 0.51, see LICENSE for details.
 # SPDX-License-Identifier: SHL-0.51
-
 # Author: Tim Fischer <fischeti@iis.ee.ethz.ch>
 
-set dotenv-load
+set dotenv-load := true
 set shell := ["bash", "-cu"]
 
 bender := env_var_or_default("BENDER", "bender")
-vsim   := env_var_or_default("VSIM",   "vsim")
-work   := env_var_or_default("WORK",   "work")
+vsim := env_var_or_default("VSIM", "vsim")
+work := env_var_or_default("WORK", "work")
 vlogan := env_var_or_default("VLOGAN", "vlogan")
-vcs    := env_var_or_default("VCS",    "vcs")
-
+vcs := env_var_or_default("VCS", "vcs")
 bender_flags := "-t slink_test -t test"
-
-vlog_flags  := "-suppress vlog-2583 -suppress vlog-13314 -suppress vlog-13233 -timescale 1ns/1ps -work " + work
-vsim_flags  := "-work " + work
+vlog_flags := "-suppress vlog-2583 -suppress vlog-13314 -suppress vlog-13233 -timescale 1ns/1ps -work " + work
+vsim_flags := "-work " + work
 vlogan_args := "-timescale=1ns/1ps"
-vcs_flags   := "-full64 -Mlib=" + work + " -Mdir=" + work
+vcs_flags := "-full64 -Mlib=" + work + " -Mdir=" + work
 
 # List all available recipes
 default:
