@@ -24,15 +24,10 @@ vcs_flags   := "-full64 -Mlib=" + work + " -Mdir=" + work
 default:
     @just --list
 
-# Generate register files from SystemRDL source
+# Generate register files from SystemRDL source (pass SLINK_* overrides as args)
 [group("regs")]
-gen-regs num_channels="1" num_lanes="8" log2_max_clk_div="10" log2_raw_mode_tx_fifo_depth="3":
-    make -f slink.mk slink-gen-regs \
-        SLINK_ROOT={{ justfile_directory() }} \
-        SLINK_NUM_CHANNELS={{ num_channels }} \
-        SLINK_NUM_LANES={{ num_lanes }} \
-        SLINK_LOG2_MAX_CLK_DIV={{ log2_max_clk_div }} \
-        SLINK_LOG2_RAW_MODE_TX_FIFO_DEPTH={{ log2_raw_mode_tx_fifo_depth }}
+gen-regs *args="":
+    make -f slink.mk slink-gen-regs SLINK_ROOT={{ justfile_directory() }} {{ args }}
 
 # Compile design (sim: vsim [default], vcs)
 [group("sim")]
@@ -49,11 +44,10 @@ run sim="vsim" tb="tb_axi_slink" *sim_args="":
 run-batch sim="vsim" tb="tb_axi_slink" *sim_args="":
     just _run-{{ sim }}-batch {{ tb }} {{ sim_args }}
 
-# Remove all build artefacts
+# Remove build artefacts (sim: vsim, vcs; default: all)
 [group("sim")]
-clean:
-    just _vsim-clean
-    just _vcs-clean
+clean sim="all":
+    just _clean-{{ sim }}
 
 ####################
 # Private: QuestaSim
@@ -75,7 +69,7 @@ _run-vsim-batch tb *sim_args:
     {{ vsim }} -c {{ vsim_flags }} {{ sim_args }} {{ tb }} -do "run -all; quit"
 
 [private]
-_vsim-clean:
+_clean-vsim:
     rm -rf scripts/compile_vsim.tcl work* vsim.wlf transcript modelsim.ini *.vstf scripts/vsim.log
 
 ################
@@ -101,5 +95,10 @@ _run-vcs-batch tb *sim_args:
     {{ work }}/bin/{{ tb }}.vcs +permissive -exitstatus +permissive-off {{ sim_args }}
 
 [private]
-_vcs-clean:
+_clean-vcs:
     rm -rf AN.DB scripts/compile_vcs.sh ucli.key vc_hdrs.h logs/*.vcs.log scripts/compile_vcs.log
+
+[private]
+_clean-all:
+    just _clean-vsim
+    just _clean-vcs

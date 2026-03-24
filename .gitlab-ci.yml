@@ -19,7 +19,7 @@ stages:
 build-vsim:
   stage: build
   script:
-    - just gen-regs ${NUM_CHANNELS}
+    - just gen-regs SLINK_NUM_CHANNELS=${NUM_CHANNELS}
     - WORK=work_${NUM_CHANNELS} just compile vsim
   parallel:
     matrix:
@@ -31,7 +31,7 @@ build-vsim:
 build-vcs:
   stage: build
   script:
-    - just gen-regs ${NUM_CHANNELS}
+    - just gen-regs SLINK_NUM_CHANNELS=${NUM_CHANNELS}
     - WORK=work_${NUM_CHANNELS} just compile vcs ${TB_DUT}
   parallel:
     matrix:
