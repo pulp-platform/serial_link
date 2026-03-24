@@ -8,7 +8,7 @@ variables:
   UV_LINK_MODE: copy
 
 before_script:
-  - set -a && source .iis_env && set +a
+  - ln -sf .iis_env .env
   - /usr/local/uv/uv tool install rust-just --quiet
   - export PATH="${HOME}/.local/bin:${PATH}"
 
