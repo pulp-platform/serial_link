@@ -4,9 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 2.0.0 - 2026-04-07
 
-- Added Support for Single-Data-Rate (SDR) PHY
+### Added
+- Added support for Single-Data-Rate (SDR) PHY option for simpler links.
+
+### Changed
+- **Breaking**: Renamed all `serial_link_*` IP modules and files to `slink_*` (e.g., `serial_link.sv` -> `slink.sv`, `serial_link_physical.sv` -> `slink_phys_layer.sv`). Users instantiating the core will need to update module names.
+- **Breaking**: Migrated register generation from `reggen` to `systemRDL` and changed the register interface to APB. This updates the register memory map headers and RTL files (`slink_reg.sv`, `slink_reg_pkg.sv`).
+- **Breaking**: Renamed the `occamy_wrapper` module to `slink_isolate` to reflect its general utility for isolation in other projects.
+- Architecturally renamed the "network layer" to the "protocol layer" (`slink_prot_layer`).
+- Removed internal `axis` dependencies and `axi_channel_compare` in favor of their upstream versions, and shifted to a cleaned-up internal wiring architecture.
+- Cleaned up the `slink_pkg` package by removing redundant or obsolete constants and types.
+- Replaced the project `Makefile` with a `justfile` for build automation.
+- Switched to `uv` for handling Python dependencies, replacing the standard `pip`/`requirements.txt` workflow.
+- Testbenches are no longer automatically imported under the `Bender` simulation target.
+- Migrated project license checking to REUSE.
+
+### Fixed
+- **Breaking**: Fixed the `ddr_sel` output path in the PHY with a `tc_clk_mux2`. This means users will need to make sure to have a `tc_clk_mux2` technology cell specified for FPGA or ASIC implementations.
+- Fixed testbench port assignments in `tb_channel_allocator` and other refactoring typos in the hardware layers.
 
 ## 1.1.2 - 2024-08-30
 
