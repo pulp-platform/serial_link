@@ -35,8 +35,7 @@ $(SLINK_ROOT)/.generated: SLINK_FORCE
 	@printf '%s\n' "$(SLINK_PEAKRDL_PARAMS)" | cmp -s - $@ || printf '%s\n' "$(SLINK_PEAKRDL_PARAMS)" > $@
 
 
-$(SLINK_ROOT)/src/regs/slink_reg.sv:$(SLINK_ROOT)/src/regs/slink_reg_pkg.sv
-$(SLINK_ROOT)/src/regs/slink_reg_pkg.sv: $(SLINK_ROOT)/src/regs/slink_reg.rdl $(SLINK_ROOT)/.generated
+$(SLINK_ROOT)/src/regs/slink_reg.sv $(SLINK_ROOT)/src/regs/slink_reg_pkg.sv: $(SLINK_ROOT)/src/regs/slink_reg.rdl $(SLINK_ROOT)/.generated
 	$(PEAKRDL) regblock $< -o $(dir $@) --default-reset arst_n --cpuif apb4-flat $(SLINK_PEAKRDL_PARAMS)
 	@sed -i '1i$(SLINK_COPYRIGHT_NOTICE)' $@ $(dir $@)/slink_reg.sv
 
