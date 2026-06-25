@@ -9,8 +9,6 @@ variables:
 
 before_script:
   - ln -sf .iis_env .env
-  - /usr/local/uv/uv tool install rust-just --quiet
-  - export PATH="${HOME}/.local/bin:${PATH}"
 
 stages:
   - build

@@ -429,18 +429,18 @@ module tb_axi_slink;
     $info("[DDR%0d]: Enabling clock and deassert link reset.", id);
     // Reset and clock gate sequence, AXI isolation remains enabled
     // De-assert reset
-    cfg_write(drv, `SLINK_REG_CTRL_REG_OFFSET, 32'h300);
+    cfg_write(drv, `SLINK_REG_CTRL_BASE_ADDR, 32'h300);
     // Assert reset
-    cfg_write(drv, `SLINK_REG_CTRL_REG_OFFSET, 32'h302);
+    cfg_write(drv, `SLINK_REG_CTRL_BASE_ADDR, 32'h302);
     // Enable clock
-    cfg_write(drv, `SLINK_REG_CTRL_REG_OFFSET, 32'h303);
+    cfg_write(drv, `SLINK_REG_CTRL_BASE_ADDR, 32'h303);
     // Wait for some clock cycles
     repeat(50) drv.cycle_end();
     // De-isolate AXI ports
     $info("[DDR%0d] Enabling AXI ports...",id);
-    cfg_write(drv, `SLINK_REG_CTRL_REG_OFFSET, 32'h03);
+    cfg_write(drv, `SLINK_REG_CTRL_BASE_ADDR, 32'h03);
     do begin
-      cfg_read(drv, `SLINK_REG_ISOLATED_REG_OFFSET, data);
+      cfg_read(drv, `SLINK_REG_ISOLATED_BASE_ADDR, data);
     end while(data != 0); // Wait until both isolation status bits are 0 to
                           // indicate disabling of isolation
     $info("[DDR%0d] Link is ready", id);
