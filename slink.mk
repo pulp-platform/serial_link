@@ -34,11 +34,10 @@ SLINK_FORCE:
 $(SLINK_ROOT)/.generated: SLINK_FORCE
 	@printf '%s\n' "$(SLINK_PEAKRDL_PARAMS)" | cmp -s - $@ || printf '%s\n' "$(SLINK_PEAKRDL_PARAMS)" > $@
 
-
-$(SLINK_ROOT)/src/regs/slink_reg.sv:$(SLINK_ROOT)/src/regs/slink_reg_pkg.sv
-$(SLINK_ROOT)/src/regs/slink_reg_pkg.sv: $(SLINK_ROOT)/src/regs/slink_reg.rdl $(SLINK_ROOT)/.generated
+# Use pattern rule to emulate grouped target behaviour
+$(SLINK_ROOT)/src/regs/%_reg.sv $(SLINK_ROOT)/src/regs/%_reg_pkg.sv: $(SLINK_ROOT)/src/regs/%_reg.rdl $(SLINK_ROOT)/.generated
 	$(PEAKRDL) regblock $< -o $(dir $@) --default-reset arst_n --cpuif apb4-flat $(SLINK_PEAKRDL_PARAMS)
-	@sed -i '1i$(SLINK_COPYRIGHT_NOTICE)' $@ $(dir $@)/slink_reg.sv
+	@sed -i '1i$(SLINK_COPYRIGHT_NOTICE)' $(dir $@)/$*_reg.sv $(dir $@)/$*_reg_pkg.sv
 
 $(SLINK_ROOT)/src/regs/slink_addrmap.svh: $(SLINK_ROOT)/src/regs/slink_reg.rdl $(SLINK_ROOT)/.generated
 	$(PEAKRDL) raw-header $< -o $@ --format svh $(SLINK_PEAKRDL_PARAMS)
