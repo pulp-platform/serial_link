@@ -219,14 +219,13 @@ module slink_prot_layer #(
   assign axis_out_req_o.t.data = axis_reg_data_out;
   assign axis_reg_ready_out = axis_out_rsp_i.tready;
 
-  stream_fifo #(
+  cc_stream_fifo #(
     .DEPTH  ( 2           ),
     .T      (  payload_t  )
   ) i_axis_out_reg (
     .clk_i      ( clk_i               ),
     .rst_ni     ( rst_ni              ),
     .flush_i    ( 1'b0                ),
-    .testmode_i ( 1'b0                ),
     .usage_o    (                     ),
     .valid_i    ( axis_reg_valid_in   ),
     .ready_o    ( axis_reg_ready_in   ),

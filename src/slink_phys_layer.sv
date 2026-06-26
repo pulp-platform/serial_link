@@ -134,7 +134,7 @@ module slink_phys_layer_rx #(
   //   CLOCK DOMAIN CROSSING   //
   ///////////////////////////////
 
-  cdc_fifo_gray #(
+  cc_cdc_fifo_gray #(
     .T            ( phy_data_t                        ),
     .LOG_DEPTH    ( $clog2(FifoDepth) + CdcSyncStages ),
     .SYNC_STAGES  ( CdcSyncStages                     )

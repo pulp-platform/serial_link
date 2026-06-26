@@ -55,9 +55,9 @@ module slink_stream_dechopper #(
   assign s_out_buffer_clear = output_valid_q;
 
   // Count trailing 1s
-  lzc #(
+  cc_lzc #(
     .WIDTH(Width),
-    .MODE(0)
+    .MODE(cc_pkg::LZC_TRAILING_ZERO_CNT)
   ) i_lzc(
     .in_i(~valid_i),
     .cnt_o(s_chopsize),

@@ -17,7 +17,7 @@ module tb_stream_chopper_dechopper;
   typedef logic [15:0]  element_t;
   typedef element_t[ChannelCount-1:0]  payload_t;
 
-  typedef stream_test::stream_driver #(
+  typedef cc_test_pkg::cc_stream_driver #(
     .payload_t (payload_t),
     .TA (Tck*0.2),
     .TT (Tck*0.8)

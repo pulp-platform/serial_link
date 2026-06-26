@@ -222,7 +222,7 @@ module slink
     .cfg_flow_control_fifo_clear_i           ( cfg_flow_control_fifo_clear                      ),
     .cfg_raw_mode_en_i                       ( reg2hw.raw_mode_en.raw_mode_en.value ),
     .cfg_raw_mode_in_ch_sel_i                (
-      reg2hw.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value[cf_math_pkg::idx_width(NumChannels)-1:0] ),
+      reg2hw.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value[cc_pkg::idx_width(NumChannels)-1:0]    ),
     .cfg_raw_mode_in_data_o                  ( raw_mode_in_data_out ),
     .cfg_raw_mode_in_data_valid_o            ( raw_mode_in_data_valid                           ),
     .cfg_raw_mode_in_data_ready_i            (
