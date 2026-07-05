@@ -65,6 +65,8 @@ module slink_link_layer #(
   logic raw_mode_fifo_full, raw_mode_fifo_empty;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
   phy_data_t raw_mode_fifo_data_in, raw_mode_fifo_data_out;
+  // `cc_fifo` widened `usage_o` to `cc_pkg::cnt_width(Depth)`; slice it back to the legacy width
+  logic [cc_pkg::cnt_width(RawModeFifoDepth)-1:0] raw_mode_fifo_usage;
 
 
   /////////////////
@@ -77,14 +79,14 @@ module slink_link_layer #(
   logic flow_control_fifo_valid_out, flow_control_fifo_ready_out;
   logic flow_control_fifo_valid_in, flow_control_fifo_ready_in;
 
-  stream_fifo #(
-    .T(phy_data_chan_t),
-    .DEPTH (RecvFifoDepth)
+  cc_stream_fifo #(
+    .data_t(phy_data_chan_t),
+    .Depth (RecvFifoDepth)
   ) i_flow_control_fifo (
     .clk_i      ( clk_i                         ),
     .rst_ni     ( rst_ni                        ),
+    .clr_i      ( 1'b0                          ),
     .flush_i    ( cfg_flow_control_fifo_clear_i ),
-    .testmode_i ( 1'b0                          ),
     .usage_o    (                               ),
     .data_i     ( data_in_i                     ),
     .valid_i    ( flow_control_fifo_valid_in    ),
@@ -95,13 +97,12 @@ module slink_link_layer #(
   );
 
   for (genvar i = 0; i < PayloadSplits; i++) begin : gen_recv_reg
-    stream_register #(
-      .T (phy_data_chan_t)
+    cc_stream_register #(
+      .data_t (phy_data_chan_t)
     ) i_recv_reg (
       .clk_i      ( clk_i                       ),
       .rst_ni     ( rst_ni                      ),
       .clr_i      ( 1'b0                        ),
-      .testmode_i ( 1'b0                        ),
       .valid_i    ( recv_reg_in_valid[i]        ),
       .ready_o    ( recv_reg_in_ready[i]        ),
       .data_i     ( flow_control_fifo_data_out  ),
@@ -215,22 +216,24 @@ module slink_link_layer #(
     end
   end
 
-  fifo_v3 #(
-    .dtype  ( phy_data_t        ),
-    .DEPTH  ( RawModeFifoDepth  )
+  cc_fifo #(
+    .data_t ( phy_data_t        ),
+    .Depth  ( RawModeFifoDepth  )
   ) i_raw_mode_fifo (
     .clk_i      ( clk_i                                   ),
     .rst_ni     ( rst_ni                                  ),
+    .clr_i      ( 1'b0                                    ),
     .flush_i    ( cfg_raw_mode_out_data_fifo_clear_i      ),
-    .testmode_i ( 1'b0                                    ),
     .full_o     ( raw_mode_fifo_full                      ),
     .empty_o    ( raw_mode_fifo_empty                     ),
-    .usage_o    ( cfg_raw_mode_out_data_fifo_fill_state_o ),
+    .usage_o    ( raw_mode_fifo_usage                     ),
     .data_i     ( raw_mode_fifo_data_in                   ),
     .push_i     ( raw_mode_fifo_push                      ),
     .data_o     ( raw_mode_fifo_data_out                  ),
     .pop_i      ( raw_mode_fifo_pop                       )
   );
+  assign cfg_raw_mode_out_data_fifo_fill_state_o =
+      raw_mode_fifo_usage[Log2RawModeFifoDepth-1:0];
 
   assign cfg_raw_mode_out_data_fifo_is_full_o = raw_mode_fifo_full;
   assign raw_mode_fifo_push = cfg_raw_mode_out_data_valid_i & ~raw_mode_fifo_full;

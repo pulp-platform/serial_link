@@ -163,13 +163,12 @@ module slink_ch_alloc
   // auto-flushing) is already stalled. Without the synchronization FIFO, parts
   // of the late arriving packet would be accidently merged into the earlier partial
   // packet if it wasn't for this FIFO acting as the sync barrier.
-  stream_register #(
-    .T            ( slice_payload_t   )
+  cc_stream_register #(
+    .data_t       ( slice_payload_t   )
   ) i_rx_recv_barrier (
     .clk_i,
     .rst_ni,
     .clr_i      ( cfg_rx_clear_i           ),
-    .testmode_i ( 1'b0                     ),
     .data_i     ( s_rx_recv_barrier_payload_in     ),
     .valid_i    ( s_rx_recv_barrier_valid_in  ),
     .ready_o    ( s_rx_recv_barrier_ready_out ),
@@ -205,12 +204,13 @@ module slink_ch_alloc
 
   assign s_rx_despreader2slice_valid = |s_rx_despreader2slice_payload.valid;
 
-  spill_register #(
-    .T(slice_payload_t),
+  cc_spill_register #(
+    .data_t(slice_payload_t),
     .Bypass(1'b0)
   ) i_rx_decoupling_slice (
     .clk_i,
     .rst_ni,
+    .clr_i   ( 1'b0                          ),
     .valid_i ( s_rx_despreader2slice_valid   ),
     .ready_o ( s_rx_slice2despreader_ready   ),
     .data_i  ( s_rx_despreader2slice_payload ),
