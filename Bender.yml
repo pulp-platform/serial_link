@@ -44,6 +44,7 @@ sources:
     - include_dirs:
       - src/include
       files:
+      - src/slink_serializer.sv
       - src/slink.sv
 
     # Wrapper for additional isolation
