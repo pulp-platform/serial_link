@@ -65,7 +65,6 @@ module slink_link_layer #(
   logic raw_mode_fifo_full, raw_mode_fifo_empty;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
   phy_data_t raw_mode_fifo_data_in, raw_mode_fifo_data_out;
-  // `cc_fifo` widened `usage_o` to `cc_pkg::cnt_width(Depth)`; slice it back to the legacy width
   logic [cc_pkg::cnt_width(RawModeFifoDepth)-1:0] raw_mode_fifo_usage;
 
 
