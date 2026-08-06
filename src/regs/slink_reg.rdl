@@ -147,7 +147,7 @@ addrmap slink_reg #(
             sw = r;
             hw = w;
             desc = "The number of elements currently stored in the RAW mode TX FIFO that are ready to be sent.";
-        } fill_state[8+Log2RawModeTXFifoDepth-1:8] = 0x0;
+        } fill_state[8+Log2RawModeTXFifoDepth:8] = 0x0;
         field {
             name = "is_full";
             sw = r;

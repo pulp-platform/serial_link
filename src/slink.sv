@@ -193,7 +193,7 @@ module slink
   end
 
   phy_data_t raw_mode_in_data_out;
-  logic [$clog2(RawModeFifoDepth)-1:0] raw_mode_out_data_fill_state;
+  logic [cc_pkg::cnt_width(RawModeFifoDepth)-1:0] raw_mode_out_data_fill_state;
   logic raw_mode_out_data_is_full;
 
   slink_link_layer #(

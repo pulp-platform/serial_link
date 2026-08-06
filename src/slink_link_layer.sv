@@ -19,7 +19,7 @@ module slink_link_layer #(
   parameter int RawModeFifoDepth = 8,
   parameter int PayloadSplits = -1,
   parameter bit EnDdr = 1'b1,
-  localparam int Log2NumChannels = (NumChannels > 1)? $clog2(NumChannels) : 1,
+  localparam int Log2NumChannels = cc_pkg::idx_width(NumChannels),
   localparam int unsigned Log2RawModeFifoDepth = $clog2(RawModeFifoDepth)
 ) (
   input  logic                            clk_i,
@@ -48,7 +48,7 @@ module slink_link_layer #(
   input  logic                            cfg_raw_mode_out_data_valid_i,
   input  logic                            cfg_raw_mode_out_en_i,
   input  logic                            cfg_raw_mode_out_data_fifo_clear_i,
-  output logic [Log2RawModeFifoDepth-1:0] cfg_raw_mode_out_data_fifo_fill_state_o,
+  output logic [Log2RawModeFifoDepth:0]   cfg_raw_mode_out_data_fifo_fill_state_o,
   output logic                            cfg_raw_mode_out_data_fifo_is_full_o
 );
 
@@ -65,7 +65,6 @@ module slink_link_layer #(
   logic raw_mode_fifo_full, raw_mode_fifo_empty;
   logic raw_mode_fifo_push, raw_mode_fifo_pop;
   phy_data_t raw_mode_fifo_data_in, raw_mode_fifo_data_out;
-  logic [cc_pkg::cnt_width(RawModeFifoDepth)-1:0] raw_mode_fifo_usage;
 
 
   /////////////////
@@ -225,14 +224,12 @@ module slink_link_layer #(
     .flush_i    ( cfg_raw_mode_out_data_fifo_clear_i      ),
     .full_o     ( raw_mode_fifo_full                      ),
     .empty_o    ( raw_mode_fifo_empty                     ),
-    .usage_o    ( raw_mode_fifo_usage                     ),
+    .usage_o    ( cfg_raw_mode_out_data_fifo_fill_state_o ),
     .data_i     ( raw_mode_fifo_data_in                   ),
     .push_i     ( raw_mode_fifo_push                      ),
     .data_o     ( raw_mode_fifo_data_out                  ),
     .pop_i      ( raw_mode_fifo_pop                       )
   );
-  assign cfg_raw_mode_out_data_fifo_fill_state_o =
-      raw_mode_fifo_usage[Log2RawModeFifoDepth-1:0];
 
   assign cfg_raw_mode_out_data_fifo_is_full_o = raw_mode_fifo_full;
   assign raw_mode_fifo_push = cfg_raw_mode_out_data_valid_i & ~raw_mode_fifo_full;
