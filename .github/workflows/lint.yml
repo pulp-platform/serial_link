@@ -86,3 +86,26 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: fsfe/reuse-action@v6
+
+  #########
+  # Slang #
+  #########
+  slang:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Install bender
+        uses: pulp-platform/pulp-actions/bender-install@v2.5.1
+
+      - name: Generate bender file list
+        run: bender script flist-plus -t simulation -t slink_test > slink.f
+
+      - name: Slang lint
+        uses: pulp-platform/pulp-actions/slang@v2.5.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          slang-flags: >-
+            -f slink.f --top tb_axi_slink
+            -Wno-finish-num
+            --suppress-warnings .bender

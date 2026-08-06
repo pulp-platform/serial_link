@@ -12,6 +12,7 @@ path = [
   "Bender.lock",
   "LICENSE",
   "doc/**",
+  ".slang/server.json",
 ]
 SPDX-FileCopyrightText = "2022 ETH Zurich and University of Bologna"
 SPDX-License-Identifier = "SHL-0.51"
