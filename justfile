@@ -48,7 +48,7 @@ clean sim="all":
 
 # Generate the filelist for slang
 flist:
-    bender script flist-plus -t slink_test --top tb_axi_slink > slink.f
+    bender script flist-plus -t simulation -t slink_test --top tb_axi_slink > slink.f
 
 ####################
 # Private: QuestaSim
