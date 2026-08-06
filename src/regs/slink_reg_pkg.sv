@@ -42,8 +42,8 @@ package slink_reg_pkg;
 
     typedef struct packed {
         logic is_full;
-        logic [19:0] _reserved_30_11;
-        logic [2:0] fill_state;
+        logic [18:0] _reserved_30_12;
+        logic [3:0] fill_state;
         logic [7:0] _reserved_7_0;
     } slink_reg__raw_mode_out_data_fifo_ctrl__external__fields__in_t;
 

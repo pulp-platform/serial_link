@@ -193,7 +193,7 @@ module slink
   end
 
   phy_data_t raw_mode_in_data_out;
-  logic [$clog2(RawModeFifoDepth)-1:0] raw_mode_out_data_fill_state;
+  logic [cc_pkg::cnt_width(RawModeFifoDepth)-1:0] raw_mode_out_data_fill_state;
   logic raw_mode_out_data_is_full;
 
   slink_link_layer #(
@@ -222,7 +222,7 @@ module slink
     .cfg_flow_control_fifo_clear_i           ( cfg_flow_control_fifo_clear                      ),
     .cfg_raw_mode_en_i                       ( reg2hw.raw_mode_en.raw_mode_en.value ),
     .cfg_raw_mode_in_ch_sel_i                (
-      reg2hw.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value[cf_math_pkg::idx_width(NumChannels)-1:0] ),
+      reg2hw.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value[cc_pkg::idx_width(NumChannels)-1:0] ),
     .cfg_raw_mode_in_data_o                  ( raw_mode_in_data_out ),
     .cfg_raw_mode_in_data_valid_o            ( raw_mode_in_data_valid                           ),
     .cfg_raw_mode_in_data_ready_i            (

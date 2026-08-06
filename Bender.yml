@@ -11,7 +11,7 @@ package:
     - "Paul Scheffler <paulsc@iis.ee.ethz.ch>"
 
 dependencies:
-  common_cells:        { git: "https://github.com/pulp-platform/common_cells.git",       version: 1.28.0 }
+  common_cells:        { git: "https://github.com/pulp-platform/common_cells.git",       version: 2.0.0-beta }
   axi:                 { git: "https://github.com/pulp-platform/axi.git",                version: 0.39.0 }
   axi_stream:          { git: "https://github.com/pulp-platform/axi_stream.git",         version: 0.1.1  }
   apb:                 { git: "https://github.com/pulp-platform/apb.git",                version: 0.2.4  }
