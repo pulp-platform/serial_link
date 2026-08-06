@@ -42,6 +42,8 @@ module tb_ch_calib_slink;
   localparam int unsigned RegStrbWidth    = RegDataWidth / 8;
 
   localparam int unsigned ChMaskBitsPerCycle = `MIN(`MIN(NumBits, NumChannels), RegDataWidth);
+  localparam int unsigned RawModeNumWords = (NumBits + RegDataWidth - 1) / RegDataWidth;
+  localparam int unsigned RawModeDataBits = RawModeNumWords * RegDataWidth;
 
   // ==============
   //    DDR Link
@@ -64,6 +66,7 @@ module tb_ch_calib_slink;
   `APB_TYPEDEF_ALL(apb, cfg_addr_t, cfg_data_t, cfg_strb_t)
 
   typedef logic [NumBits-1:0]  phy_data_t;
+  typedef logic [RawModeDataBits-1:0] raw_mode_data_t;
 
   // Model signals
   axi_req_t   axi_out_req_1, axi_out_req_2;
@@ -450,6 +453,25 @@ module tb_ch_calib_slink;
     assert (!resp) else $error("Not able to write cfg reg");
   endtask
 
+  task automatic raw_mode_write(apb_master_t drv, phy_data_t data);
+    automatic raw_mode_data_t words = raw_mode_data_t'(data);
+    for (int i = 0; i < RawModeNumWords; i++) begin
+      cfg_write(drv, `SLINK_REG_RAW_MODE_OUT_DATA_FIFO_BASE_ADDR(i),
+          words[i*RegDataWidth+:RegDataWidth]);
+    end
+  endtask
+
+  task automatic raw_mode_read(apb_master_t drv, output phy_data_t data);
+    automatic cfg_data_t word;
+    automatic raw_mode_data_t words;
+    words = '0;
+    for (int i = 0; i < RawModeNumWords; i++) begin
+      cfg_read(drv, `SLINK_REG_RAW_MODE_IN_DATA_BASE_ADDR(i), word);
+      words[i*RegDataWidth+:RegDataWidth] = word;
+    end
+    data = phy_data_t'(words);
+  endtask
+
   task automatic bringup_link(apb_master_t drv, int id);
     $info("[DDR%0d]: Enabling clock and deassert link reset.", id);
     // Reset and clock gate sequence, AXI isolation remains enabled
@@ -517,7 +539,7 @@ module tb_ch_calib_slink;
     for (int i = 0; i < 8; i++) begin
       pattern = 16'haaaa << i;
       pattern_q.push_back(pattern);
-      cfg_write(drv, `SLINK_REG_RAW_MODE_OUT_DATA_FIFO_BASE_ADDR, pattern);
+      raw_mode_write(drv, pattern);
     end
     // Send out pattern
     cfg_write(drv, `SLINK_REG_RAW_MODE_OUT_EN_BASE_ADDR, 1);
@@ -542,12 +564,15 @@ module tb_ch_calib_slink;
           break;
         end
         // Read out first pattern
-        cfg_read(drv, `SLINK_REG_RAW_MODE_IN_DATA_BASE_ADDR, data);
-        if (pattern_q[i] != data) begin
-          $error("[DDR%0d][CH%0d] Pattern missmatch actual %h data expected %h",
-            id, c, data, pattern_q[i]);
-          working_rx_channels[c] = 1'b0;
-          break;
+        begin
+          automatic phy_data_t raw_mode_data;
+          raw_mode_read(drv, raw_mode_data);
+          if (pattern_q[i] != raw_mode_data) begin
+            $error("[DDR%0d][CH%0d] Pattern missmatch actual %h data expected %h",
+              id, c, raw_mode_data, pattern_q[i]);
+            working_rx_channels[c] = 1'b0;
+            break;
+          end
         end
       end
       if (working_rx_channels[c]) begin
@@ -576,7 +601,7 @@ module tb_ch_calib_slink;
     $info("[DDR%0d] Sending out RX channel mask.", id);
     for (int i = 0; i < (NumChannels + ChMaskBitsPerCycle - 1)/ChMaskBitsPerCycle; i++) begin
       // Write the channel mask into the TX FIFO
-      cfg_write(drv, `SLINK_REG_RAW_MODE_OUT_DATA_FIFO_BASE_ADDR, {'0, working_rx_channels[ChMaskBitsPerCycle*i+:ChMaskBitsPerCycle]});
+      raw_mode_write(drv, phy_data_t'(working_rx_channels[ChMaskBitsPerCycle*i+:ChMaskBitsPerCycle]));
     end
     // Wait until the channel mask from the other side has arrived
     do begin
@@ -592,7 +617,12 @@ module tb_ch_calib_slink;
         cfg_write(drv, `SLINK_REG_RAW_MODE_IN_CH_SEL_BASE_ADDR, c);
         // Read the mask
         for (int i = 0; i < (NumChannels + ChMaskBitsPerCycle - 1)/ChMaskBitsPerCycle; i++) begin
-          cfg_read(drv, `SLINK_REG_RAW_MODE_IN_DATA_BASE_ADDR, working_tx_channels[ChMaskBitsPerCycle*i+:ChMaskBitsPerCycle]);
+          begin
+            automatic phy_data_t raw_mode_data;
+            raw_mode_read(drv, raw_mode_data);
+            working_tx_channels[ChMaskBitsPerCycle*i+:ChMaskBitsPerCycle] =
+                raw_mode_data[ChMaskBitsPerCycle-1:0];
+          end
         end
       end
     end

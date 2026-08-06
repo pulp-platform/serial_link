@@ -13,7 +13,7 @@ module slink_reg (
         input wire s_apb_penable,
         input wire s_apb_pwrite,
         input wire [2:0] s_apb_pprot,
-        input wire [11:0] s_apb_paddr,
+        input wire [6:0] s_apb_paddr,
         input wire [31:0] s_apb_pwdata,
         input wire [3:0] s_apb_pstrb,
         output logic s_apb_pready,
@@ -29,7 +29,7 @@ module slink_reg (
     //--------------------------------------------------------------------------
     logic cpuif_req;
     logic cpuif_req_is_wr;
-    logic [11:0] cpuif_addr;
+    logic [6:0] cpuif_addr;
     logic [31:0] cpuif_wr_data;
     logic [31:0] cpuif_wr_biten;
     logic cpuif_req_stall_wr;
@@ -58,7 +58,7 @@ module slink_reg (
                     is_active <= '1;
                     cpuif_req <= '1;
                     cpuif_req_is_wr <= s_apb_pwrite;
-                    cpuif_addr <= {s_apb_paddr[11:2], 2'b0};
+                    cpuif_addr <= {s_apb_paddr[6:2], 2'b0};
                     cpuif_wr_data <= s_apb_pwdata;
                     for(int i=0; i<4; i++) begin
                         cpuif_wr_biten[i*8 +: 8] <= {8{s_apb_pstrb[i]}};
@@ -113,9 +113,9 @@ module slink_reg (
         logic ctrl;
         logic isolated;
         logic raw_mode_en;
-        logic raw_mode_in_data;
+        logic raw_mode_in_data[1];
         logic raw_mode_in_ch_sel;
-        logic raw_mode_out_data_fifo;
+        logic raw_mode_out_data_fifo[1];
         logic raw_mode_out_data_fifo_ctrl;
         logic raw_mode_out_en;
         logic flow_control_fifo_clear;
@@ -147,46 +147,50 @@ module slink_reg (
         is_external = '0;
         is_valid_addr = '1; // No error checking on valid address access
         is_invalid_rw = '0;
-        decoded_reg_strb.ctrl = cpuif_req_masked & (cpuif_addr == 12'h0);
-        decoded_reg_strb.isolated = cpuif_req_masked & (cpuif_addr == 12'h4) & !cpuif_req_is_wr;
-        is_external |= cpuif_req_masked & (cpuif_addr == 12'h4) & !cpuif_req_is_wr;
-        decoded_reg_strb.raw_mode_en = cpuif_req_masked & (cpuif_addr == 12'h8) & cpuif_req_is_wr;
-        decoded_reg_strb.raw_mode_in_data = cpuif_req_masked & (cpuif_addr == 12'hc) & !cpuif_req_is_wr;
-        is_external |= cpuif_req_masked & (cpuif_addr == 12'hc) & !cpuif_req_is_wr;
-        decoded_reg_strb.raw_mode_in_ch_sel = cpuif_req_masked & (cpuif_addr == 12'h10) & cpuif_req_is_wr;
-        decoded_reg_strb.raw_mode_out_data_fifo = cpuif_req_masked & (cpuif_addr == 12'h14) & cpuif_req_is_wr;
-        decoded_reg_strb.raw_mode_out_data_fifo_ctrl = cpuif_req_masked & (cpuif_addr == 12'h18);
-        is_external |= cpuif_req_masked & (cpuif_addr == 12'h18);
-        decoded_reg_strb.raw_mode_out_en = cpuif_req_masked & (cpuif_addr == 12'h1c);
-        decoded_reg_strb.flow_control_fifo_clear = cpuif_req_masked & (cpuif_addr == 12'h20) & cpuif_req_is_wr;
-        is_external |= cpuif_req_masked & (cpuif_addr == 12'h20) & cpuif_req_is_wr;
+        decoded_reg_strb.ctrl = cpuif_req_masked & (cpuif_addr == 7'h0);
+        decoded_reg_strb.isolated = cpuif_req_masked & (cpuif_addr == 7'h4) & !cpuif_req_is_wr;
+        is_external |= cpuif_req_masked & (cpuif_addr == 7'h4) & !cpuif_req_is_wr;
+        decoded_reg_strb.raw_mode_en = cpuif_req_masked & (cpuif_addr == 7'h8) & cpuif_req_is_wr;
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.raw_mode_in_data_valid[i0] = cpuif_req_masked & (cpuif_addr == 12'h100 + (12)'(i0) * 12'h4) & !cpuif_req_is_wr;
-            is_external |= cpuif_req_masked & (cpuif_addr == 12'h100 + (12)'(i0) * 12'h4) & !cpuif_req_is_wr;
+            decoded_reg_strb.raw_mode_in_data[i0] = cpuif_req_masked & (cpuif_addr == 7'hc + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
+            is_external |= cpuif_req_masked & (cpuif_addr == 7'hc + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
+        end
+        decoded_reg_strb.raw_mode_in_ch_sel = cpuif_req_masked & (cpuif_addr == 7'h10) & cpuif_req_is_wr;
+        for(int i0=0; i0<1; i0++) begin
+            decoded_reg_strb.raw_mode_out_data_fifo[i0] = cpuif_req_masked & (cpuif_addr == 7'h14 + (7)'(i0) * 7'h4) & cpuif_req_is_wr;
+        end
+        decoded_reg_strb.raw_mode_out_data_fifo_ctrl = cpuif_req_masked & (cpuif_addr == 7'h18);
+        is_external |= cpuif_req_masked & (cpuif_addr == 7'h18);
+        decoded_reg_strb.raw_mode_out_en = cpuif_req_masked & (cpuif_addr == 7'h1c);
+        decoded_reg_strb.flow_control_fifo_clear = cpuif_req_masked & (cpuif_addr == 7'h20) & cpuif_req_is_wr;
+        is_external |= cpuif_req_masked & (cpuif_addr == 7'h20) & cpuif_req_is_wr;
+        for(int i0=0; i0<1; i0++) begin
+            decoded_reg_strb.raw_mode_in_data_valid[i0] = cpuif_req_masked & (cpuif_addr == 7'h24 + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
+            is_external |= cpuif_req_masked & (cpuif_addr == 7'h24 + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
         end
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.raw_mode_out_ch_mask[i0] = cpuif_req_masked & (cpuif_addr == 12'h200 + (12)'(i0) * 12'h4) & cpuif_req_is_wr;
+            decoded_reg_strb.raw_mode_out_ch_mask[i0] = cpuif_req_masked & (cpuif_addr == 7'h28 + (7)'(i0) * 7'h4) & cpuif_req_is_wr;
         end
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.tx_phy_clk_div[i0] = cpuif_req_masked & (cpuif_addr == 12'h300 + (12)'(i0) * 12'h4);
+            decoded_reg_strb.tx_phy_clk_div[i0] = cpuif_req_masked & (cpuif_addr == 7'h2c + (7)'(i0) * 7'h4);
         end
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.tx_phy_clk_start[i0] = cpuif_req_masked & (cpuif_addr == 12'h400 + (12)'(i0) * 12'h4);
+            decoded_reg_strb.tx_phy_clk_start[i0] = cpuif_req_masked & (cpuif_addr == 7'h30 + (7)'(i0) * 7'h4);
         end
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.tx_phy_clk_end[i0] = cpuif_req_masked & (cpuif_addr == 12'h500 + (12)'(i0) * 12'h4);
+            decoded_reg_strb.tx_phy_clk_end[i0] = cpuif_req_masked & (cpuif_addr == 7'h34 + (7)'(i0) * 7'h4);
         end
-        decoded_reg_strb.channel_alloc_tx_cfg = cpuif_req_masked & (cpuif_addr == 12'h600) & !cpuif_req_is_wr;
-        decoded_reg_strb.channel_alloc_tx_ctrl = cpuif_req_masked & (cpuif_addr == 12'h604) & !cpuif_req_is_wr;
-        is_external |= cpuif_req_masked & (cpuif_addr == 12'h604) & !cpuif_req_is_wr;
-        decoded_reg_strb.channel_alloc_rx_cfg = cpuif_req_masked & (cpuif_addr == 12'h608) & !cpuif_req_is_wr;
-        decoded_reg_strb.channel_alloc_rx_ctrl = cpuif_req_masked & (cpuif_addr == 12'h60c) & !cpuif_req_is_wr;
-        is_external |= cpuif_req_masked & (cpuif_addr == 12'h60c) & !cpuif_req_is_wr;
+        decoded_reg_strb.channel_alloc_tx_cfg = cpuif_req_masked & (cpuif_addr == 7'h38) & !cpuif_req_is_wr;
+        decoded_reg_strb.channel_alloc_tx_ctrl = cpuif_req_masked & (cpuif_addr == 7'h3c) & !cpuif_req_is_wr;
+        is_external |= cpuif_req_masked & (cpuif_addr == 7'h3c) & !cpuif_req_is_wr;
+        decoded_reg_strb.channel_alloc_rx_cfg = cpuif_req_masked & (cpuif_addr == 7'h40) & !cpuif_req_is_wr;
+        decoded_reg_strb.channel_alloc_rx_ctrl = cpuif_req_masked & (cpuif_addr == 7'h44) & !cpuif_req_is_wr;
+        is_external |= cpuif_req_masked & (cpuif_addr == 7'h44) & !cpuif_req_is_wr;
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.channel_alloc_tx_ch_en[i0] = cpuif_req_masked & (cpuif_addr == 12'h700 + (12)'(i0) * 12'h4) & !cpuif_req_is_wr;
+            decoded_reg_strb.channel_alloc_tx_ch_en[i0] = cpuif_req_masked & (cpuif_addr == 7'h48 + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
         end
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.channel_alloc_rx_ch_en[i0] = cpuif_req_masked & (cpuif_addr == 12'h800 + (12)'(i0) * 12'h4) & !cpuif_req_is_wr;
+            decoded_reg_strb.channel_alloc_rx_ch_en[i0] = cpuif_req_masked & (cpuif_addr == 7'h4c + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
         end
         decoded_err = (~is_valid_addr | is_invalid_rw) & decoded_req;
         decoded_strb_is_external = is_external;
@@ -235,10 +239,10 @@ module slink_reg (
         } raw_mode_in_ch_sel;
         struct {
             struct {
-                logic [15:0] next;
+                logic [31:0] next;
                 logic load_next;
             } raw_mode_out_data_fifo;
-        } raw_mode_out_data_fifo;
+        } raw_mode_out_data_fifo[1];
         struct {
             struct {
                 logic next;
@@ -299,9 +303,9 @@ module slink_reg (
         } raw_mode_in_ch_sel;
         struct {
             struct {
-                logic [15:0] value;
+                logic [31:0] value;
             } raw_mode_out_data_fifo;
-        } raw_mode_out_data_fifo;
+        } raw_mode_out_data_fifo[1];
         struct {
             struct {
                 logic value;
@@ -449,10 +453,12 @@ module slink_reg (
         end
     end
     assign hwif_out.raw_mode_en.raw_mode_en.value = field_storage.raw_mode_en.raw_mode_en.value;
-    // External register: slink_reg.raw_mode_in_data
+    for(genvar i0=0; i0<1; i0++) begin
+        // External register: slink_reg.raw_mode_in_data[]
 
-    assign hwif_out.raw_mode_in_data.req = !decoded_req_is_wr ? decoded_reg_strb.raw_mode_in_data : '0;
-    assign hwif_out.raw_mode_in_data.req_is_wr = decoded_req_is_wr;
+        assign hwif_out.raw_mode_in_data[i0].req = !decoded_req_is_wr ? decoded_reg_strb.raw_mode_in_data[i0] : '0;
+        assign hwif_out.raw_mode_in_data[i0].req_is_wr = decoded_req_is_wr;
+    end
     // Field: slink_reg.raw_mode_in_ch_sel.raw_mode_in_ch_sel
     always_comb begin
         automatic logic [7:0] next_c;
@@ -476,30 +482,32 @@ module slink_reg (
         end
     end
     assign hwif_out.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value = field_storage.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value;
-    // Field: slink_reg.raw_mode_out_data_fifo.raw_mode_out_data_fifo
-    always_comb begin
-        automatic logic [15:0] next_c;
-        automatic logic load_next_c;
-        next_c = field_storage.raw_mode_out_data_fifo.raw_mode_out_data_fifo.value;
-        load_next_c = '0;
-        if(decoded_reg_strb.raw_mode_out_data_fifo && decoded_req_is_wr) begin // SW write
-            next_c = (field_storage.raw_mode_out_data_fifo.raw_mode_out_data_fifo.value & ~decoded_wr_biten[15:0]) | (decoded_wr_data[15:0] & decoded_wr_biten[15:0]);
-            load_next_c = '1;
+    for(genvar i0=0; i0<1; i0++) begin
+        // Field: slink_reg.raw_mode_out_data_fifo[].raw_mode_out_data_fifo
+        always_comb begin
+            automatic logic [31:0] next_c;
+            automatic logic load_next_c;
+            next_c = field_storage.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.value;
+            load_next_c = '0;
+            if(decoded_reg_strb.raw_mode_out_data_fifo[i0] && decoded_req_is_wr) begin // SW write
+                next_c = (field_storage.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.value & ~decoded_wr_biten[31:0]) | (decoded_wr_data[31:0] & decoded_wr_biten[31:0]);
+                load_next_c = '1;
+            end
+            field_combo.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.next = next_c;
+            field_combo.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.load_next = load_next_c;
         end
-        field_combo.raw_mode_out_data_fifo.raw_mode_out_data_fifo.next = next_c;
-        field_combo.raw_mode_out_data_fifo.raw_mode_out_data_fifo.load_next = load_next_c;
-    end
-    always_ff @(posedge clk or negedge arst_n) begin
-        if(~arst_n) begin
-            field_storage.raw_mode_out_data_fifo.raw_mode_out_data_fifo.value <= 16'h0;
-        end else begin
-            if(field_combo.raw_mode_out_data_fifo.raw_mode_out_data_fifo.load_next) begin
-                field_storage.raw_mode_out_data_fifo.raw_mode_out_data_fifo.value <= field_combo.raw_mode_out_data_fifo.raw_mode_out_data_fifo.next;
+        always_ff @(posedge clk or negedge arst_n) begin
+            if(~arst_n) begin
+                field_storage.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.value <= 32'h0;
+            end else begin
+                if(field_combo.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.load_next) begin
+                    field_storage.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.value <= field_combo.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.next;
+                end
             end
         end
+        assign hwif_out.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.value = field_storage.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.value;
+        assign hwif_out.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.swmod = decoded_reg_strb.raw_mode_out_data_fifo[i0] && decoded_req_is_wr && |(decoded_wr_biten[31:0]);
     end
-    assign hwif_out.raw_mode_out_data_fifo.raw_mode_out_data_fifo.value = field_storage.raw_mode_out_data_fifo.raw_mode_out_data_fifo.value;
-    assign hwif_out.raw_mode_out_data_fifo.raw_mode_out_data_fifo.swmod = decoded_reg_strb.raw_mode_out_data_fifo && decoded_req_is_wr && |(decoded_wr_biten[15:0]);
     // External register: slink_reg.raw_mode_out_data_fifo_ctrl
     assign hwif_out.raw_mode_out_data_fifo_ctrl.req = decoded_reg_strb.raw_mode_out_data_fifo_ctrl;
     assign hwif_out.raw_mode_out_data_fifo_ctrl.req_is_wr = decoded_req_is_wr;
@@ -684,7 +692,9 @@ module slink_reg (
         automatic logic rd_ack;
         rd_ack = '0;
         rd_ack |= hwif_in.isolated.rd_ack;
-        rd_ack |= hwif_in.raw_mode_in_data.rd_ack;
+        for(int i0=0; i0<1; i0++) begin
+            rd_ack |= hwif_in.raw_mode_in_data[i0].rd_ack;
+        end
         rd_ack |= hwif_in.raw_mode_out_data_fifo_ctrl.rd_ack;
         for(int i0=0; i0<1; i0++) begin
             rd_ack |= hwif_in.raw_mode_in_data_valid[i0].rd_ack;
@@ -711,7 +721,9 @@ module slink_reg (
     assign readback_array[0][9:9] = (decoded_reg_strb.ctrl && !decoded_req_is_wr) ? field_storage.ctrl.axi_out_isolate.value : '0;
     assign readback_array[0][31:10] = '0;
     assign readback_array[1] = hwif_in.isolated.rd_ack ? hwif_in.isolated.rd_data : '0;
-    assign readback_array[2] = hwif_in.raw_mode_in_data.rd_ack ? hwif_in.raw_mode_in_data.rd_data : '0;
+    for(genvar i0=0; i0<1; i0++) begin
+        assign readback_array[i0 * 1 + 2] = hwif_in.raw_mode_in_data[i0].rd_ack ? hwif_in.raw_mode_in_data[i0].rd_data : '0;
+    end
     assign readback_array[3] = hwif_in.raw_mode_out_data_fifo_ctrl.rd_ack ? hwif_in.raw_mode_out_data_fifo_ctrl.rd_data : '0;
     assign readback_array[4][0:0] = (decoded_reg_strb.raw_mode_out_en && !decoded_req_is_wr) ? field_storage.raw_mode_out_en.raw_mode_out_en.value : '0;
     assign readback_array[4][31:1] = '0;

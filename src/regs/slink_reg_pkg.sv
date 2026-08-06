@@ -8,8 +8,8 @@
 package slink_reg_pkg;
 
     localparam SLINK_REG_DATA_WIDTH = 32;
-    localparam SLINK_REG_MIN_ADDR_WIDTH = 12;
-    localparam SLINK_REG_SIZE = 'h804;
+    localparam SLINK_REG_MIN_ADDR_WIDTH = 7;
+    localparam SLINK_REG_SIZE = 'h50;
     localparam NumChannels = 'h1;
     localparam NumLanes = 'h8;
     localparam EnDdr = 'h1;
@@ -18,6 +18,7 @@ package slink_reg_pkg;
     localparam FlushCounterWidth = 'h8;
     localparam Log2RawModeTXFifoDepth = 'h3;
     localparam EnChAlloc = 'h0;
+    localparam RawModeNumWords = 'h1;
 
     typedef struct packed {
         logic [29:0] _reserved_31_2;
@@ -31,8 +32,7 @@ package slink_reg_pkg;
     } slink_reg__isolated__external__in_t;
 
     typedef struct packed {
-        logic [15:0] _reserved_31_16;
-        logic [15:0] raw_mode_in_data;
+        logic [31:0] raw_mode_in_data;
     } slink_reg__raw_mode_in_data__external__fields__in_t;
 
     typedef struct {
@@ -90,7 +90,7 @@ package slink_reg_pkg;
 
     typedef struct {
         slink_reg__isolated__external__in_t isolated;
-        slink_reg__raw_mode_in_data__external__in_t raw_mode_in_data;
+        slink_reg__raw_mode_in_data__external__in_t raw_mode_in_data[1];
         slink_reg__raw_mode_out_data_fifo_ctrl__external__in_t raw_mode_out_data_fifo_ctrl;
         slink_reg__flow_control_fifo_clear__external__in_t flow_control_fifo_clear;
         slink_reg__raw_mode_in_data_valid__external__in_t raw_mode_in_data_valid[1];
@@ -148,7 +148,7 @@ package slink_reg_pkg;
     } slink_reg__raw_mode_in_ch_sel__out_t;
 
     typedef struct {
-        logic [15:0] value;
+        logic [31:0] value;
         logic swmod;
     } slink_reg__raw_mode_out_data_fifo__raw_mode_out_data_fifo__out_t;
 
@@ -296,9 +296,9 @@ package slink_reg_pkg;
         slink_reg__ctrl__out_t ctrl;
         slink_reg__isolated__external__out_t isolated;
         slink_reg__raw_mode_en__out_t raw_mode_en;
-        slink_reg__raw_mode_in_data__external__out_t raw_mode_in_data;
+        slink_reg__raw_mode_in_data__external__out_t raw_mode_in_data[1];
         slink_reg__raw_mode_in_ch_sel__out_t raw_mode_in_ch_sel;
-        slink_reg__raw_mode_out_data_fifo__out_t raw_mode_out_data_fifo;
+        slink_reg__raw_mode_out_data_fifo__out_t raw_mode_out_data_fifo[1];
         slink_reg__raw_mode_out_data_fifo_ctrl__external__out_t raw_mode_out_data_fifo_ctrl;
         slink_reg__raw_mode_out_en__out_t raw_mode_out_en;
         slink_reg__flow_control_fifo_clear__external__out_t flow_control_fifo_clear;

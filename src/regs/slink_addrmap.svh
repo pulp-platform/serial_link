@@ -8,7 +8,7 @@
 `define SLINK_REG_SVH
 
 `define SLINK_REG_BASE_ADDR 64'h0
-`define SLINK_REG_SIZE 64'h804
+`define SLINK_REG_SIZE 64'h50
 
 `define SLINK_REG_CTRL_BASE_ADDR 64'h0
 
@@ -16,11 +16,13 @@
 
 `define SLINK_REG_RAW_MODE_EN_BASE_ADDR 64'h8
 
-`define SLINK_REG_RAW_MODE_IN_DATA_BASE_ADDR 64'hC
+`define SLINK_REG_RAW_MODE_IN_DATA_BASE_ADDR(raw_mode_in_data_idx) (64'hC + (raw_mode_in_data_idx * 64'h4) )
+`define SLINK_REG_RAW_MODE_IN_DATA_NUM 64'h1
 
 `define SLINK_REG_RAW_MODE_IN_CH_SEL_BASE_ADDR 64'h10
 
-`define SLINK_REG_RAW_MODE_OUT_DATA_FIFO_BASE_ADDR 64'h14
+`define SLINK_REG_RAW_MODE_OUT_DATA_FIFO_BASE_ADDR(raw_mode_out_data_fifo_idx) (64'h14 + (raw_mode_out_data_fifo_idx * 64'h4) )
+`define SLINK_REG_RAW_MODE_OUT_DATA_FIFO_NUM 64'h1
 
 `define SLINK_REG_RAW_MODE_OUT_DATA_FIFO_CTRL_BASE_ADDR 64'h18
 
@@ -28,33 +30,33 @@
 
 `define SLINK_REG_FLOW_CONTROL_FIFO_CLEAR_BASE_ADDR 64'h20
 
-`define SLINK_REG_RAW_MODE_IN_DATA_VALID_BASE_ADDR(raw_mode_in_data_valid_idx) (64'h100 + (raw_mode_in_data_valid_idx * 64'h4) )
+`define SLINK_REG_RAW_MODE_IN_DATA_VALID_BASE_ADDR(raw_mode_in_data_valid_idx) (64'h24 + (raw_mode_in_data_valid_idx * 64'h4) )
 `define SLINK_REG_RAW_MODE_IN_DATA_VALID_NUM 64'h1
 
-`define SLINK_REG_RAW_MODE_OUT_CH_MASK_BASE_ADDR(raw_mode_out_ch_mask_idx) (64'h200 + (raw_mode_out_ch_mask_idx * 64'h4) )
+`define SLINK_REG_RAW_MODE_OUT_CH_MASK_BASE_ADDR(raw_mode_out_ch_mask_idx) (64'h28 + (raw_mode_out_ch_mask_idx * 64'h4) )
 `define SLINK_REG_RAW_MODE_OUT_CH_MASK_NUM 64'h1
 
-`define SLINK_REG_TX_PHY_CLK_DIV_BASE_ADDR(tx_phy_clk_div_idx) (64'h300 + (tx_phy_clk_div_idx * 64'h4) )
+`define SLINK_REG_TX_PHY_CLK_DIV_BASE_ADDR(tx_phy_clk_div_idx) (64'h2C + (tx_phy_clk_div_idx * 64'h4) )
 `define SLINK_REG_TX_PHY_CLK_DIV_NUM 64'h1
 
-`define SLINK_REG_TX_PHY_CLK_START_BASE_ADDR(tx_phy_clk_start_idx) (64'h400 + (tx_phy_clk_start_idx * 64'h4) )
+`define SLINK_REG_TX_PHY_CLK_START_BASE_ADDR(tx_phy_clk_start_idx) (64'h30 + (tx_phy_clk_start_idx * 64'h4) )
 `define SLINK_REG_TX_PHY_CLK_START_NUM 64'h1
 
-`define SLINK_REG_TX_PHY_CLK_END_BASE_ADDR(tx_phy_clk_end_idx) (64'h500 + (tx_phy_clk_end_idx * 64'h4) )
+`define SLINK_REG_TX_PHY_CLK_END_BASE_ADDR(tx_phy_clk_end_idx) (64'h34 + (tx_phy_clk_end_idx * 64'h4) )
 `define SLINK_REG_TX_PHY_CLK_END_NUM 64'h1
 
-`define SLINK_REG_CHANNEL_ALLOC_TX_CFG_BASE_ADDR 64'h600
+`define SLINK_REG_CHANNEL_ALLOC_TX_CFG_BASE_ADDR 64'h38
 
-`define SLINK_REG_CHANNEL_ALLOC_TX_CTRL_BASE_ADDR 64'h604
+`define SLINK_REG_CHANNEL_ALLOC_TX_CTRL_BASE_ADDR 64'h3C
 
-`define SLINK_REG_CHANNEL_ALLOC_RX_CFG_BASE_ADDR 64'h608
+`define SLINK_REG_CHANNEL_ALLOC_RX_CFG_BASE_ADDR 64'h40
 
-`define SLINK_REG_CHANNEL_ALLOC_RX_CTRL_BASE_ADDR 64'h60C
+`define SLINK_REG_CHANNEL_ALLOC_RX_CTRL_BASE_ADDR 64'h44
 
-`define SLINK_REG_CHANNEL_ALLOC_TX_CH_EN_BASE_ADDR(channel_alloc_tx_ch_en_idx) (64'h700 + (channel_alloc_tx_ch_en_idx * 64'h4) )
+`define SLINK_REG_CHANNEL_ALLOC_TX_CH_EN_BASE_ADDR(channel_alloc_tx_ch_en_idx) (64'h48 + (channel_alloc_tx_ch_en_idx * 64'h4) )
 `define SLINK_REG_CHANNEL_ALLOC_TX_CH_EN_NUM 64'h1
 
-`define SLINK_REG_CHANNEL_ALLOC_RX_CH_EN_BASE_ADDR(channel_alloc_rx_ch_en_idx) (64'h800 + (channel_alloc_rx_ch_en_idx * 64'h4) )
+`define SLINK_REG_CHANNEL_ALLOC_RX_CH_EN_BASE_ADDR(channel_alloc_rx_ch_en_idx) (64'h4C + (channel_alloc_rx_ch_en_idx * 64'h4) )
 `define SLINK_REG_CHANNEL_ALLOC_RX_CH_EN_NUM 64'h1
 
 `endif /* SLINK_REG_SVH */
