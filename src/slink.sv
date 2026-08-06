@@ -80,13 +80,24 @@ module slink
   clk_div_t [NumChannels-1:0]   tx_phy_clk_shift_start;
   clk_div_t [NumChannels-1:0]   tx_phy_clk_shift_end;
 
+  apb_req_t apb_req;
+  apb_rsp_t apb_rsp;
+
+  slink_reg_pkg::slink_reg__out_t reg2hw;
+  slink_reg_pkg::slink_reg__in_t  hw2reg;
+
   ////////////////////////////
   //   SERIALIZER (FRONT-END) //
   ////////////////////////////
 
   slink_serializer #(
     .NumCredits     ( NumCredits    ),
-    .NoRegCdc       ( NoRegCdc      ),
+    .NumChannels    ( NumChannels   ),
+    .NumLanes       ( NumLanes      ),
+    .EnDdr          ( EnDdr         ),
+    .Log2MaxClkDiv  ( Log2MaxClkDiv ),
+    .Log2RawModeTXFifoDepth ( Log2RawModeTXFifoDepth ),
+    .EnChAlloc      ( EnChAlloc     ),
     .axi_req_t      ( axi_req_t     ),
     .axi_rsp_t      ( axi_rsp_t     ),
     .aw_chan_t      ( aw_chan_t     ),
@@ -94,24 +105,19 @@ module slink
     .r_chan_t       ( r_chan_t      ),
     .w_chan_t       ( w_chan_t      ),
     .b_chan_t       ( b_chan_t      ),
-    .apb_req_t      ( apb_req_t     ),
-    .apb_rsp_t      ( apb_rsp_t     ),
-    .apb_addr_t     ( apb_addr_t    ),
-    .apb_data_t     ( apb_data_t    ),
-    .apb_strb_t     ( apb_strb_t    )
+    .hwif_in_t      ( slink_reg_pkg::slink_reg__in_t  ),
+    .hwif_out_t     ( slink_reg_pkg::slink_reg__out_t )
   ) i_slink_serializer (
     .clk_i                    ( clk_i                          ),
     .rst_ni                   ( rst_ni                         ),
     .clk_sl_i                 ( clk_sl_i                       ),
     .rst_sl_ni                ( rst_sl_ni                      ),
-    .clk_reg_i                ( clk_reg_i                      ),
-    .rst_reg_ni               ( rst_reg_ni                     ),
     .axi_in_req_i             ( axi_in_req_i                   ),
     .axi_in_rsp_o             ( axi_in_rsp_o                   ),
     .axi_out_req_o            ( axi_out_req_o                  ),
     .axi_out_rsp_i            ( axi_out_rsp_i                  ),
-    .apb_req_i                ( apb_req_i                      ),
-    .apb_rsp_o                ( apb_rsp_o                      ),
+    .hwif_out_i               ( reg2hw                         ),
+    .hwif_in_o                ( hw2reg                         ),
     .phy_data_out_o           ( serializer2phy_data_out         ),
     .phy_data_out_valid_o     ( serializer2phy_data_out_valid   ),
     .phy_data_out_ready_i     ( phy2serializer_data_out_ready   ),
@@ -156,5 +162,52 @@ module slink
       .ddr_o             ( ddr_o[i]                         )
     );
   end
+
+  /////////////////////////////////
+  //   CONFIGURATION REGISTERS   //
+  /////////////////////////////////
+
+  if (!NoRegCdc) begin : gen_reg_cdc
+    apb_cdc #(
+      .LogDepth ( 1          ),
+      .req_t    ( apb_req_t  ),
+      .resp_t   ( apb_rsp_t  ),
+      .addr_t   ( apb_addr_t ),
+      .data_t   ( apb_data_t ),
+      .strb_t   ( apb_strb_t )
+    ) i_cdc_cfg (
+      .src_pclk_i    ( clk_reg_i   ),
+      .src_preset_ni ( rst_reg_ni  ),
+      .src_req_i     ( apb_req_i   ),
+      .src_resp_o    ( apb_rsp_o   ),
+
+      .dst_pclk_i    ( clk_i       ),
+      .dst_preset_ni ( rst_ni      ),
+      .dst_req_o     ( apb_req     ),
+      .dst_resp_i    ( apb_rsp     )
+    );
+  end else begin : gen_no_reg_cdc
+    assign apb_req = apb_req_i;
+    assign apb_rsp_o = apb_rsp;
+  end
+
+  slink_reg i_serial_link_reg (
+    .clk  (clk_i),
+    .arst_n (rst_ni),
+
+    .s_apb_psel    (apb_req.psel),
+    .s_apb_penable (apb_req.penable),
+    .s_apb_pwrite  (apb_req.pwrite),
+    .s_apb_pprot   (apb_req.pprot),
+    .s_apb_paddr   (apb_req.paddr[slink_reg_pkg::SLINK_REG_MIN_ADDR_WIDTH-1:0]),
+    .s_apb_pwdata  (apb_req.pwdata),
+    .s_apb_pstrb   (apb_req.pstrb),
+    .s_apb_pready  (apb_rsp.pready),
+    .s_apb_prdata  (apb_rsp.prdata),
+    .s_apb_pslverr (apb_rsp.pslverr),
+
+    .hwif_in  (hw2reg),
+    .hwif_out (reg2hw)
+  );
 
 endmodule : slink
