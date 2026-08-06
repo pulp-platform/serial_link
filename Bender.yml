@@ -10,12 +10,15 @@ package:
     - "Thomas Benz <tbenz@iis.ee.ethz.ch>"
     - "Paul Scheffler <paulsc@iis.ee.ethz.ch>"
 
+remotes:
+  pulp: https://github.com/pulp-platform
+
 dependencies:
-  common_cells:        { git: "https://github.com/pulp-platform/common_cells.git",       version: 2.0.0-beta }
-  common_verification: { git: "https://github.com/pulp-platform/common_verification.git", version: 0.2.5 }
-  axi:                 { git: "https://github.com/pulp-platform/axi.git",                version: 0.39.0 }
-  axi_stream:          { git: "https://github.com/pulp-platform/axi_stream.git",         version: 0.1.1  }
-  apb:                 { git: "https://github.com/pulp-platform/apb.git",                version: 0.2.4  }
+  common_cells: 2.0.0-beta.3
+  common_verification: 0.2.5
+  axi: 0.39.0
+  axi_stream: 0.1.1
+  apb: 0.2.4
 
 sources:
   files:
