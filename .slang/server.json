@@ -1,0 +1,10 @@
+{
+  "build": "slink.f",
+  "flags": "-f slink.f --top tb_axi_slink --timescale 1ns/1ps",
+  "index": [
+    {
+      "dirs": ["src", ".bender/git/checkouts"],
+      "excludeDirs": ["pulp-platform"]
+    }
+  ]
+}

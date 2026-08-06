@@ -20,3 +20,4 @@ vc_hdrs.h
 scripts/compile_vcs.log
 .dvt
 .env
+slink.f
