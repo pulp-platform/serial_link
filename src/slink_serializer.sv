@@ -196,7 +196,7 @@ module slink_serializer #(
   logic raw_mode_in_data_capture;
   raw_mode_words_t raw_mode_in_data_read_words;
   raw_mode_words_t raw_mode_out_data_words;
-  logic [$clog2(RawModeFifoDepth)-1:0] raw_mode_out_data_fill_state;
+  logic [cc_pkg::cnt_width(RawModeFifoDepth)-1:0] raw_mode_out_data_fill_state;
   logic raw_mode_out_data_is_full;
 
   slink_link_layer #(
