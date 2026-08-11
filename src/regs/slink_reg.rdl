@@ -113,8 +113,17 @@ addrmap slink_reg #(
     reg raw_mode_in_data {
         default sw = r;
         default hw = w;
-        desc = "One 32-bit word of data received by the selected channel in RAW mode. Reading word 0 captures/pops one full raw-mode sample; following words expose the captured sample.";
+        desc = "One 32-bit word of the currently parked raw-mode RX sample for the selected channel.";
         field {} raw_mode_in_data[31:0];
+    };
+
+    reg raw_mode_pop {
+        default sw = w;
+        default hw = r;
+        desc = "Write to pop RAW mode RX FIFO to the next sample. Write only after reading all RawModeNumWords words of raw_mode_in_data.";
+        field {
+            singlepulse;
+        } raw_mode_pop[0:0] = 0x0;
     };
 
     reg raw_mode_out_ch_mask {
@@ -127,10 +136,17 @@ addrmap slink_reg #(
     reg raw_mode_out_data_fifo {
         default sw = w;
         default hw = r;
-        desc = "One 32-bit word of data that will be pushed to the RAW mode output FIFO. Writing the last word commits the full raw-mode sample.";
+        desc = "One 32-bit word of the next raw-mode TX sample to push to the output FIFO.";
+        field {} raw_mode_out_data_fifo[31:0] = 0x0;
+    };
+
+    reg raw_mode_push {
+        default sw = w;
+        default hw = r;
+        desc = "Write to push the sample held in raw_mode_out_data_fifo into the RAW mode TX FIFO. Write only after writing all RawModeNumWords words.";
         field {
-            swmod;
-        } raw_mode_out_data_fifo[31:0] = 0x0;
+            singlepulse;
+        } raw_mode_push[0:0] = 0x0;
     };
 
     reg raw_mode_out_data_fifo_ctrl {
@@ -256,8 +272,10 @@ addrmap slink_reg #(
     external isolated                    isolated;
              raw_mode_en                 raw_mode_en;
     external raw_mode_in_data            raw_mode_in_data[RawModeNumWords];
+             raw_mode_pop                raw_mode_pop;
              raw_mode_in_ch_sel          raw_mode_in_ch_sel;
              raw_mode_out_data_fifo      raw_mode_out_data_fifo[RawModeNumWords];
+             raw_mode_push               raw_mode_push;
     external raw_mode_out_data_fifo_ctrl raw_mode_out_data_fifo_ctrl;
              raw_mode_out_en             raw_mode_out_en;
     external flow_control_fifo_clear     flow_control_fifo_clear;

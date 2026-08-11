@@ -42,6 +42,9 @@ module slink_link_layer #(
   input  logic [Log2NumChannels-1:0]      cfg_raw_mode_in_ch_sel_i,
   output phy_data_t                       cfg_raw_mode_in_data_o,
   output logic [NumChannels-1:0]          cfg_raw_mode_in_data_valid_o,
+  // Explicit, decoupled pop request (SW-driven, one cycle pulse): cfg_raw_mode_in_data_o always
+  // shows the selected channel's current head-of-FIFO entry (a non-destructive peek, safe to read
+  // repeatedly); this only advances the FIFO to the next entry, it does not gate visibility.
   input  logic                            cfg_raw_mode_in_data_ready_i,
   input  logic [NumChannels-1:0]          cfg_raw_mode_out_ch_mask_i,
   input  phy_data_t                       cfg_raw_mode_out_data_i,
@@ -126,16 +129,17 @@ module slink_link_layer #(
     if (cfg_raw_mode_en_i) begin
       // Raw mode
       cfg_raw_mode_in_data_valid_o = data_in_valid_i;
-      // Ready is asserted if there is a read access
+      // Continuously peek the selected channel's head-of-FIFO entry, independent of any pop
+      // request - repeated reads of the same entry are safe and return the same value.
+      if (data_in_valid_i[cfg_raw_mode_in_ch_sel_i]) begin
+        cfg_raw_mode_in_data_o = data_in_i[cfg_raw_mode_in_ch_sel_i];
+      end
+      // Only an explicit pop request actually advances the FIFO.
       if (cfg_raw_mode_in_data_ready_i) begin
-        // Select channel to read from and wait for valid data
         if (data_in_valid_i[cfg_raw_mode_in_ch_sel_i]) begin
-          // Pop item from CDC RX FIFO
           data_in_ready_o[cfg_raw_mode_in_ch_sel_i] = 1'b1;
-          // respond with data from selected channel
-          cfg_raw_mode_in_data_o = data_in_i[cfg_raw_mode_in_ch_sel_i];
         end else begin
-          // TODO: send out Error response
+          // TODO: send out Error response (pop requested with nothing to pop)
         end
       end
     end else begin

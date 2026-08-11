@@ -191,10 +191,8 @@ module slink_serializer #(
   end
 
   phy_data_t raw_mode_in_data_out;
-  phy_data_t raw_mode_in_data_shadow_q;
-  logic raw_mode_in_data_rd_pending;
-  logic raw_mode_in_data_capture;
-  raw_mode_words_t raw_mode_in_data_read_words;
+  raw_mode_words_t raw_mode_in_data_words;
+  logic raw_mode_pop_req, raw_mode_push_req;
   raw_mode_words_t raw_mode_out_data_words;
   logic [cc_pkg::cnt_width(RawModeFifoDepth)-1:0] raw_mode_out_data_fill_state;
   logic raw_mode_out_data_is_full;
@@ -228,7 +226,7 @@ module slink_serializer #(
       hwif_out_i.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value[cc_pkg::idx_width(NumChannels)-1:0] ),
     .cfg_raw_mode_in_data_o                  ( raw_mode_in_data_out ),
     .cfg_raw_mode_in_data_valid_o            ( raw_mode_in_data_valid                           ),
-    .cfg_raw_mode_in_data_ready_i            ( raw_mode_in_data_rd_pending                      ),
+    .cfg_raw_mode_in_data_ready_i            ( raw_mode_pop_req                                 ),
     .cfg_raw_mode_out_ch_mask_i              ( raw_mode_out_ch_mask                             ),
     .cfg_raw_mode_out_data_i                 ( phy_data_t'(raw_mode_out_data_words) ),
     .cfg_raw_mode_out_data_valid_i           ( raw_mode_out_data_valid ),
@@ -239,19 +237,9 @@ module slink_serializer #(
     .cfg_raw_mode_out_data_fifo_is_full_o    ( raw_mode_out_data_is_full )
   );
 
-  assign raw_mode_in_data_capture =
-      hwif_out_i.raw_mode_in_data[0].req & ~hwif_out_i.raw_mode_in_data[0].req_is_wr;
-  assign raw_mode_in_data_rd_pending = raw_mode_in_data_capture;
+  assign raw_mode_pop_req  = hwif_out_i.raw_mode_pop.raw_mode_pop.value;
+  assign raw_mode_push_req = hwif_out_i.raw_mode_push.raw_mode_push.value;
 
-  always_ff @(posedge clk_sl_i or negedge rst_sl_ni) begin
-    if (!rst_sl_ni) begin
-      raw_mode_in_data_shadow_q <= '0;
-    end else if (raw_mode_in_data_capture) begin
-      raw_mode_in_data_shadow_q <= raw_mode_in_data_out;
-    end
-  end
-
-  // Capture the raw-mode output data into a word array for easier access
   always_comb begin
     raw_mode_out_data_words = '0;
     for (int i = 0; i < NumRawModeDataWords; i++) begin
@@ -261,15 +249,11 @@ module slink_serializer #(
   end
 
   always_comb begin
-    raw_mode_in_data_read_words = raw_mode_words_t'(raw_mode_in_data_shadow_q);
-    if (raw_mode_in_data_capture) begin
-      raw_mode_in_data_read_words = raw_mode_words_t'(raw_mode_in_data_out);
-    end
-
+    raw_mode_in_data_words = raw_mode_words_t'(raw_mode_in_data_out);
     for (int i = 0; i < NumRawModeDataWords; i++) begin
       hwif_in_o.raw_mode_in_data[i].rd_data = '0;
       hwif_in_o.raw_mode_in_data[i].rd_data.raw_mode_in_data =
-          raw_mode_in_data_read_words[i*32 +: 32];
+          raw_mode_in_data_words[i*32 +: 32];
       `SLINK_SET_RDL_RD_ACK(raw_mode_in_data[i], hwif_in_o, hwif_out_i)
     end
   end
@@ -290,8 +274,7 @@ module slink_serializer #(
   `SLINK_ASSIGN_RDL_WR_ACK(raw_mode_out_data_fifo_ctrl, hwif_in_o, hwif_out_i)
   `SLINK_ASSIGN_RDL_WR_ACK(flow_control_fifo_clear, hwif_in_o, hwif_out_i)
 
-  `FF(raw_mode_out_data_valid,
-      hwif_out_i.raw_mode_out_data_fifo[NumRawModeDataWords-1].raw_mode_out_data_fifo.swmod, '0)
+  assign raw_mode_out_data_valid = raw_mode_push_req;
 
   ///////////////////////
   // CHANNEL ALLOCATOR //

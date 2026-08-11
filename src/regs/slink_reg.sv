@@ -114,8 +114,10 @@ module slink_reg (
         logic isolated;
         logic raw_mode_en;
         logic raw_mode_in_data[1];
+        logic raw_mode_pop;
         logic raw_mode_in_ch_sel;
         logic raw_mode_out_data_fifo[1];
+        logic raw_mode_push;
         logic raw_mode_out_data_fifo_ctrl;
         logic raw_mode_out_en;
         logic flow_control_fifo_clear;
@@ -155,42 +157,44 @@ module slink_reg (
             decoded_reg_strb.raw_mode_in_data[i0] = cpuif_req_masked & (cpuif_addr == 7'hc + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
             is_external |= cpuif_req_masked & (cpuif_addr == 7'hc + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
         end
-        decoded_reg_strb.raw_mode_in_ch_sel = cpuif_req_masked & (cpuif_addr == 7'h10) & cpuif_req_is_wr;
+        decoded_reg_strb.raw_mode_pop = cpuif_req_masked & (cpuif_addr == 7'h10) & cpuif_req_is_wr;
+        decoded_reg_strb.raw_mode_in_ch_sel = cpuif_req_masked & (cpuif_addr == 7'h14) & cpuif_req_is_wr;
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.raw_mode_out_data_fifo[i0] = cpuif_req_masked & (cpuif_addr == 7'h14 + (7)'(i0) * 7'h4) & cpuif_req_is_wr;
+            decoded_reg_strb.raw_mode_out_data_fifo[i0] = cpuif_req_masked & (cpuif_addr == 7'h18 + (7)'(i0) * 7'h4) & cpuif_req_is_wr;
         end
-        decoded_reg_strb.raw_mode_out_data_fifo_ctrl = cpuif_req_masked & (cpuif_addr == 7'h18);
-        is_external |= cpuif_req_masked & (cpuif_addr == 7'h18);
-        decoded_reg_strb.raw_mode_out_en = cpuif_req_masked & (cpuif_addr == 7'h1c);
-        decoded_reg_strb.flow_control_fifo_clear = cpuif_req_masked & (cpuif_addr == 7'h20) & cpuif_req_is_wr;
-        is_external |= cpuif_req_masked & (cpuif_addr == 7'h20) & cpuif_req_is_wr;
+        decoded_reg_strb.raw_mode_push = cpuif_req_masked & (cpuif_addr == 7'h1c) & cpuif_req_is_wr;
+        decoded_reg_strb.raw_mode_out_data_fifo_ctrl = cpuif_req_masked & (cpuif_addr == 7'h20);
+        is_external |= cpuif_req_masked & (cpuif_addr == 7'h20);
+        decoded_reg_strb.raw_mode_out_en = cpuif_req_masked & (cpuif_addr == 7'h24);
+        decoded_reg_strb.flow_control_fifo_clear = cpuif_req_masked & (cpuif_addr == 7'h28) & cpuif_req_is_wr;
+        is_external |= cpuif_req_masked & (cpuif_addr == 7'h28) & cpuif_req_is_wr;
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.raw_mode_in_data_valid[i0] = cpuif_req_masked & (cpuif_addr == 7'h24 + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
-            is_external |= cpuif_req_masked & (cpuif_addr == 7'h24 + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
-        end
-        for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.raw_mode_out_ch_mask[i0] = cpuif_req_masked & (cpuif_addr == 7'h28 + (7)'(i0) * 7'h4) & cpuif_req_is_wr;
-        end
-        for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.tx_phy_clk_div[i0] = cpuif_req_masked & (cpuif_addr == 7'h2c + (7)'(i0) * 7'h4);
+            decoded_reg_strb.raw_mode_in_data_valid[i0] = cpuif_req_masked & (cpuif_addr == 7'h2c + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
+            is_external |= cpuif_req_masked & (cpuif_addr == 7'h2c + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
         end
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.tx_phy_clk_start[i0] = cpuif_req_masked & (cpuif_addr == 7'h30 + (7)'(i0) * 7'h4);
+            decoded_reg_strb.raw_mode_out_ch_mask[i0] = cpuif_req_masked & (cpuif_addr == 7'h30 + (7)'(i0) * 7'h4) & cpuif_req_is_wr;
         end
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.tx_phy_clk_end[i0] = cpuif_req_masked & (cpuif_addr == 7'h34 + (7)'(i0) * 7'h4);
+            decoded_reg_strb.tx_phy_clk_div[i0] = cpuif_req_masked & (cpuif_addr == 7'h34 + (7)'(i0) * 7'h4);
         end
-        decoded_reg_strb.channel_alloc_tx_cfg = cpuif_req_masked & (cpuif_addr == 7'h38) & !cpuif_req_is_wr;
-        decoded_reg_strb.channel_alloc_tx_ctrl = cpuif_req_masked & (cpuif_addr == 7'h3c) & !cpuif_req_is_wr;
-        is_external |= cpuif_req_masked & (cpuif_addr == 7'h3c) & !cpuif_req_is_wr;
-        decoded_reg_strb.channel_alloc_rx_cfg = cpuif_req_masked & (cpuif_addr == 7'h40) & !cpuif_req_is_wr;
-        decoded_reg_strb.channel_alloc_rx_ctrl = cpuif_req_masked & (cpuif_addr == 7'h44) & !cpuif_req_is_wr;
+        for(int i0=0; i0<1; i0++) begin
+            decoded_reg_strb.tx_phy_clk_start[i0] = cpuif_req_masked & (cpuif_addr == 7'h38 + (7)'(i0) * 7'h4);
+        end
+        for(int i0=0; i0<1; i0++) begin
+            decoded_reg_strb.tx_phy_clk_end[i0] = cpuif_req_masked & (cpuif_addr == 7'h3c + (7)'(i0) * 7'h4);
+        end
+        decoded_reg_strb.channel_alloc_tx_cfg = cpuif_req_masked & (cpuif_addr == 7'h40) & !cpuif_req_is_wr;
+        decoded_reg_strb.channel_alloc_tx_ctrl = cpuif_req_masked & (cpuif_addr == 7'h44) & !cpuif_req_is_wr;
         is_external |= cpuif_req_masked & (cpuif_addr == 7'h44) & !cpuif_req_is_wr;
+        decoded_reg_strb.channel_alloc_rx_cfg = cpuif_req_masked & (cpuif_addr == 7'h48) & !cpuif_req_is_wr;
+        decoded_reg_strb.channel_alloc_rx_ctrl = cpuif_req_masked & (cpuif_addr == 7'h4c) & !cpuif_req_is_wr;
+        is_external |= cpuif_req_masked & (cpuif_addr == 7'h4c) & !cpuif_req_is_wr;
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.channel_alloc_tx_ch_en[i0] = cpuif_req_masked & (cpuif_addr == 7'h48 + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
+            decoded_reg_strb.channel_alloc_tx_ch_en[i0] = cpuif_req_masked & (cpuif_addr == 7'h50 + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
         end
         for(int i0=0; i0<1; i0++) begin
-            decoded_reg_strb.channel_alloc_rx_ch_en[i0] = cpuif_req_masked & (cpuif_addr == 7'h4c + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
+            decoded_reg_strb.channel_alloc_rx_ch_en[i0] = cpuif_req_masked & (cpuif_addr == 7'h54 + (7)'(i0) * 7'h4) & !cpuif_req_is_wr;
         end
         decoded_err = (~is_valid_addr | is_invalid_rw) & decoded_req;
         decoded_strb_is_external = is_external;
@@ -233,6 +237,12 @@ module slink_reg (
         } raw_mode_en;
         struct {
             struct {
+                logic next;
+                logic load_next;
+            } raw_mode_pop;
+        } raw_mode_pop;
+        struct {
+            struct {
                 logic [7:0] next;
                 logic load_next;
             } raw_mode_in_ch_sel;
@@ -243,6 +253,12 @@ module slink_reg (
                 logic load_next;
             } raw_mode_out_data_fifo;
         } raw_mode_out_data_fifo[1];
+        struct {
+            struct {
+                logic next;
+                logic load_next;
+            } raw_mode_push;
+        } raw_mode_push;
         struct {
             struct {
                 logic next;
@@ -298,6 +314,11 @@ module slink_reg (
         } raw_mode_en;
         struct {
             struct {
+                logic value;
+            } raw_mode_pop;
+        } raw_mode_pop;
+        struct {
+            struct {
                 logic [7:0] value;
             } raw_mode_in_ch_sel;
         } raw_mode_in_ch_sel;
@@ -306,6 +327,11 @@ module slink_reg (
                 logic [31:0] value;
             } raw_mode_out_data_fifo;
         } raw_mode_out_data_fifo[1];
+        struct {
+            struct {
+                logic value;
+            } raw_mode_push;
+        } raw_mode_push;
         struct {
             struct {
                 logic value;
@@ -459,6 +485,32 @@ module slink_reg (
         assign hwif_out.raw_mode_in_data[i0].req = !decoded_req_is_wr ? decoded_reg_strb.raw_mode_in_data[i0] : '0;
         assign hwif_out.raw_mode_in_data[i0].req_is_wr = decoded_req_is_wr;
     end
+    // Field: slink_reg.raw_mode_pop.raw_mode_pop
+    always_comb begin
+        automatic logic [0:0] next_c;
+        automatic logic load_next_c;
+        next_c = field_storage.raw_mode_pop.raw_mode_pop.value;
+        load_next_c = '0;
+        if(decoded_reg_strb.raw_mode_pop && decoded_req_is_wr) begin // SW write
+            next_c = (field_storage.raw_mode_pop.raw_mode_pop.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
+            load_next_c = '1;
+        end else begin // singlepulse clears back to 0
+            next_c = '0;
+            load_next_c = '1;
+        end
+        field_combo.raw_mode_pop.raw_mode_pop.next = next_c;
+        field_combo.raw_mode_pop.raw_mode_pop.load_next = load_next_c;
+    end
+    always_ff @(posedge clk or negedge arst_n) begin
+        if(~arst_n) begin
+            field_storage.raw_mode_pop.raw_mode_pop.value <= 1'h0;
+        end else begin
+            if(field_combo.raw_mode_pop.raw_mode_pop.load_next) begin
+                field_storage.raw_mode_pop.raw_mode_pop.value <= field_combo.raw_mode_pop.raw_mode_pop.next;
+            end
+        end
+    end
+    assign hwif_out.raw_mode_pop.raw_mode_pop.value = field_storage.raw_mode_pop.raw_mode_pop.value;
     // Field: slink_reg.raw_mode_in_ch_sel.raw_mode_in_ch_sel
     always_comb begin
         automatic logic [7:0] next_c;
@@ -506,8 +558,33 @@ module slink_reg (
             end
         end
         assign hwif_out.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.value = field_storage.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.value;
-        assign hwif_out.raw_mode_out_data_fifo[i0].raw_mode_out_data_fifo.swmod = decoded_reg_strb.raw_mode_out_data_fifo[i0] && decoded_req_is_wr && |(decoded_wr_biten[31:0]);
     end
+    // Field: slink_reg.raw_mode_push.raw_mode_push
+    always_comb begin
+        automatic logic [0:0] next_c;
+        automatic logic load_next_c;
+        next_c = field_storage.raw_mode_push.raw_mode_push.value;
+        load_next_c = '0;
+        if(decoded_reg_strb.raw_mode_push && decoded_req_is_wr) begin // SW write
+            next_c = (field_storage.raw_mode_push.raw_mode_push.value & ~decoded_wr_biten[0:0]) | (decoded_wr_data[0:0] & decoded_wr_biten[0:0]);
+            load_next_c = '1;
+        end else begin // singlepulse clears back to 0
+            next_c = '0;
+            load_next_c = '1;
+        end
+        field_combo.raw_mode_push.raw_mode_push.next = next_c;
+        field_combo.raw_mode_push.raw_mode_push.load_next = load_next_c;
+    end
+    always_ff @(posedge clk or negedge arst_n) begin
+        if(~arst_n) begin
+            field_storage.raw_mode_push.raw_mode_push.value <= 1'h0;
+        end else begin
+            if(field_combo.raw_mode_push.raw_mode_push.load_next) begin
+                field_storage.raw_mode_push.raw_mode_push.value <= field_combo.raw_mode_push.raw_mode_push.next;
+            end
+        end
+    end
+    assign hwif_out.raw_mode_push.raw_mode_push.value = field_storage.raw_mode_push.raw_mode_push.value;
     // External register: slink_reg.raw_mode_out_data_fifo_ctrl
     assign hwif_out.raw_mode_out_data_fifo_ctrl.req = decoded_reg_strb.raw_mode_out_data_fifo_ctrl;
     assign hwif_out.raw_mode_out_data_fifo_ctrl.req_is_wr = decoded_req_is_wr;

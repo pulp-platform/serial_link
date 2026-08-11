@@ -459,6 +459,7 @@ module tb_ch_calib_slink;
       cfg_write(drv, `SLINK_REG_RAW_MODE_OUT_DATA_FIFO_BASE_ADDR(i),
           words[i*RegDataWidth+:RegDataWidth]);
     end
+    cfg_write(drv, `SLINK_REG_RAW_MODE_PUSH_BASE_ADDR, 1);
   endtask
 
   task automatic raw_mode_read(apb_master_t drv, output phy_data_t data);
@@ -470,6 +471,7 @@ module tb_ch_calib_slink;
       words[i*RegDataWidth+:RegDataWidth] = word;
     end
     data = phy_data_t'(words);
+    cfg_write(drv, `SLINK_REG_RAW_MODE_POP_BASE_ADDR, 1);
   endtask
 
   task automatic bringup_link(apb_master_t drv, int id);
@@ -494,6 +496,12 @@ module tb_ch_calib_slink;
     // Don't do calibration for single channels
     if (NumChannels == 1) begin
       $warning("[DDR%0d]: Single channel configurations are not calibrated", id);
+      $info("[DDR%0d] Enabling AXI ports...",id);
+      cfg_write(drv, `SLINK_REG_CTRL_BASE_ADDR, 32'h03);
+      do begin
+        cfg_read(drv, `SLINK_REG_ISOLATED_BASE_ADDR, data);
+      end while(data != 0);
+      $info("[DDR%0d] Link is ready", id);
       return;
     end
     $info("[DDR%0d]: Starting link calibration.", id);
