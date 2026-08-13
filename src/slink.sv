@@ -203,7 +203,6 @@ module slink
   end
 
   phy_data_t raw_mode_in_data_out;
-  logic raw_mode_pop_req, raw_mode_push_req;
   raw_mode_words_t raw_mode_in_data_words;
   raw_mode_words_t raw_mode_out_data_words;
   logic [cc_pkg::cnt_width(RawModeFifoDepth)-1:0] raw_mode_out_data_fill_state;
@@ -238,7 +237,7 @@ module slink
       reg2hw.raw_mode_in_ch_sel.raw_mode_in_ch_sel.value[cc_pkg::idx_width(NumChannels)-1:0] ),
     .cfg_raw_mode_in_data_o                  ( raw_mode_in_data_out ),
     .cfg_raw_mode_in_data_valid_o            ( raw_mode_in_data_valid                           ),
-    .cfg_raw_mode_in_data_ready_i            ( raw_mode_pop_req                                 ),
+    .cfg_raw_mode_in_data_ready_i            ( reg2hw.raw_mode_pop.raw_mode_pop.value           ),
     .cfg_raw_mode_out_ch_mask_i              ( raw_mode_out_ch_mask                             ),
     .cfg_raw_mode_out_data_i                 ( phy_data_t'(raw_mode_out_data_words) ),
     .cfg_raw_mode_out_data_valid_i           ( raw_mode_out_data_valid ),
@@ -248,9 +247,6 @@ module slink
     .cfg_raw_mode_out_data_fifo_fill_state_o ( raw_mode_out_data_fill_state ),
     .cfg_raw_mode_out_data_fifo_is_full_o    ( raw_mode_out_data_is_full )
   );
-
-  assign raw_mode_pop_req  = reg2hw.raw_mode_pop.raw_mode_pop.value;
-  assign raw_mode_push_req = reg2hw.raw_mode_push.raw_mode_push.value;
 
   always_comb begin
     raw_mode_out_data_words = '0;
@@ -285,7 +281,7 @@ module slink
   `SLINK_ASSIGN_RDL_WR_ACK(raw_mode_out_data_fifo_ctrl)
   `SLINK_ASSIGN_RDL_WR_ACK(flow_control_fifo_clear)
 
-  assign raw_mode_out_data_valid = raw_mode_push_req;
+  assign raw_mode_out_data_valid = reg2hw.raw_mode_push.raw_mode_push.value;
 
   ///////////////////////
   // CHANNEL ALLOCATOR //
