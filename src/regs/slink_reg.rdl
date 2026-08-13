@@ -17,7 +17,8 @@ addrmap slink_reg #(
     longint unsigned Log2MaxClkDiv = 10,
     longint unsigned FlushCounterWidth = 8,
     longint unsigned Log2RawModeTXFifoDepth = 3, // 8 entries
-    longint unsigned EnChAlloc = (NumChannels > 1)
+    longint unsigned EnChAlloc = (NumChannels > 1),
+    longint unsigned RawModeNumWords = (NumBits + 31) / 32
 ) {
 
     default regwidth = 32;
@@ -112,8 +113,17 @@ addrmap slink_reg #(
     reg raw_mode_in_data {
         default sw = r;
         default hw = w;
-        desc = "Data received by the selected channel in RAW mode";
-        field {} raw_mode_in_data[NumBits-1:0];
+        desc = "One 32-bit word of the currently parked raw-mode RX sample for the selected channel.";
+        field {} raw_mode_in_data[31:0];
+    };
+
+    reg raw_mode_pop {
+        default sw = w;
+        default hw = r;
+        desc = "Write to pop RAW mode RX FIFO to the next sample. Write only after reading all RawModeNumWords words of raw_mode_in_data.";
+        field {
+            singlepulse;
+        } raw_mode_pop[0:0] = 0x0;
     };
 
     reg raw_mode_out_ch_mask {
@@ -126,10 +136,17 @@ addrmap slink_reg #(
     reg raw_mode_out_data_fifo {
         default sw = w;
         default hw = r;
-        desc = "Data that will be pushed to the RAW mode output FIFO";
+        desc = "One 32-bit word of the next raw-mode TX sample to push to the output FIFO.";
+        field {} raw_mode_out_data_fifo[31:0] = 0x0;
+    };
+
+    reg raw_mode_push {
+        default sw = w;
+        default hw = r;
+        desc = "Write to push the sample held in raw_mode_out_data_fifo into the RAW mode TX FIFO. Write only after writing all RawModeNumWords words.";
         field {
-            swmod;
-        } raw_mode_out_data_fifo[NumBits-1:0] = 0x0;
+            singlepulse;
+        } raw_mode_push[0:0] = 0x0;
     };
 
     reg raw_mode_out_data_fifo_ctrl {
@@ -251,27 +268,28 @@ addrmap slink_reg #(
         } channel_alloc_rx_ch_en[0:0] = 0x1;
     };
 
-
-             ctrl                        ctrl @0x0;
-    external isolated                    isolated @0x4;
-             raw_mode_en                 raw_mode_en @0x8;
-    external raw_mode_in_data            raw_mode_in_data @0x0c;
-             raw_mode_in_ch_sel          raw_mode_in_ch_sel @0x10;
-             raw_mode_out_data_fifo      raw_mode_out_data_fifo @0x14;
-    external raw_mode_out_data_fifo_ctrl raw_mode_out_data_fifo_ctrl @0x18;
-             raw_mode_out_en             raw_mode_out_en @0x1c;
-    external flow_control_fifo_clear     flow_control_fifo_clear @0x20;
-    external raw_mode_in_data_valid      raw_mode_in_data_valid[NumChannels] @0x100;
-             raw_mode_out_ch_mask        raw_mode_out_ch_mask[NumChannels] @0x200;
-             tx_phy_clk_div              tx_phy_clk_div[NumChannels] @0x300;
-             tx_phy_clk_start            tx_phy_clk_start[NumChannels] @0x400;
-             tx_phy_clk_end              tx_phy_clk_end[NumChannels] @0x500;
-             channel_alloc_tx_cfg        channel_alloc_tx_cfg @0x600;
-    external channel_alloc_tx_ctrl       channel_alloc_tx_ctrl @0x604;
-             channel_alloc_rx_cfg        channel_alloc_rx_cfg @0x608;
-    external channel_alloc_rx_ctrl       channel_alloc_rx_ctrl @0x60c;
-             channel_alloc_tx_ch_en      channel_alloc_tx_ch_en[NumChannels] @0x700;
-             channel_alloc_rx_ch_en      channel_alloc_rx_ch_en[NumChannels] @0x800;
+             ctrl                        ctrl;
+    external isolated                    isolated;
+             raw_mode_en                 raw_mode_en;
+    external raw_mode_in_data            raw_mode_in_data[RawModeNumWords];
+             raw_mode_pop                raw_mode_pop;
+             raw_mode_in_ch_sel          raw_mode_in_ch_sel;
+             raw_mode_out_data_fifo      raw_mode_out_data_fifo[RawModeNumWords];
+             raw_mode_push               raw_mode_push;
+    external raw_mode_out_data_fifo_ctrl raw_mode_out_data_fifo_ctrl;
+             raw_mode_out_en             raw_mode_out_en;
+    external flow_control_fifo_clear     flow_control_fifo_clear;
+    external raw_mode_in_data_valid      raw_mode_in_data_valid[NumChannels];
+             raw_mode_out_ch_mask        raw_mode_out_ch_mask[NumChannels];
+             tx_phy_clk_div              tx_phy_clk_div[NumChannels];
+             tx_phy_clk_start            tx_phy_clk_start[NumChannels];
+             tx_phy_clk_end              tx_phy_clk_end[NumChannels];
+             channel_alloc_tx_cfg        channel_alloc_tx_cfg;
+    external channel_alloc_tx_ctrl       channel_alloc_tx_ctrl;
+             channel_alloc_rx_cfg        channel_alloc_rx_cfg;
+    external channel_alloc_rx_ctrl       channel_alloc_rx_ctrl;
+             channel_alloc_tx_ch_en      channel_alloc_tx_ch_en[NumChannels];
+             channel_alloc_rx_ch_en      channel_alloc_rx_ch_en[NumChannels];
 };
 
 `endif // SERIAL_LINK_BASE_RDL
